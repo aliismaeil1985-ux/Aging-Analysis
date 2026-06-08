@@ -437,6 +437,23 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .modal-head{padding:12px 12px}
   .modal-head h3{font-size:15px}
 }
+/* ===== FORCE LANDSCAPE for the report popup when the phone is held in PORTRAIT =====
+   Rotates ONLY the report/detail window 90deg so the table shows horizontally,
+   full-screen, within the phone bounds (like the desired screenshot). When the
+   phone is physically in landscape, no rotation is applied (the table is already wide). */
+@media screen and (max-width:900px) and (orientation:portrait){
+  #detail-ov{padding:0}
+  #detail-ov .modal-box{
+    position:fixed;top:50%;left:50%;
+    width:100vh;height:100vw;max-width:100vh;max-height:100vw;
+    transform:translate(-50%,-50%) rotate(90deg);
+    transform-origin:center center;
+    border-radius:0;animation:none;
+  }
+  #detail-ov .modal-body{flex:1 1 auto;min-height:0;overflow:auto}
+  #detail-ov .pivot{min-width:0;font-size:12px}
+  #detail-ov .pivot th,#detail-ov .pivot td{padding:7px 8px;white-space:nowrap}
+}
 </style>
 </head>
 <body>
