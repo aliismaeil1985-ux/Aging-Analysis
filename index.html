@@ -373,6 +373,9 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   #page-dash .topbar{grid-area:top;margin-bottom:0}
   #page-dash .kpis{grid-area:kpis;display:flex !important;flex-direction:column;gap:10px;margin:0;overflow:visible}
   #page-dash .side{grid-area:side}
+  #page-dash .side{display:flex;flex-direction:column;gap:12px}
+  #page-dash .side .fbox{flex:0 0 auto;min-height:auto}
+  #page-dash .side .fbox>div:last-child{flex:0 0 auto;min-height:auto;max-height:200px;overflow-y:auto}
   #page-dash .main{display:contents}
   #page-dash .main>div:last-child{grid-area:charts}
   #page-dash .foot{grid-area:foot}
@@ -384,7 +387,6 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .kpi .ktrend{font-size:9px}
   .kpi .bar{margin-top:8px}
   .side{flex-direction:column}
-  .fbox>div:last-child{max-height:150px}
   /* Chart grids -> single column, shorter */
   .grid{grid-template-columns:1fr !important}
   .card{padding:14px 14px 10px;border-radius:14px}
@@ -409,7 +411,7 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .kpi{padding:10px 11px}
   .kpi h3{font-size:10px}
   .kpi .v{font-size:18px}
-  .fbox>div:last-child{max-height:128px}
+  #page-dash .side .fbox>div:last-child{max-height:170px}
   .btn-print{padding:10px 12px}
   .btn-print span:last-child{display:none}
   .chartbox{height:215px}
