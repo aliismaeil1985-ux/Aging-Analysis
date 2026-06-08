@@ -404,14 +404,18 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .chartbox{height:240px}
   .classify-card .cl-top{flex-direction:column}
   .cl-pie{width:100% !important;height:250px}
-  /* Tables scroll inside their card */
-  .pivot-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Tables stay horizontal and scroll within phone bounds (cards + detail modal) */
+  .pivot-wrap{width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+  .pivot{min-width:640px;font-size:11.5px}
+  .pivot th,.pivot td{padding:6px 7px}
   .sumbar{gap:10px}
   .sf{flex:1 1 140px}
   .sf select,.sf input{width:100%}
   .fb-grid{grid-template-columns:1fr}
   .cloud,.imp{max-width:100%}
-  .modal-box{width:94vw;max-width:none}
+  .modal-ov{padding:10px}
+  .modal-box{width:96vw;max-width:96vw;max-height:90vh}
+  .modal-body{padding:10px;min-width:0;overflow-x:hidden;overflow-y:auto}
 }
 @media screen and (max-width:540px){
   .content{padding:62px 10px 16px}
@@ -427,6 +431,11 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .chartbox{height:215px}
   .cl-pie{height:225px}
   .card h5{font-size:12.5px}
+  /* very small phones: narrower but still horizontal, scrolls inside the modal */
+  .pivot{min-width:560px;font-size:11px}
+  .pivot th,.pivot td{padding:5px 6px}
+  .modal-head{padding:12px 12px}
+  .modal-head h3{font-size:15px}
 }
 </style>
 </head>
