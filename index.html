@@ -1239,6 +1239,20 @@ function initAuth(){
   if(s&&s.u){const us=getUsers()||[];const fnd=us.find(x=>x.u===s.u);if(fnd){CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};document.getElementById('login-ov').style.display='none';applyRole();return;}}
 }
 /* ===== FIREBASE CLOUD SYNC ===== */
+/* ==================================================================================
+   Firebase config embedded so EVERY device that opens this file auto-connects
+   to the same cloud data with no manual setup.
+   ================================================================================== */
+const EMBEDDED_FB_CONFIG = {
+  apiKey:            "AIzaSyBkuGlDpXM4uvKkCFegIni7-HsHZHDtn1U",
+  authDomain:        "ali-28d63.firebaseapp.com",
+  projectId:         "ali-28d63",
+  storageBucket:     "ali-28d63.firebasestorage.app",
+  messagingSenderId: "902073937069",
+  appId:             "1:902073937069:web:e21a6501cc8c82db362a24",
+  measurementId:     "G-2TNVT4VDBC"
+};
+/* ================================================================================== */
 let fbApp=null,fbDB=null,fbReady=false,fbUnsub=null,LAST_FILE='',_lastSelfTs=0;
 const FB_COL='inventory_dashboard',FB_DOC='latest';
 // Unique id for THIS browser tab/device, so we can tell our own writes apart from teammates'.
@@ -1377,6 +1391,8 @@ function cloudAutoSave(){
 function cloudInit(){
   let saved=null;try{saved=JSON.parse(localStorage.getItem('fb_config_fields')||'null');}catch(e){}
   if(!saved){let cfg='';try{cfg=localStorage.getItem('fb_config')||'';}catch(e){}if(cfg){saved=parseFbConfig(cfg)||null;}}
+  // Prefer the config embedded in this file so EVERY device auto-connects with no manual setup.
+  try{if(typeof EMBEDDED_FB_CONFIG!=='undefined'&&EMBEDDED_FB_CONFIG&&EMBEDDED_FB_CONFIG.apiKey&&EMBEDDED_FB_CONFIG.projectId){saved=Object.assign({},EMBEDDED_FB_CONFIG);Object.keys(saved).forEach(k=>{if(!saved[k])delete saved[k];});try{localStorage.setItem('fb_config_fields',JSON.stringify(saved));}catch(e){}}}catch(e){}
   if(saved)FB_FIELDS.forEach(k=>{const el=document.getElementById('fb-'+k);if(el&&saved[k]!=null)el.value=saved[k];});
   // Auto-save + live sync are ON by default now; the checkboxes only let a user opt OUT.
   let auto='1';try{const v=localStorage.getItem('fb_auto');if(v!=null)auto=v;}catch(e){}
