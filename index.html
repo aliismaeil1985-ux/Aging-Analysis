@@ -368,18 +368,23 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .spacer{display:none}
   .gsearch{order:5;width:100%}
   .print-head{display:none}
-  /* KPI cards: compact 2-up */
-  .kpis{grid-template-columns:repeat(2,1fr) !important;gap:10px;margin-bottom:14px}
-  .kpi{padding:13px 14px;border-radius:14px}
-  .kpi h3{font-size:11px;line-height:1.25}
-  .kpi .ic{width:30px;height:30px;font-size:15px}
-  .kpi .v{font-size:23px}
-  .kpi .pill{font-size:10px;padding:1px 7px}
-  .kpi .ktrend{font-size:10px}
-  /* Dashboard main two-column -> stack */
-  .main{grid-template-columns:1fr !important;gap:14px}
+  /* Dashboard: KPI cards in a vertical column beside the filters (Slicer); charts full-width below */
+  #page-dash .wrap{display:grid;grid-template-columns:minmax(128px,42%) 1fr;grid-template-areas:"top top" "kpis side" "charts charts" "foot foot";gap:12px;align-items:start}
+  #page-dash .topbar{grid-area:top;margin-bottom:0}
+  #page-dash .kpis{grid-area:kpis;display:flex !important;flex-direction:column;gap:10px;margin:0;overflow:visible}
+  #page-dash .side{grid-area:side}
+  #page-dash .main{display:contents}
+  #page-dash .main>div:last-child{grid-area:charts}
+  #page-dash .foot{grid-area:foot}
+  .kpi{padding:11px 13px;border-radius:14px}
+  .kpi h3{font-size:10.5px;line-height:1.2}
+  .kpi .ic{width:26px;height:26px;font-size:13px}
+  .kpi .v{font-size:20px}
+  .kpi .pill{font-size:9px;padding:1px 6px}
+  .kpi .ktrend{font-size:9px}
+  .kpi .bar{margin-top:8px}
   .side{flex-direction:column}
-  .fbox>div:last-child{max-height:200px}
+  .fbox>div:last-child{max-height:150px}
   /* Chart grids -> single column, shorter */
   .grid{grid-template-columns:1fr !important}
   .card{padding:14px 14px 10px;border-radius:14px}
@@ -399,13 +404,12 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 @media (max-width:540px){
   .content{padding:62px 10px 16px}
   .htext h1{font-size:15px}
-  /* KPI cards as a horizontal swipeable slider */
-  .kpis{display:flex !important;grid-template-columns:none !important;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding:2px 2px 9px;margin-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-  .kpis::-webkit-scrollbar{height:6px}
-  .kpis::-webkit-scrollbar-thumb{background:#c4d3e6;border-radius:6px}
-  .kpis::-webkit-scrollbar-track{background:transparent}
-  .kpi{flex:0 0 45%;min-width:148px;scroll-snap-align:start;padding:12px 14px}
-  .kpi .v{font-size:23px}
+  /* Tighter KPI column + Slicer */
+  #page-dash .wrap{grid-template-columns:minmax(118px,44%) 1fr;gap:10px}
+  .kpi{padding:10px 11px}
+  .kpi h3{font-size:10px}
+  .kpi .v{font-size:18px}
+  .fbox>div:last-child{max-height:128px}
   .btn-print{padding:10px 12px}
   .btn-print span:last-child{display:none}
   .chartbox{height:215px}
