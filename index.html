@@ -1184,7 +1184,7 @@ function buildSku(){
 let CURRENT_USER=null;
 function val(id){const e=document.getElementById(id);return e?e.value:'';}
 function getUsers(){try{return JSON.parse(localStorage.getItem('dash_users')||'null');}catch(e){return null;}}
-function saveUsers(u){try{localStorage.setItem('dash_users',JSON.stringify(u));}catch(e){}}
+function saveUsers(u){try{localStorage.setItem('dash_users',JSON.stringify(u));}catch(e){}try{pushUsersToCloud(u);}catch(e){}}
 function seedUsers(){if(!getUsers())saveUsers([{u:'admin',p:'admin123',r:'admin'}]);}
 function isAdmin(){return !!(CURRENT_USER&&CURRENT_USER.r==='admin');}
 const ALL_PAGES=['dash','sum','sku','records','imp','cloud','designer'];
@@ -1241,7 +1241,7 @@ function initAuth(){
 /* ===== FIREBASE CLOUD SYNC ===== */
 /* ==================================================================================
    Firebase config embedded so EVERY device that opens this file auto-connects
-   to the same cloud data with no manual setup.
+   to the same cloud data + user accounts, with no manual setup.
    ================================================================================== */
 const EMBEDDED_FB_CONFIG = {
   apiKey:            "AIzaSyBkuGlDpXM4uvKkCFegIni7-HsHZHDtn1U",
@@ -1255,6 +1255,43 @@ const EMBEDDED_FB_CONFIG = {
 /* ================================================================================== */
 let fbApp=null,fbDB=null,fbReady=false,fbUnsub=null,LAST_FILE='',_lastSelfTs=0;
 const FB_COL='inventory_dashboard',FB_DOC='latest';
+/* ----- Cross-device login/accounts sync (users stored in Firestore too) ----- */
+const FB_USERS_DOC='users';
+let fbUsersUnsub=null,_pushUsersT=null,_lastUsersJson='',_usersCloudReady=false;
+function pushUsersToCloud(u){
+  try{
+    if(!fbReady||!fbDB||!_usersCloudReady)return; // never clobber cloud before first pull
+    const json=JSON.stringify(u||getUsers()||[]);
+    if(json===_lastUsersJson)return; // unchanged / echo of what we already have
+    _lastUsersJson=json;
+    if(_pushUsersT)clearTimeout(_pushUsersT);
+    _pushUsersT=setTimeout(function(){try{fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:JSON.parse(json),updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}},400);
+  }catch(e){}
+}
+function fbUsersSync(){
+  try{
+    if(!fbReady||!fbDB)return;
+    if(fbUsersUnsub){fbUsersUnsub();fbUsersUnsub=null;}
+    fbUsersUnsub=fbDB.collection(FB_COL).doc(FB_USERS_DOC).onSnapshot({includeMetadataChanges:false},function(doc){
+      if(!doc.exists){ // no accounts doc in cloud yet -> seed it from this device
+        _usersCloudReady=true;
+        var local=getUsers();
+        if(local&&local.length){_lastUsersJson=JSON.stringify(local);try{fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:local,updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}}
+        return;
+      }
+      if(doc.metadata&&doc.metadata.hasPendingWrites)return; // our own un-acked write
+      var dd=doc.data();if(!dd||!Array.isArray(dd.users))return;
+      var json=JSON.stringify(dd.users);
+      _lastUsersJson=json;_usersCloudReady=true;
+      try{localStorage.setItem('dash_users',json);}catch(e){}
+      try{
+        if(CURRENT_USER){var fnd=dd.users.find(function(x){return x.u===CURRENT_USER.u;});if(fnd){CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};applyRole();}}
+        var pu=document.getElementById('page-users');
+        if(pu&&pu.classList.contains('show'))renderUsers();
+      }catch(e){}
+    },function(e){});
+  }catch(e){}
+}
 // Unique id for THIS browser tab/device, so we can tell our own writes apart from teammates'.
 let FB_CLIENT_ID='';try{FB_CLIENT_ID=localStorage.getItem('fb_client_id')||'';}catch(e){}
 if(!FB_CLIENT_ID){FB_CLIENT_ID='c_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);try{localStorage.setItem('fb_client_id',FB_CLIENT_ID);}catch(e){}}
@@ -1288,6 +1325,7 @@ function fbConnect(silent){
       const ac=document.getElementById('cloud-auto');
       if(ac&&!ac.checked){ac.checked=true;localStorage.setItem('fb_auto','1');}
     }catch(e){}
+    try{fbUsersSync();}catch(e){}
     return true;
   }catch(e){fbReady=false;cloudStatus('err',fbMsg('Connection failed: ','فشل الاتصال: ')+e.message);setCloudBtns();return false;}
 }
