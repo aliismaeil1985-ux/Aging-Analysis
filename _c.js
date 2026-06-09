@@ -1,0 +1,858 @@
+
+let DATA = [{"item_code": "30000136", "identity": "4- Mokabat", "branch": "6. Dammam", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 1069.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 468.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1584.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1872.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 2088.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Aug", "logo": "Krones", "cat2": "CTN", "qty": 224.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "B<90", "pack": "24 ×600 ml", "size": "600", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 1750.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "B<90", "pack": "24 ×600 ml", "size": "600", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 1670.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 1564.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 2992.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 2856.0}, {"item_code": "30000175", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "C>90", "pack": "6 × 600 ml", "size": "600", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 5424.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1278.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 3264.0}, {"item_code": "30000009", "identity": "2- OLD Identity", "branch": "6. Dammam", "store_class": "C>90", "pack": "30 × 600 ml", "size": "600", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 512.0}, {"item_code": "30000159", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "30 × 600 ml", "size": "600", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1172.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "B<90", "pack": "40 × 200 ml", "size": "200", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 648.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 312.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "B<90", "pack": "48 × 200 ml", "size": "200", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 84.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1512.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1820.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1596.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1728.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1944.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 2232.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Sep", "logo": "Krones", "cat2": "CTN", "qty": 104.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "B<90", "pack": "48 × 200 ml", "size": "200", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 1008.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "B<90", "pack": "40 × 330 ml", "size": "330", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 1296.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 2520.0}, {"item_code": "40000002", "identity": "6- TG Sparkling", "branch": "6. Dammam", "store_class": "B<90", "pack": "24 × 250ml", "size": "250", "month": "Mar", "logo": "Sparkling", "cat2": "Pac", "qty": 1451.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2620.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2933.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2772.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "B<90", "pack": "40 × 200 ml", "size": "200", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 1728.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 621.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Sep", "logo": "Krones", "cat2": "CTN", "qty": 104.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 13453.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2016.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2664.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2232.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2160.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "6. Dammam", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1800.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "4. Jeddah (W)", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 2317.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 5451.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2710.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 4065.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 9335.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Aug", "logo": "Krones", "cat2": "CTN", "qty": 4104.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 2114.0}, {"item_code": "30000159", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "C>90", "pack": "30 × 600 ml", "size": "600", "month": "Jan", "logo": "Krones", "cat2": "CTN", "qty": 18.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 79.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 2634.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "4. Jeddah (W)", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 4308.0}, {"item_code": "40000002", "identity": "6- TG Sparkling", "branch": "4. Jeddah (W)", "store_class": "B<90", "pack": "24 × 250ml", "size": "250", "month": "Mar", "logo": "Sparkling", "cat2": "Pac", "qty": 1108.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 6202.0}, {"item_code": "30000025", "identity": "5- SAR", "branch": "1. Riyadh", "store_class": "C>90", "pack": "48 × 200 ml", "size": "200", "month": "Nov", "logo": "SAR", "cat2": "CTN", "qty": 65.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "1. Riyadh", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 1353.0}, {"item_code": "30000167", "identity": "3- Mai", "branch": "1. Riyadh", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 3347.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 2868.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 8175.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 13705.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 9540.0}, {"item_code": "30000164", "identity": "3- Mai", "branch": "1. Riyadh", "store_class": "A<60", "pack": "12 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 639.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 21896.0}, {"item_code": "30000169", "identity": "3- Mai", "branch": "1. Riyadh", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 1680.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 8749.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "C>90", "pack": "24 × 200 ml", "size": "200", "month": "Feb", "logo": "Krones", "cat2": "SHR", "qty": 808.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 386.0}, {"item_code": "30000214", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "C>90", "pack": "15 × 330 ml", "size": "330", "month": "Mar", "logo": "Krones", "cat2": "SHR", "qty": 1664.0}, {"item_code": "30000170", "identity": "3- Mai", "branch": "1. Riyadh", "store_class": "A<60", "pack": "30 × 600 ml", "size": "600", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 341.0}, {"item_code": "30000170", "identity": "3- Mai", "branch": "1. Riyadh", "store_class": "A<60", "pack": "30 × 600 ml", "size": "600", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 1920.0}, {"item_code": "40000002", "identity": "6- TG Sparkling", "branch": "1. Riyadh", "store_class": "B<90", "pack": "24 × 250ml", "size": "250", "month": "Mar", "logo": "Sparkling", "cat2": "Pac", "qty": 5095.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 8736.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 21672.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 20592.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 17971.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 4368.0}, {"item_code": "30000159", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "30 × 600 ml", "size": "600", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 22728.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 18107.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 16380.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 11365.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "1. Riyadh", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 15527.0}, {"item_code": "40000002", "identity": "6- TG Sparkling", "branch": "8. Ahsa", "store_class": "B<90", "pack": "24 × 250ml", "size": "250", "month": "Mar", "logo": "Sparkling", "cat2": "Pac", "qty": 359.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "C>90", "pack": "20 × 330 ml", "size": "330", "month": "Feb", "logo": "Krones", "cat2": "SHR", "qty": 628.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "8. Ahsa", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 326.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2475.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "B<90", "pack": "40 × 200 ml", "size": "200", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 710.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 61.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 107.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 5114.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 363.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "8. Ahsa", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 735.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 3024.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 6048.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 5712.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 4370.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Aug", "logo": "Krones", "cat2": "CTN", "qty": 2496.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Aug", "logo": "Krones", "cat2": "CTN", "qty": 1643.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 4536.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 5184.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 7776.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 7560.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 6048.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 12096.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1728.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 4248.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1467.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 5184.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 6624.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 6021.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 2040.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 9360.0}, {"item_code": "30000164", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "C>90", "pack": "12 × 1.5 Litter", "size": "1500", "month": "Oct", "logo": "Mai", "cat2": "CTN", "qty": 9251.0}, {"item_code": "30000164", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "12 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 4920.0}, {"item_code": "30000164", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "12 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 1920.0}, {"item_code": "30000166", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Oct", "logo": "Mai", "cat2": "SHR", "qty": 4488.0}, {"item_code": "30000170", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "30 × 600 ml", "size": "600", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 3354.0}, {"item_code": "30000170", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "30 × 600 ml", "size": "600", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 7790.0}, {"item_code": "30000166", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Oct", "logo": "Mai", "cat2": "SHR", "qty": 15057.0}, {"item_code": "30000167", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "C>90", "pack": "48 × 200 ml", "size": "200", "month": "Oct", "logo": "Mai", "cat2": "CTN", "qty": 49.0}, {"item_code": "30000167", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 924.0}, {"item_code": "30000167", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 2016.0}, {"item_code": "30000168", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "C>90", "pack": "20 × 330 ml", "size": "330", "month": "Oct", "logo": "Mai", "cat2": "SHR", "qty": 20367.0}, {"item_code": "30000169", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 9324.0}, {"item_code": "30000169", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Mai", "cat2": "CTN", "qty": 1680.0}, {"item_code": "30000169", "identity": "3- Mai", "branch": "2. Kharj", "store_class": "C>90", "pack": "40 × 330 ml", "size": "330", "month": "Oct", "logo": "Mai", "cat2": "CTN", "qty": 63.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 7829.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Jan", "logo": "Krones", "cat2": "SHR", "qty": 12716.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Jan", "logo": "Krones", "cat2": "SHR", "qty": 7293.0}, {"item_code": "30000175", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "C>90", "pack": "6 × 600 ml", "size": "600", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 5664.0}, {"item_code": "30000175", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "C>90", "pack": "6 × 600 ml", "size": "600", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 10337.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 3324.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 2208.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 6624.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "2. Kharj", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 1552.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "2. Kharj", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 920.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "2. Kharj", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 1472.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "2. Kharj", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 920.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "2. Kharj", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 368.0}, {"item_code": "30000003", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "48 × 200 ml", "size": "200", "month": "Nov", "logo": "Crystal", "cat2": "CTN", "qty": 1297.0}, {"item_code": "30000003", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "48 × 200 ml", "size": "200", "month": "Nov", "logo": "Crystal", "cat2": "CTN", "qty": 7392.0}, {"item_code": "30000003", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "48 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 8988.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 10393.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 11664.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 10495.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 4860.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 6372.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 12960.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 4968.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 8316.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 5076.0}, {"item_code": "30000004", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "40 × 200 ml", "size": "200", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 5076.0}, {"item_code": "30000007", "identity": "2- OLD Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 15556.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3183.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 14919.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 8571.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 16609.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 19012.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 5242.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 8851.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 8712.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 6471.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "B<90", "pack": "24 ×600 ml", "size": "600", "month": "Mar", "logo": "Krones", "cat2": "CTN", "qty": 324.0}, {"item_code": "30000159", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "30 × 600 ml", "size": "600", "month": "Jan", "logo": "Krones", "cat2": "CTN", "qty": 40.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 4104.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Jan", "logo": "Krones", "cat2": "SHR", "qty": 15639.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Jan", "logo": "Krones", "cat2": "SHR", "qty": 11339.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 34723.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 22243.0}, {"item_code": "30000175", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "6 × 600 ml", "size": "600", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 3717.0}, {"item_code": "30000175", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "6 × 600 ml", "size": "600", "month": "Sep", "logo": "Krones", "cat2": "SHR", "qty": 1833.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "5. Jeddah (F)", "store_class": "C>90", "pack": "6 × 1.5 Litter", "size": "1500", "month": "Jan", "logo": "Krones", "cat2": "SHR", "qty": 549.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 3960.0}, {"item_code": "30000159", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "C>90", "pack": "30 × 600 ml", "size": "600", "month": "Dec", "logo": "Krones", "cat2": "CTN", "qty": 858.0}, {"item_code": "30000173", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "C>90", "pack": "20 × 200 ml", "size": "200", "month": "Jan", "logo": "Krones", "cat2": "SHR", "qty": 242.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1968.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 2030.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "7. Qassim", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 134.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2353.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3456.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "C>90", "pack": "24 × 200 ml", "size": "200", "month": "Feb", "logo": "Krones", "cat2": "CTN", "qty": 3878.0}, {"item_code": "30000175", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "6 × 600 ml", "size": "600", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 665.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 6307.0}, {"item_code": "30000009", "identity": "2- OLD Identity", "branch": "7. Qassim", "store_class": "C>90", "pack": "30 × 600 ml", "size": "600", "month": "Dec", "logo": "Crystal", "cat2": "CTN", "qty": 19.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 401.0}, {"item_code": "40000002", "identity": "6- TG Sparkling", "branch": "7. Qassim", "store_class": "B<90", "pack": "24 × 250ml", "size": "250", "month": "Mar", "logo": "Sparkling", "cat2": "Pac", "qty": 682.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "7. Qassim", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 2558.0}, {"item_code": "30000136", "identity": "4- Mokabat", "branch": "3. Heet", "store_class": "C>90", "pack": "100 ML x 16", "size": "C100", "month": "Jan", "logo": "Mokabat NEW", "cat2": "CTN", "qty": 736.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 3108.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3696.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3696.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3696.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1848.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1848.0}, {"item_code": "30000153", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "48 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1848.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 487.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2376.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2376.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2376.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2376.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 2376.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3065.0}, {"item_code": "30000154", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1848.0}, {"item_code": "30000155", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 7488.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1584.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1584.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 2952.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1584.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 3168.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1584.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 1584.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 3168.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 3168.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3168.0}, {"item_code": "30000156", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "40 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 3168.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Aug", "logo": "Krones", "cat2": "CTN", "qty": 1648.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Aug", "logo": "Krones", "cat2": "CTN", "qty": 1652.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Aug", "logo": "Krones", "cat2": "CTN", "qty": 5436.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Sep", "logo": "Krones", "cat2": "CTN", "qty": 5824.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Sep", "logo": "Krones", "cat2": "CTN", "qty": 5824.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "C>90", "pack": "24 × 330 ml", "size": "330", "month": "Sep", "logo": "Krones", "cat2": "CTN", "qty": 5824.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "24 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 6864.0}, {"item_code": "30000157", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "24 × 330 ml", "size": "330", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 6864.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "Apr", "logo": "Krones", "cat2": "CTN", "qty": 3540.0}, {"item_code": "30000158", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "24 ×600 ml", "size": "600", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1320.0}, {"item_code": "30000159", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "30 × 600 ml", "size": "600", "month": "May", "logo": "Krones", "cat2": "CTN", "qty": 1632.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 5440.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 2992.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 5984.0}, {"item_code": "30000174", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "20 × 330 ml", "size": "330", "month": "Apr", "logo": "Krones", "cat2": "SHR", "qty": 5984.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 3128.0}, {"item_code": "30000176", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "6 × 1.5 Litter", "size": "1500", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 4416.0}, {"item_code": "30000233", "identity": "1- New Identity", "branch": "3. Heet", "store_class": "A<60", "pack": "24 × 200 ml", "size": "200", "month": "May", "logo": "Krones", "cat2": "SHR", "qty": 2880.0}, {"item_code": "40000002", "identity": "6- TG Sparkling", "branch": "3. Heet", "store_class": "B<90", "pack": "24 × 250ml", "size": "250", "month": "Mar", "logo": "Sparkling", "cat2": "Pac", "qty": 720.0}];
+let LANG='en';
+/* ===== DATA PERSISTENCE: keep users' latest data across code/version updates ===== */
+const DATA_SEED = DATA;            // built-in seed (used only on first ever load)
+const DATA_KEY = 'dash_data_v1';
+try{const _saved=JSON.parse(localStorage.getItem(DATA_KEY)||'null');if(Array.isArray(_saved))DATA=_saved;}catch(e){}
+function saveData(){try{localStorage.setItem(DATA_KEY,JSON.stringify(DATA));}catch(e){if(typeof cloudStatus==='function'){/* storage full */}console&&console.warn&&console.warn('saveData failed: '+e.message);}}
+const fmt = n => Math.round(n).toLocaleString('en-US');
+let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b5cd6'};
+const IDENT_ORDER=['1- New Identity','2- OLD Identity','3- Mai','4- Mokabat','5- SAR','6- TG Sparkling'];
+const BRANCH_ORDER=['1. Riyadh','2. Kharj','3. Heet','4. Jeddah (W)','5. Jeddah (F)','6. Dammam','7. Qassim','8. Ahsa'];
+const CLASS_ORDER=['A<60','B<90','C>90'];
+const IDENT_COLORS=['#1e4e8c','#e0792f','#0f9b8e','#2f7ed8','#7b5cd6','#d4a017'];
+const sel={identity:new Set(),branch:new Set(),store_class:new Set()};
+let PREV_KPI=null;try{PREV_KPI=JSON.parse(localStorage.getItem('kpi_prev')||'null');}catch(e){}
+function kpiTotals(rows){const c=agg(rows,'store_class');const a=c['A<60']||0,b=c['B<90']||0,cc=c['C>90']||0;return {total:a+b+cc,a:a,b:b,c:cc};}
+
+const MONTH_AR={Aug:'أغسطس',Sep:'سبتمبر',Oct:'أكتوبر',Nov:'نوفمبر',Dec:'ديسمبر',Jan:'يناير',Feb:'فبراير',Mar:'مارس',Apr:'أبريل',May:'مايو'};
+const BRANCH_AR={'1. Riyadh':'الرياض','2. Kharj':'الخرج','3. Heet':'هيت','4. Jeddah (W)':'جدة','5. Jeddah (F)':'مصنع جدة','6. Dammam':'الدمام','7. Qassim':'القصيم','8. Ahsa':'الأحساء'};
+const BRANCH_SUM_EN={'1. Riyadh':'Riyadh','2. Kharj':'Kharj','3. Heet':'Heet','4. Jeddah (W)':'Jeddah (W)','5. Jeddah (F)':'Jeddah (F)','6. Dammam':'Dammam','7. Qassim':'Qassim','8. Ahsa':'Ahsa'};
+const BRANCH_SUM_AR={'1. Riyadh':'مصنع الرياض','2. Kharj':'الخرج','3. Heet':'هيت','4. Jeddah (W)':'جدة','5. Jeddah (F)':'مصنع جدة','6. Dammam':'الدمام','7. Qassim':'القصيم','8. Ahsa':'الأحساء'};
+
+const T={
+ en:{grp_aging:'Inventory Aging',grp_settings:'Settings',nav_dash:'Dashboard',nav_sum:'Summary',nav_imp:'Import Data',title:'Total W/H Inventory Aging Analysis',lastupdate:'Last update',
+  kpi_total:'Total Quantity',kpi_60:'Less than 60 days',kpi_90:'Less than 90 days',kpi_g90:'Greater than 90 days',
+  f_identity:'Identity',f_branch:'Branch',f_classify:'Classify',clear:'Clear',
+  ch_identity:'Identity Inventory Weight',ch_month:'Inventory Aging Pattern',sub_month:'monthly qty',
+  ch_sizewise:'SKU Inventory — Size wise',ch_pack:'SKU Inventory',sub_pack:'by pack',
+  ch_classify:'Inventory Classifying',ch_sizeitem:'SKU Inventory — Size Item',sub_sizeitem:'CTN / SHR',
+  center_total:'TOTAL QTY',gsearch_ph:'Search anything…',login_sub:'Inventory Dashboard',login_user:'Username',login_pass:'Password',login_btn:'Login',login_bad:'Invalid username or password',login_hint:'Default admin:  admin  /  admin123',nav_users:'Users',nav_records:'Data',rec_title:'Database Records',rec_add:'Add Record',rec_search:'Search records',rec_del:'Delete',rec_save:'Save to Cloud',rec_qty:'Quantity',rec_cat2:'Category 2',rec_logo:'Logo',rec_need:'Enter Identity and Branch at least',logout:'Logout',users_title:'User Management',u_user:'Username',u_pass:'Password',u_role:'Role',u_add:'Add User',u_admin:'Admin',u_userrole:'User',u_actions:'Actions',u_delete:'Delete',u_exists:'Username already exists',u_need:'Enter username and password',u_perms:'Screen permissions',u_temp:'Temporary',u_all:'All',u_email:'Email',u_mobile:'Mobile',u_password:'Password',u_resetpwd:'Reset Password',set_new_pwd:'Enter a new password for the user:',pwd_changed:'Password updated successfully.',u_pwd_help:'Password management: click "Reset Password" to set a new password for a user. Tick "Temporary" to force the user to change it at next login.',temp_prompt:'Your password is temporary. Please enter a new password:',cols_btn:'Columns',cols_title:'Show / hide columns',cols_hint:'Check a branch to show its column, uncheck to hide it. Changes are saved automatically and apply to both tables.',nav_designer:'Designer',designer_title:'Table Designer',designer_sub:'Rename columns, choose the calculation method, reorder and show/hide columns.',calc_method:'Calculation method',calc_sum:'Sum',calc_avg:'Average',calc_count:'Count',calc_max:'Max',calc_min:'Min',calc_hint:'Applies to all value cells in the Summary and SKU tables.',appearance:'Appearance',colors:'Colors',c_primary:'Primary',c_teal:'Teal',c_blue:'Blue',c_orange:'Orange',st_color:'Color',st_font:'Font',st_size:'Font size (px)',st_align:'Text align',dz_al_def:'Default',dz_al_l:'Left',dz_al_c:'Center',dz_al_r:'Right',font_family:'Font',font_default:'Default',display_size:'Display size',card_titles:'Card titles & labels',dz_pick:'Choose screen to edit',dz_pick_hint:'Each screen is edited independently — changes here do not affect other screens.',dz_scr_dash:'Dashboard',dz_scr_sum:'Summary table',dz_scr_sku:'SKU table',dz_scr_appear:'General appearance',chart_order:'Chart cards order / position',dz_branch_order:'Branch column order',dz_col:'Column',dz_name:'Display name',dz_show:'Show',dz_calc:'Calc',calc_default:'Default',dz_reset:'Reset',dz_sum_title:'Summary columns',dz_sku_title:'SKU columns',set_date_label:'Report update date',set_btn:'Set date',saved_date:'\u2713 Update date saved.',
+  sum_title:'Finished Product — Totals Summary',c_year:'Year',c_month:'Month',c_cat:'Category',c_total:'Total',c_pct:'%',sum_grand:'Grand Total',
+  ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',cloud_title:'\u2601\ufe0f Firebase Cloud Sync',cloud_sub:'Store and sync the report data in Firebase (Firestore).',cloud_cfg_label:'Firebase configuration',fb_apikey:'API Key',fb_project:'Project ID',fb_authdomain:'Auth Domain',fb_bucket:'Storage Bucket',fb_sender:'Messaging Sender ID',fb_appid:'App ID',fb_paste_toggle:'Or paste the full firebaseConfig',fb_fill:'Fill fields from config',print_btn:'Print',popout_btn:'Window',full_btn:'Fullscreen',export_excel:'Export to Excel',cloud_connect:'Connect',cloud_save:'Save to Cloud',cloud_test:'Test Connection',cloud_load:'Load from Cloud',cloud_auto:'Auto-load on open & auto-save on every change',cloud_live:'Live two-way sync (recommended)',cloud_note_title:'Setup notes',cloud_st_idle:'Not connected',cloud_n1:'Create a Firebase project, enable <b>Firestore Database</b>, then copy the <span class=\"tag\">firebaseConfig</span> from Project settings.',cloud_n2:'For testing, set Firestore rules to test mode. For production, secure your rules.',cloud_n3:'Data is stored in collection <span class=\"tag\">inventory_dashboard</span>, document <span class=\"tag\">latest</span>.',cloud_n4:'Your config is saved locally in this browser only.',
+  foot:(s,t,q)=>'Showing '+s+' of '+t+' records  •  Total qty '+q+'  •  Click filters to slice',
+  imp_title:'&#128228; Import Data — Auto Update',
+  imp_sub:'Upload your inventory file and the dashboard refreshes automatically. Supported: <span class="tag">.xlsb</span> <span class="tag">.xlsx</span> <span class="tag">.xls</span> <span class="tag">.csv</span>',
+  imp_d1:'Drag & drop your data file here',imp_d2:'or click to browse — the sheet named <b>data</b> is read automatically',
+  imp_browse:'Choose File',imp_note_title:'How auto-update works',
+  imp_n1:'The file is read entirely inside your browser — nothing is uploaded to any server.',
+  imp_n2:'It reads the sheet named <span class="tag">data</span> (or the first sheet) and matches columns by header: <b>Identity, Branch, الحجم, الشد, الفئة 2, الشهر, تصنيف التخزين, الكمية, الشعار</b>.',
+  imp_n3:'All KPIs, charts and filters recompute instantly.',
+  imp_n4:'The update date is taken from the file name (pattern <span class="tag">dd-mm-yyyy</span>) when available.',
+  reading:f=>'Reading '+f+' ...',
+  loaded:(f,sh,n,q)=>'&#9989; Loaded <b>'+f+'</b> — sheet "<b>'+sh+'</b>", '+n+' rows, total qty <b>'+q+'</b>. Dashboard updated. <a href="#" onclick="go(\'dash\');return false;">Open Dashboard →</a>',
+  readerr:'Could not read the file.',all:'All',clear_data:'Clear Data',update_data:'Update with New Data',cleared:'&#10003; Data cleared. Import a new file to update the report.',confirm_clear:'Clear all current data from the report? This cannot be undone.',
+  map:{month:{},branchSum:BRANCH_SUM_EN}},
+ ar:{grp_aging:'أعمار المخزون',grp_settings:'الإعدادات',nav_dash:'لوحة المعلومات',nav_sum:'ملخص الإجماليات',nav_imp:'استيراد البيانات',title:'تحليل أعمار المخزون — إجمالي المستودعات',lastupdate:'آخر تحديث',
+  kpi_total:'إجمالي الكمية',kpi_60:'أقل من 60 يوم',kpi_90:'أقل من 90 يوم',kpi_g90:'أكثر من 90 يوم',
+  f_identity:'الهوية',f_branch:'الفرع',f_classify:'التصنيف',clear:'مسح',
+  ch_identity:'وزن المخزون حسب الهوية',ch_month:'نمط أعمار المخزون',sub_month:'الكمية الشهرية',
+  ch_sizewise:'المخزون حسب الحجم',ch_pack:'المخزون حسب العبوة',sub_pack:'حسب العبوة',
+  ch_classify:'تصنيف المخزون',ch_sizeitem:'المخزون حسب الحجم والصنف',sub_sizeitem:'كرتون / شرنك',
+  center_total:'إجمالي الكمية',gsearch_ph:'بحث شامل…',login_sub:'لوحة تحليل المخزون',login_user:'اسم المستخدم',login_pass:'كلمة المرور',login_btn:'دخول',login_bad:'اسم المستخدم أو كلمة المرور غير صحيحة',login_hint:'المسؤول الافتراضي:  admin  /  admin123',nav_users:'المستخدمون',nav_records:'سجل البيانات',rec_title:'سجل بيانات قاعدة البيانات',rec_add:'إضافة سجل',rec_search:'بحث في السجلات',rec_del:'حذف',rec_save:'حفظ في السحابة',rec_qty:'الكمية',rec_cat2:'الفئة 2',rec_logo:'الشعار',rec_need:'أدخل الهوية والفرع على الأقل',logout:'خروج',users_title:'إدارة المستخدمين',u_user:'اسم المستخدم',u_pass:'كلمة المرور',u_role:'الصلاحية',u_add:'إضافة مستخدم',u_admin:'مسؤول',u_userrole:'مستخدم',u_actions:'إجراءات',u_delete:'حذف',u_exists:'اسم المستخدم موجود مسبقاً',u_need:'أدخل اسم المستخدم وكلمة المرور',u_perms:'صلاحيات الشاشات',u_temp:'مؤقتة',u_all:'الكل',u_email:'البريد الإلكتروني',u_mobile:'الجوال',u_password:'كلمة المرور',u_resetpwd:'إعادة تعيين كلمة المرور',set_new_pwd:'أدخل كلمة مرور جديدة للمستخدم:',pwd_changed:'تم تحديث كلمة المرور بنجاح.',u_pwd_help:'إدارة كلمة المرور: اضغط "إعادة تعيين كلمة المرور" لتعيين كلمة جديدة للمستخدم. فعّل "مؤقتة" لإجبار المستخدم على تغييرها عند أول دخول.',temp_prompt:'كلمة مرورك مؤقتة. الرجاء إدخال كلمة مرور جديدة:',cols_btn:'الأعمدة',cols_title:'إظهار / إخفاء الأعمدة',cols_hint:'فعّل الفرع لإظهار عموده، وألغِ التفعيل لإخفائه. تُحفظ التغييرات تلقائياً وتُطبّق على الجدولين.',nav_designer:'تصميم الجداول',designer_title:'تصميم الجداول',designer_sub:'عدّل مسميات الأعمدة، اختر طريقة الحساب، ورتّب وأظهر/أخفِ الأعمدة.',calc_method:'طريقة الحساب',calc_sum:'المجموع',calc_avg:'المتوسط',calc_count:'العدد',calc_max:'الأعلى',calc_min:'الأدنى',calc_hint:'تُطبّق على كل خلايا القيم في جدولي الملخص والأصناف.',appearance:'المظهر',colors:'الألوان',c_primary:'الأساسي',c_teal:'التركواز',c_blue:'الأزرق',c_orange:'البرتقالي',st_color:'اللون',st_font:'الخط',st_size:'حجم الخط (px)',st_align:'محاذاة النص',dz_al_def:'افتراضي',dz_al_l:'يسار',dz_al_c:'وسط',dz_al_r:'يمين',font_family:'الخط',font_default:'افتراضي',display_size:'حجم العرض',card_titles:'عناوين ومسميات البطاقات',dz_pick:'اختر الشاشة للتعديل',dz_pick_hint:'كل شاشة تُعدّل بشكل مستقل — التعديلات هنا لا تؤثر على باقي الشاشات.',dz_scr_dash:'لوحة المعلومات',dz_scr_sum:'جدول الملخص',dz_scr_sku:'جدول الأصناف',dz_scr_appear:'المظهر العام',chart_order:'ترتيب/مكان بطاقات الرسوم',dz_branch_order:'ترتيب أعمدة الفروع',dz_col:'العمود',dz_name:'الاسم المعروض',dz_show:'إظهار',dz_calc:'الحساب',calc_default:'افتراضي',dz_reset:'استعادة الافتراضي',dz_sum_title:'أعمدة الملخص',dz_sku_title:'أعمدة الأصناف',set_date_label:'تاريخ تحديث التقرير',set_btn:'تعيين التاريخ',saved_date:'\u2713 تم حفظ تاريخ التحديث.',
+  sum_title:'المنتج التام — ملخص الإجماليات',c_year:'العام',c_month:'الشهر',c_cat:'الفئة',c_total:'الإجمالي',c_pct:'النسبة %',sum_grand:'الإجمالي',
+  ch_brand:'المخزون حسب الفئة (العلامة)',ch_monthly:'الإجماليات الشهرية',nav_sku:'ملخص الأصناف',sku_title:'ملخص إجماليات الأصناف (SKU)',c_code:'كود الصنف',c_size:'الحجم',c_pack2:'الشد',c_dim:'الحجم / الشد',search_item:'بحث بكود الصنف',dimension:'البُعد',ch_topitems:'أعلى الأصناف كميةً',nav_cloud:'السحابة',cloud_title:'\u2601\ufe0f مزامنة سحابية - Firebase',cloud_sub:'تخزين ومزامنة بيانات التقرير في Firebase (Firestore).',cloud_cfg_label:'إعدادات Firebase',fb_apikey:'مفتاح API',fb_project:'معرّف المشروع',fb_authdomain:'نطاق المصادقة',fb_bucket:'مساحة التخزين',fb_sender:'معرّف المرسل',fb_appid:'معرّف التطبيق',fb_paste_toggle:'أو الصق إعدادات firebaseConfig كاملة',fb_fill:'تعبئة الحقول من الإعدادات',print_btn:'طباعة',popout_btn:'نافذة',full_btn:'ملء الشاشة',export_excel:'تصدير إلى Excel',cloud_connect:'اتصال',cloud_save:'حفظ إلى السحابة',cloud_test:'اختبار الاتصال',cloud_load:'تحميل من السحابة',cloud_auto:'تحميل تلقائي عند الفتح وحفظ تلقائي بعد كل تعديل',cloud_live:'مزامنة لحظية ثنائية (موصى بها)',cloud_note_title:'ملاحظات الإعداد',cloud_st_idle:'غير متصل',cloud_n1:'أنشئ مشروع Firebase، فعّل <b>Firestore Database</b>، ثم انسخ <span class=\"tag\">firebaseConfig</span> من إعدادات المشروع.',cloud_n2:'للاختبار اضبط قواعد Firestore على وضع الاختبار. للإنتاج أمّن القواعد.',cloud_n3:'تُخزّن البيانات في المجموعة <span class=\"tag\">inventory_dashboard</span>، المستند <span class=\"tag\">latest</span>.',cloud_n4:'تُحفظ إعداداتك محلياً في هذا المتصفح فقط.',
+  foot:(s,t,q)=>'عرض '+s+' من '+t+' سجل  •  إجمالي الكمية '+q+'  •  اضغط الفلاتر للتصفية',
+  imp_title:'&#128228; استيراد البيانات — تحديث تلقائي',
+  imp_sub:'ارفع ملف المخزون وسيتم تحديث لوحة المعلومات تلقائياً. الصيغ المدعومة: <span class="tag">.xlsb</span> <span class="tag">.xlsx</span> <span class="tag">.xls</span> <span class="tag">.csv</span>',
+  imp_d1:'اسحب وأفلت ملف البيانات هنا',imp_d2:'أو اضغط للاختيار — تتم قراءة الشيت المسمى <b>data</b> تلقائياً',
+  imp_browse:'اختر ملفاً',imp_note_title:'كيف يعمل التحديث التلقائي',
+  imp_n1:'تتم قراءة الملف بالكامل داخل متصفحك — لا يتم رفع أي شيء إلى أي خادم.',
+  imp_n2:'يقرأ الشيت المسمى <span class="tag">data</span> (أو أول شيت) ويطابق الأعمدة حسب العناوين: <b>Identity, Branch, الحجم, الشد, الفئة 2, الشهر, تصنيف التخزين, الكمية, الشعار</b>.',
+  imp_n3:'يُعاد حساب كل المؤشرات والرسوم والفلاتر فوراً.',
+  imp_n4:'يُؤخذ تاريخ التحديث من اسم الملف (بنمط <span class="tag">dd-mm-yyyy</span>) عند توفّره.',
+  reading:f=>'جارٍ قراءة '+f+' ...',
+  loaded:(f,sh,n,q)=>'&#9989; تم تحميل <b>'+f+'</b> — الشيت "<b>'+sh+'</b>"، '+n+' صف، إجمالي الكمية <b>'+q+'</b>. تم تحديث اللوحة. <a href="#" onclick="go(\'dash\');return false;">فتح اللوحة →</a>',
+  readerr:'تعذّرت قراءة الملف.',all:'الكل',clear_data:'تفريغ البيانات',update_data:'تحديث ببيانات جديدة',cleared:'&#10003; تم تفريغ البيانات. استورد ملفاً جديداً لتحديث التقرير.',confirm_clear:'هل تريد تفريغ كل بيانات التقرير الحالية؟ لا يمكن التراجع عن هذا الإجراء.',
+  map:{identity:{'1- New Identity':'1- الهوية الجديدة','2- OLD Identity':'2- الهوية القديمة','3- Mai':'3- ماي','4- Mokabat':'4- مكبّات','5- SAR':'5- سار','6- TG Sparkling':'6- TG الفوّارة'},
+   branch:BRANCH_AR,cat2:{'CTN':'كرتون','SHR':'شرنك','Pac':'حزمة','Carton':'كرتون'},month:MONTH_AR,branchSum:BRANCH_SUM_AR}}
+};
+function tr(k){const v=T[LANG][k];return v!=null?v:(T.en[k]!=null?T.en[k]:k);}
+function mv(type,v){const m=(T[LANG].map||{})[type];return (m&&m[v])||v;}
+
+Chart.defaults.font.family="'Inter',sans-serif";
+Chart.defaults.font.size=11;Chart.defaults.color='#64748b';Chart.defaults.animation.duration=700;
+Chart.defaults.plugins.tooltip.backgroundColor='#0c2547';Chart.defaults.plugins.tooltip.padding=10;
+Chart.defaults.plugins.tooltip.cornerRadius=8;Chart.defaults.plugins.tooltip.titleFont={weight:'700'};Chart.defaults.plugins.tooltip.boxPadding=5;
+
+function setLang(l){LANG=l;applyLang();}
+function applyLang(){
+  const ar=LANG==='ar';
+  document.documentElement.dir=ar?'rtl':'ltr';document.documentElement.lang=ar?'ar':'en';
+  Chart.defaults.font.family=ar?"'Cairo',sans-serif":"'Inter',sans-serif";
+  document.getElementById('lang-en').classList.toggle('on',!ar);
+  document.getElementById('lang-ar').classList.toggle('on',ar);
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=ttl(el.dataset.i18n);});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{el.innerHTML=tr(el.dataset.i18nHtml);});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=tr(el.dataset.i18nPh);});
+  applyStyles();
+  buildFilters(false);render();
+  if(document.getElementById('page-sum').classList.contains('show'))buildSummary();
+  if(document.getElementById('page-sku').classList.contains('show'))buildSku();
+  if(CURRENT_USER)applyRole();
+  if(document.getElementById('page-users').classList.contains('show'))renderUsers();
+  if(document.getElementById('page-designer').classList.contains('show'))renderDesigner();
+  if(document.getElementById('page-records').classList.contains('show'))renderRecords();
+}
+function toggleGroup(g){const el=document.querySelector('.nav-group[data-grp="'+g+'"]');if(el)el.classList.toggle('collapsed');}
+function toggleNav(){const n=document.getElementById('nav');const b=document.getElementById('nav-backdrop');const open=n.classList.toggle('mobile-open');if(b)b.classList.toggle('show',open);}
+function closeNav(){const n=document.getElementById('nav');if(n)n.classList.remove('mobile-open');const b=document.getElementById('nav-backdrop');if(b)b.classList.remove('show');}
+function go(p){
+  if(!canView(p))return;
+  closeNav();
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+  document.getElementById('page-users').classList.toggle('show',p==='users');
+  document.getElementById('page-dash').classList.toggle('show',p==='dash');
+  document.getElementById('page-sum').classList.toggle('show',p==='sum');
+  document.getElementById('page-sku').classList.toggle('show',p==='sku');
+  document.getElementById('page-imp').classList.toggle('show',p==='imp');
+  document.getElementById('page-cloud').classList.toggle('show',p==='cloud');
+  document.getElementById('page-designer').classList.toggle('show',p==='designer');
+  document.getElementById('page-records').classList.toggle('show',p==='records');
+  if(p==='users')renderUsers();
+  if(p==='records')renderRecords();
+  if(p==='designer'){renderDesigner();showDzScreen((document.getElementById('dz-screen')||{}).value||'dash');}
+  if(p==='sum')buildSummary();
+  setTimeout(()=>{applyChartHeights();addResizers();},30);
+  if(p==='sku')buildSku();
+}
+function grad(ctx,a,c1,c2){const g=ctx.createLinearGradient(0,a.bottom,0,a.top);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
+function hgrad(ctx,a,c1,c2){const g=ctx.createLinearGradient(a.left,0,a.right,0);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
+function shade(hex,p){const n=parseInt(hex.slice(1),16);let r=(n>>16)+p,g=((n>>8)&255)+p,b=(n&255)+p;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return '#'+(r<<16|g<<8|b).toString(16).padStart(6,'0');}
+
+function uniq(key,order){const s=[...new Set(DATA.map(d=>d[key]))];return order.filter(o=>s.includes(o)).concat(s.filter(x=>!order.includes(x)));}
+function buildFilters(clear){
+  if(clear)Object.values(sel).forEach(s=>s.clear());
+  [['identity',IDENT_ORDER],['branch',BRANCH_ORDER],['store_class',CLASS_ORDER]].forEach(([k,ord])=>{
+    const box=document.getElementById('f-'+k);box.innerHTML='';
+    const _opts=uniq(k,ord);if(box.parentElement)box.parentElement.style.flexGrow=Math.max(1,_opts.length);
+    _opts.forEach(v=>{
+      const b=document.createElement('button');b.className='fbtn';
+      b.textContent=(k==='store_class')?v:mv(k,v);
+      b.onclick=()=>{if(sel[k].has(v))sel[k].delete(v);else sel[k].add(v);render();};
+      b.dataset.key=k;b.dataset.val=v;box.appendChild(b);
+    });
+  });
+}
+function clearF(k){sel[k].clear();render();}
+let GQ='';
+let PACK_CAT2='all';
+function buildPackTabs(){const box=document.getElementById('pack-cat2tabs');if(!box)return;
+  const opts=[['all',tr('all')],['CTN',mv('cat2','CTN')],['SHR',mv('cat2','SHR')],['Pac',mv('cat2','Pac')]];
+  box.innerHTML=opts.map(o=>'<button class="'+(PACK_CAT2===o[0]?'on':'')+'" onclick="setPackCat2(\''+o[0]+'\')">'+o[1]+'</button>').join('');}
+function setPackCat2(v){PACK_CAT2=v;render();}
+function gsearch(v){GQ=(v||'').trim().toLowerCase();const bx=document.getElementById('gsearch-box');if(bx)bx.classList.toggle('has',GQ!=='');render();}
+function matchG(d){if(!GQ)return true;const br=brandOf(d.identity);const s=[d.item_code,d.identity,d.branch,d.pack,d.size,d.month,d.store_class,d.cat2,d.logo,br,mv('identity',d.identity),mv('branch',d.branch),mn(d.month),mv('cat2',d.cat2)].join(' ').toLowerCase();return s.includes(GQ);}
+function filtered(){return DATA.filter(d=> matchG(d) &&
+  (sel.identity.size===0||sel.identity.has(d.identity))&&
+  (sel.branch.size===0||sel.branch.has(d.branch))&&
+  (sel.store_class.size===0||sel.store_class.has(d.store_class)));}
+function agg(rows,key){const m={};rows.forEach(r=>{m[r[key]]=(m[r[key]]||0)+r.qty;});return m;}
+let charts={};
+function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
+const dlabel={id:'dl',afterDatasetsDraw(c){const{ctx}=c;ctx.save();const _fs=(c.data.labels&&c.data.labels.length>9)?9.5:11;ctx.font='700 '+_fs+'px '+(LANG==='ar'?'Cairo':'Inter');ctx.fillStyle='#334155';
+  c.data.datasets.forEach((ds,di)=>{const meta=c.getDatasetMeta(di);if(meta.hidden)return;meta.data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;
+    if(c.config.type==='bar'&&c.options.indexAxis==='y'){ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(fmt(v),el.x+6,el.y);}
+    else if(c.config.type==='bar'){ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmt(v),el.x,el.y-4);}
+  });});ctx.restore();}};
+const dlabelSeg={id:'dlseg',afterDatasetsDraw(c){const{ctx}=c;ctx.save();ctx.font='400 8.5px '+(LANG==='ar'?'Cairo':'Inter');ctx.textAlign='center';ctx.textBaseline='middle';
+  c.data.datasets.forEach((ds,di)=>{const meta=c.getDatasetMeta(di);if(meta.hidden)return;meta.data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;const w=Math.abs(el.x-(el.base!=null?el.base:el.x));if(w<24)return;ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText(fmt(v),(el.x+(el.base!=null?el.base:el.x))/2,el.y);});});ctx.restore();}};
+const pieLabel={id:'pl',afterDatasetsDraw(c){if(c.config.type!=='doughnut'&&c.config.type!=='pie')return;const{ctx}=c;const ds=c.data.datasets[0];const meta=c.getDatasetMeta(0);const total=ds.data.reduce((s,x)=>s+(+x||0),0);if(!total)return;const fn=LANG==='ar'?'Cairo':'Inter';ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=3;meta.data.forEach((arc,i)=>{const v=ds.data[i];if(!v)return;const pct=v/total*100;if(pct<4)return;const ang=(arc.startAngle+arc.endAngle)/2;const r=(arc.innerRadius+arc.outerRadius)/2;const x=arc.x+Math.cos(ang)*r,y=arc.y+Math.sin(ang)*r;ctx.fillStyle='#fff';if(pct>=8){ctx.font='800 11px '+fn;ctx.fillText(fmt(v),x,y-6);ctx.font='700 10px '+fn;ctx.fillText(pct.toFixed(0)+'%',x,y+7);}else{ctx.font='800 10px '+fn;ctx.fillText(pct.toFixed(0)+'%',x,y);}});ctx.restore();}};
+const monthTrend={id:'mtrend',afterDatasetsDraw(c){if(!c.options._trend)return;const ds=c.data.datasets[0],meta=c.getDatasetMeta(0),ctx=c.ctx;const horiz=c.options.indexAxis==='y';ctx.save();ctx.font='800 12px '+(LANG==='ar'?'Cairo':'Inter');meta.data.forEach((el,i)=>{if(i===0||!el)return;const v=ds.data[i],pv=ds.data[i-1];if(v===pv)return;const up=v>pv;ctx.fillStyle=up?'#16a34a':'#dc2626';if(horiz){ctx.textAlign='start';ctx.textBaseline='middle';ctx.fillText(up?'\u25B2':'\u25BC',el.x+46,el.y);}else{ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(up?'\u25B2':'\u25BC',el.x,el.y-19);}});ctx.restore();}};
+const yearAxis={id:'yearaxis',afterDraw(c){const meta=c.getDatasetMeta(0);if(!meta||!meta.data.length)return;const yrs=c.data.datasets[0]._years;if(!yrs)return;const area=c.chartArea,ctx=c.ctx,fn=LANG==='ar'?'Cairo':'Inter';const n=meta.data.length;ctx.save();ctx.font='800 12px '+fn;ctx.fillStyle='#475569';ctx.textBaseline='top';ctx.textAlign='center';let i=0;while(i<n){let j=i;while(j+1<n&&yrs[j+1]===yrs[i])j++;const cx=(meta.data[i].x+meta.data[j].x)/2;ctx.fillText(String(yrs[i]),cx,area.bottom+24);if(i>0){const xb=(meta.data[i-1].x+meta.data[i].x)/2;ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xb,area.top);ctx.lineTo(xb,area.bottom+30);ctx.stroke();}i=j+1;}ctx.restore();}};
+function pieOut(){return {id:'pieout',afterDraw(c){if(c.config.type!=='doughnut'&&c.config.type!=='pie')return;if((window.innerWidth||999)<=540)return;const ds=c.data.datasets[0],meta=c.getDatasetMeta(0);const total=ds.data.reduce((s,x)=>s+(+x||0),0);if(!total||!meta.data.length)return;const ctx=c.ctx,fn=LANG==='ar'?'Cairo':'Inter';const cx=meta.data[0].x,cy=meta.data[0].y;const items=[];meta.data.forEach((arc,i)=>{const v=ds.data[i];if(!v)return;const pct=v/total*100;if(pct<3)return;const ang=(arc.startAngle+arc.endAngle)/2;const oR=arc.outerRadius;const x0=cx+Math.cos(ang)*oR,y0=cy+Math.sin(ang)*oR;const right=Math.cos(ang)>=0;items.push({v:v,pct:pct,oR:oR,x0:x0,y0:y0,right:right,col:(ds.backgroundColor[i]||'#94a3b8'),y:cy+Math.sin(ang)*(oR+8)});});const GAP=21;['r','l'].forEach(side=>{const arr=items.filter(it=>it.right===(side==='r')).sort((a,b)=>a.y-b.y);for(let k=1;k<arr.length;k++){if(arr[k].y-arr[k-1].y<GAP)arr[k].y=arr[k-1].y+GAP;}});ctx.save();items.forEach(it=>{const r=it.right;const elbowX=cx+(r?1:-1)*(it.oR+9);const labelX=cx+(r?1:-1)*(it.oR+14);ctx.strokeStyle=it.col;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(it.x0,it.y0);ctx.lineTo(elbowX,it.y);ctx.lineTo(labelX,it.y);ctx.stroke();ctx.beginPath();ctx.arc(labelX,it.y,1.8,0,7);ctx.fillStyle=it.col;ctx.fill();ctx.textAlign=r?'left':'right';ctx.textBaseline='middle';const tx=labelX+(r?4:-4);ctx.fillStyle='#1e293b';ctx.font='800 10.5px '+fn;ctx.fillText(fmt(it.v),tx,it.y-6);ctx.font='700 9.5px '+fn;ctx.fillStyle='#475569';ctx.fillText(it.pct.toFixed(0)+'%',tx,it.y+7);});ctx.restore();}};}
+function centerText(total){return {id:'ct',afterDraw(c){const{ctx,chartArea}=c;if(!chartArea)return;const x=(chartArea.left+chartArea.right)/2,y=(chartArea.top+chartArea.bottom)/2;
+  const meta=c.getDatasetMeta(0).data[0];const inner=meta?meta.innerRadius:60;const fn=LANG==='ar'?'Cairo':'Inter';
+  const txt=fmt(total);ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+  let fs=Math.floor(inner*0.62);ctx.font='800 '+fs+'px '+fn;
+  while(ctx.measureText(txt).width>inner*1.7&&fs>9){fs--;ctx.font='800 '+fs+'px '+fn;}
+  ctx.fillStyle='#1e293b';ctx.fillText(txt,x,y);ctx.restore();}};}
+
+function render(){
+  document.querySelectorAll('.fbtn').forEach(b=>{const s=sel[b.dataset.key];b.classList.toggle('off',s.size>0&&!s.has(b.dataset.val));});
+  const rows=filtered();
+  const cls=agg(rows,'store_class');
+  const a=cls['A<60']||0,b=cls['B<90']||0,c=cls['C>90']||0,tot=a+b+c;
+  const pc=x=>tot?Math.round(x/tot*100)+'%':'0%';
+  const setk=(id,v,p,bid)=>{document.getElementById(id).textContent=fmt(v);if(p)document.getElementById(p).textContent=pc(v);if(bid)document.getElementById(bid).style.width=(tot?Math.round(v/tot*100):0)+'%';};
+  document.getElementById('k-total').textContent=fmt(tot);document.getElementById('kp-total').textContent='100%';
+  setk('k-60',a,'kp-60','b-60');setk('k-90',b,'kp-90','b-90');setk('k-g90',c,'kp-g90','b-g90');
+  document.getElementById('cl-a').textContent=fmt(a);document.getElementById('cl-b').textContent=fmt(b);document.getElementById('cl-c').textContent=fmt(c);
+  const rtl=LANG==='ar';
+
+  const idm=agg(rows,'identity');const idk=IDENT_ORDER.filter(x=>idm[x]).concat(Object.keys(idm).filter(x=>!IDENT_ORDER.includes(x)));
+  mk('c_identity',{type:'doughnut',data:{labels:idk.map(x=>mv('identity',x)),datasets:[{data:idk.map(x=>idm[x]),backgroundColor:IDENT_COLORS,borderWidth:3,borderColor:'#fff',hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',layout:{padding:((window.innerWidth||999)<=540?{top:6,bottom:6,left:8,right:8}:{top:22,bottom:22,left:66,right:66})},plugins:{legend:{rtl:rtl,position:((window.innerWidth||999)<=540?'bottom':'right'),labels:{font:{size:10},boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'circle',padding:7}},
+      tooltip:{rtl:rtl,callbacks:{label:ctx=>'  '+fmt(ctx.raw)+' ('+pc(ctx.raw)+')'}}}},plugins:[centerText(tot),pieOut()]});
+
+  const MO=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];const mm=agg(rows,'month');
+  const moL=MO.filter(x=>mm[x]!==undefined).concat(Object.keys(mm).filter(x=>!MO.includes(x)));
+  mk('c_month',{type:'bar',data:{labels:moL.map(mn),datasets:[{data:moL.map(x=>mm[x]||0),_years:moL.map(x=>yearOf(x)),borderRadius:6,maxBarThickness:34,
+    backgroundColor:cx=>{const{chart,dataIndex}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.teal;const c1=(yearOf(moL[dataIndex])===2025)?C.blue:C.teal;return grad(ctx,chartArea,c1,shade(c1,60));}}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16,bottom:30}},plugins:{legend:{display:false},dl:{}},scales:{y:{display:false,grace:'22%'},x:{grid:{display:false},border:{display:false}}}},plugins:[dlabel,yearAxis]});
+
+  const SZ=['200','330','600','1500','C100','250'];const szm=agg(rows,'size');
+  const szl=SZ.filter(x=>szm[x]).concat(Object.keys(szm).filter(x=>!SZ.includes(x)));
+  mk('c_size',{type:'bar',data:{labels:szl,datasets:[{data:szl.map(x=>szm[x]),borderRadius:6,maxBarThickness:26,
+    backgroundColor:cx=>{const{chart}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.navy;return hgrad(ctx,chartArea,C.navy,C.blue);}}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},dl:{}},scales:{x:{display:false,grace:'26%',reverse:rtl},y:{position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{weight:'600'}}}}},plugins:[dlabel]});
+
+  buildPackTabs();
+  const pcats=['CTN','SHR','Pac'];const pcatcol={CTN:C.blue,SHR:'#9ec9ee',Pac:'#7fb0dd'};
+  const prows=PACK_CAT2==='all'?rows:rows.filter(r=>r.cat2===PACK_CAT2);
+  const pmm={};prows.forEach(r=>{pmm[r.pack]=pmm[r.pack]||{};pmm[r.pack][r.cat2]=(pmm[r.pack][r.cat2]||0)+r.qty;});
+  const ptot={};Object.keys(pmm).forEach(p=>{ptot[p]=Object.values(pmm[p]).reduce((s,x)=>s+x,0);});
+  const pl=Object.keys(pmm).sort((x,y)=>ptot[y]-ptot[x]);
+  const pcatsAll=PACK_CAT2==='all'?[...new Set([...pcats,...prows.map(r=>r.cat2)])]:[PACK_CAT2];
+  mk('c_pack',{type:'bar',data:{labels:pl,datasets:pcatsAll.map(ct=>({label:mv('cat2',ct),data:pl.map(p=>(pmm[p]||{})[ct]||0),borderRadius:4,maxBarThickness:20,backgroundColor:pcatcol[ct]||'#8fb8d4',stack:'p'}))},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:PACK_CAT2==='all'?{rtl:rtl,position:'top',align:'end',labels:{font:{size:10},boxWidth:9,boxHeight:9,usePointStyle:true,pointStyle:'rectRounded',padding:8}}:{display:false},dl:{}},scales:{x:{display:false,grace:'28%',reverse:rtl,stacked:true},y:{stacked:true,position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'}}}}},plugins:PACK_CAT2==='all'?[dlabelSeg]:[dlabel]});
+
+  mk('c_class',{type:'doughnut',data:{labels:['A<60','B<90','C>90'],datasets:[{data:[a,b,c],backgroundColor:[C.teal,C.navy,C.orange],borderColor:'#fff',borderWidth:3,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,bottom:10,left:8,right:8}},cutout:'52%',plugins:{legend:{display:false},tooltip:{rtl:rtl,callbacks:{label:ctx=>'  '+fmt(ctx.raw)+' ('+pc(ctx.raw)+')'}}}},plugins:[pieLabel]});
+
+  const cats=['CTN','SHR','Pac'];const catcol={CTN:C.blue,SHR:'#9ec9ee',Pac:'#7fb0dd'};
+  const sim={};rows.forEach(r=>{sim[r.size]=sim[r.size]||{};sim[r.size][r.cat2]=(sim[r.size][r.cat2]||0)+r.qty;});
+  const siL=['C100','600','330','250','200','1500'].filter(x=>sim[x]).concat(Object.keys(sim).filter(x=>!['C100','600','330','250','200','1500'].includes(x)));
+  const catsAll=[...new Set([...cats,...rows.map(r=>r.cat2)])];
+  mk('c_sizeitem',{type:'bar',data:{labels:siL,datasets:catsAll.map(ct=>({label:mv('cat2',ct),data:siL.map(s=>(sim[s]||{})[ct]||0),borderRadius:5,maxBarThickness:30,backgroundColor:catcol[ct]||'#8fb8d4'}))},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{bottom:26}},plugins:{legend:{rtl:rtl,position:'top',align:'end',labels:{font:{size:10.5},boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rectRounded',padding:10}},dl:{}},scales:{y:{display:false,grace:'22%'},x:{grid:{display:false},border:{display:false},ticks:{font:{weight:'600'}}}}},plugins:[dlabel]});
+
+  [['c_identity',el=>({rows:filtered().filter(d=>d.identity===idk[el.index]),title:mv('identity',idk[el.index])})],
+   ['c_month',el=>({rows:filtered().filter(d=>d.month===moL[el.index]),title:mn(moL[el.index])})],
+   ['c_size',el=>({rows:filtered().filter(d=>String(d.size)===String(szl[el.index])),title:szl[el.index]})],
+   ['c_pack',el=>{const pk=pl[el.index];const ct=pcatsAll[el.datasetIndex];const rws=filtered().filter(d=>d.pack===pk&&(PACK_CAT2==='all'?(ct?d.cat2===ct:true):d.cat2===PACK_CAT2));return {rows:rws,title:pk+(PACK_CAT2!=='all'?' / '+mv('cat2',PACK_CAT2):(ct?' / '+mv('cat2',ct):''))};}],
+   ['c_class',el=>{const cc=['A<60','B<90','C>90'][el.index];return {rows:filtered().filter(d=>d.store_class===cc),title:cc};}],
+   ['c_sizeitem',el=>{const sz=siL[el.index],ct=catsAll[el.datasetIndex];return {rows:filtered().filter(d=>String(d.size)===String(sz)&&d.cat2===ct),title:sz+' / '+mv('cat2',ct)};}]
+  ].forEach(p=>{if(charts[p[0]])charts[p[0]].options.onClick=chartClick(p[1]);});
+  document.getElementById('foot').textContent=tr('foot')(rows.length,DATA.length,fmt(tot));
+}
+
+const BRANCH_SUM_ORDER=['5. Jeddah (F)','2. Kharj','1. Riyadh','3. Heet','4. Jeddah (W)','6. Dammam','7. Qassim','8. Ahsa'];
+const MONTH_ORDER=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+const BRAND_ORDER=['Tania','Mai','Mokabat','SAR','TG Sparkling'];
+const BRAND_COLORS={Tania:'#1f6f8b',Mai:'#3aa0c4',Mokabat:'#2e7d4a',SAR:'#e0792f','TG Sparkling':'#b0379b'};
+function brandOf(id){const p=id.slice(0,2);if(p==='1-'||p==='2-')return 'Tania';return ({'3':'Mai','4':'Mokabat','5':'SAR','6':'TG Sparkling'})[id[0]]||id;}
+function yearOf(m){return ['Aug','Sep','Oct','Nov','Dec'].includes(m)?2025:2026;}
+function bn(v){const m=(T[LANG].map||{}).branchSum;return (m&&m[v])||mv('branch',v);}
+function mn(m){const t=(T[LANG].map||{}).month;return (t&&t[m])||m;}
+
+let HIDDEN=new Set();try{HIDDEN=new Set(JSON.parse(localStorage.getItem('hidden_cols')||localStorage.getItem('hidden_branches')||'[]'));}catch(e){}
+function allBranchesList(){return BRANCH_SUM_ORDER.filter(b=>DATA.some(d=>d.branch===b)).concat([...new Set(DATA.map(d=>d.branch))].filter(b=>!BRANCH_SUM_ORDER.includes(b)));}
+let LABELS={};try{LABELS=JSON.parse(localStorage.getItem('col_labels')||'{}')||{};}catch(e){}
+let AGGS={sum:'sum',sku:'sum'};try{AGGS=Object.assign(AGGS,JSON.parse(localStorage.getItem('col_agg2')||'{}'));}catch(e){}
+let CURAGG='sum';
+let BORDS={sum:null,sku:null};try{BORDS=Object.assign(BORDS,JSON.parse(localStorage.getItem('branch_order2')||'{}'));}catch(e){}
+let TITLES={};try{TITLES=JSON.parse(localStorage.getItem('ui_titles')||'{}')||{};}catch(e){}
+let FONT='';try{FONT=localStorage.getItem('ui_font')||'';}catch(e){}
+let UISCALE='100';try{UISCALE=localStorage.getItem('ui_scale')||'100';}catch(e){}
+let CHARTORDER=null;try{CHARTORDER=JSON.parse(localStorage.getItem('chart_order')||'null');}catch(e){}
+let COLORS={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f'};try{COLORS=Object.assign(COLORS,JSON.parse(localStorage.getItem('ui_colors')||'{}'));}catch(e){}
+function applyColors(){const r=document.documentElement;Object.keys(COLORS).forEach(k=>{if(r&&r.style&&r.style.setProperty)r.style.setProperty('--'+k,COLORS[k]);C[k]=COLORS[k];});refreshCharts();}
+function setColor(k,v){COLORS[k]=v;try{localStorage.setItem('ui_colors',JSON.stringify(COLORS));}catch(e){}applyColors();}
+let STYLES={};try{STYLES=JSON.parse(localStorage.getItem('ui_styles')||'{}')||{};}catch(e){}
+function applyStyles(){document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;const st=STYLES[k];if(!st){el.style.color='';el.style.fontFamily='';el.style.fontSize='';el.style.textAlign='';return;}el.style.color=st.c||'';el.style.fontFamily=st.f?("'"+st.f+"'"):'';el.style.fontSize=st.s?(st.s+'px'):'';if(st.a){el.style.textAlign=st.a;el.style.flexGrow='1';el.style.flexBasis='auto';el.style.width='';}else{el.style.textAlign='';el.style.flexGrow='';el.style.flexBasis='';el.style.width='';}});}
+function setStyle(k,p,v){STYLES[k]=STYLES[k]||{};if(v!==''&&v!=null)STYLES[k][p]=v;else delete STYLES[k][p];if(Object.keys(STYLES[k]).length===0)delete STYLES[k];try{localStorage.setItem('ui_styles',JSON.stringify(STYLES));}catch(e){}applyStyles();}
+const CHART_DEF=['identity','month','size','pack','classify','sizeitem'];
+const CHART_TKEY={identity:'ch_identity',month:'ch_month',size:'ch_sizewise',pack:'ch_pack',classify:'ch_classify',sizeitem:'ch_sizeitem'};
+const TITLE_KEYS=['title','kpi_total','kpi_60','kpi_90','kpi_g90','ch_identity','ch_month','ch_sizewise','ch_pack','ch_classify','ch_sizeitem','f_identity','f_branch','f_classify'];
+function ttl(key){return (TITLES[key]!=null&&TITLES[key]!=='')?TITLES[key]:tr(key);}
+function setTitle(k,v){if(v&&v.trim())TITLES[k]=v;else delete TITLES[k];try{localStorage.setItem('ui_titles',JSON.stringify(TITLES));}catch(e){}document.querySelectorAll('[data-i18n="'+k+'"]').forEach(el=>{el.textContent=ttl(k);});}
+function applyFont(){const ff=FONT?("'"+FONT+"', sans-serif"):'';document.body.style.fontFamily=ff;Chart.defaults.font.family=FONT?("'"+FONT+"'"):(LANG==='ar'?"'Cairo',sans-serif":"'Inter',sans-serif");refreshCharts();}
+function setFont(v){FONT=v;try{localStorage.setItem('ui_font',v);}catch(e){}applyFont();}
+function applyScale(){const c=document.querySelector('.content');if(c)c.style.zoom=(parseInt(UISCALE,10)||100)/100;}
+function setScale(v){UISCALE=v;try{localStorage.setItem('ui_scale',v);}catch(e){}applyScale();}
+function refreshCharts(){try{render();}catch(e){}rebuildTables();}
+function tagCards(){const g=document.getElementById('chart-grid');if(!g)return[];const cards=[...g.children];cards.forEach((c,i)=>{if(!c.dataset.chart)c.dataset.chart=CHART_DEF[i]||('x'+i);});return cards;}
+function applyChartOrder(){const cards=tagCards();const order=CHARTORDER||CHART_DEF;cards.forEach(c=>{const idx=order.indexOf(c.dataset.chart);c.style.order=idx<0?99:idx;});}
+function moveChart(id,dir){let order=(CHARTORDER||CHART_DEF).slice();const i=order.indexOf(id);const j=i+dir;if(i<0||j<0||j>=order.length)return;const t=order[i];order[i]=order[j];order[j]=t;CHARTORDER=order;try{localStorage.setItem('chart_order',JSON.stringify(order));}catch(e){}applyChartOrder();renderDesigner();}
+function clabel(key,def){return (LABELS[key]!=null&&LABELS[key]!=='')?LABELS[key]:def;}
+function aggFn(arr){if(!arr||!arr.length)return 0;const AGG=CURAGG;if(AGG==='count')return arr.length;if(AGG==='avg')return arr.reduce((s,x)=>s+x,0)/arr.length;if(AGG==='max')return Math.max.apply(null,arr);if(AGG==='min')return Math.min.apply(null,arr);return arr.reduce((s,x)=>s+x,0);}
+let AGGC={};try{AGGC=JSON.parse(localStorage.getItem('col_agg_col')||'{}')||{};}catch(e){}
+function aggBy(m,arr){if(!arr||!arr.length)return 0;if(m==='count')return arr.length;if(m==='avg')return arr.reduce((s,x)=>s+x,0)/arr.length;if(m==='max')return Math.max.apply(null,arr);if(m==='min')return Math.min.apply(null,arr);return arr.reduce((s,x)=>s+x,0);}
+function mcol(which,key){return AGGC[key]||AGGS[which]||'sum';}
+function setColAgg(key,m){if(m)AGGC[key]=m;else delete AGGC[key];try{localStorage.setItem('col_agg_col',JSON.stringify(AGGC));}catch(e){}rebuildTables();}
+function isValCol(k){return k.indexOf(':br:')>=0||/:total$/.test(k);}
+function orderBranches(br,which){const bo=BORDS[which];if(!bo)return br;return bo.filter(b=>br.includes(b)).concat(br.filter(b=>!bo.includes(b)));}
+function defName(key){const map={'sum:year':'c_year','sum:month':'c_month','sum:cat':'c_cat','sum:total':'c_total','sum:pct':'c_pct','sku:cat':'c_cat','sku:code':'c_code','sku:size':'c_size','sku:pack':'c_pack2','sku:total':'c_total','sku:pct':'c_pct'};return map[key]?tr(map[key]):bn(key);}
+function showDzScreen(s){document.querySelectorAll('.dz-grp').forEach(g=>{g.style.display=(g.getAttribute('data-screen')===s)?'':'none';});}
+function dzColTable(which,contId){const cont=document.getElementById(contId);if(!cont)return;const keys=colDefs(which).map(c=>c[0]);const AOPT=[['','calc_default'],['sum','calc_sum'],['avg','calc_avg'],['count','calc_count'],['max','calc_max'],['min','calc_min']];
+  let html='<table class="dz-table"><thead><tr><th>'+tr('dz_col')+'</th><th>'+tr('dz_name')+'</th><th>'+tr('dz_calc')+'</th><th>'+tr('dz_show')+'</th></tr></thead><tbody>';
+  keys.forEach(k=>{const dn=defName(k);const cur=(LABELS[k]!=null?LABELS[k]:'');const ck=HIDDEN.has(k)?'':'checked';const kk=k.replace(/'/g,'');
+    let calc='<span style="color:#cbd5e1">—</span>';if(isValCol(k)){const cm=AGGC[k]||'';calc='<select onchange="setColAgg(\''+kk+'\',this.value)">'+AOPT.map(o=>'<option value="'+o[0]+'" '+((cm===o[0])?'selected':'')+'>'+tr(o[1])+'</option>').join('')+'</select>';}
+    html+='<tr><td>'+dn+'</td><td><input type="text" value="'+String(cur).replace(/"/g,'&quot;')+'" placeholder="'+String(dn).replace(/"/g,'&quot;')+'" oninput="renameCol(\''+kk+'\',this.value)"></td><td>'+calc+'</td><td style="text-align:center"><input type="checkbox" '+ck+' onchange="toggleCol(\''+kk+'\')"></td></tr>';});
+  html+='</tbody></table>';cont.innerHTML=html;}
+function dzBranchOrder(which,contId){const c=document.getElementById(contId);if(!c)return;let html='';const arr=orderBranches(allBranchesList(),which);arr.forEach((b,i)=>{const bb=b.replace(/'/g,'');html+='<div class="dz-brow"><span>'+clabel(which+':br:'+b,bn(b))+'</span><span class="dz-ord"><button onclick="moveBranch(\''+which+'\',\''+bb+'\',-1)" '+(i===0?'disabled':'')+'>&#9650;</button><button onclick="moveBranch(\''+which+'\',\''+bb+'\',1)" '+(i===arr.length-1?'disabled':'')+'>&#9660;</button></span></div>';});c.innerHTML=html;}
+function renderDesigner(){
+  const a1=document.getElementById('dz-agg-sum');if(a1)a1.value=AGGS.sum;
+  const a2=document.getElementById('dz-agg-sku');if(a2)a2.value=AGGS.sku;
+  dzBranchOrder('sum','dz-branchorder-sum');dzBranchOrder('sku','dz-branchorder-sku');
+  dzColTable('sum','dz-sum');dzColTable('sku','dz-sku');
+  const fsel=document.getElementById('dz-font');if(fsel)fsel.value=FONT;
+  const ssel=document.getElementById('dz-scale');if(ssel)ssel.value=UISCALE;
+  ['navy','teal','blue','orange'].forEach(k=>{const ce=document.getElementById('dz-c-'+k);if(ce)ce.value=COLORS[k];});
+  const tc=document.getElementById('dz-titles');if(tc){const FO=['','Inter','Cairo','Tahoma','Arial'];let html='';TITLE_KEYS.forEach(k=>{const cur=(TITLES[k]!=null?TITLES[k]:'');const st=STYLES[k]||{};
+    const fonts=FO.map(fo=>'<option value="'+fo+'" '+((st.f||'')===fo?'selected':'')+'>'+(fo||tr('font_default'))+'</option>').join('');
+    const aligns=[['','dz_al_def'],['right','dz_al_r'],['center','dz_al_c'],['left','dz_al_l']].map(a=>'<option value="'+a[0]+'" '+((st.a||'')===a[0]?'selected':'')+'>'+tr(a[1])+'</option>').join('');
+    html+='<div class="dz-inline"><span class="nm">'+tr(k)+'</span>'+
+      '<input type="text" class="ti" value="'+String(cur).replace(/"/g,'&quot;')+'" placeholder="'+String(tr(k)).replace(/"/g,'&quot;')+'" oninput="setTitle(\''+k+'\',this.value)">'+
+      '<input type="color" title="'+tr('st_color')+'" value="'+(st.c||'#1e293b')+'" oninput="setStyle(\''+k+'\',\'c\',this.value)">'+
+      '<select title="'+tr('st_font')+'" onchange="setStyle(\''+k+'\',\'f\',this.value)">'+fonts+'</select>'+
+      '<input type="number" class="sz" title="'+tr('st_size')+'" placeholder="px" value="'+(st.s||'')+'" oninput="setStyle(\''+k+'\',\'s\',this.value)">'+
+      '<select title="'+tr('st_align')+'" onchange="setStyle(\''+k+'\',\'a\',this.value)">'+aligns+'</select></div>';});
+    tc.innerHTML=html;}
+  const co=document.getElementById('dz-chartorder');if(co){let html='';const order=CHARTORDER||CHART_DEF;order.forEach((id,i)=>{html+='<div class="dz-brow"><span>'+ttl(CHART_TKEY[id])+'</span><span class="dz-ord"><button onclick="moveChart(\''+id+'\',-1)" '+(i===0?'disabled':'')+'>&#9650;</button><button onclick="moveChart(\''+id+'\',1)" '+(i===order.length-1?'disabled':'')+'>&#9660;</button></span></div>';});co.innerHTML=html;}
+}
+function rebuildTables(){if(document.getElementById('page-sum').classList.contains('show'))buildSummary();if(document.getElementById('page-sku').classList.contains('show'))buildSku();}
+function setAgg(which,v){AGGS[which]=v;try{localStorage.setItem('col_agg2',JSON.stringify(AGGS));}catch(e){}rebuildTables();}
+function renameCol(k,v){if(v&&v.trim())LABELS[k]=v;else delete LABELS[k];try{localStorage.setItem('col_labels',JSON.stringify(LABELS));}catch(e){}rebuildTables();buildColMenu('colpop-sum','sum');buildColMenu('colpop-sku','sku');}
+function moveBranch(which,b,dir){let arr=orderBranches(allBranchesList(),which);const i=arr.indexOf(b);const j=i+dir;if(i<0||j<0||j>=arr.length)return;const t=arr[i];arr[i]=arr[j];arr[j]=t;BORDS[which]=arr;try{localStorage.setItem('branch_order2',JSON.stringify(BORDS));}catch(e){}rebuildTables();renderDesigner();}
+function resetDesigner(){LABELS={};AGGS={sum:'sum',sku:'sum'};BORDS={sum:null,sku:null};HIDDEN=new Set();TITLES={};FONT='';UISCALE='100';CHARTORDER=null;COLORS={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f'};STYLES={};AGGC={};try{['col_labels','col_agg','col_agg2','col_agg_col','branch_order','branch_order2','hidden_cols','hidden_branches','ui_titles','ui_font','ui_scale','chart_order','ui_colors','ui_styles'].forEach(k=>localStorage.removeItem(k));}catch(e){}applyFont();applyScale();applyChartOrder();applyColors();applyStyles();applyChartHeights();addResizers();applyStyles();applyLang();rebuildTables();renderDesigner();buildColMenu('colpop-sum','sum');buildColMenu('colpop-sku','sku');}
+function colDefs(which){const br=orderBranches(allBranchesList(),which).map(b=>[which+':br:'+b,clabel(which+':br:'+b,bn(b))]);
+  if(which==='sum')return [['sum:year',clabel('sum:year',tr('c_year'))],['sum:month',clabel('sum:month',tr('c_month'))],['sum:cat',clabel('sum:cat',tr('c_cat'))],['sum:id',clabel('sum:id',tr('f_identity'))]].concat(br).concat([['sum:total',clabel('sum:total',tr('c_total'))],['sum:pct',clabel('sum:pct',tr('c_pct'))]]);
+  return [['sku:cat',clabel('sku:cat',tr('c_cat'))],['sku:code',clabel('sku:code',tr('c_code'))],['sku:size',clabel('sku:size',tr('c_size'))],['sku:pack',clabel('sku:pack',tr('c_pack2'))]].concat(br).concat([['sku:total',clabel('sku:total',tr('c_total'))],['sku:pct',clabel('sku:pct',tr('c_pct'))]]);}
+function buildColMenu(popId,which){const pop=document.getElementById(popId);if(!pop)return;let html='<h6>'+tr('cols_title')+'</h6><div class="cm-hint">'+tr('cols_hint')+'</div>';colDefs(which).forEach(c=>{const ck=HIDDEN.has(c[0])?'':'checked';html+='<label><input type="checkbox" '+ck+' data-k="'+String(c[0]).replace(/"/g,'&quot;')+'" onchange="toggleCol(this.getAttribute(\'data-k\'))"> '+c[1]+'</label>';});pop.innerHTML=html;}
+function toggleColMenu(which){const pop=document.getElementById('colpop-'+which);if(!pop)return;const open=!pop.classList.contains('show');document.querySelectorAll('.colmenu-pop').forEach(p=>p.classList.remove('show'));if(open){buildColMenu('colpop-'+which,which);pop.classList.add('show');}}
+function toggleCol(k){if(HIDDEN.has(k))HIDDEN.delete(k);else HIDDEN.add(k);try{localStorage.setItem('hidden_cols',JSON.stringify([...HIDDEN]));}catch(e){}if(document.getElementById('page-sum').classList.contains('show'))buildSummary();if(document.getElementById('page-sku').classList.contains('show'))buildSku();buildColMenu('colpop-sum','sum');buildColMenu('colpop-sku','sku');}
+function trendArrow(v,avg){if(!avg||v===avg)return '';const up=v>avg;return ' <span style="font-size:10px;color:'+(up?'#16a34a':'#dc2626')+'">'+(up?'\u25B2':'\u25BC')+'</span>';}
+function fillSel(id,opts){const s=document.getElementById(id);const prev=s.value;s.innerHTML='';const o0=document.createElement('option');o0.value='';o0.textContent=tr('all');s.appendChild(o0);opts.forEach(o=>{const op=document.createElement('option');op.value=o[0];op.textContent=o[1];s.appendChild(op);});s.value=opts.some(o=>o[0]===prev)?prev:'';}
+function clearSumFilters(){['sum-month','sum-cat','sum-id','sum-cat2'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});buildSummary();}
+function buildSummary(){
+  const ALL=DATA;CURAGG=AGGS.sum;
+  const allMonths=MONTH_ORDER.filter(m=>ALL.some(d=>d.month===m)).concat([...new Set(ALL.map(d=>d.month))].filter(m=>!MONTH_ORDER.includes(m)));
+  const allBrands=BRAND_ORDER.filter(b=>ALL.some(d=>brandOf(d.identity)===b)).concat([...new Set(ALL.map(d=>brandOf(d.identity)))].filter(b=>!BRAND_ORDER.includes(b)));
+  fillSel('sum-month',allMonths.map(m=>[m,mn(m)]));
+  fillSel('sum-cat',allBrands.map(b=>[b,b]));
+  const numOf=s=>{const m=String(s).match(/\d+/);return m?parseInt(m[0],10):9999;};
+  const allIds=[...new Set(ALL.map(d=>d.identity))].map(id=>[id,mv('identity',id)]).sort((a,b)=>numOf(a[1])-numOf(b[1])||String(a[1]).localeCompare(String(b[1]),'ar'));
+  fillSel('sum-id',allIds);
+  fillSel('sum-cat2',['CTN','SHR','Pac'].filter(c=>ALL.some(d=>d.cat2===c)).map(c=>[c,mv('cat2',c)]));
+  const fm=document.getElementById('sum-month').value,fc=document.getElementById('sum-cat').value;
+  const fid=(document.getElementById('sum-id')||{}).value||'',fcat2=(document.getElementById('sum-cat2')||{}).value||'';
+  const D=ALL.filter(d=>(fm===''||d.month===fm)&&(fc===''||brandOf(d.identity)===fc)&&(fid===''||d.identity===fid)&&(fcat2===''||d.cat2===fcat2));
+  let branches=BRANCH_SUM_ORDER.filter(b=>ALL.some(d=>d.branch===b)).concat([...new Set(ALL.map(d=>d.branch))].filter(b=>!BRANCH_SUM_ORDER.includes(b)));branches=orderBranches(branches,'sum');const VB=branches.filter(b=>!HIDDEN.has('sum:br:'+b));
+  let months=allMonths.filter(m=>D.some(d=>d.month===m));
+  const grand=aggBy(mcol('sum','sum:total'),ALL.map(d=>d.qty))||1;
+  const M={};
+  D.forEach(d=>{const m=d.month,br=brandOf(d.identity),id=d.identity;M[m]=M[m]||{};M[m][br]=M[m][br]||{};M[m][br][id]=M[m][br][id]||{};(M[m][br][id][d.branch]=M[m][br][id][d.branch]||[]).push(d.qty);});
+  const qOf=brMap=>{let a=[];Object.values(brMap).forEach(x=>a=a.concat(x));return a;};
+  const sumId=(m,br,id)=>aggBy(mcol('sum','sum:total'),qOf(M[m][br][id]));
+  const brAllQ=(m,br)=>{let a=[];Object.keys(M[m][br]).forEach(id=>a=a.concat(qOf(M[m][br][id])));return a;};
+  const sumBr=(m,br)=>aggBy(mcol('sum','sum:total'),brAllQ(m,br));
+  const idCount=m=>{let n=0;Object.keys(M[m]||{}).forEach(br=>n+=Object.keys(M[m][br]).length);return n;};
+  let html='<table class="pivot"><thead><tr>';
+  const sY=!HIDDEN.has('sum:year'),sM=!HIDDEN.has('sum:month'),sC=!HIDDEN.has('sum:cat'),sI=!HIDDEN.has('sum:id'),sT=!HIDDEN.has('sum:total'),sP=!HIDDEN.has('sum:pct');
+  if(sY)html+='<th>'+clabel('sum:year',tr('c_year'))+'</th>';if(sM)html+='<th>'+clabel('sum:month',tr('c_month'))+'</th>';if(sC)html+='<th>'+clabel('sum:cat',tr('c_cat'))+'</th>';if(sI)html+='<th>'+clabel('sum:id',tr('f_identity'))+'</th>';
+  VB.forEach(b=>html+='<th>'+clabel('sum:br:'+b,bn(b))+'</th>');
+  if(sT)html+='<th>'+clabel('sum:total',tr('c_total'))+'</th>';if(sP)html+='<th>'+clabel('sum:pct',tr('c_pct'))+'</th>';html+='</tr></thead><tbody>';
+  const years=[...new Set(months.map(yearOf))].sort();
+  years.forEach(y=>{
+    const ymonths=months.filter(m=>yearOf(m)===y);
+    let yearRows=0;ymonths.forEach(m=>{yearRows+=idCount(m);});
+    let firstY=true;
+    ymonths.forEach(m=>{
+      let brands=BRAND_ORDER.filter(b=>M[m]&&M[m][b]).concat(Object.keys(M[m]||{}).filter(b=>!BRAND_ORDER.includes(b)));
+      brands.sort((a,b)=>sumBr(m,b)-sumBr(m,a));
+      const monthRows=idCount(m);
+      let firstM=true;
+      brands.forEach(br=>{
+        const ids=Object.keys(M[m][br]).sort((a,b)=>sumId(m,br,b)-sumId(m,br,a));
+        let firstBr=true;
+        ids.forEach(id=>{
+          html+='<tr>';
+          if(sY){if(firstY){html+='<td class="yr" rowspan="'+yearRows+'">'+y+'</td>';firstY=false;}}
+          if(sM){if(firstM){html+='<td class="mo" rowspan="'+monthRows+'">'+mn(m)+'</td>';firstM=false;}}
+          if(sC){if(firstBr){html+='<td class="cat" rowspan="'+ids.length+'">'+br+'</td>';firstBr=false;}}
+          if(sI)html+='<td class="idc">'+mv('identity',id)+'</td>';
+          const rt=sumId(m,br,id);
+          VB.forEach(b=>{const v=aggBy(mcol('sum','sum:br:'+b),M[m][br][id][b]||[]);html+='<td class="'+(v?'':'zero')+'">'+fmt(v)+'</td>';});
+          if(sT)html+='<td class="tot">'+fmt(rt)+'</td>';if(sP)html+='<td class="pct">'+(grand?(rt/grand*100).toFixed(1):0)+'%</td>';html+='</tr>';
+        });
+      });
+    });
+  });
+  const Dtot=aggBy(mcol('sum','sum:total'),D.map(d=>d.qty));
+  const lead=(sY?1:0)+(sM?1:0)+(sC?1:0)+(sI?1:0);
+  html+='<tr class="grand">';if(lead>0)html+='<td colspan="'+lead+'">'+tr('sum_grand')+'</td>';
+  VB.forEach(b=>{const v=aggBy(mcol('sum','sum:br:'+b),D.filter(d=>d.branch===b).map(d=>d.qty));html+='<td>'+fmt(v)+'</td>';});
+  if(sT)html+='<td>'+fmt(Dtot)+'</td>';if(sP)html+='<td>'+(Math.abs(Dtot-grand)<0.0001?'100%':(grand?(Dtot/grand*100).toFixed(1):0)+'%')+'</td>';html+='</tr></tbody></table>';
+  document.getElementById('pivot-wrap').innerHTML=html;
+  const realGrand=aggBy(mcol('sum','sum:total'),ALL.map(d=>d.qty));const cntEl=document.getElementById('sum-count');if(cntEl)cntEl.textContent=realGrand?fmt(Dtot)+' / '+fmt(realGrand)+'  ('+(Dtot/realGrand*100).toFixed(1)+'%)':'—';
+
+  const rtl=LANG==='ar';
+  const bt={};D.forEach(d=>{const br=brandOf(d.identity);bt[br]=(bt[br]||0)+d.qty;});
+  const bl=BRAND_ORDER.filter(b=>bt[b]).concat(Object.keys(bt).filter(b=>!BRAND_ORDER.includes(b)));
+  mk('s_brand',{type:'pie',data:{labels:bl,datasets:[{data:bl.map(b=>bt[b]),backgroundColor:bl.map(b=>BRAND_COLORS[b]||'#94a3b8'),borderColor:'#fff',borderWidth:2,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:((window.innerWidth||999)<=540?{top:6,bottom:6,left:8,right:8}:{top:22,bottom:22,left:66,right:66})},plugins:{legend:{rtl:rtl,position:((window.innerWidth||999)<=540?'bottom':(rtl?'left':'right')),labels:{font:{size:11},boxWidth:11,usePointStyle:true,pointStyle:'circle',padding:9,generateLabels:ch=>ch.data.labels.map((l,i)=>{const v=ch.data.datasets[0].data[i];return {text:l+'  '+fmt(v)+' ('+(v/grand*100).toFixed(0)+'%)',fillStyle:ch.data.datasets[0].backgroundColor[i],strokeStyle:'#fff',index:i};})}},
+      tooltip:{rtl:rtl,callbacks:{label:ctx=>'  '+fmt(ctx.raw)+' ('+(ctx.raw/grand*100).toFixed(1)+'%)'}}}},plugins:[pieOut()]});
+
+  const mt={};D.forEach(d=>{mt[d.month]=(mt[d.month]||0)+d.qty;});
+  const ml=months.slice().reverse();
+  mk('s_month',{type:'bar',data:{labels:ml.map(m=>mn(m)+' ('+yearOf(m)+')'),datasets:[{data:ml.map(m=>mt[m]||0),borderRadius:5,maxBarThickness:22,
+    backgroundColor:cx=>{const{chart}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.teal;return hgrad(ctx,chartArea,C.teal,shade(C.teal,55));}}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},dl:{}},scales:{x:{display:false,grace:'26%',reverse:rtl},y:{position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'}}}}},plugins:[dlabel]});
+  if(charts.s_brand)charts.s_brand.options.onClick=chartClick(el=>{const br=bl[el.index];return {rows:D.filter(d=>brandOf(d.identity)===br),title:br};});
+  if(charts.s_month)charts.s_month.options.onClick=chartClick(el=>{const m=ml[el.index];return {rows:D.filter(d=>d.month===m),title:mn(m)};});
+}
+
+let SKU_DIM='size';
+function setSkuDim(d){SKU_DIM=d;document.getElementById('sku-dim-size').classList.toggle('on',d==='size');document.getElementById('sku-dim-pack').classList.toggle('on',d==='pack');buildSku();}
+function clearSkuFilters(){document.getElementById('sku-search').value='';document.getElementById('sku-cat').value='';buildSku();}
+function buildSku(){
+  const ALL=DATA;CURAGG=AGGS.sku;
+  const allBrands=BRAND_ORDER.filter(b=>ALL.some(d=>brandOf(d.identity)===b)).concat([...new Set(ALL.map(d=>brandOf(d.identity)))].filter(b=>!BRAND_ORDER.includes(b)));
+  fillSel('sku-cat',allBrands.map(b=>[b,b]));
+  const q=(document.getElementById('sku-search').value||'').trim().toLowerCase();
+  const fc=document.getElementById('sku-cat').value;
+  const D=ALL.filter(d=>(fc===''||brandOf(d.identity)===fc)&&(q===''||String(d.item_code||'').toLowerCase().includes(q)));
+  let branches=BRANCH_SUM_ORDER.filter(b=>ALL.some(d=>d.branch===b)).concat([...new Set(ALL.map(d=>d.branch))].filter(b=>!BRANCH_SUM_ORDER.includes(b)));branches=orderBranches(branches,'sku');const VB=branches.filter(b=>!HIDDEN.has('sku:br:'+b));
+  const grand=aggBy(mcol('sku','sku:total'),ALL.map(d=>d.qty))||1;
+  // structure: brand -> item -> {desc, branchSums}
+  const M={};
+  D.forEach(d=>{const br=brandOf(d.identity),it=d.item_code||'-';M[br]=M[br]||{};M[br][it]=M[br][it]||{size:d.size,pack:d.pack,b:{}};if(!M[br][it].size)M[br][it].size=d.size;if(!M[br][it].pack)M[br][it].pack=d.pack;(M[br][it].b[d.branch]=M[br][it].b[d.branch]||[]).push(d.qty);});
+  const itot=(o)=>{let a=[];Object.values(o.b).forEach(x=>a=a.concat(x));return aggBy(mcol('sku','sku:total'),a);};
+  let _krts=[];Object.keys(M).forEach(br=>Object.keys(M[br]).forEach(it=>_krts.push(itot(M[br][it]))));const _kavg=_krts.length?_krts.reduce((s,x)=>s+x,0)/_krts.length:0;
+  let html='<table class="pivot"><thead><tr>';
+  const kC=!HIDDEN.has('sku:cat'),kI=!HIDDEN.has('sku:code'),kS=!HIDDEN.has('sku:size'),kK=!HIDDEN.has('sku:pack'),kT=!HIDDEN.has('sku:total'),kP=!HIDDEN.has('sku:pct');
+  if(kC)html+='<th>'+clabel('sku:cat',tr('c_cat'))+'</th>';if(kI)html+='<th>'+clabel('sku:code',tr('c_code'))+'</th>';if(kS)html+='<th>'+clabel('sku:size',tr('c_size'))+'</th>';if(kK)html+='<th>'+clabel('sku:pack',tr('c_pack2'))+'</th>';
+  VB.forEach(b=>html+='<th>'+clabel('sku:br:'+b,bn(b))+'</th>');
+  if(kT)html+='<th>'+clabel('sku:total',tr('c_total'))+'</th>';if(kP)html+='<th>'+clabel('sku:pct',tr('c_pct'))+'</th>';html+='</tr></thead><tbody>';
+  const brands=allBrands.filter(b=>M[b]);
+  brands.forEach(br=>{
+    const items=Object.keys(M[br]).sort((a,b)=>itot(M[br][b])-itot(M[br][a]));
+    let firstB=true;
+    items.forEach(it=>{
+      html+='<tr>';
+      if(kC){if(firstB){html+='<td class="yr" rowspan="'+items.length+'">'+br+'</td>';firstB=false;}}
+      if(kI)html+='<td class="mo">'+it+'</td>';if(kS)html+='<td class="cat">'+(M[br][it].size||'')+'</td>';if(kK)html+='<td class="cat">'+(M[br][it].pack||'')+'</td>';
+      let ra=[];branches.forEach(b=>{if(M[br][it].b[b])ra=ra.concat(M[br][it].b[b]);});const rt=aggBy(mcol('sku','sku:total'),ra);VB.forEach(b=>{const v=aggBy(mcol('sku','sku:br:'+b),M[br][it].b[b]||[]);html+='<td class="'+(v?'':'zero')+'">'+fmt(v)+'</td>';});
+      if(kT)html+='<td class="tot">'+fmt(rt)+'</td>';if(kP)html+='<td class="pct">'+(grand?(rt/grand*100).toFixed(1):0)+'%</td>';html+='</tr>';
+    });
+  });
+  const Dtot=aggBy(mcol('sku','sku:total'),D.map(d=>d.qty));
+  const klead=(kC?1:0)+(kI?1:0)+(kS?1:0)+(kK?1:0);
+  html+='<tr class="grand">';if(klead>0)html+='<td colspan="'+klead+'">'+tr('sum_grand')+'</td>';
+  VB.forEach(b=>{const v=aggBy(mcol('sku','sku:br:'+b),D.filter(d=>d.branch===b).map(d=>d.qty));html+='<td>'+fmt(v)+'</td>';});
+  if(kT)html+='<td>'+fmt(Dtot)+'</td>';if(kP)html+='<td>'+(Math.abs(Dtot-grand)<0.0001?'100%':(grand?(Dtot/grand*100).toFixed(1):0)+'%')+'</td>';html+='</tr></tbody></table>';
+  document.getElementById('sku-wrap').innerHTML=html;
+  const realGrand=aggBy(mcol('sku','sku:total'),ALL.map(d=>d.qty));const cnt=document.getElementById('sku-count');if(cnt)cnt.textContent=realGrand?fmt(Dtot)+' / '+fmt(realGrand)+'  ('+(Dtot/realGrand*100).toFixed(1)+'%)':'—';
+  // top items chart
+  const it={};D.forEach(d=>{const k=(d.item_code||'-');it[k]=(it[k]||0)+d.qty;});
+  const top=Object.keys(it).sort((a,b)=>it[b]-it[a]).slice(0,15);
+  const rtl=LANG==='ar';
+  mk('sku_top',{type:'bar',data:{labels:top,datasets:[{data:top.map(k=>it[k]),borderRadius:5,maxBarThickness:20,
+    backgroundColor:cx=>{const{chart}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.navy;return hgrad(ctx,chartArea,C.navy,C.blue);}}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},dl:{}},scales:{x:{display:false,grace:'28%',reverse:rtl},y:{position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'}}}}},plugins:[dlabel]});
+  if(charts.sku_top)charts.sku_top.options.onClick=chartClick(el=>{const code=top[el.index];return {rows:D.filter(d=>(d.item_code||'-')===code),title:tr('c_code')+' '+code};});
+}
+/* ===== AUTH / USERS ===== */
+let CURRENT_USER=null;
+function val(id){const e=document.getElementById(id);return e?e.value:'';}
+function getUsers(){try{return JSON.parse(localStorage.getItem('dash_users')||'null');}catch(e){return null;}}
+function saveUsers(u){try{localStorage.setItem('dash_users',JSON.stringify(u));}catch(e){}try{pushUsersToCloud(u);}catch(e){}}
+function seedUsers(){if(!getUsers())saveUsers([{u:'admin',p:'admin123',r:'admin'}]);}
+function isAdmin(){return !!(CURRENT_USER&&CURRENT_USER.r==='admin');}
+const ALL_PAGES=['dash','sum','sku','records','imp','cloud','designer'];
+const PAGE_LABEL={dash:'nav_dash',sum:'nav_sum',sku:'nav_sku',records:'nav_records',imp:'nav_imp',cloud:'nav_cloud',designer:'nav_designer'};
+function canView(p){if(isAdmin())return true;if(p==='users')return false;if(p==='dash')return true;return !!(CURRENT_USER&&CURRENT_USER.perms&&CURRENT_USER.perms.indexOf(p)>=0);}
+function applyRole(){
+  const admin=isAdmin();
+  document.body.classList.toggle('is-admin',admin);
+  document.querySelectorAll('.admin-only').forEach(el=>{el.style.display=admin?'':'none';});
+  document.querySelectorAll('.navbtn[data-page]').forEach(b=>{b.style.display=canView(b.dataset.page)?'':'none';});
+  document.querySelectorAll('.nav-group').forEach(gr=>{const any=Array.prototype.some.call(gr.querySelectorAll('.navbtn[data-page]'),b=>canView(b.dataset.page));gr.style.display=any?'':'none';});
+  if(CURRENT_USER){const cu=document.getElementById('cur-user');if(cu)cu.textContent=CURRENT_USER.u;const rr=document.getElementById('cur-role');if(rr){rr.textContent=tr(admin?'u_admin':'u_userrole');rr.className='urole'+(admin?'':' user');}}
+  document.querySelectorAll('.page').forEach(pg=>{if(pg.classList.contains('show')){const p=pg.id.replace('page-','');if(!canView(p))go('dash');}});
+}
+function doLogin(){
+  const u=(val('login-user')||'').trim(),p=val('login-pass')||'';
+  const us=getUsers()||[];const fnd=us.find(x=>x.u.toLowerCase()===u.toLowerCase()&&x.p===p);
+  if(!fnd){document.getElementById('login-err').textContent=tr('login_bad');return;}
+  if(fnd.temp){const np=prompt(tr('temp_prompt'));if(np&&np.trim()){const us2=getUsers();const u2=us2.find(y=>y.u===fnd.u);if(u2){u2.p=np.trim();u2.temp=false;saveUsers(us2);}}}
+  CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};
+  try{localStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
+  document.getElementById('login-err').textContent='';document.getElementById('login-pass').value='';
+  document.getElementById('login-ov').style.display='none';applyRole();go('dash');
+}
+function logout(){CURRENT_USER=null;try{localStorage.removeItem('dash_session');}catch(e){}document.body.classList.remove('is-admin');go('dash');document.getElementById('login-ov').style.display='flex';}
+function renderUsers(){
+  const us=getUsers()||[];let html='<thead><tr><th>'+tr('u_user')+'</th><th>'+tr('u_email')+'</th><th>'+tr('u_mobile')+'</th><th>'+tr('u_password')+'</th><th>'+tr('u_role')+'</th><th>'+tr('u_temp')+'</th><th>'+tr('u_perms')+'</th><th>'+tr('u_actions')+'</th></tr></thead><tbody>';
+  us.forEach((x,i)=>{const me=CURRENT_USER&&x.u===CURRENT_USER.u;
+    html+='<tr><td><b>'+x.u+'</b></td>';
+    html+='<td><input type="email" value="'+String(x.email||'').replace(/"/g,'&quot;')+'" oninput="setUserField('+i+',\'email\',this.value)" style="width:160px"></td>';
+    html+='<td><input type="text" value="'+String(x.mobile||'').replace(/"/g,'&quot;')+'" oninput="setUserField('+i+',\'mobile\',this.value)" style="width:120px"></td>';
+    html+='<td><span style="color:#94a3b8;letter-spacing:2px">&#8226;&#8226;&#8226;&#8226;&#8226;</span> <button class="btn-cols" style="padding:5px 10px" onclick="resetUserPwd('+i+')">&#128273; '+tr('u_resetpwd')+'</button></td>';
+    html+='<td><select onchange="setUserField('+i+',\'r\',this.value)"'+(me?' disabled':'')+'><option value="user" '+(x.r!=='admin'?'selected':'')+'>'+tr('u_userrole')+'</option><option value="admin" '+(x.r==='admin'?'selected':'')+'>'+tr('u_admin')+'</option></select></td>';
+    html+='<td style="text-align:center"><label style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" '+(x.temp?'checked':'')+' onchange="setUserField('+i+',\'temp\',this.checked)"> '+tr('u_temp')+'</label></td>';
+    if(x.r==='admin'){html+='<td><span class="role-tag admin">'+tr('u_all')+'</span></td>';}
+    else{let pc='<div class="perm-grid">';ALL_PAGES.forEach(pg=>{if(pg==='dash')return;const on=(x.perms||[]).indexOf(pg)>=0;pc+='<label><input type="checkbox" '+(on?'checked':'')+' onchange="toggleUserPerm('+i+',\''+pg+'\')"> '+tr(PAGE_LABEL[pg])+'</label>';});pc+='</div>';html+='<td>'+pc+'</td>';}
+    html+='<td>'+(me?'<span style="color:#94a3b8">—</span>':'<button class="del-btn" onclick="delUser('+i+')">'+tr('u_delete')+'</button>')+'</td></tr>';});
+  html+='</tbody>';document.getElementById('utable').innerHTML=html;
+}
+function resetUserPwd(i){const us=getUsers()||[];if(!us[i])return;const np=prompt(tr('set_new_pwd')+' ('+us[i].u+')');if(np&&np.trim()){us[i].p=np.trim();saveUsers(us);renderUsers();try{alert(tr('pwd_changed'));}catch(e){}}}
+function setUserField(i,field,v){const us=getUsers()||[];if(!us[i])return;us[i][field]=v;if(field==='r'&&v==='user'&&!us[i].perms)us[i].perms=['dash','sum','sku'];saveUsers(us);if(field==='r')renderUsers();}
+function toggleUserPerm(i,page){const us=getUsers()||[];if(!us[i])return;us[i].perms=us[i].perms||['dash','sum','sku'];const idx=us[i].perms.indexOf(page);if(idx>=0)us[i].perms.splice(idx,1);else us[i].perms.push(page);saveUsers(us);}
+function addUser(){
+  const u=(val('nu-user')||'').trim(),p=(val('nu-pass')||'').trim(),r=val('nu-role')||'user';const msg=document.getElementById('u-msg');
+  if(!u||!p){msg.textContent=tr('u_need');return;}
+  let us=getUsers()||[];if(us.some(x=>x.u.toLowerCase()===u.toLowerCase())){msg.textContent=tr('u_exists');return;}
+  us.push({u:u,p:p,r:r,email:(val('nu-email')||'').trim(),mobile:(val('nu-mobile')||'').trim(),perms:['dash','sum','sku'],temp:false});saveUsers(us);['nu-user','nu-pass','nu-email','nu-mobile'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});msg.textContent='';renderUsers();
+}
+function delUser(i){let us=getUsers()||[];if(!us[i])return;if(CURRENT_USER&&us[i].u===CURRENT_USER.u)return;us.splice(i,1);saveUsers(us);renderUsers();}
+function initAuth(){
+  seedUsers();let s=null;try{s=JSON.parse(localStorage.getItem('dash_session')||'null');}catch(e){}
+  if(s&&s.u){const us=getUsers()||[];const fnd=us.find(x=>x.u===s.u);if(fnd){CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};document.getElementById('login-ov').style.display='none';applyRole();return;}}
+}
+/* ===== FIREBASE CLOUD SYNC ===== */
+/* ==================================================================================
+   Firebase config embedded so EVERY device that opens this file auto-connects
+   to the same cloud data + user accounts, with no manual setup.
+   ================================================================================== */
+const EMBEDDED_FB_CONFIG = {
+  apiKey:            "AIzaSyBkuGlDpXM4uvKkCFegIni7-HsHZHDtn1U",
+  authDomain:        "ali-28d63.firebaseapp.com",
+  projectId:         "ali-28d63",
+  storageBucket:     "ali-28d63.firebasestorage.app",
+  messagingSenderId: "902073937069",
+  appId:             "1:902073937069:web:e21a6501cc8c82db362a24",
+  measurementId:     "G-2TNVT4VDBC"
+};
+/* ================================================================================== */
+let fbApp=null,fbDB=null,fbReady=false,fbUnsub=null,LAST_FILE='',_lastSelfTs=0;
+const FB_COL='inventory_dashboard',FB_DOC='latest';
+/* ----- Cross-device login/accounts sync (users stored in Firestore too) ----- */
+const FB_USERS_DOC='users';
+let fbUsersUnsub=null,_pushUsersT=null,_lastUsersJson='',_usersCloudReady=false;
+function pushUsersToCloud(u){
+  try{
+    if(!fbReady||!fbDB||!_usersCloudReady)return; // never clobber cloud before first pull
+    const json=JSON.stringify(u||getUsers()||[]);
+    if(json===_lastUsersJson)return; // unchanged / echo of what we already have
+    _lastUsersJson=json;
+    if(_pushUsersT)clearTimeout(_pushUsersT);
+    _pushUsersT=setTimeout(function(){try{fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:JSON.parse(json),updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}},400);
+  }catch(e){}
+}
+function fbUsersSync(){
+  try{
+    if(!fbReady||!fbDB)return;
+    if(fbUsersUnsub){fbUsersUnsub();fbUsersUnsub=null;}
+    fbUsersUnsub=fbDB.collection(FB_COL).doc(FB_USERS_DOC).onSnapshot({includeMetadataChanges:false},function(doc){
+      if(!doc.exists){ // no accounts doc in cloud yet -> seed it from this device
+        _usersCloudReady=true;
+        var local=getUsers();
+        if(local&&local.length){_lastUsersJson=JSON.stringify(local);try{fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:local,updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}}
+        return;
+      }
+      if(doc.metadata&&doc.metadata.hasPendingWrites)return; // our own un-acked write
+      var dd=doc.data();if(!dd||!Array.isArray(dd.users))return;
+      var json=JSON.stringify(dd.users);
+      _lastUsersJson=json;_usersCloudReady=true;
+      try{localStorage.setItem('dash_users',json);}catch(e){}
+      try{
+        if(CURRENT_USER){var fnd=dd.users.find(function(x){return x.u===CURRENT_USER.u;});if(fnd){CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};applyRole();}}
+        var pu=document.getElementById('page-users');
+        if(pu&&pu.classList.contains('show'))renderUsers();
+      }catch(e){}
+    },function(e){});
+  }catch(e){}
+}
+// Unique id for THIS browser tab/device, so we can tell our own writes apart from teammates'.
+let FB_CLIENT_ID='';try{FB_CLIENT_ID=localStorage.getItem('fb_client_id')||'';}catch(e){}
+if(!FB_CLIENT_ID){FB_CLIENT_ID='c_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);try{localStorage.setItem('fb_client_id',FB_CLIENT_ID);}catch(e){}}
+// Highest updatedAt we have already applied/sent, to ignore stale or self-originated snapshots.
+let _lastAppliedTs=0;
+// Until the first cloud snapshot lands, do NOT push the locally-cached copy up — it may be stale
+// and would clobber a newer cloud version (the storage-vs-sync race the user identified).
+let _cloudSynced=false;
+function fbMsg(en,ar){return LANG==='ar'?ar:en;}
+let _toastT=null;
+function syncToast(msg,type){var el=document.getElementById('sync-toast');if(!el)return;el.textContent=msg;el.className='sync-toast '+(type||'ok')+' show';if(_toastT)clearTimeout(_toastT);_toastT=setTimeout(()=>{el.className='sync-toast '+(type||'ok');},(type==='err'?6000:3200));}
+function cloudStatus(cls,txt){const s=document.getElementById('cloud-status');if(!s)return;s.className='cl-status '+cls;document.getElementById('cloud-status-txt').textContent=txt;document.getElementById('cloud-status-txt').removeAttribute('data-i18n');}
+function setCloudBtns(){const on=fbReady;document.getElementById('btn-save').disabled=!on;document.getElementById('btn-load').disabled=!on;document.getElementById('nav-cloud').classList.toggle('cloud-on',on);}
+function parseFbConfig(txt){if(!txt)return null;let s=txt;const i=s.indexOf('{'),j=s.lastIndexOf('}');if(i<0||j<0)return null;s=s.slice(i,j+1);try{return (new Function('return ('+s+')'))();}catch(e){return null;}}
+function fbConnect(silent){
+  if(typeof firebase==='undefined'){cloudStatus('err',fbMsg('Firebase SDK not loaded (check internet).','تعذّر تحميل Firebase SDK (تحقق من الإنترنت).'));return false;}
+  const cfg=fbCfgFromFields();
+  if(!cfg.apiKey||!cfg.projectId){cloudStatus('err',fbMsg('Enter at least API Key and Project ID.','أدخل على الأقل API Key و Project ID.'));return false;}
+  try{
+    fbApp=firebase.initializeApp(cfg,'app_'+Date.now());
+    fbDB=firebase.firestore(fbApp);
+    fbReady=true;
+    try{localStorage.setItem('fb_config_fields',JSON.stringify(cfg));}catch(e){}
+    cloudStatus('ok',fbMsg('Connected to '+cfg.projectId,'متصل بـ '+cfg.projectId));
+    setCloudBtns();
+    // Always turn on live two-way sync once connected, so edits reach teammates automatically.
+    try{
+      const lc=document.getElementById('cloud-live');
+      if(lc&&!lc.checked){lc.checked=true;localStorage.setItem('fb_live','1');toggleLive();}
+      else if(lc&&lc.checked&&!fbUnsub){toggleLive();}
+      const ac=document.getElementById('cloud-auto');
+      if(ac&&!ac.checked){ac.checked=true;localStorage.setItem('fb_auto','1');}
+    }catch(e){}
+    try{fbUsersSync();}catch(e){}
+    return true;
+  }catch(e){fbReady=false;cloudStatus('err',fbMsg('Connection failed: ','فشل الاتصال: ')+e.message);setCloudBtns();return false;}
+}
+const FB_FIELDS=['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId'];
+function fbCfgFromFields(){
+  const g=id=>((document.getElementById('fb-'+id)||{}).value||'').trim();
+  const cfg={};FB_FIELDS.forEach(k=>{const v=g(k);if(v)cfg[k]=v;});
+  if(cfg.projectId){if(!cfg.authDomain)cfg.authDomain=cfg.projectId+'.firebaseapp.com';if(!cfg.storageBucket)cfg.storageBucket=cfg.projectId+'.appspot.com';}
+  return cfg;
+}
+function fbFillFromPaste(){
+  const txt=((document.getElementById('cloud-config')||{}).value||'').trim();
+  const cfg=parseFbConfig(txt);
+  if(!cfg){cloudStatus('err',fbMsg('Could not read the pasted config.','تعذّر قراءة الإعدادات الملصقة.'));return;}
+  FB_FIELDS.forEach(k=>{const el=document.getElementById('fb-'+k);if(el&&cfg[k]!=null)el.value=cfg[k];});
+  cloudStatus('ok',fbMsg('Fields filled from config.','تم تعبئة الحقول من الإعدادات.'));
+}
+function saveToCloud(silent){
+  if(!fbReady){cloudStatus('err',fbMsg('Connect first.','اتصل أولاً.'));return;}
+  cloudStatus('work',fbMsg('Saving...','جارٍ الحفظ...'));
+  const dateTxt=(document.getElementById('upddate').textContent||'').trim();
+  let ts=Date.now();if(ts<=_lastAppliedTs)ts=_lastAppliedTs+1; // keep timestamps strictly increasing
+  _lastSelfTs=ts;_lastAppliedTs=ts;
+  const payload={records:DATA,count:DATA.length,updateDate:dateTxt,name:LAST_FILE||'',updatedAt:ts,clientId:FB_CLIENT_ID};
+  fbDB.collection(FB_COL).doc(FB_DOC).set(payload)
+    .then(()=>{cloudStatus('ok',fbMsg('Saved '+DATA.length+' records to cloud.','تم حفظ '+DATA.length+' سجل في السحابة.'));syncToast(fbMsg('\u2601\uFE0F Synced '+DATA.length+' records','\u2601\uFE0F تمت مزامنة '+DATA.length+' سجل'),'ok');})
+    .catch(e=>{const big=/(longer than|exceeds|1048|too large|maximum)/i.test((e&&e.message)||'');const perm=/(permission|insufficient|PERMISSION_DENIED)/i.test((e&&(e.code+' '+e.message))||'');const m=fmsgErr(e,big,perm);cloudStatus('err',m);syncToast(m,'err');});
+}
+function fmsgErr(e,big,perm){if(big)return fmbMsgBig();if(perm)return fbMsg('Sync failed: check Firestore Rules (allow write).','فشل المزامنة: تحقق من قواعد Firestore (allow write).');return fbMsg('Sync failed: ','فشل المزامنة: ')+((e&&e.message)||e);}
+function fmbMsgBig(){return fbMsg('Sync failed: data too large for one Firestore document (1MB limit).','فشل المزامنة: البيانات أكبر من حد وثيقة Firestore (1 ميجابايت).');}
+function fbTest(){
+  cloudStatus('work',fbMsg('Testing connection…','جارٍ اختبار الاتصال…'));
+  if(!fbReady && !fbConnect(true))return;
+  const ref=fbDB.collection(FB_COL).doc('_conn_test');const stamp=Date.now();
+  ref.set({t:stamp,by:(CURRENT_USER&&CURRENT_USER.u)||'?'})
+    .then(()=>ref.get())
+    .then(doc=>{const ok=doc.exists&&doc.data().t===stamp;return ref.delete().then(()=>ok).catch(()=>ok);})
+    .then(ok=>{
+      const pid=((fbApp&&fbApp.options&&fbApp.options.projectId)||'');
+      if(ok)cloudStatus('ok',fbMsg('\u2705 Connection OK — read & write work. Project: '+pid,'\u2705 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0633\u0644\u064a\u0645 \u2014 \u0627\u0644\u0642\u0631\u0627\u0621\u0629 \u0648\u0627\u0644\u0643\u062a\u0627\u0628\u0629 \u062a\u0639\u0645\u0644\u0627\u0646. \u0627\u0644\u0645\u0634\u0631\u0648\u0639: '+pid));
+      else cloudStatus('err',fbMsg('Connected but verify failed.','\u0627\u062a\u0635\u0644 \u0644\u0643\u0646 \u0627\u0644\u062a\u062d\u0642\u0642 \u0641\u0634\u0644.'));
+    })
+    .catch(e=>{const perm=/(permission|insufficient|PERMISSION_DENIED)/i.test((e&&(e.code+' '+e.message))||'');
+      cloudStatus('err',fbMsg('Test failed: ','\u0641\u0634\u0644 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631: ')+((e&&e.message)||e)+(perm?fbMsg('  \u2192 Fix Firestore Rules (allow read, write).','  \u2190 \u0627\u0636\u0628\u0637 \u0642\u0648\u0627\u0639\u062f Firestore (allow read, write).'):''));
+    });
+}
+function applyCloudData(d){
+  if(!d||!Array.isArray(d.records)){cloudStatus('err',fbMsg('No data found in cloud.','لا توجد بيانات في السحابة.'));return;}
+  DATA=d.records;saveData();buildFilters(true);render();
+  syncToast(fbMsg('\u2601\uFE0F Updated from cloud: '+DATA.length+' records','\u2601\uFE0F تم التحديث من السحابة: '+DATA.length+' سجل'),'ok');
+  if(document.getElementById('page-sum').classList.contains('show'))buildSummary();
+  if(document.getElementById('page-sku').classList.contains('show'))buildSku();
+  if(d.updateDate){const v='&nbsp;'+d.updateDate.replace(/^\s+/,'');['upddate','upddate2','upddate3'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=v;});}
+  cloudStatus('ok',fbMsg('Loaded '+DATA.length+' records from cloud.','تم تحميل '+DATA.length+' سجل من السحابة.'));
+}
+function loadFromCloud(silent){
+  if(!fbReady){cloudStatus('err',fbMsg('Connect first.','اتصل أولاً.'));return;}
+  cloudStatus('work',fbMsg('Loading...','جارٍ التحميل...'));
+  fbDB.collection(FB_COL).doc(FB_DOC).get()
+    .then(doc=>{if(!doc.exists){cloudStatus('err',fbMsg('No saved data in cloud yet.','لا توجد بيانات محفوظة بعد.'));return;}const dd=doc.data();if(dd&&dd.updatedAt)_lastAppliedTs=dd.updatedAt;_cloudSynced=true;applyCloudData(dd);})
+    .catch(e=>cloudStatus('err',fbMsg('Load failed: ','فشل التحميل: ')+e.message));
+}
+function toggleLive(){
+  const el=document.getElementById('cloud-live');const on=el.checked;
+  try{localStorage.setItem('fb_live',on?'1':'0');}catch(e){}
+  if(fbUnsub){fbUnsub();fbUnsub=null;}
+  if(on){
+    if(!fbReady && !fbConnect(true)){el.checked=false;try{localStorage.setItem('fb_live','0');}catch(e){}return;}
+    // The onSnapshot listener fires immediately with the current server doc on attach,
+    // so it doubles as the initial load. The cloud copy thus always overrides the local cache.
+    fbUnsub=fbDB.collection(FB_COL).doc(FB_DOC).onSnapshot({includeMetadataChanges:false},doc=>{
+      if(!doc.exists)return;
+      if(doc.metadata&&doc.metadata.hasPendingWrites)return; // skip our own un-acked local write
+      const dd=doc.data();if(!dd)return;
+      if(dd.clientId&&dd.clientId===FB_CLIENT_ID)return; // skip our own confirmed write
+      const ts=dd.updatedAt||0;
+      if(ts&&ts<_lastAppliedTs)return; // only reject STRICTLY older docs (never block first load)
+      _lastAppliedTs=ts;
+      _cloudSynced=true; // cloud has taken over from local cache; safe to auto-push edits now
+      applyCloudData(dd);
+    },e=>cloudStatus('err',fbMsg('Live sync error: ','خطأ المزامنة: ')+e.message));
+    cloudStatus('ok',fbMsg('Live sync enabled.','المزامنة اللحظية مفعّلة.'));
+  }
+}
+let _autoSaveT=null;
+// Call this for ANY direct user edit. It marks the session as "owner of the latest change"
+// so the auto-push guard lets the edit reach the cloud even if no snapshot has arrived yet.
+function userEdited(){_cloudSynced=true;saveData();cloudAutoSave();}
+function cloudAutoSave(){
+  try{
+    const a=document.getElementById('cloud-auto'),l=document.getElementById('cloud-live');
+    const want=(a&&a.checked)||(l&&l.checked);
+    if(!(fbReady && want))return;
+    // Guard against the storage-vs-sync race: never auto-push the local cache before the cloud
+    // copy has loaded at least once. A direct user edit (see addRecord/delRecord) flips this on.
+    if(!_cloudSynced)return;
+    if(_autoSaveT)clearTimeout(_autoSaveT);
+    _autoSaveT=setTimeout(()=>{try{saveToCloud(true);}catch(e){}},900);
+  }catch(e){}
+}
+function cloudInit(){
+  let saved=null;try{saved=JSON.parse(localStorage.getItem('fb_config_fields')||'null');}catch(e){}
+  if(!saved){let cfg='';try{cfg=localStorage.getItem('fb_config')||'';}catch(e){}if(cfg){saved=parseFbConfig(cfg)||null;}}
+  // Prefer the config embedded in this file so EVERY device auto-connects with no manual setup.
+  try{if(typeof EMBEDDED_FB_CONFIG!=='undefined'&&EMBEDDED_FB_CONFIG&&EMBEDDED_FB_CONFIG.apiKey&&EMBEDDED_FB_CONFIG.projectId){saved=Object.assign({},EMBEDDED_FB_CONFIG);Object.keys(saved).forEach(k=>{if(!saved[k])delete saved[k];});try{localStorage.setItem('fb_config_fields',JSON.stringify(saved));}catch(e){}}}catch(e){}
+  if(saved)FB_FIELDS.forEach(k=>{const el=document.getElementById('fb-'+k);if(el&&saved[k]!=null)el.value=saved[k];});
+  // Auto-save + live sync are ON by default now; the checkboxes only let a user opt OUT.
+  let auto='1';try{const v=localStorage.getItem('fb_auto');if(v!=null)auto=v;}catch(e){}
+  let live='1';try{const v=localStorage.getItem('fb_live');if(v!=null)live=v;}catch(e){}
+  const ac=document.getElementById('cloud-auto');if(ac){ac.checked=(auto!=='0');ac.addEventListener('change',()=>{try{localStorage.setItem('fb_auto',ac.checked?'1':'0');}catch(e){}});}
+  const lc=document.getElementById('cloud-live');if(lc){lc.checked=(live!=='0');}
+  // If config is available, ALWAYS connect on startup so the cloud (source of truth) takes over
+  // from the locally cached copy. fbConnect() turns on live sync and an initial load itself.
+  if(saved && saved.projectId){fbConnect(true);}
+}
+function fmtDate(iso){if(!iso)return '';const p=String(iso).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:iso;}
+function applyDateStr(s){const v='&nbsp;'+s;['upddate','upddate2','upddate3'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=v;});document.querySelectorAll('.pdate').forEach(e=>{e.innerHTML=v;});}
+function printScreen(){try{document.querySelectorAll('.page').forEach(p=>p.style.animation='none');}catch(e){}try{Object.values(window.charts||{}).forEach(c=>{try{c.resize();}catch(e){}});}catch(e){}setTimeout(()=>window.print(),60);}
+function toggleFullscreen(){try{var el=document.documentElement;var fs=document.fullscreenElement||document.webkitFullscreenElement;if(!fs){(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);}else{(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);}}catch(e){}}
+function popOut(){try{var f='width=1280,height=860,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes';var wn=window.open(location.href,'tania_float_'+Date.now(),f);if(wn)wn.focus();}catch(e){}}
+function setUpdDate(){const v=document.getElementById('upd-input').value;if(!v)return;const s=fmtDate(v);applyDateStr(s);try{localStorage.setItem('upd_date',s);}catch(e){}const m=document.getElementById('upd-msg');if(m)m.textContent=tr('saved_date');try{_cloudSynced=true;cloudAutoSave();}catch(e){}}
+function applySavedDate(){let s='';try{s=localStorage.getItem('upd_date')||'';}catch(e){}if(s){applyDateStr(s);const inp=document.getElementById('upd-input');if(inp){const p=s.split('/');if(p.length===3)inp.value=p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');}}}
+function heat(v,mn,mx){if(mx<=mn)return 'hsl(80,68%,86%)';const t=(v-mn)/(mx-mn);const hue=125*(1-t);return 'hsl('+hue.toFixed(0)+',72%,'+(87-t*6).toFixed(0)+'%)';}
+function closeDetail(){document.getElementById('detail-ov').classList.remove('show');try{var t=document.querySelector('#detail-wrap table.pivot');if(t){t.style.zoom='';t.style.transform='';}}catch(e){}}
+let _lastDetail=null;
+function exportDetailExcel(){try{if(!_lastDetail||!_lastDetail.aoa||!window.XLSX)return;const ws=XLSX.utils.aoa_to_sheet(_lastDetail.aoa);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Report');let nm=(_lastDetail.title||'report').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,28)||'report';XLSX.writeFile(wb,nm+'.xlsx');}catch(e){}}
+function showDetailRows(rows,title){
+  const branches=orderBranches(allBranchesList(),'sum');
+  const MO=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+  const M={};rows.forEach(d=>{const k=d.identity+'\u0001'+d.month+'\u0001'+d.pack;if(!M[k])M[k]={i:d.identity,m:d.month,p:d.pack,b:{},t:0};M[k].b[d.branch]=(M[k].b[d.branch]||0)+d.qty;M[k].t+=d.qty;});
+  let keys=Object.keys(M).sort((a,b)=>{const A=M[a],B=M[b];const ai=A.i.localeCompare(B.i);if(ai!==0)return ai;return (MO.indexOf(A.m)-MO.indexOf(B.m))|| (B.t-A.t);});
+  const _tots=keys.map(k=>M[k].t);const _mx=_tots.length?Math.max.apply(null,_tots):0,_mn=_tots.length?Math.min.apply(null,_tots):0;
+  let html='<table class="pivot"><thead><tr><th>'+tr('c_year')+'</th><th>'+tr('f_identity')+'</th><th>'+tr('c_month')+'</th><th>'+tr('c_pack2')+'</th>';
+  branches.forEach(b=>html+='<th>'+bn(b)+'</th>');
+  html+='<th>'+tr('c_total')+'</th></tr></thead><tbody>';
+  let gt=0;const gb={};
+  keys.forEach(k=>{const r=M[k];gt+=r.t;html+='<tr><td class="yr">'+yearOf(r.m)+'</td><td class="cat">'+mv('identity',r.i)+'</td><td class="mo">'+mn(r.m)+'</td><td class="cat">'+(r.p||'')+'</td>';
+    branches.forEach(b=>{const v=r.b[b]||0;gb[b]=(gb[b]||0)+v;html+='<td class="'+(v?'':'zero')+'">'+fmt(v)+'</td>';});
+    html+='<td class="tot" style="background:'+heat(r.t,_mn,_mx)+';color:#14532d">'+fmt(r.t)+'</td></tr>';});
+  html+='<tr class="grand"><td colspan="4">'+tr('sum_grand')+'</td>';branches.forEach(b=>html+='<td>'+fmt(gb[b]||0)+'</td>');html+='<td>'+fmt(gt)+'</td></tr></tbody></table>';
+  const _aoa=[[tr('c_year'),tr('f_identity'),tr('c_month'),tr('c_pack2')].concat(branches.map(b=>bn(b))).concat([tr('c_total')])];
+  keys.forEach(k=>{const r=M[k];_aoa.push([yearOf(r.m),mv('identity',r.i),mn(r.m),r.p||''].concat(branches.map(b=>r.b[b]||0)).concat([r.t]));});
+  _aoa.push([tr('sum_grand'),'','',''].concat(branches.map(b=>gb[b]||0)).concat([gt]));
+  _lastDetail={aoa:_aoa,title:title||'Report'};
+  if(!keys.length)html='<div style="padding:36px;text-align:center;color:#94a3b8;font-weight:600">'+(LANG==='ar'?'لا توجد بيانات':'No data')+'</div>';
+  document.getElementById('detail-wrap').innerHTML=html;
+  document.getElementById('detail-title').textContent=title||'';
+  document.getElementById('detail-badge').textContent=fmt(gt)+' '+(LANG==='ar'?'وحدة':'qty')+' • '+keys.length+' '+(LANG==='ar'?'صف':'rows');
+  document.getElementById('detail-ov').classList.add('show');
+  requestAnimationFrame(function(){requestAnimationFrame(fitDetailReport);});
+}
+// Shrink the report table so the WHOLE report fits within the screen (phones only).
+function fitDetailReport(){
+  try{
+    var ov=document.getElementById('detail-ov');
+    if(!ov||!ov.classList.contains('show'))return;
+    var tbl=ov.querySelector('#detail-wrap table.pivot');
+    var body=ov.querySelector('.modal-body');
+    if(!tbl||!body)return;
+    tbl.style.zoom='';tbl.style.transform='';tbl.style.transformOrigin='top center';
+    if(window.innerWidth>900)return; // desktop keeps normal scrolling
+    var cs=getComputedStyle(body);
+    var availW=body.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+    var availH=body.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
+    var tw=tbl.scrollWidth,th=tbl.scrollHeight;
+    if(!tw||!th||!availW)return;
+    // Fit to WIDTH so the report stays within the screen horizontally while numbers
+    // remain readable; long reports simply scroll vertically instead of shrinking to dust.
+    var sc=availW/tw;
+    if(sc>=1)return;            // already fits the width at full size
+    sc=Math.max(0.6,sc*0.99);   // never shrink past a readable size; any remainder scrolls
+    if('zoom' in tbl.style){tbl.style.zoom=sc;}else{tbl.style.transform='scale('+sc+')';}
+  }catch(e){}
+}
+var _fitDetailT=null;
+function _refitDetail(){if(_fitDetailT)clearTimeout(_fitDetailT);_fitDetailT=setTimeout(fitDetailReport,180);}
+window.addEventListener('resize',_refitDetail);
+window.addEventListener('orientationchange',function(){setTimeout(fitDetailReport,350);});
+function openDetail(cls){const titles={all:tr('kpi_total'),'A<60':tr('kpi_60'),'B<90':tr('kpi_90'),'C>90':tr('kpi_g90')};showDetailRows(filtered().filter(d=>cls==='all'||d.store_class===cls),titles[cls]||'');}
+function openDetailBy(field,value,title){showDetailRows(filtered().filter(d=>String(d[field])===String(value)),title);}
+function chartClick(getInfo){return (e,els,chart)=>{if(!els||!els.length)return;const info=getInfo(els[0]);if(info)showDetailRows(info.rows,info.title);};}
+function fillSelOpts(id,opts,labeler){const s=document.getElementById(id);if(!s)return;const prev=s.value;s.innerHTML=opts.map(o=>'<option value="'+String(o).replace(/"/g,'&quot;')+'">'+(labeler?labeler(o):o)+'</option>').join('');if(opts.indexOf(prev)>=0)s.value=prev;}
+function refreshAfterData(){if(document.getElementById('page-sum').classList.contains('show'))buildSummary();if(document.getElementById('page-sku').classList.contains('show'))buildSku();}
+function renderRecords(){
+  fillSelOpts('rc-id',IDENT_ORDER,o=>mv('identity',o));
+  fillSelOpts('rc-br',BRANCH_ORDER,o=>mv('branch',o));
+  fillSelOpts('rc-size',['200','330','600','1500','250','C100']);
+  fillSelOpts('rc-cat2',['CTN','SHR','Pac'],o=>mv('cat2',o));
+  fillSelOpts('rc-month',MONTH_ORDER,o=>mn(o));
+  fillSelOpts('rc-cls',CLASS_ORDER);
+  const q=((document.getElementById('rc-search')||{}).value||'').toLowerCase();
+  let html='<thead><tr><th>'+tr('c_code')+'</th><th>'+tr('f_identity')+'</th><th>'+tr('f_branch')+'</th><th>'+tr('c_size')+'</th><th>'+tr('c_pack2')+'</th><th>'+tr('rec_cat2')+'</th><th>'+tr('c_month')+'</th><th>'+tr('f_classify')+'</th><th>'+tr('rec_qty')+'</th><th>'+tr('rec_logo')+'</th><th></th></tr></thead><tbody>';
+  DATA.forEach((d,i)=>{if(q&&((d.item_code||'')+' '+(d.identity||'')+' '+(d.branch||'')+' '+(d.pack||'')).toLowerCase().indexOf(q)<0)return;
+    html+='<tr><td>'+(d.item_code||'')+'</td><td>'+mv('identity',d.identity)+'</td><td>'+mv('branch',d.branch)+'</td><td>'+(d.size||'')+'</td><td>'+(d.pack||'')+'</td><td>'+mv('cat2',d.cat2)+'</td><td>'+mn(d.month)+'</td><td>'+(d.store_class||'')+'</td><td style="font-weight:700;color:var(--navy)">'+fmt(d.qty)+'</td><td>'+(d.logo||'')+'</td><td><button class="del-btn" onclick="delRecord('+i+')">'+tr('rec_del')+'</button></td></tr>';});
+  html+='</tbody>';document.getElementById('rec-table').innerHTML=html;
+  document.getElementById('rec-count').textContent=DATA.length+' '+(LANG==='ar'?'سجل':'records')+'  •  '+fmt(DATA.reduce((s,d)=>s+(d.qty||0),0));
+}
+function addRecord(){const id=val('rc-id'),br=val('rc-br');const msg=document.getElementById('rc-msg');const qty=parseFloat(val('rc-qty'))||0;
+  if(!id||!br){msg.textContent=tr('rec_need');return;}
+  DATA.push({item_code:val('rc-code').trim(),identity:id,branch:br,size:val('rc-size'),pack:val('rc-pack').trim(),cat2:val('rc-cat2'),month:val('rc-month'),store_class:val('rc-cls'),logo:val('rc-logo').trim(),qty:qty});
+  userEdited();
+  document.getElementById('rc-code').value='';document.getElementById('rc-qty').value='';document.getElementById('rc-pack').value='';document.getElementById('rc-logo').value='';msg.textContent='';
+  buildFilters(false);render();refreshAfterData();renderRecords();}
+function delRecord(i){if(i<0||i>=DATA.length)return;DATA.splice(i,1);userEdited();buildFilters(false);render();refreshAfterData();renderRecords();}
+let CHART_H={};try{CHART_H=JSON.parse(localStorage.getItem('chart_h')||'{}')||{};}catch(e){}
+function applyChartHeights(){Object.keys(CHART_H).forEach(id=>{const cv=document.getElementById(id);if(cv&&cv.parentElement)cv.parentElement.style.height=CHART_H[id]+'px';});}
+function addResizers(){document.querySelectorAll('.chartbox').forEach(box=>{if(box.querySelector('.csize'))return;const cv=box.querySelector('canvas');if(!cv||!cv.id)return;const id=cv.id;const d=document.createElement('div');d.className='csize';d.innerHTML='<button title="-" onclick="event.stopPropagation();chSize(\''+id+'\',-1)">&#8722;</button><button title="+" onclick="event.stopPropagation();chSize(\''+id+'\',1)">+</button>';box.appendChild(d);});}
+function chSize(id,dir){const cv=document.getElementById(id);if(!cv)return;const box=cv.parentElement;let cur=parseInt(box.style.height,10);if(!cur)cur=box.offsetHeight||240;let nh=cur+dir*40;nh=Math.max(150,Math.min(720,nh));box.style.height=nh+'px';CHART_H[id]=nh;try{localStorage.setItem('chart_h',JSON.stringify(CHART_H));}catch(e){}try{if(charts[id]&&charts[id].resize)charts[id].resize();}catch(e){}}
+function clearData(){
+  if(typeof confirm==='function' && !confirm(tr('confirm_clear')))return;
+  try{const _p=kpiTotals(DATA);PREV_KPI=_p;localStorage.setItem('kpi_prev',JSON.stringify(_p));}catch(e){}
+  DATA=[];userEdited();buildFilters(true);render();
+  if(document.getElementById('page-sum').classList.contains('show'))buildSummary();
+  document.getElementById('upddate').innerHTML='&nbsp;—';
+  const u2=document.getElementById('upddate2');if(u2)u2.innerHTML='&nbsp;—';var u3=document.getElementById('upddate3');if(u3)u3.innerHTML='&nbsp;—';
+  const st=document.getElementById('status');if(st){st.className='status ok';st.innerHTML=tr('cleared');}
+}
+function norm(s){return (s==null?'':String(s)).replace(/‏|‎/g,'').trim();}
+function mnorm(s){return norm(s).toLowerCase().replace(/[\u064B-\u0652\u0670]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/ـ/g,'').replace(/\s+/g,'');}
+function findCol(headers,cands){for(let i=0;i<headers.length;i++){const h=mnorm(headers[i]);for(const cnd of cands){const c=mnorm(cnd);if(c&&(h===c||h.includes(c)))return i;}}return -1;}
+function processWorkbook(wb,fname){
+  let sn=wb.SheetNames.find(n=>norm(n).toLowerCase()==='data')||wb.SheetNames[0];
+  const aoa=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true});
+  let hr=-1;
+  for(let i=0;i<Math.min(aoa.length,15);i++){const row=(aoa[i]||[]).map(norm);if(row.some(c=>c==='Identity')&&row.some(c=>c==='Branch')){hr=i;break;}}
+  if(hr<0)throw new Error(LANG==='ar'?'تعذّر إيجاد صف عناوين يحتوي "Identity" و "Branch".':'Could not find a header row with "Identity" and "Branch".');
+  const H=aoa[hr];
+  const ci={identity:findCol(H,['Identity','الهوية']),branch:findCol(H,['Branch','الفرع','الجهة']),size:findCol(H,['الحجم','size']),pack:findCol(H,['الشد','pack']),item_code:findCol(H,['كود الصنف','كود','code','sku','item code','itemcode']),
+    cat2:findCol(H,['الفئة 2','الفئة٢','الفئه 2','category 2','cat2']),month:findCol(H,['الشهر','month']),store_class:findCol(H,['تصنيف التخزين','تصنيف','classification','class']),qty:findCol(H,['الكمية','كمية','الكميات','quantity','qty']),logo:findCol(H,['الشعار','logo','brand'])};
+  if(ci.qty<0){const used=new Set(Object.keys(ci).map(k=>ci[k]).filter(x=>x>=0));let best=-1,bn2=0;for(let c=0;c<H.length;c++){if(used.has(c))continue;const hh=mnorm(H[c]);if(/تاريخ|عام|سنه|يوم|date|year|day|متوسط|بيع|avg|sale|كود|code/.test(hh))continue;let n=0;for(let i=hr+1;i<Math.min(aoa.length,hr+80);i++){const v=aoa[i]&&aoa[i][c];if(typeof v==='number'&&isFinite(v))n++;}if(n>bn2){bn2=n;best=c;}}if(best>=0)ci.qty=best;}
+  const missing=['identity','branch','qty'].filter(k=>ci[k]<0);
+  if(missing.length)throw new Error((LANG==='ar'?'أعمدة مفقودة: ':'Missing columns: ')+missing.join(', ')+'  •  '+(LANG==='ar'?'العناوين الموجودة: ':'Found headers: ')+H.map(x=>norm(x)).filter(Boolean).join(' , '));
+  const recs=[];
+  for(let i=hr+1;i<aoa.length;i++){const r=aoa[i];if(!r)continue;const idv=norm(r[ci.identity]);if(!idv)continue;
+    let q=r[ci.qty];q=(typeof q==='number')?q:parseFloat(String(q).replace(/,/g,''))||0;
+    let sz=r[ci.size];sz=(typeof sz==='number')?String(sz):norm(sz);
+    recs.push({item_code:ci.item_code>=0?String(typeof r[ci.item_code]==='number'?Math.round(r[ci.item_code]):norm(r[ci.item_code])).replace(/\.0$/,''):'',identity:idv,branch:norm(r[ci.branch]),size:sz,pack:norm(r[ci.pack]),cat2:norm(r[ci.cat2]),month:norm(r[ci.month]),store_class:norm(r[ci.store_class]),logo:ci.logo>=0?norm(r[ci.logo]):'',qty:q});}
+  if(!recs.length)throw new Error(LANG==='ar'?'لا توجد صفوف بيانات.':'No data rows found.');
+  try{const _p=kpiTotals(DATA);PREV_KPI=_p;localStorage.setItem('kpi_prev',JSON.stringify(_p));}catch(e){}
+  DATA=recs;saveData();buildFilters(true);render();
+  if(document.getElementById('page-sum').classList.contains('show'))buildSummary();
+  if(document.getElementById('page-sku').classList.contains('show'))buildSku();
+  const m=fname.match(/(\d{1,2})[-_.](\d{1,2})[-_.](\d{2,4})/);
+  if(m){const ds=m[1].padStart(2,'0')+'/'+m[2].padStart(2,'0')+'/'+m[3];applyDateStr(ds);try{localStorage.setItem('upd_date',ds);}catch(e){}}
+  return {n:recs.length,sheet:sn,tot:recs.reduce((s,r)=>s+r.qty,0)};
+}
+function handleFile(file){
+  LAST_FILE=file.name;
+  const st=document.getElementById('status');st.className='status ok';st.textContent=tr('reading')(file.name);
+  const rd=new FileReader();
+  rd.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const res=processWorkbook(wb,file.name);
+    st.className='status ok';st.innerHTML=tr('loaded')(file.name,res.sheet,res.n,fmt(res.tot));_cloudSynced=true;cloudAutoSave();
+  }catch(err){st.className='status err';st.textContent='⚠ '+err.message;}};
+  rd.onerror=()=>{st.className='status err';st.textContent=tr('readerr');};
+  rd.readAsArrayBuffer(file);
+}
+document.getElementById('file').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);});
+const drop=document.getElementById('drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',e=>{if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
+document.addEventListener('click',e=>{if(!e.target.closest('.colmenu'))document.querySelectorAll('.colmenu-pop').forEach(p=>p.classList.remove('show'));});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail();});
+
+applyLang();buildFilters(true);render();cloudInit();initAuth();applySavedDate();applyFont();applyScale();applyChartOrder();applyColors();applyStyles();applyChartHeights();addResizers();

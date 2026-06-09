@@ -160,7 +160,7 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .pivot td.idc{text-align:start;color:#334155;font-weight:600;font-size:12.5px}
 .pivot td.tot{font-weight:800;background:#f3f7fc;color:var(--navy)}
 .pivot td.pct{font-weight:700;color:var(--teal);background:#f3f7fc}
-.pivot tbody tr:hover td:not(.yr):not(.mo){background:#eef6ff}
+.pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo){background:#eef6ff}
 .pivot tr.grand td{background:linear-gradient(180deg,#1a4480,#13396b);color:#fff;font-weight:800;border-color:#2f63a0;font-size:13.5px}
 
 .sumbar{display:flex;align-items:flex-end;gap:14px;margin-bottom:14px;flex-wrap:wrap}
@@ -451,8 +451,22 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
     border-radius:0;animation:none;
   }
   #detail-ov .modal-body{flex:1 1 auto;min-height:0;overflow:auto}
-  #detail-ov .pivot{min-width:0;font-size:12px}
-  #detail-ov .pivot th,#detail-ov .pivot td{padding:7px 8px;white-space:nowrap}
+}
+/* ===== Readable, content-sized report table on phones (numbers stay legible) =====
+   Columns shrink to their data, wide header/text columns wrap, numbers keep a
+   readable size, and zebra striping improves scanability. */
+@media screen and (max-width:900px){
+  #detail-ov .pivot{min-width:0;width:auto;font-size:13px}
+  #detail-ov .pivot th{padding:5px 4px;font-size:10.5px;line-height:1.12;white-space:normal;word-break:break-word}
+  #detail-ov .pivot td{padding:4px 5px;font-size:13px;white-space:nowrap}
+  #detail-ov .pivot td.cat{white-space:normal;max-width:90px;font-size:11px;line-height:1.18}
+  #detail-ov .pivot td.yr{font-size:12px;padding:4px 4px}
+  #detail-ov .pivot td.mo{font-size:11px}
+  #detail-ov .pivot td.zero{color:#d3dbe6;font-size:11px}
+  #detail-ov .pivot tbody tr:nth-child(even):not(.grand) td:not(.yr):not(.mo){background:#f6faff}
+  #detail-ov .pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo){background:#eaf3ff}
+  #detail-ov .pivot td.tot{font-size:13px;font-weight:800}
+  #detail-ov .pivot tr.grand td{font-size:12.5px;padding:6px 5px}
 }
 </style>
 </head>
@@ -1517,10 +1531,12 @@ function fitDetailReport(){
     var availW=body.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
     var availH=body.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
     var tw=tbl.scrollWidth,th=tbl.scrollHeight;
-    if(!tw||!th||!availW||!availH)return;
-    var sc=Math.min(availW/tw,availH/th);
-    if(sc>=1)return;            // already fits
-    sc=Math.max(0.25,sc*0.98);  // safety margin + floor
+    if(!tw||!th||!availW)return;
+    // Fit to WIDTH so the report stays within the screen horizontally while numbers
+    // remain readable; long reports simply scroll vertically instead of shrinking to dust.
+    var sc=availW/tw;
+    if(sc>=1)return;            // already fits the width at full size
+    sc=Math.max(0.6,sc*0.99);   // never shrink past a readable size; any remainder scrolls
     if('zoom' in tbl.style){tbl.style.zoom=sc;}else{tbl.style.transform='scale('+sc+')';}
   }catch(e){}
 }
