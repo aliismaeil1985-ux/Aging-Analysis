@@ -821,6 +821,44 @@ body.editmode{padding-top:32px;}
 
 /* ===== Stacked multi-line platform title ===== */
 h1[data-i18n="title"], .lb-title{white-space:pre-line;line-height:1.22;text-align:left;}
+
+/* ============================================================
+   MOBILE: cards on a single swipeable row + tables shown
+   horizontally (full-bleed scroll) with a frozen first column
+   so the identity stays visible while scanning the numbers.
+   Placed last so it wins the cascade on phones.
+   ============================================================ */
+@media screen and (max-width:860px){
+  /* ---- Dashboard KPI cards: one horizontal swipeable row ---- */
+  #page-dash .wrap{grid-template-columns:1fr;grid-template-areas:"top" "kpis" "side" "charts" "foot";gap:12px}
+  #page-dash .kpis{flex-direction:row !important;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-bottom:6px;margin:0}
+  #page-dash .kpi{flex:0 0 auto;width:46%;min-width:148px;max-width:210px;scroll-snap-align:start}
+  #page-dash .side{max-width:100%}
+  .kpis::-webkit-scrollbar,.fg-cards::-webkit-scrollbar,.sp-cards::-webkit-scrollbar,.pivot-wrap::-webkit-scrollbar,.sp-scroll::-webkit-scrollbar,.bt-scroll::-webkit-scrollbar{height:7px}
+  .kpis::-webkit-scrollbar-thumb,.fg-cards::-webkit-scrollbar-thumb,.sp-cards::-webkit-scrollbar-thumb,.pivot-wrap::-webkit-scrollbar-thumb,.sp-scroll::-webkit-scrollbar-thumb,.bt-scroll::-webkit-scrollbar-thumb{background:#bcd0e8;border-radius:6px}
+
+  /* ---- Report summary cards (FG/Space): one horizontal swipeable row ---- */
+  .fg-cards{flex-wrap:nowrap;overflow-x:auto;gap:9px;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+  .fg-card{flex:0 0 auto;width:43%;min-width:140px;max-width:210px}
+  .fg-c-grand{flex:0 0 auto;width:62%;min-width:196px;max-width:280px}
+  .sp-cards{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:9px;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+  .sp-card{flex:0 0 auto;width:58%;min-width:178px;max-width:240px}
+
+  /* ---- Report tables: full-bleed, smooth horizontal scroll, more columns visible ---- */
+  #page-rspace .wrap>.card,#page-rfgbal .wrap>.card,#page-roldid .wrap>.card,#page-rtransit .wrap>.card,#page-rbottle .wrap>.card{padding:8px !important}
+  .sp-scroll,.bt-scroll,.fg-wrap,.pivot-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .fg-table{min-width:960px;font-size:10.5px}
+  .fg-table th,.fg-table td{padding:4px 5px}
+  .sp-table{min-width:720px;font-size:10.5px}
+  .sp-table th,.sp-table td{padding:4px 5px}
+  .bt-table{min-width:880px;font-size:10px}
+
+  /* ---- Frozen first column (identity / product) while scrolling sideways ---- */
+  .fg-table th:first-child,.fg-table td:first-child{position:sticky;inset-inline-start:0;z-index:2}
+  .fg-table thead th:first-child{z-index:5}
+  .fg-table tbody tr:not(.grand) td:first-child{background:#fff;box-shadow:1px 0 0 #e2e8f2}
+  .fg-table tbody tr.fg-hl td:first-child{background:#dbe8f7}
+}
 </style>
 </head>
 <body>
