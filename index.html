@@ -1475,7 +1475,7 @@ function popOut(){try{var f='width=1280,height=860,menubar=no,toolbar=no,locatio
 function setUpdDate(){const v=document.getElementById('upd-input').value;if(!v)return;const s=fmtDate(v);applyDateStr(s);try{localStorage.setItem('upd_date',s);}catch(e){}const m=document.getElementById('upd-msg');if(m)m.textContent=tr('saved_date');try{_cloudSynced=true;cloudAutoSave();}catch(e){}}
 function applySavedDate(){let s='';try{s=localStorage.getItem('upd_date')||'';}catch(e){}if(s){applyDateStr(s);const inp=document.getElementById('upd-input');if(inp){const p=s.split('/');if(p.length===3)inp.value=p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');}}}
 function heat(v,mn,mx){if(mx<=mn)return 'hsl(80,68%,86%)';const t=(v-mn)/(mx-mn);const hue=125*(1-t);return 'hsl('+hue.toFixed(0)+',72%,'+(87-t*6).toFixed(0)+'%)';}
-function closeDetail(){document.getElementById('detail-ov').classList.remove('show');}
+function closeDetail(){document.getElementById('detail-ov').classList.remove('show');try{var t=document.querySelector('#detail-wrap table.pivot');if(t){t.style.zoom='';t.style.transform='';}}catch(e){}}
 let _lastDetail=null;
 function exportDetailExcel(){try{if(!_lastDetail||!_lastDetail.aoa||!window.XLSX)return;const ws=XLSX.utils.aoa_to_sheet(_lastDetail.aoa);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Report');let nm=(_lastDetail.title||'report').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,28)||'report';XLSX.writeFile(wb,nm+'.xlsx');}catch(e){}}
 function showDetailRows(rows,title){
@@ -1501,7 +1501,33 @@ function showDetailRows(rows,title){
   document.getElementById('detail-title').textContent=title||'';
   document.getElementById('detail-badge').textContent=fmt(gt)+' '+(LANG==='ar'?'وحدة':'qty')+' • '+keys.length+' '+(LANG==='ar'?'صف':'rows');
   document.getElementById('detail-ov').classList.add('show');
+  requestAnimationFrame(function(){requestAnimationFrame(fitDetailReport);});
 }
+// Shrink the report table so the WHOLE report fits within the screen (phones only).
+function fitDetailReport(){
+  try{
+    var ov=document.getElementById('detail-ov');
+    if(!ov||!ov.classList.contains('show'))return;
+    var tbl=ov.querySelector('#detail-wrap table.pivot');
+    var body=ov.querySelector('.modal-body');
+    if(!tbl||!body)return;
+    tbl.style.zoom='';tbl.style.transform='';tbl.style.transformOrigin='top center';
+    if(window.innerWidth>900)return; // desktop keeps normal scrolling
+    var cs=getComputedStyle(body);
+    var availW=body.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+    var availH=body.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
+    var tw=tbl.scrollWidth,th=tbl.scrollHeight;
+    if(!tw||!th||!availW||!availH)return;
+    var sc=Math.min(availW/tw,availH/th);
+    if(sc>=1)return;            // already fits
+    sc=Math.max(0.25,sc*0.98);  // safety margin + floor
+    if('zoom' in tbl.style){tbl.style.zoom=sc;}else{tbl.style.transform='scale('+sc+')';}
+  }catch(e){}
+}
+var _fitDetailT=null;
+function _refitDetail(){if(_fitDetailT)clearTimeout(_fitDetailT);_fitDetailT=setTimeout(fitDetailReport,180);}
+window.addEventListener('resize',_refitDetail);
+window.addEventListener('orientationchange',function(){setTimeout(fitDetailReport,350);});
 function openDetail(cls){const titles={all:tr('kpi_total'),'A<60':tr('kpi_60'),'B<90':tr('kpi_90'),'C>90':tr('kpi_g90')};showDetailRows(filtered().filter(d=>cls==='all'||d.store_class===cls),titles[cls]||'');}
 function openDetailBy(field,value,title){showDetailRows(filtered().filter(d=>String(d[field])===String(value)),title);}
 function chartClick(getInfo){return (e,els,chart)=>{if(!els||!els.length)return;const info=getInfo(els[0]);if(info)showDetailRows(info.rows,info.title);};}
