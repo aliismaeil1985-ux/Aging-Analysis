@@ -1257,6 +1257,12 @@ button,.navbtn,.d-tile,.hub-tile,.kpi{-webkit-tap-highlight-color:rgba(47,126,21
 /* الجداول العريضة: تمرير سلس على iOS */
 .utable-scroll,div[style*="overflow:auto"],div[style*="overflow-x:auto"]{-webkit-overflow-scrolling:touch}
 
+
+/* ═══ شريط توضيح الرفع ═══ */
+.dr-intro-banner{display:flex;align-items:flex-start;gap:12px;background:linear-gradient(90deg,#eff6ff,#f0fdf4);border:1px solid #bfdbfe;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:13.5px;line-height:1.7;color:#1e3a5f}
+.dr-intro-ic{font-size:24px;flex-shrink:0;line-height:1.2}
+.dr-intro-banner b{color:#1d4ed8}
+@media (max-width:640px){.dr-intro-banner{font-size:12.5px;padding:12px 14px}}
 </style>
 
 <style id="thome-css">
@@ -2280,7 +2286,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-UPLOAD-1715 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
+      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-UPLOAD2-1745 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
       <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
 
       <div class="cb-layout">
@@ -2707,27 +2713,57 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
     </div></div>
     <div class="page" id="page-dailyup"><div class="wrap">
       <div class="topbar"><div class="htext"><h1 data-i18n="nav_dailyup">Daily Reports Upload</h1><span class="upd"><span class="dot"></span> رفع ومزامنة بيانات التقارير اليومية</span></div></div>
+      <div class="dr-intro-banner">
+        <span class="dr-intro-ic">&#128228;</span>
+        <div><b>رفع سهل بملف عادي</b> — ارفع كل تقرير في مكانه. النظام يقرأ البيانات تلقائياً من رؤوس الأعمدة وأكواد الأصناف، مهما كان اسم الورقة أو ترتيب الأعمدة. <b>المساحات الفعلية تُحسب تلقائياً</b> ولا تحتاج رفعاً.</div>
+      </div>
       <div class="dr-up-grid">
         <div class="dr-slot">
-          <h4>&#9312; الملف الرئيسي — Daily Coverage (Space + FG Balance + OLD Identity)</h4>
-          <p>ملف Excel واحد يحتوي أوراق التقارير الثلاثة (تُطابَق بالاسم تلقائياً). القالب يتضمن أوراق «Example» توضيحية تُتجاهل عند الرفع — في Space يكفي تعبئة 7 صفوف، وعمود Total يُحسب تلقائياً.</p>
-          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadMain(this)"><button class="btn-soft sm" onclick="drTemplateMain()"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearMain()" title="تفريغ بيانات Space و FG Balance و OLD Identity"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
-          <div class="dr-st" id="dr-st-main"></div>
-          <div class="dr-tpl"><span class="dr-meta">Space: <b id="dr-info-space">—</b></span><span class="dr-meta">FG Balance: <b id="dr-info-fgbal">—</b></span><span class="dr-meta">OLD Identity: <b id="dr-info-oldid">—</b></span></div>
+          <h4>&#9312; FG Balance — رصيد البضاعة التامة</h4>
+          <p>ارفع ملف رصيد البضاعة التامة. النظام يتعرّف على الأعمدة تلقائياً (كود الصنف، الفروع، الكميات). عمود Total يُحسب تلقائياً.</p>
+          <div class="dr-row">
+            <input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'fgbal')">
+            <button class="btn-soft sm" onclick="drTemplateOne('fgbal')"><span>&#11015;&#65039;</span> تنزيل القالب</button>
+            <button class="btn-soft sm dr-clear-btn" onclick="drClearOne('fgbal')" title="تفريغ بيانات FG Balance"><span>&#128465;&#65039;</span> تفريغ</button>
+          </div>
+          <div class="dr-st" id="dr-st-fgbal"></div>
+          <div class="dr-tpl"><span class="dr-meta">آخر تحديث: <b id="dr-info-fgbal">—</b></span></div>
         </div>
+
         <div class="dr-slot">
-          <h4>&#9313; FG Transit Report — ملف منفصل</h4>
-          <p>ملف Excel خاص بتقرير الترانزيت — عمود Total يُحسب تلقائياً، وورقة «Example» للتوضيح فقط.</p>
-          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'transit')"><button class="btn-soft sm" onclick="drTemplateOne('transit')"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearOne('transit')" title="تفريغ بيانات FG Transit"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
+          <h4>&#9313; OLD Identity — الهوية القديمة</h4>
+          <p>ملف منفصل للهوية القديمة. ارفعه هنا مباشرة — النظام يقرأ الأعمدة والأكواد تلقائياً. عمود Total يُحسب تلقائياً.</p>
+          <div class="dr-row">
+            <input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'oldid')">
+            <button class="btn-soft sm" onclick="drTemplateOne('oldid')"><span>&#11015;&#65039;</span> تنزيل القالب</button>
+            <button class="btn-soft sm dr-clear-btn" onclick="drClearOne('oldid')" title="تفريغ بيانات OLD Identity"><span>&#128465;&#65039;</span> تفريغ</button>
+          </div>
+          <div class="dr-st" id="dr-st-oldid"></div>
+          <div class="dr-tpl"><span class="dr-meta">آخر تحديث: <b id="dr-info-oldid">—</b></span></div>
+        </div>
+
+        <div class="dr-slot">
+          <h4>&#9314; FG Transit — الترانزيت</h4>
+          <p>ملف تقرير الترانزيت. النظام يقرأ الأعمدة تلقائياً، وعمود Total يُحسب تلقائياً.</p>
+          <div class="dr-row">
+            <input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'transit')">
+            <button class="btn-soft sm" onclick="drTemplateOne('transit')"><span>&#11015;&#65039;</span> تنزيل القالب</button>
+            <button class="btn-soft sm dr-clear-btn" onclick="drClearOne('transit')" title="تفريغ بيانات FG Transit"><span>&#128465;&#65039;</span> تفريغ</button>
+          </div>
           <div class="dr-st" id="dr-st-transit"></div>
-          <div class="dr-tpl"><span class="dr-meta">Transit: <b id="dr-info-transit">—</b></span></div>
+          <div class="dr-tpl"><span class="dr-meta">آخر تحديث: <b id="dr-info-transit">—</b></span></div>
         </div>
+
         <div class="dr-slot">
-          <h4>&#9314; FG Bottle Stock — ملف منفصل (أرصدة القارورة)</h4>
-          <p>ملف Excel خاص بأرصدة القارورة — أعمدة الإجماليات وصف «الاجمالى» تُحسب تلقائياً، وورقة «Example» للتوضيح فقط.</p>
-          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'bottle')"><button class="btn-soft sm" onclick="drTemplateOne('bottle')"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearOne('bottle')" title="تفريغ بيانات FG Bottle Stock"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
+          <h4>&#9315; FG Bottle Stock — أرصدة القارورة</h4>
+          <p>ملف أرصدة القارورة. النظام يقرأ الأعمدة تلقائياً، وأعمدة الإجماليات تُحسب تلقائياً.</p>
+          <div class="dr-row">
+            <input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'bottle')">
+            <button class="btn-soft sm" onclick="drTemplateOne('bottle')"><span>&#11015;&#65039;</span> تنزيل القالب</button>
+            <button class="btn-soft sm dr-clear-btn" onclick="drClearOne('bottle')" title="تفريغ بيانات FG Bottle Stock"><span>&#128465;&#65039;</span> تفريغ</button>
+          </div>
           <div class="dr-st" id="dr-st-bottle"></div>
-          <div class="dr-tpl"><span class="dr-meta">Bottle: <b id="dr-info-bottle">—</b></span></div>
+          <div class="dr-tpl"><span class="dr-meta">آخر تحديث: <b id="dr-info-bottle">—</b></span></div>
         </div>
       </div>
     </div></div>
@@ -5555,7 +5591,7 @@ function drClearMain(){
 /* تفريغ بيانات قالب واحد (transit / bottle) */
 function drClearOne(key){
   var ar=drIsAr&&drIsAr();
-  var label={transit:'FG Transit',bottle:'FG Bottle Stock'}[key]||key;
+  var label={fgbal:'FG Balance',oldid:'OLD Identity',transit:'FG Transit',bottle:'FG Bottle Stock'}[key]||key;
   var msg=ar?('هل تريد تفريغ بيانات «'+label+'»؟\nستُعاد للقالب الافتراضي ولا يمكن التراجع.'):('Clear "'+label+'" data?\nIt will reset to the default template. This cannot be undone.');
   if(!confirm(msg))return;
   var s=getDR();
