@@ -641,31 +641,32 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
    full-screen, within the phone bounds (like the desired screenshot). When the
    phone is physically in landscape, no rotation is applied (the table is already wide). */
 @media screen and (max-width:900px) and (orientation:portrait){
-  /* نافذة التفاصيل — دوران لعرض الجدول أفقياً على الجوال */
+  /* نافذة التفاصيل — ملء الشاشة مع تمرير طبيعي على الجوال */
   #detail-ov{padding:0}
   #detail-ov .modal-box{
-    position:fixed;top:50%;left:50%;
-    width:100vh;height:100vw;max-width:100vh;max-height:100vw;
-    transform:translate(-50%,-50%) rotate(90deg);
-    transform-origin:center center;
-    border-radius:0;animation:none;
+    position:fixed;inset:0;
+    width:100%;height:100%;max-width:100%;max-height:100%;
+    transform:none;border-radius:0;animation:none;
+    display:flex;flex-direction:column;
   }
+  #detail-ov .modal-body{overflow:auto;-webkit-overflow-scrolling:touch}
+  #detail-ov .pivot-wrap{overflow:auto !important;-webkit-overflow-scrolling:touch}
   #detail-ov .modal-body{flex:1 1 auto;min-height:0;overflow:auto}
 
-  /* نوافذ تقارير fgbal/oldid/transit العائمة — نفس الدوران الأفقي */
+  /* نوافذ التقارير العائمة — ملء الشاشة مع تمرير طبيعي */
   .fg-modal-ov{padding:0 !important}
   .fg-modal-ov.show .fg-modal-box{
-    position:fixed;top:50%;left:50%;
-    width:100vh !important;height:100vw !important;
-    max-width:100vh !important;max-height:100vw !important;
-    transform:translate(-50%,-50%) rotate(90deg);
-    transform-origin:center center;
-    border-radius:0 !important;animation:none !important
+    position:fixed;inset:0;
+    width:100% !important;height:100% !important;
+    max-width:100% !important;max-height:100% !important;
+    transform:none;border-radius:0 !important;animation:none !important;
+    display:flex;flex-direction:column
   }
+  .fg-modal-ov.show .fg-modal-body{overflow:auto;-webkit-overflow-scrolling:touch}
   .fg-modal-ov.show .fg-modal-body{flex:1 1 auto;min-height:0;overflow:auto}
   .fg-modal-ov.show .fg-modal-head{flex:0 0 auto}
 
-  /* تصغير الجداول داخل النوافذ المُدارة لتناسب عرض الجوال */
+  /* تصغير الجداول داخل النوافذ لتناسب عرض الجوال */
   .fg-modal-ov.show .fg-dt{font-size:11px}
   .fg-modal-ov.show .fg-dt th,.fg-modal-ov.show .fg-dt td{padding:4px 6px}
   #detail-ov .modal-box .pivot{font-size:11.5px}
@@ -1067,11 +1068,25 @@ h1[data-i18n="title"], .lb-title{white-space:pre-line;line-height:1.22;text-alig
    Placed last so it wins the cascade on phones.
    ============================================================ */
 @media screen and (max-width:860px){
-  /* ---- Dashboard KPI cards: one horizontal swipeable row ---- */
-  #page-dash .wrap{grid-template-columns:1fr;grid-template-areas:"top" "kpis" "side" "charts" "foot";gap:12px}
-  #page-dash .kpis{flex-direction:row !important;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-bottom:6px;margin:0}
-  #page-dash .kpi{flex:0 0 auto;width:46%;min-width:148px;max-width:210px;scroll-snap-align:start}
-  #page-dash .side{max-width:100%}
+  /* ---- الجوال: البطاقات يسار عمودياً + الفلاتر يمين بمحاذاتها + الرسم تحتها منظّم ---- */
+  #page-dash .wrap{grid-template-columns:minmax(120px,44%) 1fr;grid-template-areas:"top top" "kpis side" "charts charts" "foot foot";gap:11px}
+  /* البطاقات: عمود رأسي تحت بعضها على اليسار */
+  #page-dash .kpis{display:flex !important;flex-direction:column !important;flex-wrap:nowrap;gap:10px;margin:0;overflow:visible;grid-area:kpis}
+  #page-dash .kpi{width:100% !important;min-width:0 !important;max-width:100% !important;margin:0 !important}
+  /* الفلاتر: عمود على اليمين بمحاذاة البطاقات */
+  #page-dash .side{grid-area:side;max-width:100%;display:flex;flex-direction:column;gap:10px}
+  /* الرسم البياني: صف كامل تحتهما، منظّم داخل الحدود */
+  #page-dash .main>div:last-child,#page-dash .grid{grid-area:charts}
+  #page-dash .main .grid{display:grid !important;grid-template-columns:1fr !important;gap:12px}
+  #page-dash .main .grid>.card{width:100%;max-width:100%;overflow:hidden}
+  #page-dash .chartbox{max-width:100%;overflow:hidden}
+  #page-dash .chartbox canvas{max-width:100% !important;height:auto !important}
+  /* الرسم البياني: احتواء داخل البطاقة + مساحة للملصقات الخارجية */
+  #page-dash .main .grid>.card{padding:14px 12px 16px}
+  #page-dash .chartbox{height:auto !important;max-height:none !important;min-height:260px;padding:6px 2px;overflow:visible}
+  #page-dash .chartbox canvas{max-width:100% !important;width:100% !important}
+  /* عنوان الرسم لا يلتصق بالحافة */
+  #page-dash .main .grid>.card>.ch{margin-bottom:6px;padding-inline:2px}
   .kpis::-webkit-scrollbar,.fg-cards::-webkit-scrollbar,.sp-cards::-webkit-scrollbar,.pivot-wrap::-webkit-scrollbar,.sp-scroll::-webkit-scrollbar,.bt-scroll::-webkit-scrollbar{height:7px}
   .kpis::-webkit-scrollbar-thumb,.fg-cards::-webkit-scrollbar-thumb,.sp-cards::-webkit-scrollbar-thumb,.pivot-wrap::-webkit-scrollbar-thumb,.sp-scroll::-webkit-scrollbar-thumb,.bt-scroll::-webkit-scrollbar-thumb{background:#bcd0e8;border-radius:6px}
 
@@ -1268,8 +1283,6 @@ button,.navbtn,.d-tile,.hub-tile,.kpi{-webkit-tap-highlight-color:rgba(47,126,21
    عرض التقارير على الجوال: تدوير + تجميد + تصغير
    ═══════════════════════════════════════════ */
 /* زر التدوير العائم */
-.rotate-btn{display:none;position:fixed;bottom:max(64px,calc(env(safe-area-inset-bottom) + 64px));inset-inline-end:14px;z-index:9991;width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#2f7ed8,#1d4ed8);color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(47,126,216,.4);align-items:center;justify-content:center;transition:transform .15s}
-.rotate-btn:active{transform:scale(.9)}
 
 @media (max-width:820px){
   /* ── تصغير الجداول لتناسب عرض الشاشة ── */
@@ -1302,42 +1315,83 @@ button,.navbtn,.d-tile,.hub-tile,.kpi{-webkit-tap-highlight-color:rgba(47,126,21
   tr:nth-child(even) .freeze-col{background:#f8fafc !important}
 }
 
-/* ── الوضع الأفقي الافتراضي على الجوال: الجدول مدوّر 90° يملأ طول الشاشة ── */
-@media screen and (max-width:820px) and (orientation:portrait){
-  body.report-landscape #page-rspace .pivot-wrap,
-  body.report-landscape #page-rfgbal .pivot-wrap,
-  body.report-landscape #page-roldid .pivot-wrap,
-  body.report-landscape #page-rtransit .pivot-wrap,
-  body.report-landscape #page-rbottle .pivot-wrap,
-  body.report-landscape #page-rbottle .bt-scroll,
-  body.report-landscape #page-rspace .sp-scroll{
-    position:fixed !important;top:50% !important;left:50% !important;
-    width:100vh !important;height:100vw !important;
-    max-width:100vh !important;max-height:100vw !important;
-    transform:translate(-50%,-50%) rotate(90deg) !important;
-    transform-origin:center center !important;
-    background:#fff;z-index:980;
-    overflow:auto !important;-webkit-overflow-scrolling:touch;
-    padding:46px 12px 12px !important;border-radius:0 !important;
-  }
-  /* الجداول داخل الوضع الأفقي: حجم قراءة مريح */
-  body.report-landscape .pivot,body.report-landscape .fg-table,
-  body.report-landscape .bt-table,body.report-landscape .sp-table{
-    font-size:11.5px !important;table-layout:auto !important;width:auto !important;min-width:0 !important;
-  }
-  body.report-landscape .pivot th,body.report-landscape .pivot td,
-  body.report-landscape .fg-table th,body.report-landscape .fg-table td,
-  body.report-landscape .bt-table th,body.report-landscape .bt-table td,
-  body.report-landscape .sp-table th,body.report-landscape .sp-table td{
-    padding:5px 7px !important;
+/* ── عرض التقارير على الجوال: تمرير أفقي طبيعي (بلا تدوير) ── */
+@media (max-width:820px){
+  #page-rspace .pivot-wrap,#page-rfgbal .pivot-wrap,#page-roldid .pivot-wrap,
+  #page-rtransit .pivot-wrap,#page-rbottle .pivot-wrap,
+  #page-rbottle .bt-scroll,#page-rspace .sp-scroll,.fg-wrap{
+    overflow-x:auto !important;-webkit-overflow-scrolling:touch;max-width:100% !important;
   }
 }
 
 /* ═══ زر الرجوع العائم للنوافذ على الجوال ═══ */
-.modal-back-btn{display:none;position:fixed;top:max(12px,env(safe-area-inset-top));inset-inline-start:12px;z-index:99999;align-items:center;gap:7px;background:rgba(15,23,42,.92);color:#fff;border:none;border-radius:99px;padding:11px 18px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:inherit;transition:transform .12s}
+.modal-back-btn{display:none;position:fixed;bottom:max(18px,calc(env(safe-area-inset-bottom) + 18px));inset-inline-start:18px;z-index:99999;align-items:center;gap:7px;background:rgba(37,99,235,.96);color:#fff;border:none;border-radius:99px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(37,99,235,.5);font-family:inherit;transition:transform .12s}
 .modal-back-btn:active{transform:scale(.93)}
 .mbb-lbl{font-size:13.5px}
 @media print{.modal-back-btn{display:none !important}}
+
+/* ═══ إخفاء أزرار الحافة وإظهارها عند اللمس/التمرير (الجوال) ═══ */
+@media (max-width:900px){
+  /* menu-btn و modal-back-btn مخفية افتراضياً (شفافة، لا تُعطّل اللمس) */
+  .menu-btn{opacity:0;transform:translateX(-6px) scale(.9);pointer-events:none;transition:opacity .22s ease,transform .22s ease}
+  html[dir=rtl] .menu-btn{transform:translateX(6px) scale(.9)}
+  /* زر الرجوع: شبه شفاف عند فتح النافذة، يتضح عند لمس حافة اليسار */
+  .modal-back-btn{opacity:.35;transition:opacity .22s ease,transform .22s ease}
+
+  /* عند تمرير/لمس الحافة المعنية → تظهر بالكامل */
+  body.edge-peek-start .menu-btn{opacity:1;transform:none;pointer-events:auto}
+  body.edge-peek-end .modal-back-btn{opacity:1 !important;transform:none !important}
+
+  /* حدّ خفيف يلمّح لوجود الزر عند الحافة */
+  .edge-hint-start,.edge-hint-end{position:fixed;top:0;bottom:0;width:18px;z-index:59;pointer-events:none}
+  .edge-hint-start{inset-inline-start:0}
+  .edge-hint-end{inset-inline-end:0}
+
+  /* عند فتح القائمة فعلياً، الزر يبقى ظاهراً */
+  body.nav-is-open .menu-btn{opacity:1;transform:none;pointer-events:auto}
+}
+/* على الشاشات الكبيرة: السلوك الطبيعي بلا إخفاء */
+@media (min-width:901px){
+  body.edge-peek-start .menu-btn,body.edge-peek-end #modal-back-btn{opacity:1}
+}
+
+/* ═══ زر التحويل لعرض أفقي (أعلى الشاشة، الجوال) ═══ */
+.landscape-btn{display:none;position:fixed;top:max(10px,env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-8px);z-index:9990;width:44px;height:44px;border-radius:50%;border:none;background:linear-gradient(135deg,#2f7ed8,#1d4ed8);color:#fff;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(47,126,216,.45);opacity:0;transition:opacity .25s ease,transform .25s ease}
+.landscape-btn.lb-visible{display:flex;opacity:.55;transform:translateX(-50%) translateY(0)}
+.landscape-btn.lb-visible:active{transform:translateX(-50%) scale(.92)}
+.landscape-btn.lb-active{opacity:1;background:linear-gradient(135deg,#059669,#047857)}
+/* وميض عند الاقتراب من أعلى الشاشة */
+.landscape-btn.lb-pulse{opacity:1;animation:lbPulse 1s ease-in-out infinite}
+@keyframes lbPulse{0%,100%{box-shadow:0 4px 16px rgba(47,126,216,.45)}50%{box-shadow:0 4px 24px rgba(47,126,216,.9),0 0 0 6px rgba(47,126,216,.18)}}
+
+/* ── الوضع الأفقي الآمن: توسيع الجدول + تمرير (بلا قلب) ── */
+@media (max-width:820px){
+  body.wide-view #page-rspace .pivot-wrap,
+  body.wide-view #page-rfgbal .pivot-wrap,
+  body.wide-view #page-roldid .pivot-wrap,
+  body.wide-view #page-rtransit .pivot-wrap,
+  body.wide-view #page-rbottle .pivot-wrap,
+  body.wide-view #page-rbottle .bt-scroll,
+  body.wide-view #page-rspace .sp-scroll{
+    overflow-x:auto !important;-webkit-overflow-scrolling:touch;
+  }
+  /* الجدول يأخذ عرضه الطبيعي الكامل (يتمدّد أفقياً) */
+  body.wide-view #page-rspace .pivot,body.wide-view #page-rfgbal .pivot,
+  body.wide-view #page-roldid .pivot,body.wide-view #page-rtransit .pivot,
+  body.wide-view #page-rbottle .pivot,
+  body.wide-view .fg-table,body.wide-view .bt-table,body.wide-view .sp-table{
+    width:auto !important;min-width:max-content !important;table-layout:auto !important;
+    font-size:12.5px !important;
+  }
+  body.wide-view .pivot th,body.wide-view .pivot td,
+  body.wide-view .fg-table th,body.wide-view .fg-table td,
+  body.wide-view .bt-table th,body.wide-view .bt-table td,
+  body.wide-view .sp-table th,body.wide-view .sp-table td{
+    padding:7px 10px !important;white-space:nowrap !important;
+  }
+  /* مساحة علوية صغيرة كي لا يغطّي الزر العنوان */
+  body.wide-view .page.show .topbar{padding-top:42px}
+}
 </style>
 
 <style id="thome-css">
@@ -2361,7 +2415,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-SECURE-1900 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
+      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-DASHLAYOUT-2120 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
       <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
 
       <div class="cb-layout">
@@ -2557,6 +2611,11 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
           <li data-i18n-html="cloud_n3">Data is stored in collection <span class="tag">inventory_dashboard</span>, document <span class="tag">latest</span>.</li>
           <li data-i18n="cloud_n4">Your config is saved locally in this browser only.</li>
         </ul>
+      </div>
+      <div class="cl-card" style="border:1px solid #fecaca;background:#fff7f7">
+        <h4 style="font-size:14px;font-weight:800;color:#dc2626;margin:0 0 8px">&#128295; صيانة التخزين · Storage Maintenance</h4>
+        <p class="sub" style="margin:0 0 12px">إذا ظهرت بيانات أو بطاقات قديمة لا تتحدّث، أعد بناء التخزين. يُمسح المحلي والسحابي ويُعاد البناء نظيفاً (يبقى المستخدمون والاتصال).</p>
+        <button class="btn-soft" style="border-color:#fecaca;color:#dc2626" onclick="factoryResetStorage()"><span>&#128260;</span> إعادة بناء التخزين · Rebuild Storage</button>
       </div>
     </div></div>
     <div class="page" id="page-rspace"><div class="wrap">
@@ -2965,16 +3024,17 @@ function applyLang(){
   if(EDITMODE){unbindEditables();bindEditables();}
 }
 function toggleGroup(g){const el=document.querySelector('.nav-group[data-grp="'+g+'"]');if(el)el.classList.toggle('collapsed');}
-function toggleNav(){const n=document.getElementById('nav');const b=document.getElementById('nav-backdrop');const open=n.classList.toggle('mobile-open');if(b)b.classList.toggle('show',open);}
-function closeNav(){const n=document.getElementById('nav');if(n)n.classList.remove('mobile-open');const b=document.getElementById('nav-backdrop');if(b)b.classList.remove('show');}
+function toggleNav(){const n=document.getElementById('nav');const b=document.getElementById('nav-backdrop');const open=n.classList.toggle('mobile-open');if(b)b.classList.toggle('show',open);try{document.body.classList.toggle('nav-is-open',open);if(open&&window._edgePeekStart)window._edgePeekStart();}catch(e){}}
+function closeNav(){const n=document.getElementById('nav');if(n)n.classList.remove('mobile-open');const b=document.getElementById('nav-backdrop');if(b)b.classList.remove('show');try{document.body.classList.remove('nav-is-open');}catch(e){}}
 let NAV_HIST=[];let _navBack=false;
 function goBack(){if(NAV_HIST.length){var prev=NAV_HIST.pop();_navBack=true;go(prev);}else{go('home');}}
 function updateTopnav(p){var tn=document.getElementById('topnav');if(!tn)return;tn.style.display=(p==='home')?'none':'flex';var lbl='';var b=document.querySelector('.navbtn[data-page="'+p+'"] .lbl');if(b)lbl=b.textContent;if(!lbl){var pg=document.getElementById('page-'+p);var h1=pg?pg.querySelector('h1'):null;lbl=h1?h1.textContent.trim():'';}var cc=document.getElementById('crumb-current');if(cc)cc.textContent=lbl;}
 var CURRENT_PAGE='';
 function go(p){
   CURRENT_PAGE=p;
-  try{if(['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)<0){document.body.classList.remove('report-landscape');}}catch(e){}
-  setTimeout(function(){try{_updateRotateBtn();_markFreezeColumns();}catch(e){}},120);
+  setTimeout(function(){try{_markFreezeColumns();}catch(e){}},120);
+  try{if(['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)<0){document.body.classList.remove('wide-view');window._wideView=false;}}catch(e){}
+  setTimeout(function(){try{_updateLandscapeBtn();}catch(e){}},130);
   if(!CURRENT_USER){
     /* لا يوجد مستخدم مسجل — أظهر شاشة الدخول */
     var ov=document.getElementById('login-ov');
@@ -3130,7 +3190,7 @@ function render(){
 
 /* ═══ بطاقات مخصّصة في الداش بورد (للمدير) — إنشاء + إعادة حساب ═══ */
 function getCustomCards(){try{return JSON.parse(localStorage.getItem('dash_custom_cards')||'[]')||[];}catch(e){return [];}}
-function saveCustomCards(c){try{localStorage.setItem('dash_custom_cards',JSON.stringify(c));}catch(e){}try{if(typeof drPush==='function')drPush();}catch(e){}}
+function saveCustomCards(c){try{localStorage.setItem('dash_custom_cards',JSON.stringify(c));}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}try{if(typeof renderCustomCards==='function')renderCustomCards();}catch(e){}}
 function computeCustomCard(card){
   var rows=filtered();
   if(card.cls && card.cls!=='all')rows=rows.filter(function(r){return r.store_class===card.cls;});
@@ -4872,8 +4932,50 @@ const FB_USERS_DOC='users';
 const FB_SET_DOC='ui_settings';
 // ---- Report-customisation settings sync (titles, labels, colors, conditional formatting, custom columns...) ----
 let _setCloudReady=false,_lastSetJson='',_pushSetT=null,fbSetUnsub=null;
-const SET_KEYS=['col_labels','col_agg2','col_agg_col','branch_order2','hidden_cols','ui_titles','ui_font','ui_scale','chart_order','ui_colors','ui_styles','cond_fmt','col_colors','custom_cols','report_designer','coldef_v1'];
+const SET_KEYS=['col_labels','col_agg2','col_agg_col','branch_order2','hidden_cols','ui_titles','ui_font','ui_scale','chart_order','ui_colors','ui_styles','cond_fmt','col_colors','custom_cols','report_designer','coldef_v1','dash_custom_cards'];
 function gatherSettings(){const o={};SET_KEYS.forEach(k=>{try{const v=localStorage.getItem(k);if(v!=null)o[k]=v;}catch(e){}});return o;}
+/* ═══════════════════════════════════════════
+   نظام إعادة بناء التخزين (مسح وإعادة حقن نظيف)
+   ═══════════════════════════════════════════ */
+/* مفاتيح يُحتفظ بها دائماً (الاتصال + المستخدمون) */
+var STORAGE_KEEP=['fb_config_fields','fb_config','fb_client_id','fb_live','fb_auto','dash_users','dash_session','dr_app_ver'];
+/* كل مفاتيح التطبيق المعروفة (للمسح النظيف) */
+function _allAppKeys(){
+  var known=['kpi_prev','dr_last_page','dal_collapsed','md_collapsed','users_tab','dash_custom_cards',
+    'hidden_cols','hidden_branches','col_labels','col_agg2','branch_order2','ui_titles','ui_font','ui_scale',
+    'chart_order','ui_colors','ui_styles','cond_fmt','col_colors','custom_cols','coldef_v1','dz_collapsed',
+    'col_agg_col','report_designer','emailjs_cfg','login_log','upd_date','chart_h','dr_data','space_auto'];
+  /* نضيف أي مفاتيح أخرى موجودة فعلاً (احتياط) */
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&STORAGE_KEEP.indexOf(k)<0&&known.indexOf(k)<0)known.push(k);}}catch(e){}
+  return known;
+}
+/* مسح البيانات المحلية مع الإبقاء على الاتصال والمستخدمين */
+function rebuildLocalStorage(opts){
+  opts=opts||{};
+  try{
+    var keys=_allAppKeys();
+    keys.forEach(function(k){if(STORAGE_KEEP.indexOf(k)<0){try{localStorage.removeItem(k);}catch(e){}}});
+  }catch(e){}
+}
+/* إعادة الضبط الكاملة: مسح محلي + سحابي + إعادة تحميل */
+function factoryResetStorage(){
+  var ar=(typeof drIsAr==='function'&&drIsAr());
+  var msg1=ar?'⚠️ إعادة ضبط التخزين بالكامل؟\n\nسيُمسح:\n• كل البطاقات المخصّصة\n• كل إعدادات التصميم والأعمدة\n• بيانات التقارير المحلية\n\nسيبقى:\n• المستخدمون وكلمات المرور\n• إعدادات الاتصال بالسحابة\n\nهل تريد المتابعة؟':'Full storage reset? This clears all custom cards, design settings, and local report data. Users and cloud connection are kept.';
+  if(!confirm(msg1))return;
+  var msg2=ar?'تأكيد أخير: سيُعاد تحميل الصفحة بعد المسح. متابعة؟':'Final confirm: the page will reload. Continue?';
+  if(!confirm(msg2))return;
+  /* مسح محلي */
+  rebuildLocalStorage();
+  /* مسح الإعدادات السحابية (ui_settings) لمنع عودتها */
+  try{
+    if(typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined'&&typeof FB_SET_DOC!=='undefined'){
+      fbDB.collection(FB_COL).doc(FB_SET_DOC).set({settings:{},updatedAt:Date.now(),clientId:(typeof FB_CLIENT_ID!=='undefined'?FB_CLIENT_ID:'')});
+    }
+  }catch(e){}
+  /* إعادة تحميل نظيفة */
+  setTimeout(function(){try{location.reload(true);}catch(e){location.reload();}},600);
+}
+
 function pushSettingsToCloud(){try{
     if(!fbReady||!fbDB||!_setCloudReady)return;
     const o=gatherSettings();const json=JSON.stringify(o);
@@ -4885,6 +4987,8 @@ function applySettingsObj(o){if(!o)return;
     SET_KEYS.forEach(k=>{try{if(o[k]!=null)localStorage.setItem(k,o[k]);else localStorage.removeItem(k);}catch(e){}});
     // reload in-memory copies
     try{COLDEF=Object.assign({sum:[],sku:[],fgbal:[],oldid:[],transit:[]},JSON.parse(localStorage.getItem('coldef_v1')||'{}'));}catch(e){}
+    try{if(typeof renderCustomCards==='function')renderCustomCards();}catch(e){}
+    try{if(typeof cbRenderList==='function'&&document.getElementById('page-cardbuilder')&&document.getElementById('page-cardbuilder').classList.contains('show'))cbRenderList();}catch(e){}
     try{if(typeof renderColManager==='function'&&document.getElementById('page-designer')&&document.getElementById('page-designer').classList.contains('show'))renderColManager();}catch(e){}
     try{LABELS=JSON.parse(localStorage.getItem('col_labels')||'{}')||{};}catch(e){}
     try{AGGS=Object.assign({sum:'sum',sku:'sum'},JSON.parse(localStorage.getItem('col_agg2')||'{}'));}catch(e){}
@@ -7685,38 +7789,17 @@ window.addEventListener('online',_updateSyncBar);
 window.addEventListener('offline',_updateSyncBar);
 </script>
 
-<!-- زر تدوير الجدول للجوال -->
-<button id="rotate-btn" class="rotate-btn" onclick="toggleReportRotate()" title="تكبير الجدول">
-  <span id="rotate-ic">&#128241;</span>
-</button>
+
 <script>
-/* ═══ نظام عرض التقارير على الجوال (تدوير + تجميد الأعمدة) ═══ */
-/* الوضع الافتراضي على الجوال = أفقي (landscape). الزر يحوّل للرأسي عند الحاجة */
-window._reportPortrait=false; /* false = أفقي (افتراضي)، true = رأسي */
+/* ═══ تجميد عمودَي كود الصنف والحجم على الجوال (بلا تدوير) ═══ */
 function _isReportScreen(){
   var p=(typeof CURRENT_PAGE!=='undefined')?CURRENT_PAGE:'';
   return ['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)>=0;
 }
 function _isMobile(){return window.innerWidth<=820;}
-function _isPhonePortrait(){return _isMobile()&&window.innerHeight>window.innerWidth;}
-function _applyReportOrientation(){
-  /* أفقي = نضيف class landscape (يدوّر الجدول) إذا الجهاز رأسي */
-  var landscape=!window._reportPortrait&&_isPhonePortrait()&&_isReportScreen();
-  document.body.classList.toggle('report-landscape',landscape);
-}
-function _updateRotateBtn(){
-  var btn=document.getElementById('rotate-btn');if(!btn)return;
-  if(_isMobile()&&_isReportScreen()){btn.style.display='flex';}
-  else{btn.style.display='none';}
-  var ic=document.getElementById('rotate-ic');
-  if(ic)ic.innerHTML=window._reportPortrait?'&#8596;&#65039;':'&#8597;&#65039;';
-  btn.title=window._reportPortrait?'عرض أفقي (الجدول بعرض الشاشة)':'عرض رأسي عادي';
-  _applyReportOrientation();
-}
-function toggleReportRotate(){
-  window._reportPortrait=!window._reportPortrait;
-  _updateRotateBtn();
-}
+function _updateRotateBtn(){/* لا يوجد زر تدوير بعد الآن */}
+function toggleReportRotate(){/* أُلغي التدوير */}
+function _applyReportOrientation(){/* أُلغي التدوير */}
 /* تجميد أعمدة كود الصنف والحجم: نُعلّم أول عمودين بـ sticky */
 function _markFreezeColumns(){
   try{
@@ -7753,8 +7836,8 @@ window.addEventListener('orientationchange',function(){setTimeout(_updateRotateB
 
 <!-- زر رجوع عائم للنوافذ على الجوال -->
 <button id="modal-back-btn" class="modal-back-btn" onclick="closeAnyOpenModal()" aria-label="رجوع">
-  <span style="font-size:20px;line-height:1">&#10005;</span>
-  <span class="mbb-lbl">رجوع</span>
+  <span style="font-size:18px;line-height:1">&#8594;</span>
+  <span class="mbb-lbl">رجوع · Back</span>
 </button>
 <script>
 /* ═══ نظام الرجوع الموحّد للنوافذ العائمة ═══ */
@@ -7779,10 +7862,6 @@ function closeAnyOpenModal(){
   });
   /* أي fg-modal-ov أخرى ظاهرة */
   document.querySelectorAll('.fg-modal-ov.show').forEach(function(el){el.classList.remove('show');closed=true;});
-  /* الوضع الأفقي: الرجوع يعيد للرأسي */
-  if(!closed&&document.body.classList.contains('report-landscape')){
-    try{window._reportPortrait=true;_updateRotateBtn();closed=true;}catch(e){}
-  }
   _updateModalBackBtn();
   return closed;
 }
@@ -7793,8 +7872,6 @@ function _anyModalOpen(){
     if(el&&(el.classList.contains('show')||getComputedStyle(el).display==='flex'))return true;
   }
   if(document.querySelector('.fg-modal-ov.show'))return true;
-  /* الوضع الأفقي للتقارير يُحتسب كنافذة (له زر رجوع) */
-  if(document.body.classList.contains('report-landscape'))return true;
   return false;
 }
 function _updateModalBackBtn(){
@@ -7821,6 +7898,93 @@ function _updateModalBackBtn(){
       try{history.pushState(null,'',location.href);}catch(e){}
     });
   }catch(e){}
+})();
+</script>
+
+<script>
+/* ═══════════════════════════════════════════
+   إظهار أزرار الحافة عند اللمس/التمرير (الجوال)
+   menu-btn (يمين أعلى) · modal-back-btn (يسار أسفل)
+   ═══════════════════════════════════════════ */
+(function(){
+  var EDGE=42;        /* مسافة الحافة الحساسة (px) */
+  var SHOW_MS=2600;   /* مدة بقاء الزر ظاهراً */
+  var _t1=null,_t2=null;
+  function _isMobile(){return window.innerWidth<=900;}
+  function _peek(which){
+    if(!_isMobile())return;
+    document.body.classList.add('edge-peek-'+which);
+    var tref=(which==='start')?'_t1':'_t2';
+    if(window[tref])clearTimeout(window[tref]);
+    window[tref]=setTimeout(function(){
+      /* لا نُخفي إذا كانت القائمة/نافذة مفتوحة فعلاً */
+      document.body.classList.remove('edge-peek-'+which);
+    },SHOW_MS);
+  }
+  function _handle(x,y){
+    if(!_isMobile())return;
+    var W=window.innerWidth;
+    var isRTL=(document.documentElement.dir==='rtl');
+    /* الحافة التي فيها menu-btn (inset-inline-start → يمين في RTL) */
+    var startEdge=isRTL?(x>=W-EDGE):(x<=EDGE);
+    /* الحافة المقابلة */
+    var endEdge=isRTL?(x<=EDGE):(x>=W-EDGE);
+    if(startEdge)_peek('start');   /* menu-btn + nav-close */
+    if(endEdge)_peek('end');       /* modal-back-btn */
+  }
+  /* لمس */
+  document.addEventListener('touchstart',function(e){
+    var t=e.touches&&e.touches[0];if(t)_handle(t.clientX,t.clientY);
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    var t=e.touches&&e.touches[0];if(t)_handle(t.clientX,t.clientY);
+  },{passive:true});
+  /* ماوس (للأجهزة الهجينة) */
+  document.addEventListener('mousemove',function(e){_handle(e.clientX,e.clientY);});
+  /* عند فتح القائمة، نُبقي الزر ظاهراً */
+  window._edgePeekStart=function(){_peek('start');};
+  window._edgePeekEnd=function(){_peek('end');};
+})();
+</script>
+
+<!-- زر التحويل للعرض الأفقي (أعلى الشاشة، الجوال) -->
+<button id="landscape-btn" class="landscape-btn" onclick="toggleWideView()" aria-label="عرض أفقي" title="تحويل لعرض أفقي">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
+</button>
+<script>
+/* ═══════════════════════════════════════════
+   زر التحويل لعرض أفقي (آمن: توسيع + تمرير، بلا قلب)
+   ═══════════════════════════════════════════ */
+window._wideView=false;
+function _lbIsMobile(){return window.innerWidth<=820;}
+function _lbOnReport(){try{return _isReportScreen();}catch(e){return false;}}
+function _updateLandscapeBtn(){
+  var btn=document.getElementById('landscape-btn');if(!btn)return;
+  if(_lbIsMobile()&&_lbOnReport()){btn.classList.add('lb-visible');}
+  else{btn.classList.remove('lb-visible');document.body.classList.remove('wide-view');window._wideView=false;}
+  btn.classList.toggle('lb-active',!!window._wideView);
+}
+function toggleWideView(){
+  window._wideView=!window._wideView;
+  document.body.classList.toggle('wide-view',window._wideView);
+  _updateLandscapeBtn();
+}
+/* وميض عند الاقتراب من أعلى الشاشة */
+function _lbPulse(){
+  var btn=document.getElementById('landscape-btn');if(!btn)return;
+  if(!_lbIsMobile()||!_lbOnReport())return;
+  btn.classList.add('lb-pulse');
+  clearTimeout(window._lbPulseT);
+  window._lbPulseT=setTimeout(function(){btn.classList.remove('lb-pulse');},1800);
+}
+(function(){
+  /* لمس/تمرير قرب أعلى الشاشة (أول 60px) → وميض */
+  function near(y){return y<=60;}
+  document.addEventListener('touchstart',function(e){var t=e.touches&&e.touches[0];if(t&&near(t.clientY))_lbPulse();},{passive:true});
+  document.addEventListener('touchmove',function(e){var t=e.touches&&e.touches[0];if(t&&near(t.clientY))_lbPulse();},{passive:true});
+  document.addEventListener('mousemove',function(e){if(near(e.clientY))_lbPulse();});
+  window.addEventListener('resize',_updateLandscapeBtn);
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(_updateLandscapeBtn,700);});
 })();
 </script>
 </body>
