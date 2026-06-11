@@ -1618,6 +1618,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 .fp-done-hint{opacity:.85;font-size:12.5px}
 [dir=rtl] .fpc-strength{text-align:start}
 .fp-ov.show{display:flex}
+.fpc-ov.show{display:flex}
 .fp-box{position:relative;width:100%;max-width:420px;background:#fff;border-radius:22px;padding:34px 30px 28px;box-shadow:0 30px 70px rgba(6,20,44,.4);animation:fade .2s ease;text-align:center}
 .fp-x{position:absolute;top:16px;inset-inline-end:16px;width:34px;height:34px;border:none;background:#f1f5f9;border-radius:10px;font-size:15px;color:#64748b;cursor:pointer;transition:background .15s}
 .fp-x:hover{background:#e2e8f0}
@@ -2279,7 +2280,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-SYNC-1620 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
+      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-UPLOAD-1715 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
       <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
 
       <div class="cb-layout">
@@ -2710,21 +2711,21 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
         <div class="dr-slot">
           <h4>&#9312; الملف الرئيسي — Daily Coverage (Space + FG Balance + OLD Identity)</h4>
           <p>ملف Excel واحد يحتوي أوراق التقارير الثلاثة (تُطابَق بالاسم تلقائياً). القالب يتضمن أوراق «Example» توضيحية تُتجاهل عند الرفع — في Space يكفي تعبئة 7 صفوف، وعمود Total يُحسب تلقائياً.</p>
-          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls" onchange="drUploadMain(this)"><button class="btn-soft sm" onclick="drTemplateMain()"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearMain()" title="تفريغ بيانات Space و FG Balance و OLD Identity"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
+          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadMain(this)"><button class="btn-soft sm" onclick="drTemplateMain()"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearMain()" title="تفريغ بيانات Space و FG Balance و OLD Identity"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
           <div class="dr-st" id="dr-st-main"></div>
           <div class="dr-tpl"><span class="dr-meta">Space: <b id="dr-info-space">—</b></span><span class="dr-meta">FG Balance: <b id="dr-info-fgbal">—</b></span><span class="dr-meta">OLD Identity: <b id="dr-info-oldid">—</b></span></div>
         </div>
         <div class="dr-slot">
           <h4>&#9313; FG Transit Report — ملف منفصل</h4>
           <p>ملف Excel خاص بتقرير الترانزيت — عمود Total يُحسب تلقائياً، وورقة «Example» للتوضيح فقط.</p>
-          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls" onchange="drUploadOne(this,'transit')"><button class="btn-soft sm" onclick="drTemplateOne('transit')"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearOne('transit')" title="تفريغ بيانات FG Transit"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
+          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'transit')"><button class="btn-soft sm" onclick="drTemplateOne('transit')"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearOne('transit')" title="تفريغ بيانات FG Transit"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
           <div class="dr-st" id="dr-st-transit"></div>
           <div class="dr-tpl"><span class="dr-meta">Transit: <b id="dr-info-transit">—</b></span></div>
         </div>
         <div class="dr-slot">
           <h4>&#9314; FG Bottle Stock — ملف منفصل (أرصدة القارورة)</h4>
           <p>ملف Excel خاص بأرصدة القارورة — أعمدة الإجماليات وصف «الاجمالى» تُحسب تلقائياً، وورقة «Example» للتوضيح فقط.</p>
-          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls" onchange="drUploadOne(this,'bottle')"><button class="btn-soft sm" onclick="drTemplateOne('bottle')"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearOne('bottle')" title="تفريغ بيانات FG Bottle Stock"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
+          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls,.xlsb,.csv" onchange="drUploadOne(this,'bottle')"><button class="btn-soft sm" onclick="drTemplateOne('bottle')"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearOne('bottle')" title="تفريغ بيانات FG Bottle Stock"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
           <div class="dr-st" id="dr-st-bottle"></div>
           <div class="dr-tpl"><span class="dr-meta">Bottle: <b id="dr-info-bottle">—</b></span></div>
         </div>
@@ -5508,11 +5509,14 @@ function parseBottleSheet(aoa){
 function drParseGeneric(aoa){
   if(!aoa||!aoa.length)return null;
   var hi=-1,best=-1;
+  /* نبحث عن صف العناوين: أكثر صف فيه نصوص (الحد الأدنى نصّان) */
   for(var i=0;i<Math.min(aoa.length,16);i++){
     var row=aoa[i]||[],ne=0,txt=0;
     for(var j=0;j<row.length;j++){var v=row[j];if(v!==''&&v!=null){ne++;if(isNaN(v)&&String(v).trim()!=='')txt++;}}
-    if(txt>=3&&ne>best){best=ne;hi=i;}
+    if(txt>=2&&ne>best){best=ne;hi=i;}
   }
+  /* احتياطي: إن لم نجد صف عناوين واضحاً، نستخدم أول صف غير فارغ */
+  if(hi<0){for(var i2=0;i2<aoa.length;i2++){var rr=aoa[i2]||[];var has=false;for(var jj=0;jj<rr.length;jj++){if(rr[jj]!==''&&rr[jj]!=null){has=true;break;}}if(has){hi=i2;break;}}}
   if(hi<0)return null;
   var hdr=(aoa[hi]||[]).map(function(c,idx){c=(c==null?'':String(c).trim());return c||('C'+(idx+1));});
   var last=hdr.length-1;while(last>0&&/^C\d+$/.test(hdr[last]))last--;hdr=hdr.slice(0,last+1);
@@ -5569,25 +5573,47 @@ function drClearOne(key){
 }
 function drUploadMain(input){
   var f=input.files&&input.files[0];if(!f)return;drSetSt('main','… جارٍ القراءة','');
-  drReadFile(f,function(wb){
-    if(!wb){drSetSt('main','تعذّر قراءة الملف','err');return;}
+  drReadFile(f,function(wb,err){
+    if(!wb){drSetSt('main','⚠️ تعذّر فتح الملف. تأكّد أنه ملف Excel صحيح (.xlsx) وغير محمي بكلمة مرور وغير تالف. جرّب فتحه في Excel ثم احفظه باسم جديد.','err');return;}
+    if(!wb.SheetNames||!wb.SheetNames.length){drSetSt('main','⚠️ الملف لا يحتوي أي أوراق. تأكّد من حفظه بشكل صحيح.','err');return;}
+    var allNames=wb.SheetNames.slice();
     var names=wb.SheetNames.filter(function(n){return !drIsExSheet(n);});
-    var map=[['space',['space']],['fgbal',['fg balance','balance']],['oldid',['old','identity']]];
-    var done=[],fail=[];
+    /* مطابقة مرنة: كلمات عربية وإنجليزية متعددة */
+    var map=[
+      ['space',['space','مساحة','مساحات','المساحات','سبيس']],
+      ['fgbal',['fg balance','balance','رصيد','الرصيد','بضاعة','تامة','fg']],
+      ['oldid',['old','identity','هوية','قديم','قديمة','الهوية','old id']]
+    ];
+    var done=[],fail=[],matched={};
+    /* مطابقة بالاسم أولاً */
     map.forEach(function(m){
       var key=m[0],kw=m[1];
-      var sn=names.filter(function(n){var L=String(n).toLowerCase();var hit=kw.some(function(k){return L.indexOf(k)>=0;});if(key==='fgbal'&&L.indexOf('old')>=0)return false;return hit;})[0];
-      if(!sn)return;
+      var sn=names.filter(function(n){var L=String(n).toLowerCase().trim();var hit=kw.some(function(k){return L.indexOf(k)>=0;});if(key==='fgbal'&&(L.indexOf('old')>=0||L.indexOf('قديم')>=0))return false;return hit;})[0];
+      if(sn)matched[key]=sn;
+    });
+    /* احتياطي بالترتيب: الأوراق غير المطابَقة تُوزّع على المفاتيح الناقصة بترتيبها */
+    var unmatchedKeys=map.map(function(m){return m[0];}).filter(function(k){return !matched[k];});
+    var usedSheets=Object.keys(matched).map(function(k){return matched[k];});
+    var freeSheets=names.filter(function(n){return usedSheets.indexOf(n)<0;});
+    unmatchedKeys.forEach(function(k,idx){ if(freeSheets[idx])matched[k]=freeSheets[idx]; });
+    /* الآن نحلّل كل مفتاح مطابَق */
+    map.forEach(function(m){
+      var key=m[0];var sn=matched[key];
+      if(!sn){fail.push(key);return;}
       var aoa=sheetToAoa(wb.Sheets[sn]);var p;
       if(key==='space')p=parseSpaceTemplate(aoa)||parseSpaceSheet(aoa);
       else p=drAutoTotal(key,drParseGeneric(aoa));
       if(p){var s=getDR();s[key]=p;saveDR(s);done.push(key);try{updateHomeDates();}catch(e){}}else fail.push(key);
     });
     if(done.length){_drCloudReady=true;done.forEach(renderDailyReport);renderUploadStatus();drPush();if(done.indexOf('fgbal')>=0||done.indexOf('space')>=0){try{renderDailyReport('space');if(document.getElementById('sp-conv-body')&&document.getElementById('sp-conv-body').style.display==='block')renderSpaceConvTable();}catch(e){}}}
-    if(done.length&&!fail.length)drSetSt('main','✅ تم تحديث: '+done.join(' / '),'ok');
-    else if(done.length)drSetSt('main','✅ تم تحديث: '+done.join(' / ')+' — ⚠️ تعذّر قراءة: '+fail.join(' / '),'err');
-    else if(fail.length)drSetSt('main','تعذّرت قراءة بيانات: '+fail.join(' / ')+' — نزّل القالب وعبّئ أوراق البيانات (أوراق Example للتوضيح فقط)','err');
-    else drSetSt('main','لم يتم العثور على أوراق مطابقة (Space / FG Balance / OLD Identity)','err');
+    var nameAr={space:'Space',fgbal:'FG Balance',oldid:'OLD Identity'};
+    var doneT=done.map(function(k){return nameAr[k]||k;}).join(' / ');
+    var failT=fail.map(function(k){return nameAr[k]||k;}).join(' / ');
+    var sheetsInFile=allNames.join('، ');
+    if(done.length&&!fail.length)drSetSt('main','✅ تم تحديث: '+doneT,'ok');
+    else if(done.length)drSetSt('main','✅ تم تحديث: '+doneT+' — ⚠️ تعذّر: '+failT+'. الأوراق في ملفك: '+sheetsInFile,'err');
+    else if(fail.length)drSetSt('main','⚠️ تعذّر قراءة: '+failT+'. الأوراق الموجودة في ملفك: «'+sheetsInFile+'». تأكّد أن كل ورقة تحتوي صف عناوين ثم صفوف البيانات، أو نزّل القالب الجاهز.','err');
+    else drSetSt('main','⚠️ لم يُعثر على أوراق بيانات. ملفك يحتوي: «'+sheetsInFile+'». نزّل القالب الجاهز واملأه، أو سمِّ الأوراق: Space / FG Balance / OLD Identity','err');
     input.value='';
   });
 }
