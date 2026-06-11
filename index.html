@@ -2221,7 +2221,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:10px 16px;border-radius:12px;margin-bottom:14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:10px">&#127919; منشئ البطاقات — الإصدار v5.8 &middot; إذا رأيت هذا الشريط فالنسخة محدّثة بنجاح</div>
+      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-20260611-1545 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
       <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
 
       <div class="cb-layout">
@@ -2250,8 +2250,8 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
             <div class="sf"><label data-i18n="cb_f_month">الشهر</label><select id="cbs-month" onchange="cbPreview()"><option value="all" data-i18n="cb_month_all">كل الشهور</option></select></div>
           </div>
           <div class="cb-fields">
-            <div class="sf full"><label data-i18n="cb_f_icon">الأيقونة</label><div class="cb-icons" id="cbs-icons"></div></div>
-            <div class="sf full"><label data-i18n="cb_f_color">اللون</label><div class="cb-colors" id="cbs-colors"></div></div>
+            <div class="sf full"><label data-i18n="cb_f_icon">الأيقونة</label><div class="cb-icons" id="cbs-icons"><button type="button" class="cb-ic on" onclick="_cbPickIcon('&#128202;')">&#128202;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128230;')">&#128230;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#9989;')">&#9989;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#9888;&#65039;')">&#9888;&#65039;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128176;')">&#128176;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128200;')">&#128200;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128201;')">&#128201;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#127981;')">&#127981;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128666;')">&#128666;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#9203;')">&#9203;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128276;')">&#128276;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#11088;')">&#11088;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128737;&#65039;')">&#128737;&#65039;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128295;')">&#128295;</button><button type="button" class="cb-ic" onclick="_cbPickIcon('&#128221;')">&#128221;</button></div></div>
+            <div class="sf full"><label data-i18n="cb_f_color">اللون</label><div class="cb-colors" id="cbs-colors"><button type="button" class="cb-col on" style="background:#2f7ed8" onclick="_cbPickColor('#2f7ed8')"></button><button type="button" class="cb-col" style="background:#16a34a" onclick="_cbPickColor('#16a34a')"></button><button type="button" class="cb-col" style="background:#ea580c" onclick="_cbPickColor('#ea580c')"></button><button type="button" class="cb-col" style="background:#9333ea" onclick="_cbPickColor('#9333ea')"></button><button type="button" class="cb-col" style="background:#0891b2" onclick="_cbPickColor('#0891b2')"></button><button type="button" class="cb-col" style="background:#dc2626" onclick="_cbPickColor('#dc2626')"></button><button type="button" class="cb-col" style="background:#ca8a04" onclick="_cbPickColor('#ca8a04')"></button><button type="button" class="cb-col" style="background:#0d9488" onclick="_cbPickColor('#0d9488')"></button><button type="button" class="cb-col" style="background:#6366f1" onclick="_cbPickColor('#6366f1')"></button><button type="button" class="cb-col" style="background:#db2777" onclick="_cbPickColor('#db2777')"></button></div></div>
           </div>
           <div class="cb-actions">
             <button class="btn-primary" onclick="cbSave()"><span>&#128190;</span> <span id="cb-save-lbl" data-i18n="cb_save">حفظ البطاقة</span></button>
@@ -2263,7 +2263,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
         <!-- المعاينة الحية -->
         <div class="card cb-preview-card">
           <h2 class="sec-h"><span>&#128065;&#65039;</span> <span data-i18n="cb_preview">معاينة حية</span></h2>
-          <div class="cb-preview-wrap"><div class="kpis"><div id="cb-preview-host"></div></div></div>
+          <div class="cb-preview-wrap"><div class="kpis"><div id="cb-preview-host"><div class="kpi kpi-custom" style="--cc:#2f7ed8"><div class="row"><h3>عنوان البطاقة</h3><div class="ic">&#128202;</div></div><div class="v">0</div><span class="cc-meta">مجموع &middot; الكل</span></div></div></div></div>
           <div class="cb-hint" data-i18n="cb_preview_hint">القيمة محسوبة من البيانات الحالية وتتأثر بالفلاتر المطبّقة في لوحة المعلومات.</div>
         </div>
       </div>
@@ -2271,7 +2271,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
       <!-- قائمة البطاقات المنشأة -->
       <div class="card">
         <h2 class="sec-h"><span>&#128203;</span> <span data-i18n="cb_list">البطاقات المنشأة</span> <span class="cb-count" id="cb-list-count"></span></h2>
-        <div class="cb-list" id="cb-list"></div>
+        <div class="cb-list" id="cb-list"><div class="cb-empty">لا توجد بطاقات بعد. أنشئ بطاقتك الأولى من النموذج أعلاه. · No cards yet. Create your first card from the form above.</div></div>
       </div>
 
     </div></div></div>
