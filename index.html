@@ -1302,26 +1302,42 @@ button,.navbtn,.d-tile,.hub-tile,.kpi{-webkit-tap-highlight-color:rgba(47,126,21
   tr:nth-child(even) .freeze-col{background:#f8fafc !important}
 }
 
-/* ── وضع «الحجم الكامل» (مدوّر): الجدول بحجمه الطبيعي + تمرير أفقي + تجميد ── */
-@media (max-width:820px){
-  /* الوضع الافتراضي = مصغّر ليظهر كاملاً (table-layout:auto + font صغير) */
-  /* عند تفعيل report-rotated = حجم كامل مريح للقراءة مع تمرير وتجميد */
-  body.report-rotated #page-rspace .fg-table,body.report-rotated #page-rfgbal .fg-table,
-  body.report-rotated #page-roldid .fg-table,body.report-rotated #page-rtransit .fg-table,
-  body.report-rotated #page-rbottle .fg-table,
-  body.report-rotated #page-rspace .pivot,body.report-rotated #page-rfgbal .pivot,
-  body.report-rotated #page-roldid .pivot,body.report-rotated #page-rtransit .pivot,
-  body.report-rotated #page-rbottle .pivot,
-  body.report-rotated .bt-table,body.report-rotated .sp-table{
-    font-size:12px !important;width:auto !important;min-width:max-content !important;table-layout:auto !important;
+/* ── الوضع الأفقي الافتراضي على الجوال: الجدول مدوّر 90° يملأ طول الشاشة ── */
+@media screen and (max-width:820px) and (orientation:portrait){
+  body.report-landscape #page-rspace .pivot-wrap,
+  body.report-landscape #page-rfgbal .pivot-wrap,
+  body.report-landscape #page-roldid .pivot-wrap,
+  body.report-landscape #page-rtransit .pivot-wrap,
+  body.report-landscape #page-rbottle .pivot-wrap,
+  body.report-landscape #page-rbottle .bt-scroll,
+  body.report-landscape #page-rspace .sp-scroll{
+    position:fixed !important;top:50% !important;left:50% !important;
+    width:100vh !important;height:100vw !important;
+    max-width:100vh !important;max-height:100vw !important;
+    transform:translate(-50%,-50%) rotate(90deg) !important;
+    transform-origin:center center !important;
+    background:#fff;z-index:980;
+    overflow:auto !important;-webkit-overflow-scrolling:touch;
+    padding:46px 12px 12px !important;border-radius:0 !important;
   }
-  body.report-rotated .fg-table th,body.report-rotated .fg-table td,
-  body.report-rotated .pivot th,body.report-rotated .pivot td,
-  body.report-rotated .bt-table th,body.report-rotated .bt-table td,
-  body.report-rotated .sp-table th,body.report-rotated .sp-table td{
-    padding:7px 9px !important;
+  /* الجداول داخل الوضع الأفقي: حجم قراءة مريح */
+  body.report-landscape .pivot,body.report-landscape .fg-table,
+  body.report-landscape .bt-table,body.report-landscape .sp-table{
+    font-size:11.5px !important;table-layout:auto !important;width:auto !important;min-width:0 !important;
+  }
+  body.report-landscape .pivot th,body.report-landscape .pivot td,
+  body.report-landscape .fg-table th,body.report-landscape .fg-table td,
+  body.report-landscape .bt-table th,body.report-landscape .bt-table td,
+  body.report-landscape .sp-table th,body.report-landscape .sp-table td{
+    padding:5px 7px !important;
   }
 }
+
+/* ═══ زر الرجوع العائم للنوافذ على الجوال ═══ */
+.modal-back-btn{display:none;position:fixed;top:max(12px,env(safe-area-inset-top));inset-inline-start:12px;z-index:99999;align-items:center;gap:7px;background:rgba(15,23,42,.92);color:#fff;border:none;border-radius:99px;padding:11px 18px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:inherit;transition:transform .12s}
+.modal-back-btn:active{transform:scale(.93)}
+.mbb-lbl{font-size:13.5px}
+@media print{.modal-back-btn{display:none !important}}
 </style>
 
 <style id="thome-css">
@@ -2345,7 +2361,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-MOBILE-1810 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
+      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-SECURE-1900 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
       <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
 
       <div class="cb-layout">
@@ -2957,7 +2973,7 @@ function updateTopnav(p){var tn=document.getElementById('topnav');if(!tn)return;
 var CURRENT_PAGE='';
 function go(p){
   CURRENT_PAGE=p;
-  try{if(window._reportRotated&&['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)<0){window._reportRotated=false;document.body.classList.remove('report-rotated');}}catch(e){}
+  try{if(['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)<0){document.body.classList.remove('report-landscape');}}catch(e){}
   setTimeout(function(){try{_updateRotateBtn();_markFreezeColumns();}catch(e){}},120);
   if(!CURRENT_USER){
     /* لا يوجد مستخدم مسجل — أظهر شاشة الدخول */
@@ -4071,6 +4087,52 @@ let CURRENT_USER=null;
 function val(id){const e=document.getElementById(id);return e?e.value:'';}
 function getUsers(){try{return JSON.parse(localStorage.getItem('dash_users')||'null');}catch(e){return null;}}
 function saveUsers(u){try{localStorage.setItem('dash_users',JSON.stringify(u));}catch(e){}try{pushUsersToCloud(u);}catch(e){}}
+/* ═══ تشفير كلمات المرور (SHA-256 مدمج، متزامن) ═══ */
+function _sha256(ascii){
+  function rightRotate(v,a){return (v>>>a)|(v<<(32-a));}
+  var mathPow=Math.pow,maxWord=mathPow(2,32),result='';
+  var words=[],asciiBitLength=ascii.length*8;
+  var hash=_sha256.h=_sha256.h||[],k=_sha256.k=_sha256.k||[],primeCounter=k.length;
+  var isComposite={};
+  for(var candidate=2;primeCounter<64;candidate++){
+    if(!isComposite[candidate]){
+      for(var i=0;i<313;i+=candidate)isComposite[i]=candidate;
+      hash[primeCounter]=(mathPow(candidate,.5)*maxWord)|0;
+      k[primeCounter++]=(mathPow(candidate,1/3)*maxWord)|0;
+    }
+  }
+  ascii+='\x80';
+  while(ascii.length%64-56)ascii+='\x00';
+  for(i=0;i<ascii.length;i++){
+    var j2=ascii.charCodeAt(i);if(j2>>8)return '';
+    words[i>>2]|=j2<<((3-i)%4)*8;
+  }
+  words[words.length]=((asciiBitLength/maxWord)|0);
+  words[words.length]=(asciiBitLength);
+  for(j2=0;j2<words.length;){
+    var w=words.slice(j2,j2+=16),oldHash=hash;
+    hash=hash.slice(0,8);
+    for(i=0;i<64;i++){
+      var w15=w[i-15],w2=w[i-2];
+      var a=hash[0],e=hash[4];
+      var temp1=hash[7]+(rightRotate(e,6)^rightRotate(e,11)^rightRotate(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rightRotate(w15,7)^rightRotate(w15,18)^(w15>>>3))+w[i-7]+(rightRotate(w2,17)^rightRotate(w2,19)^(w2>>>10)))|0);
+      var temp2=(rightRotate(a,2)^rightRotate(a,13)^rightRotate(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+      hash=[(temp1+temp2)|0].concat(hash);
+      hash[4]=(hash[4]+temp1)|0;
+    }
+    for(i=0;i<8;i++)hash[i]=(hash[i]+oldHash[i])|0;
+  }
+  for(i=0;i<8;i++){for(var j3=3;j3+1;j3--){var b=(hash[i]>>(j3*8))&255;result+=((b>>4).toString(16))+((b&15).toString(16));}}
+  return result;
+}
+function pwdHash(p){try{return 'h$'+_sha256(unescape(encodeURIComponent(String(p))));}catch(e){return String(p);}}
+function pwdIsHashed(s){return typeof s==='string'&&s.indexOf('h$')===0&&s.length===66;}
+/* مقارنة متوافقة: تقبل المخزّن القديم (نص) أو الجديد (hash) */
+function pwdMatch(stored,input){
+  if(stored==null)return false;
+  if(pwdIsHashed(stored))return stored===pwdHash(input);
+  return String(stored)===String(input);
+}
 function seedUsers(){if(!getUsers())saveUsers([{u:'admin',p:'admin123',r:'admin'}]);}
 function isAdmin(){return !!(CURRENT_USER&&CURRENT_USER.r==='admin');}
 const ALL_PAGES=['rspace','rfgbal','roldid','rtransit','rbottle','dash','sum','sku','masterdata','spaceact','dailyup','imp','cloud','records','designer','cardbuilder','users'];
@@ -4337,7 +4399,7 @@ function fpVerifyReset(){
   var us=getUsers()||[];
   var idx=us.findIndex(function(x){return x.u===_fpState.user;});
   if(idx<0){ _fpMsg(tr('fp_no_user'),'err'); return; }
-  us[idx].p=np;
+  us[idx].p=pwdHash(np);
   us[idx].temp=false; /* كلمة مرور دائمة الآن */
   saveUsers(us);
 
@@ -4500,7 +4562,7 @@ function _loginProceed(u,p){
   }
   /* قبول كلمة المرور العادية أو الرقم المؤقت الصالح (24 ساعة) */
   var usedTemp=false;
-  if(byName.p!==p){
+  if(!pwdMatch(byName.p,p)){
     if(checkTempPassword(byName,p)){
       usedTemp=true;/* دخل برقم مؤقت — سيُجبر على التغيير */
     }else{
@@ -4518,6 +4580,8 @@ function _loginProceed(u,p){
   if(uEl)uEl.classList.remove('login-input-err');if(pEl)pEl.classList.remove('login-input-err');
   /* إن دخل برقم مؤقت، فرض تغيير كلمة المرور */
   if(usedTemp)fnd.mustChange=true;
+  /* ترقية تلقائية: تخزين الكلمة مشفّرة بعد دخول ناجح بكلمة قديمة */
+  try{if(!usedTemp&&!pwdIsHashed(fnd.p)){fnd.p=pwdHash(p);saveUsers(us);}}catch(e){}
   CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};
   try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
   try{logLogin(fnd.u,'login');}catch(e){}
@@ -4579,8 +4643,8 @@ function submitForcePwd(){
   /* منع إعادة نفس كلمة المرور المؤقتة */
   var us=getUsers()||[];var u=us.find(function(x){return x.u===_forcePwdUser;});
   if(!u){if(err)err.textContent=ar?'خطأ في الحساب':'Account error';return;}
-  if(u.p===pw){if(err)err.textContent=ar?'اختر كلمة مرور مختلفة عن المؤقتة':'Choose a password different from the temporary one';return;}
-  u.p=pw;u.temp=false;u.mustChange=false;u.pwdChangedAt=drToday&&drToday();delete u.tempCode;delete u.tempExpires;
+  if(pwdMatch(u.p,pw)){if(err)err.textContent=ar?'اختر كلمة مرور مختلفة عن المؤقتة':'Choose a password different from the temporary one';return;}
+  u.p=pwdHash(pw);u.temp=false;u.mustChange=false;u.pwdChangedAt=drToday&&drToday();delete u.tempCode;delete u.tempExpires;
   saveUsers(us);
   try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}
   /* تسجيل الدخول الفعلي بعد التغيير */
@@ -4704,7 +4768,7 @@ function renderUserStats(){
     card('&#9888;',pending,ar?'تغيير معلّق':'Pending change','s-pending')+
     card('&#9203;',activeTemp,ar?'أرقام مؤقتة نشطة':'Active temp codes','s-temp');
 }
-function resetUserPwd(i){const us=getUsers()||[];if(!us[i])return;const np=prompt(tr('set_new_pwd')+' ('+us[i].u+')');if(np&&np.trim()){us[i].p=np.trim();us[i].mustChange=true;us[i].temp=false;saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}renderUsers();try{alert(tr('pwd_reset_forced'));}catch(e){}}}
+function resetUserPwd(i){const us=getUsers()||[];if(!us[i])return;const np=prompt(tr('set_new_pwd')+' ('+us[i].u+')');if(np&&np.trim()){us[i].p=pwdHash(np.trim());us[i].mustChange=true;us[i].temp=false;saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}renderUsers();try{alert(tr('pwd_reset_forced'));}catch(e){}}}
 /* المدير: توليد رقم مؤقت يدوياً (24 ساعة) وعرضه ليسلّمه للمستخدم */
 function adminIssueTemp(i){
   var us=getUsers()||[];if(!us[i])return;
@@ -4753,7 +4817,7 @@ function addUser(){
   const u=(val('nu-user')||'').trim(),p=(val('nu-pass')||'').trim(),r=val('nu-role')||'user';const msg=document.getElementById('u-msg');
   if(!u||!p){msg.textContent=tr('u_need');return;}
   let us=getUsers()||[];if(us.some(x=>x.u.toLowerCase()===u.toLowerCase())){msg.textContent=tr('u_exists');return;}
-  us.push({u:u,p:p,r:r,email:(val('nu-email')||'').trim(),mobile:(val('nu-mobile')||'').trim(),perms:['dash','sum','sku'],temp:false,mustChange:true});saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}['nu-user','nu-pass','nu-email','nu-mobile'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});msg.textContent='';renderUsers();
+  us.push({u:u,p:pwdHash(p),r:r,email:(val('nu-email')||'').trim(),mobile:(val('nu-mobile')||'').trim(),perms:['dash','sum','sku'],temp:false,mustChange:true});saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}['nu-user','nu-pass','nu-email','nu-mobile'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});msg.textContent='';renderUsers();
 }
 function delUser(i){let us=getUsers()||[];if(!us[i])return;if(CURRENT_USER&&us[i].u===CURRENT_USER.u)return;us.splice(i,1);saveUsers(us);renderUsers();}
 function initAuth(){
@@ -7627,26 +7691,31 @@ window.addEventListener('offline',_updateSyncBar);
 </button>
 <script>
 /* ═══ نظام عرض التقارير على الجوال (تدوير + تجميد الأعمدة) ═══ */
-window._reportRotated=false;
+/* الوضع الافتراضي على الجوال = أفقي (landscape). الزر يحوّل للرأسي عند الحاجة */
+window._reportPortrait=false; /* false = أفقي (افتراضي)، true = رأسي */
 function _isReportScreen(){
   var p=(typeof CURRENT_PAGE!=='undefined')?CURRENT_PAGE:'';
   return ['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)>=0;
 }
 function _isMobile(){return window.innerWidth<=820;}
+function _isPhonePortrait(){return _isMobile()&&window.innerHeight>window.innerWidth;}
+function _applyReportOrientation(){
+  /* أفقي = نضيف class landscape (يدوّر الجدول) إذا الجهاز رأسي */
+  var landscape=!window._reportPortrait&&_isPhonePortrait()&&_isReportScreen();
+  document.body.classList.toggle('report-landscape',landscape);
+}
 function _updateRotateBtn(){
   var btn=document.getElementById('rotate-btn');if(!btn)return;
-  /* يظهر فقط على الجوال وفي شاشات التقارير */
   if(_isMobile()&&_isReportScreen()){btn.style.display='flex';}
   else{btn.style.display='none';}
   var ic=document.getElementById('rotate-ic');
-  if(ic)ic.innerHTML=window._reportRotated?'&#128290;':'&#128269;';
-  btn.title=window._reportRotated?'عرض مصغّر يظهر كامل الجدول':'تكبير مع تمرير أفقي وتجميد الأعمدة';
+  if(ic)ic.innerHTML=window._reportPortrait?'&#8596;&#65039;':'&#8597;&#65039;';
+  btn.title=window._reportPortrait?'عرض أفقي (الجدول بعرض الشاشة)':'عرض رأسي عادي';
+  _applyReportOrientation();
 }
 function toggleReportRotate(){
-  window._reportRotated=!window._reportRotated;
-  document.body.classList.toggle('report-rotated',window._reportRotated);
+  window._reportPortrait=!window._reportPortrait;
   _updateRotateBtn();
-  try{var t=document.getElementById('sync-txt');}catch(e){}
 }
 /* تجميد أعمدة كود الصنف والحجم: نُعلّم أول عمودين بـ sticky */
 function _markFreezeColumns(){
@@ -7677,6 +7746,79 @@ window.addEventListener('orientationchange',function(){setTimeout(_updateRotateB
       ['rep-fgbal-wrap','rep-oldid-wrap','rep-transit-wrap','rep-bottle-wrap','rep-space-wrap'].forEach(function(id){
         var el=document.getElementById(id);if(el)mo.observe(el,{childList:true,subtree:true});
       });
+    });
+  }catch(e){}
+})();
+</script>
+
+<!-- زر رجوع عائم للنوافذ على الجوال -->
+<button id="modal-back-btn" class="modal-back-btn" onclick="closeAnyOpenModal()" aria-label="رجوع">
+  <span style="font-size:20px;line-height:1">&#10005;</span>
+  <span class="mbb-lbl">رجوع</span>
+</button>
+<script>
+/* ═══ نظام الرجوع الموحّد للنوافذ العائمة ═══ */
+/* خريطة: id النافذة → طريقة الإغلاق */
+function closeAnyOpenModal(){
+  var closed=false;
+  /* النوافذ بدوال إغلاق مخصصة */
+  var m=[
+    ['detail-ov',function(){try{closeDetail();}catch(e){}}],
+    ['card-editor-ov',function(){try{closeCardEditor();}catch(e){}}],
+    ['dal-detail-ov',function(){try{closeDALDetail();}catch(e){}}],
+    ['sp-card-ov',function(){try{closeSpaceCardDetail();}catch(e){}}],
+    ['temp-show-ov',function(){var o=document.getElementById('temp-show-ov');if(o)o.classList.remove('show');}],
+    ['fp-ov',function(){var o=document.getElementById('fp-ov');if(o)o.classList.remove('show');}],
+    ['perms-modal-ov',function(){var o=document.getElementById('perms-modal-ov');if(o)o.classList.remove('show');}]
+  ];
+  m.forEach(function(pair){
+    var el=document.getElementById(pair[0]);
+    if(el&&(el.classList.contains('show')||getComputedStyle(el).display!=='none')){
+      pair[1]();closed=true;
+    }
+  });
+  /* أي fg-modal-ov أخرى ظاهرة */
+  document.querySelectorAll('.fg-modal-ov.show').forEach(function(el){el.classList.remove('show');closed=true;});
+  /* الوضع الأفقي: الرجوع يعيد للرأسي */
+  if(!closed&&document.body.classList.contains('report-landscape')){
+    try{window._reportPortrait=true;_updateRotateBtn();closed=true;}catch(e){}
+  }
+  _updateModalBackBtn();
+  return closed;
+}
+function _anyModalOpen(){
+  var ids=['detail-ov','card-editor-ov','dal-detail-ov','sp-card-ov','temp-show-ov','fp-ov','perms-modal-ov'];
+  for(var i=0;i<ids.length;i++){
+    var el=document.getElementById(ids[i]);
+    if(el&&(el.classList.contains('show')||getComputedStyle(el).display==='flex'))return true;
+  }
+  if(document.querySelector('.fg-modal-ov.show'))return true;
+  /* الوضع الأفقي للتقارير يُحتسب كنافذة (له زر رجوع) */
+  if(document.body.classList.contains('report-landscape'))return true;
+  return false;
+}
+function _updateModalBackBtn(){
+  try{
+    var btn=document.getElementById('modal-back-btn');if(!btn)return;
+    var show=(window.innerWidth<=900)&&_anyModalOpen();
+    btn.style.display=show?'flex':'none';
+  }catch(e){}
+}
+/* مراقبة فتح/إغلاق النوافذ تلقائياً */
+(function(){
+  try{
+    var mo=new MutationObserver(function(){clearTimeout(window._mbT);window._mbT=setTimeout(_updateModalBackBtn,120);});
+    document.addEventListener('DOMContentLoaded',function(){
+      mo.observe(document.body,{attributes:true,attributeFilter:['class','style'],subtree:true});
+      setTimeout(_updateModalBackBtn,600);
+    });
+    window.addEventListener('resize',_updateModalBackBtn);
+    /* زر الرجوع في الجهاز (Android back) يغلق النافذة بدل الخروج */
+    window.addEventListener('popstate',function(){
+      if(_anyModalOpen()){closeAnyOpenModal();history.pushState(null,'',location.href);}
+    });
+    document.addEventListener('DOMContentLoaded',function(){
+      try{history.pushState(null,'',location.href);}catch(e){}
     });
   }catch(e){}
 })();
