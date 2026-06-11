@@ -1263,6 +1263,65 @@ button,.navbtn,.d-tile,.hub-tile,.kpi{-webkit-tap-highlight-color:rgba(47,126,21
 .dr-intro-ic{font-size:24px;flex-shrink:0;line-height:1.2}
 .dr-intro-banner b{color:#1d4ed8}
 @media (max-width:640px){.dr-intro-banner{font-size:12.5px;padding:12px 14px}}
+
+/* ═══════════════════════════════════════════
+   عرض التقارير على الجوال: تدوير + تجميد + تصغير
+   ═══════════════════════════════════════════ */
+/* زر التدوير العائم */
+.rotate-btn{display:none;position:fixed;bottom:max(64px,calc(env(safe-area-inset-bottom) + 64px));inset-inline-end:14px;z-index:9991;width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,#2f7ed8,#1d4ed8);color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(47,126,216,.4);align-items:center;justify-content:center;transition:transform .15s}
+.rotate-btn:active{transform:scale(.9)}
+
+@media (max-width:820px){
+  /* ── تصغير الجداول لتناسب عرض الشاشة ── */
+  #page-rspace .fg-table,#page-rfgbal .fg-table,#page-roldid .fg-table,
+  #page-rtransit .fg-table,#page-rbottle .fg-table,
+  #page-rspace .pivot,#page-rfgbal .pivot,#page-roldid .pivot,
+  #page-rtransit .pivot,#page-rbottle .pivot,
+  .bt-table,.sp-table{
+    font-size:9px !important;width:100% !important;table-layout:auto !important;
+  }
+  .fg-table th,.fg-table td,.pivot th,.pivot td,.bt-table th,.bt-table td,.sp-table th,.sp-table td{
+    padding:3px 4px !important;white-space:nowrap;
+  }
+  /* الحاوية تسمح بالتمرير الأفقي مع تجميد */
+  #page-rspace .pivot-wrap,#page-rfgbal .pivot-wrap,#page-roldid .pivot-wrap,
+  #page-rtransit .pivot-wrap,#page-rbottle .pivot-wrap,
+  .pivot-wrap,.fg-wrap,.sp-scroll,.bt-scroll{
+    overflow-x:auto !important;-webkit-overflow-scrolling:touch;max-width:100% !important;
+  }
+
+  /* ── تجميد عمودي كود الصنف والحجم (sticky) ── */
+  .freeze-col{position:sticky !important;background:#fff !important;z-index:5;box-shadow:1px 0 0 rgba(0,0,0,.08)}
+  .freeze-col-1{inset-inline-start:0 !important;z-index:6 !important;min-width:54px;max-width:80px}
+  .freeze-col-2{inset-inline-start:54px !important;z-index:6 !important;min-width:48px;max-width:72px}
+  /* رؤوس الأعمدة المجمّدة فوق الكل */
+  thead .freeze-col{z-index:7 !important;background:#f1f5f9 !important}
+  thead .freeze-col-1{z-index:8 !important}
+  thead .freeze-col-2{z-index:8 !important}
+  /* خلفية صفوف بديلة تبقى مع التجميد */
+  tr:nth-child(even) .freeze-col{background:#f8fafc !important}
+}
+
+/* ── وضع «الحجم الكامل» (مدوّر): الجدول بحجمه الطبيعي + تمرير أفقي + تجميد ── */
+@media (max-width:820px){
+  /* الوضع الافتراضي = مصغّر ليظهر كاملاً (table-layout:auto + font صغير) */
+  /* عند تفعيل report-rotated = حجم كامل مريح للقراءة مع تمرير وتجميد */
+  body.report-rotated #page-rspace .fg-table,body.report-rotated #page-rfgbal .fg-table,
+  body.report-rotated #page-roldid .fg-table,body.report-rotated #page-rtransit .fg-table,
+  body.report-rotated #page-rbottle .fg-table,
+  body.report-rotated #page-rspace .pivot,body.report-rotated #page-rfgbal .pivot,
+  body.report-rotated #page-roldid .pivot,body.report-rotated #page-rtransit .pivot,
+  body.report-rotated #page-rbottle .pivot,
+  body.report-rotated .bt-table,body.report-rotated .sp-table{
+    font-size:12px !important;width:auto !important;min-width:max-content !important;table-layout:auto !important;
+  }
+  body.report-rotated .fg-table th,body.report-rotated .fg-table td,
+  body.report-rotated .pivot th,body.report-rotated .pivot td,
+  body.report-rotated .bt-table th,body.report-rotated .bt-table td,
+  body.report-rotated .sp-table th,body.report-rotated .sp-table td{
+    padding:7px 9px !important;
+  }
+}
 </style>
 
 <style id="thome-css">
@@ -2286,7 +2345,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-UPLOAD2-1745 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
+      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(139,92,246,.3)">&#127919; Card Builder v5.8 &middot; BUILD-MOBILE-1810 &middot; <span style="background:rgba(255,255,255,.25);padding:3px 10px;border-radius:6px">إذا رأيت هذا = النسخة الصحيحة</span></div>
       <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
 
       <div class="cb-layout">
@@ -2895,7 +2954,11 @@ function closeNav(){const n=document.getElementById('nav');if(n)n.classList.remo
 let NAV_HIST=[];let _navBack=false;
 function goBack(){if(NAV_HIST.length){var prev=NAV_HIST.pop();_navBack=true;go(prev);}else{go('home');}}
 function updateTopnav(p){var tn=document.getElementById('topnav');if(!tn)return;tn.style.display=(p==='home')?'none':'flex';var lbl='';var b=document.querySelector('.navbtn[data-page="'+p+'"] .lbl');if(b)lbl=b.textContent;if(!lbl){var pg=document.getElementById('page-'+p);var h1=pg?pg.querySelector('h1'):null;lbl=h1?h1.textContent.trim():'';}var cc=document.getElementById('crumb-current');if(cc)cc.textContent=lbl;}
+var CURRENT_PAGE='';
 function go(p){
+  CURRENT_PAGE=p;
+  try{if(window._reportRotated&&['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)<0){window._reportRotated=false;document.body.classList.remove('report-rotated');}}catch(e){}
+  setTimeout(function(){try{_updateRotateBtn();_markFreezeColumns();}catch(e){}},120);
   if(!CURRENT_USER){
     /* لا يوجد مستخدم مسجل — أظهر شاشة الدخول */
     var ov=document.getElementById('login-ov');
@@ -5144,7 +5207,7 @@ function showDetailRows(rows,title){
   document.getElementById('detail-badge').textContent=fmt(gt)+' '+(LANG==='ar'?'وحدة':'qty')+' • '+keys.length+' '+(LANG==='ar'?'صف':'rows');
   document.getElementById('detail-ov').classList.add('show');
 }
-/* نظام fitDetail (تكبير الجدول) حُذف — كان يسبب حلقة resize/zoom ورعشة. التمرير الطبيعي والتدوير على الجوال يكفيان. */
+/* نظام التكبير التلقائي القديم حُذف — كان يسبب حلقة ورعشة. التمرير الطبيعي والتدوير على الجوال يكفيان. */
 function openDetail(cls){const titles={all:tr('kpi_total'),'A<60':tr('kpi_60'),'B<90':tr('kpi_90'),'C>90':tr('kpi_g90')};showDetailRows(filtered().filter(d=>cls==='all'||d.store_class===cls),titles[cls]||'');}
 function chartClick(getInfo){return (e,els,chart)=>{if(!els||!els.length)return;const info=getInfo(els[0]);if(info)showDetailRows(info.rows,info.title);};}
 function fillSelOpts(id,opts,labeler){const s=document.getElementById(id);if(!s)return;const prev=s.value;s.innerHTML=opts.map(o=>'<option value="'+String(o).replace(/"/g,'&quot;')+'">'+(labeler?labeler(o):o)+'</option>').join('');if(opts.indexOf(prev)>=0)s.value=prev;}
@@ -7556,6 +7619,67 @@ setInterval(_updateSyncBar,30000);
 document.addEventListener('DOMContentLoaded',function(){setTimeout(_updateSyncBar,2000);});
 window.addEventListener('online',_updateSyncBar);
 window.addEventListener('offline',_updateSyncBar);
+</script>
+
+<!-- زر تدوير الجدول للجوال -->
+<button id="rotate-btn" class="rotate-btn" onclick="toggleReportRotate()" title="تكبير الجدول">
+  <span id="rotate-ic">&#128241;</span>
+</button>
+<script>
+/* ═══ نظام عرض التقارير على الجوال (تدوير + تجميد الأعمدة) ═══ */
+window._reportRotated=false;
+function _isReportScreen(){
+  var p=(typeof CURRENT_PAGE!=='undefined')?CURRENT_PAGE:'';
+  return ['rspace','rfgbal','roldid','rtransit','rbottle'].indexOf(p)>=0;
+}
+function _isMobile(){return window.innerWidth<=820;}
+function _updateRotateBtn(){
+  var btn=document.getElementById('rotate-btn');if(!btn)return;
+  /* يظهر فقط على الجوال وفي شاشات التقارير */
+  if(_isMobile()&&_isReportScreen()){btn.style.display='flex';}
+  else{btn.style.display='none';}
+  var ic=document.getElementById('rotate-ic');
+  if(ic)ic.innerHTML=window._reportRotated?'&#128290;':'&#128269;';
+  btn.title=window._reportRotated?'عرض مصغّر يظهر كامل الجدول':'تكبير مع تمرير أفقي وتجميد الأعمدة';
+}
+function toggleReportRotate(){
+  window._reportRotated=!window._reportRotated;
+  document.body.classList.toggle('report-rotated',window._reportRotated);
+  _updateRotateBtn();
+  try{var t=document.getElementById('sync-txt');}catch(e){}
+}
+/* تجميد أعمدة كود الصنف والحجم: نُعلّم أول عمودين بـ sticky */
+function _markFreezeColumns(){
+  try{
+    document.querySelectorAll('.fg-table,.pivot,.bt-table,.sp-table').forEach(function(tbl){
+      /* أول عمودين = كود الصنف + الحجم/الصنف → نثبّتهما */
+      var rows=tbl.querySelectorAll('tr');
+      rows.forEach(function(tr){
+        var cells=tr.children;
+        if(cells[0])cells[0].classList.add('freeze-col','freeze-col-1');
+        if(cells[1])cells[1].classList.add('freeze-col','freeze-col-2');
+      });
+    });
+  }catch(e){}
+}
+/* نطبّق التجميد بعد كل رسم تقرير */
+var _origRenderRich=(typeof renderRichReport!=='undefined')?renderRichReport:null;
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(function(){_updateRotateBtn();_markFreezeColumns();},800);
+});
+window.addEventListener('resize',_updateRotateBtn);
+window.addEventListener('orientationchange',function(){setTimeout(_updateRotateBtn,300);});
+/* مراقب لإعادة تطبيق التجميد عند تغيّر الجداول */
+(function(){
+  try{
+    var mo=new MutationObserver(function(){clearTimeout(window._freezeT);window._freezeT=setTimeout(function(){_markFreezeColumns();_updateRotateBtn();},150);});
+    document.addEventListener('DOMContentLoaded',function(){
+      ['rep-fgbal-wrap','rep-oldid-wrap','rep-transit-wrap','rep-bottle-wrap','rep-space-wrap'].forEach(function(id){
+        var el=document.getElementById(id);if(el)mo.observe(el,{childList:true,subtree:true});
+      });
+    });
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
