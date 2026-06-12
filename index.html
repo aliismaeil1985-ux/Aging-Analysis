@@ -8265,5 +8265,48 @@ function renderBottleReport(rep){
 })();
 </script>
 
+<!-- ===================================================================
+     FORCE FULL CLOUD SYNC — make "Save to Cloud" push EVERYTHING:
+     main data (latest) + daily reports (daily_reports) + UI settings.
+     Fixes daily reports (FG Balance/Transit/OLD Identity) not reaching
+     other devices because the old Save only pushed the main data doc.
+     =================================================================== -->
+<script id="forcesync-js">
+(function(){
+  'use strict';
+  function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function toast(m){try{if(typeof syncToast==='function')syncToast(m,'ok');}catch(e){}}
+  function ready(){try{return (typeof fbReady!=='undefined'&&fbReady&&typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined');}catch(e){return false;}}
+  /* push ALL daily reports (Space, FG Balance, OLD Identity, Transit, Bottle) to the cloud doc */
+  function pushDailyReports(){
+    try{ if(!ready()||typeof getDR!=='function')return false;
+      var d=getDR()||{}; if(!d||!Object.keys(d).length)return false;
+      var cid=(typeof FB_CLIENT_ID!=='undefined')?FB_CLIENT_ID:'';
+      fbDB.collection(FB_COL).doc('daily_reports').set({data:d,updatedAt:Date.now(),clientId:cid});
+      return true;
+    }catch(e){return false;}
+  }
+  function pushSettings(){
+    try{ if(typeof pushSettingsToCloud==='function'){ try{_setCloudReady=true;}catch(_){} pushSettingsToCloud(); } }catch(e){}
+  }
+  function wrap(){
+    if(typeof window.saveToCloud==='function' && !window.saveToCloud.__full){
+      var orig=window.saveToCloud;
+      window.saveToCloud=function(){
+        var r=orig.apply(this,arguments);          /* original: pushes main DATA (latest) */
+        var okDaily=pushDailyReports();             /* NEW: push daily reports */
+        pushSettings();                             /* NEW: push UI settings */
+        toast(ar()?'☁️ تم دفع كل البيانات والتقارير اليومية للسحابة':'☁️ Pushed all data + daily reports to cloud');
+        return r;
+      };
+      window.saveToCloud.__full=true;
+    }
+  }
+  var t=setInterval(wrap,800); wrap();
+  /* also expose a manual trigger */
+  try{window.pushEverythingToCloud=function(){ if(typeof window.saveToCloud==='function')window.saveToCloud(); else { pushDailyReports(); pushSettings(); } };}catch(e){}
+})();
+</script>
+
 </body>
 </html>
