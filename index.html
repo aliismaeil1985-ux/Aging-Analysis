@@ -11,6 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root{
@@ -7645,6 +7646,284 @@ function renderBottleReport(rep){
     setTimeout(rescanAll,400);
   }
   if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+
+<!-- ===================================================================
+     FIREBASE AUTHENTICATION  (email = username)  — added module
+     Rebuilds login/users on top of Firebase Auth. Roles & permissions
+     are stored in Firestore collection "user_profiles" (doc id = email).
+     The configured admin self-provisions its profile on first sign-in.
+     =================================================================== -->
+<style id="fbauth-css">
+.fa-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fa-badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.fa-badge.admin{background:#e7f0ff;color:#1e4e8c}
+.fa-badge.user{background:#eef2f7;color:#56657a}
+.fa-badge.user{color:#56657a}
+.fa-act{border:1px solid var(--line,#e2e8f0);background:#fff;border-radius:9px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#1f2d44}
+.fa-act:hover{background:#f3f8ff;border-color:#bcd4f5}
+.fa-act.danger{color:#c0392b}.fa-act.danger:hover{background:#fdecea;border-color:#f3b4ab}
+.fa-perm-ov{position:fixed;inset:0;background:rgba(8,20,40,.55);display:none;align-items:center;justify-content:center;z-index:9000;padding:16px}
+.fa-perm-ov.show{display:flex}
+.fa-perm-box{background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(8,22,44,.35)}
+.fa-perm-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #eef2f7}
+.fa-perm-head h3{font-size:16px;font-weight:800;color:#0f2747;margin:0}
+.fa-perm-x{border:none;background:#f1f5f9;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px}
+.fa-perm-body{padding:14px 18px}
+.fa-perm-grp{margin-bottom:12px}
+.fa-perm-grp h4{font-size:12px;font-weight:800;color:#1e4e8c;margin:0 0 6px}
+.fa-perm-item{display:flex;align-items:center;gap:8px;padding:5px 2px;font-size:13px;color:#243349}
+.fa-perm-foot{padding:14px 18px;border-top:1px solid #eef2f7;display:flex;gap:10px;justify-content:flex-end}
+.fa-note{font-size:12px;color:#7c8aa0;margin:6px 0 0}
+</style>
+<script id="fbauth-js">
+(function(){
+  'use strict';
+  var ADMIN_EMAIL='aliismaeil1985@gmail.com';      /* bootstrap admin (email = username) */
+  var PROF_COL='user_profiles';
+  var _auth=null, _authReady=false, _secApp=null;
+  function isAr(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function T(en,ar){return isAr()?ar:en;}
+  function allPages(){return (window.ALL_PAGES||['rspace','rfgbal','roldid','rtransit','rbottle','dash','sum','sku','masterdata','spaceact','dailyup','imp','cloud','records','designer','cardbuilder','users']);}
+  function loginErr(msg){try{var e=document.getElementById('login-err');if(e)e.textContent=msg;}catch(_){}}
+  function toast(m,t){try{if(typeof syncToast==='function')syncToast(m,t||'ok');}catch(_){}}
+
+  /* ---- wait for the firebase app created by fbConnect(), then attach Auth ---- */
+  function tryInitAuth(){
+    try{
+      if(_auth)return true;
+      if(typeof firebase==='undefined'||!firebase.auth)return false;
+      if(typeof fbApp==='undefined'||!fbApp)return false;
+      _auth=firebase.auth(fbApp);
+      _auth.onAuthStateChanged(onAuthChanged);
+      _authReady=true;
+      return true;
+    }catch(e){return false;}
+  }
+  var _initT=setInterval(function(){if(tryInitAuth())clearInterval(_initT);},400);
+
+  function profileRef(email){return fbDB.collection(PROF_COL).doc(String(email).toLowerCase());}
+  function fetchProfile(email){return profileRef(email).get().then(function(d){return d.exists?d.data():null;}).catch(function(){return null;});}
+
+  function onAuthChanged(user){
+    if(!user){ CURRENT_USER=null; var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex'; return; }
+    var email=String(user.email||'').toLowerCase();
+    fetchProfile(email).then(function(p){
+      if(!p && email===ADMIN_EMAIL){     /* bootstrap admin profile on first login */
+        p={email:email,role:'admin',perms:allPages().slice(),name:'Admin',createdAt:Date.now()};
+        try{profileRef(email).set(p);}catch(e){}
+      }
+      if(!p){ loginErr(T('This account has no access profile. Contact the admin.','هذا الحساب لا يملك صلاحية وصول. تواصل مع الأدمن.')); try{_auth.signOut();}catch(e){} return; }
+      if(p.disabled){ loginErr(T('This account is disabled.','هذا الحساب موقوف.')); try{_auth.signOut();}catch(e){} return; }
+      CURRENT_USER={u:email,email:email,r:(p.role==='admin'?'admin':'user'),perms:p.perms||['dash','sum','sku'],name:p.name||email};
+      try{var le=document.getElementById('login-err');if(le)le.textContent='';}catch(e){}
+      try{document.getElementById('login-pass').value='';}catch(e){}
+      var ov=document.getElementById('login-ov'); if(ov)ov.style.display='none';
+      try{applyRole();}catch(e){}
+      try{var lp=(LS.getItem('dr_last_page')||'home');go(lp);}catch(e){try{go('home');}catch(_){}}
+      try{if(typeof logLogin==='function')logLogin(email,'login');}catch(e){}
+    });
+  }
+
+  function mapErr(err){
+    var c=(err&&err.code)||'';
+    if(/wrong-password|invalid-credential|invalid-login/.test(c))return T('Incorrect email or password.','البريد أو كلمة المرور غير صحيحة.');
+    if(/user-not-found/.test(c))return T('No account found with this email.','لا يوجد حساب بهذا البريد.');
+    if(/invalid-email/.test(c))return T('Enter a valid email.','أدخل بريداً صحيحاً.');
+    if(/too-many-requests/.test(c))return T('Too many attempts. Try again later.','محاولات كثيرة. حاول لاحقاً.');
+    if(/user-disabled/.test(c))return T('This account is disabled.','هذا الحساب موقوف.');
+    if(/network/.test(c))return T('Network error. Check your connection.','خطأ شبكة. تحقق من الاتصال.');
+    if(/operation-not-allowed/.test(c))return T('Email/Password sign-in is not enabled in Firebase.','مزوّد Email/Password غير مُفعّل في Firebase.');
+    return (err&&err.message)||T('Sign-in failed.','فشل تسجيل الدخول.');
+  }
+
+  /* ===================== overrides ===================== */
+  window.doLogin=function(){
+    var email=((document.getElementById('login-user')||{}).value||'').trim().toLowerCase();
+    var pass=((document.getElementById('login-pass')||{}).value||'');
+    var uEl=document.getElementById('login-user'),pEl=document.getElementById('login-pass');
+    if(uEl)uEl.classList.remove('login-input-err'); if(pEl)pEl.classList.remove('login-input-err');
+    if(!email){loginErr(T('Enter your email.','أدخل بريدك.'));if(uEl){uEl.classList.add('login-input-err');uEl.focus();}return;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){loginErr(T('Enter a valid email.','أدخل بريداً صحيحاً.'));if(uEl){uEl.classList.add('login-input-err');uEl.focus();}return;}
+    if(!pass){loginErr(T('Enter your password.','أدخل كلمة المرور.'));if(pEl){pEl.classList.add('login-input-err');pEl.focus();}return;}
+    if(!tryInitAuth()){loginErr(T('Cloud not ready yet — wait a moment and retry.','السحابة لم تجهز بعد — انتظر لحظة وأعد المحاولة.'));return;}
+    loginErr(T('Signing in…','جارٍ تسجيل الدخول…'));
+    _auth.signInWithEmailAndPassword(email,pass).then(function(){/* onAuthChanged finishes */})
+      .catch(function(err){loginErr(mapErr(err));if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}try{if(typeof logLogin==='function')logLogin(email,'failed');}catch(e){}});
+  };
+
+  window.logout=function(){
+    try{CURRENT_USER=null;}catch(e){}
+    try{document.body.classList.remove('is-admin');}catch(e){}
+    try{if(_auth)_auth.signOut();}catch(e){}
+    var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex';
+    try{go('dash');}catch(e){}
+  };
+
+  window.openForgot=function(){
+    var email=((document.getElementById('login-user')||{}).value||'').trim().toLowerCase();
+    if(!email){ email=(prompt(T('Enter your account email to receive a reset link:','أدخل بريد حسابك لإرسال رابط إعادة التعيين:'))||'').trim().toLowerCase(); }
+    if(!email)return;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){loginErr(T('Enter a valid email.','أدخل بريداً صحيحاً.'));return;}
+    if(!tryInitAuth()){loginErr(T('Cloud not ready yet — retry shortly.','السحابة لم تجهز — أعد المحاولة بعد لحظات.'));return;}
+    _auth.sendPasswordResetEmail(email)
+      .then(function(){loginErr('');toast(T('Reset link sent to '+email,'تم إرسال رابط إعادة التعيين إلى '+email),'ok');})
+      .catch(function(err){loginErr(mapErr(err));});
+  };
+
+  /* neutralize the legacy local-account bootstrap & session restore */
+  window.seedUsers=function(){};
+  window.initAuth=function(){ var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex'; tryInitAuth(); };
+
+  /* ===================== admin: user management ===================== */
+  function listProfiles(){return fbDB.collection(PROF_COL).get().then(function(qs){var a=[];qs.forEach(function(d){var x=d.data()||{};x.email=x.email||d.id;a.push(x);});return a;}).catch(function(){return [];});}
+
+  window.renderUsers=function(){
+    var tbl=document.getElementById('utable'); if(!tbl)return;
+    var ar=isAr();
+    tbl.innerHTML='<thead><tr><th>'+T('Email','البريد')+'</th><th>'+T('Role','الدور')+'</th><th>'+T('Permissions','الصلاحيات')+'</th><th>'+T('Actions','إجراءات')+'</th></tr></thead><tbody><tr><td colspan="4" style="padding:14px;color:#94a3b8">'+T('Loading…','جارٍ التحميل…')+'</td></tr></tbody>';
+    listProfiles().then(function(list){
+      list.sort(function(a,b){return (a.role==='admin'?0:1)-(b.role==='admin'?0:1)||String(a.email).localeCompare(String(b.email));});
+      var rows=list.map(function(p){
+        var email=p.email, isAdmin=(p.role==='admin');
+        var permCount=(p.perms&&p.perms.length)||0;
+        var permTxt=isAdmin?T('All','الكل'):(permCount+' '+T('screens','شاشة'));
+        var me=(window.CURRENT_USER&&CURRENT_USER.email===String(email).toLowerCase());
+        return '<tr>'
+          +'<td style="font-weight:700">'+esc(email)+(me?' <span class="fa-note" style="display:inline">('+T('you','أنت')+')</span>':'')+'</td>'
+          +'<td><span class="fa-badge '+(isAdmin?'admin':'user')+'">'+(isAdmin?T('Admin','الأدمن'):T('User','مستخدم'))+'</span></td>'
+          +'<td>'+esc(permTxt)+'</td>'
+          +'<td><div class="fa-row">'
+            +'<button class="fa-act" onclick="faToggleRole(\''+jss(email)+'\')">'+(isAdmin?T('Make user','اجعله مستخدم'):T('Make admin','اجعله أدمن'))+'</button>'
+            +(isAdmin?'':'<button class="fa-act" onclick="faPerms(\''+jss(email)+'\')">'+T('Permissions','الصلاحيات')+'</button>')
+            +'<button class="fa-act" onclick="faReset(\''+jss(email)+'\')">'+T('Send reset','إرسال إعادة تعيين')+'</button>'
+            +(me?'':'<button class="fa-act danger" onclick="faRemove(\''+jss(email)+'\')">'+T('Remove','إزالة')+'</button>')
+          +'</div></td></tr>';
+      }).join('');
+      tbl.querySelector('tbody').innerHTML=rows||'<tr><td colspan="4" style="padding:14px;color:#94a3b8">'+T('No users yet.','لا يوجد مستخدمون بعد.')+'</td></tr>';
+    });
+  };
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function jss(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+
+  window.addUser=function(){
+    var email=((document.getElementById('nu-email')||{}).value||'').trim().toLowerCase();
+    var pass=((document.getElementById('nu-pass')||{}).value||'').trim();
+    var role=((document.getElementById('nu-role')||{}).value||'user');
+    var name=((document.getElementById('nu-user')||{}).value||'').trim();
+    var msg=document.getElementById('u-msg');
+    function m(t){if(msg)msg.textContent=t;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){m(T('Enter a valid email.','أدخل بريداً صحيحاً.'));return;}
+    if(pass.length<6){m(T('Password must be at least 6 characters.','كلمة المرور 6 أحرف على الأقل.'));return;}
+    if(typeof firebase==='undefined'||!firebase.auth||typeof fbApp==='undefined'||!fbApp){m(T('Cloud not ready.','السحابة غير جاهزة.'));return;}
+    m(T('Creating…','جارٍ الإنشاء…'));
+    try{ if(!_secApp)_secApp=firebase.initializeApp(fbApp.options,'fa_secondary'); }catch(e){ try{_secApp=firebase.app('fa_secondary');}catch(_){} }
+    var sAuth=_secApp.auth();
+    sAuth.createUserWithEmailAndPassword(email,pass).then(function(cred){
+      var perms=(role==='admin')?allPages().slice():['dash','sum','sku'];
+      return profileRef(email).set({email:email,role:(role==='admin'?'admin':'user'),perms:perms,name:name||email,createdAt:Date.now()})
+        .then(function(){ return sAuth.signOut(); });
+    }).then(function(){
+      m(''); toast(T('User created: '+email,'تم إنشاء المستخدم: '+email),'ok');
+      ['nu-user','nu-email','nu-mobile','nu-pass'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+      renderUsers();
+    }).catch(function(err){
+      var c=(err&&err.code)||'';
+      if(/email-already-in-use/.test(c)){ /* account exists -> just (re)write profile */
+        var perms=(role==='admin')?allPages().slice():['dash','sum','sku'];
+        profileRef(email).set({email:email,role:(role==='admin'?'admin':'user'),perms:perms,name:name||email,createdAt:Date.now()},{merge:true})
+          .then(function(){m('');toast(T('Profile updated for existing account: '+email,'تم تحديث ملف حساب موجود: '+email),'ok');renderUsers();});
+      } else { m(mapErr(err)); }
+    });
+  };
+
+  window.faToggleRole=function(email){
+    email=String(email).toLowerCase();
+    profileRef(email).get().then(function(d){
+      var p=d.data()||{}; var newRole=(p.role==='admin')?'user':'admin';
+      var perms=(newRole==='admin')?allPages().slice():(p.perms&&p.perms.length?p.perms:['dash','sum','sku']);
+      return profileRef(email).set({role:newRole,perms:perms},{merge:true});
+    }).then(function(){toast(T('Role updated.','تم تحديث الدور.'),'ok');renderUsers();
+      if(window.CURRENT_USER&&CURRENT_USER.email===email){fetchProfile(email).then(function(p){if(p){CURRENT_USER.r=p.role==='admin'?'admin':'user';CURRENT_USER.perms=p.perms||[];try{applyRole();}catch(e){}}});}
+    });
+  };
+
+  window.faReset=function(email){
+    if(!tryInitAuth())return;
+    _auth.sendPasswordResetEmail(String(email).toLowerCase())
+      .then(function(){toast(T('Reset link sent to '+email,'تم إرسال رابط إعادة التعيين إلى '+email),'ok');})
+      .catch(function(err){toast(mapErr(err),'err');});
+  };
+
+  window.faRemove=function(email){
+    email=String(email).toLowerCase();
+    if(!confirm(T('Remove access for '+email+'? (The login account stays in Firebase, but loses access.)','إزالة وصول '+email+'؟ (يبقى الحساب في Firebase لكنه يفقد الصلاحية.)')))return;
+    profileRef(email).delete().then(function(){toast(T('Access removed.','تمت إزالة الوصول.'),'ok');renderUsers();}).catch(function(err){toast(mapErr(err),'err');});
+  };
+
+  /* ---- permissions modal ---- */
+  function ensurePermOv(){
+    var ov=document.getElementById('fa-perm-ov'); if(ov)return ov;
+    ov=document.createElement('div'); ov.id='fa-perm-ov'; ov.className='fa-perm-ov';
+    ov.innerHTML='<div class="fa-perm-box"><div class="fa-perm-head"><h3 id="fa-perm-title"></h3><button class="fa-perm-x" onclick="faPermClose()">&#10005;</button></div><div class="fa-perm-body" id="fa-perm-body"></div><div class="fa-perm-foot"><button class="fa-act" onclick="faPermClose()">'+T('Cancel','إلغاء')+'</button><button class="btn-primary" onclick="faPermSave()">'+T('Save','حفظ')+'</button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)faPermClose();});
+    return ov;
+  }
+  var _permEmail=null;
+  var PLABELS={rspace:'Space in Warehouses',rfgbal:'FG Balance',roldid:'OLD Identity',rtransit:'FG Transit',rbottle:'FG Bottle',dash:'Dashboard',sum:'Summary',sku:'SKU',masterdata:'Master Data',spaceact:'Space Actuals',dailyup:'Daily Upload',imp:'Import',cloud:'Cloud',records:'Records',designer:'Designer',cardbuilder:'Card Builder',users:'Users'};
+  var PGROUPS=[['daily',['rspace','rfgbal','roldid','rtransit','rbottle']],['aging',['dash','sum','sku']],['data',['masterdata','spaceact','dailyup','imp','records']],['admin',['cloud','designer','users','cardbuilder']]];
+  var GLAB={daily:[ 'Daily Reports','التقارير اليومية'],aging:['Aging','تحليل الأعمار'],data:['Data & Tools','البيانات والأدوات'],admin:['Admin Tools','أدوات الإدارة']};
+  window.faPerms=function(email){
+    _permEmail=String(email).toLowerCase();
+    var ov=ensurePermOv();
+    document.getElementById('fa-perm-title').textContent=T('Permissions','الصلاحيات')+' — '+_permEmail;
+    profileRef(_permEmail).get().then(function(d){
+      var p=d.data()||{}; var have={}; (p.perms||[]).forEach(function(x){have[x]=1;});
+      var body=document.getElementById('fa-perm-body'); var html='';
+      PGROUPS.forEach(function(g){
+        html+='<div class="fa-perm-grp"><h4>'+T(GLAB[g[0]][0],GLAB[g[0]][1])+'</h4>';
+        g[1].forEach(function(pg){
+          html+='<label class="fa-perm-item"><input type="checkbox" data-pg="'+pg+'" '+(have[pg]?'checked':'')+'> '+esc(PLABELS[pg]||pg)+'</label>';
+        });
+        html+='</div>';
+      });
+      body.innerHTML=html;
+      ov.classList.add('show');
+    });
+  };
+  window.faPermClose=function(){var ov=document.getElementById('fa-perm-ov');if(ov)ov.classList.remove('show');};
+  window.faPermSave=function(){
+    var body=document.getElementById('fa-perm-body'); if(!body||!_permEmail)return;
+    var perms=[]; body.querySelectorAll('input[data-pg]:checked').forEach(function(c){perms.push(c.getAttribute('data-pg'));});
+    profileRef(_permEmail).set({perms:perms},{merge:true}).then(function(){
+      toast(T('Permissions saved.','تم حفظ الصلاحيات.'),'ok'); faPermClose(); renderUsers();
+      if(window.CURRENT_USER&&CURRENT_USER.email===_permEmail){CURRENT_USER.perms=perms;try{applyRole();}catch(e){}}
+    });
+  };
+
+  /* ---- relabel UI: Username -> Email, role label, add-user form ---- */
+  function relabel(){
+    try{
+      var dict=['login_user','u_user'];
+      // login input -> email
+      var li=document.getElementById('login-user');
+      if(li){li.type='email';li.setAttribute('autocomplete','username');li.setAttribute('inputmode','email');li.placeholder=T('name@example.com','name@example.com');}
+      // label texts via data-i18n nodes
+      document.querySelectorAll('[data-i18n="login_user"]').forEach(function(el){el.textContent=T('Email','البريد الإلكتروني');});
+      document.querySelectorAll('[data-i18n="u_user"]').forEach(function(el){el.textContent=T('Display name (optional)','اسم العرض (اختياري)');});
+      document.querySelectorAll('[data-i18n="u_admin"]').forEach(function(el){el.textContent=T('Admin','الأدمن');});
+      // add-user: nu-email is the account id; make password helper text
+      var np=document.getElementById('nu-pass'); if(np)np.placeholder=T('min 6 characters','6 أحرف على الأقل');
+      var ne=document.getElementById('nu-email'); if(ne)ne.placeholder=T('name@example.com','name@example.com');
+    }catch(e){}
+  }
+
+  function start(){ tryInitAuth(); relabel(); var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex'; }
+  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
+  /* re-apply labels after language switches */
+  var _lblT=setInterval(relabel, 1500);
 })();
 </script>
 
