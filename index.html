@@ -8112,37 +8112,30 @@ function renderBottleReport(rep){
 </style>
 
 <!-- ===================================================================
-     SPACE REPORT — rotate-to-landscape (phone only)
-     A faint, auto-hiding rotate arrow at the bottom of the Space in
-     Warehouses screen. Tapping it shows the full table rotated to
-     landscape, filling the screen width, vertically scrollable.
+     REPORT rotate-to-landscape (phone only) — Space / FG Balance / OLD
+     Identity / Transit / Bottle. Faint auto-hiding bottom arrow; tap to
+     view the full report (table + cylinder charts) rotated to landscape.
      =================================================================== -->
 <style id="rot-css">
-.rot-fab{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:6000;
-  width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
-  background:rgba(22,63,115,.55);color:#fff;font-size:22px;line-height:1;
-  display:none;align-items:center;justify-content:center;
-  box-shadow:0 6px 18px rgba(10,30,64,.22);
-  opacity:.22;transition:opacity .5s ease;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.rot-fab{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:6000;width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;background:rgba(22,63,115,.55);color:#fff;font-size:23px;line-height:1;display:none;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(10,30,64,.22);opacity:.25;transition:opacity .5s;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .rot-fab.show{display:flex}
 .rot-fab.awake{opacity:.95}
-.rot-fab .rl{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);font-size:8.5px;font-weight:700;color:#1e4e8c;white-space:nowrap;opacity:0;transition:opacity .4s}
-.rot-fab.awake .rl{opacity:.7}
+.rot-fab .rl{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8.5px;font-weight:800;color:#1e4e8c;white-space:nowrap;opacity:0;transition:opacity .4s}
+.rot-fab.awake .rl{opacity:.75}
 @media (min-width:861px){.rot-fab{display:none !important}}
-
-.rot-ov{position:fixed;inset:0;background:#f4f6fb;z-index:9600;display:none}
+.rot-ov{position:fixed;inset:0;background:#eef2f8;z-index:9600;display:none}
 .rot-ov.show{display:block}
-.rot-ov-inner{position:absolute;top:50%;left:50%;width:100vh;height:100vw;
-  transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;
-  overflow:auto;-webkit-overflow-scrolling:touch;padding:16px 18px 26px;box-sizing:border-box;background:#f4f6fb}
-.rot-ov-inner .rot-title{font-size:14px;font-weight:800;color:#142f57;margin:0 0 10px}
-.rot-ov-inner table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(16,40,80,.08)}
-.rot-ov-inner .sp-table{min-width:0 !important;font-size:12.5px}
-.rot-ov-inner .sp-table th,.rot-ov-inner .sp-table td{padding:7px 9px}
-.rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:42px;height:42px;border-radius:50%;
-  border:none;background:rgba(20,40,70,.9);color:#fff;font-size:18px;cursor:pointer;
-  display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.28)}
-.rot-ov.show ~ .rot-ov-close,.rot-ov-close.show{display:flex}
+.rot-ov-inner{position:absolute;top:50%;left:50%;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;overflow:auto;-webkit-overflow-scrolling:touch;padding:18px 20px 30px;box-sizing:border-box}
+.rot-ttl{font-size:15px;font-weight:800;color:#142f57;margin:0 0 12px}
+.rot-card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(16,40,80,.08);padding:8px;margin-bottom:14px;overflow:auto;-webkit-overflow-scrolling:touch}
+.rot-card table{border-collapse:collapse;width:auto;min-width:100%;font-size:12.5px;background:#fff}
+.rot-card table th,.rot-card table td{padding:7px 10px;white-space:nowrap}
+.rot-card.charts{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:flex-start;padding:16px;overflow:visible}
+.rot-card.charts .sp-charts{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;width:100%}
+.rot-card.charts .sp-chart{flex:0 0 auto}
+.rot-empty{padding:34px 18px;text-align:center;color:#94a3b8;font-weight:700;line-height:1.8}
+.rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,40,70,.92);color:#fff;font-size:19px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.rot-ov-close.show{display:flex}
 </style>
 <script id="rot-js">
 (function(){
@@ -8150,52 +8143,54 @@ function renderBottleReport(rep){
   var MQ=window.matchMedia('(max-width:860px)');
   function isMobile(){return MQ.matches;}
   function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  var REPS={'page-rspace':'space','page-rfgbal':'fgbal','page-roldid':'oldid','page-rtransit':'transit','page-rbottle':'bottle'};
+  var TITLES={space:['Space in Warehouses','المساحات في المستودعات'],fgbal:['FG Balance','أرصدة المنتجات'],oldid:['OLD Identity','الهوية القديمة'],transit:['FG Transit','الترانزيت'],bottle:['FG Bottle Stock','أرصدة القارورة']};
   var fab,ov,inner,closeBtn,idleT;
   function build(){
     if(fab)return;
-    fab=document.createElement('button'); fab.className='rot-fab'; fab.type='button';
-    fab.setAttribute('aria-label','Rotate to landscape');
+    fab=document.createElement('button');fab.type='button';fab.className='rot-fab';fab.setAttribute('aria-label','Rotate');
     fab.innerHTML='⟳<span class="rl"></span>';
     fab.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openOv();});
     document.body.appendChild(fab);
-    ov=document.createElement('div'); ov.className='rot-ov';
-    inner=document.createElement('div'); inner.className='rot-ov-inner';
-    ov.appendChild(inner); document.body.appendChild(ov);
-    closeBtn=document.createElement('button'); closeBtn.className='rot-ov-close'; closeBtn.type='button';
-    closeBtn.innerHTML='✕';
-    closeBtn.addEventListener('click',closeOv);
-    document.body.appendChild(closeBtn);
+    ov=document.createElement('div');ov.className='rot-ov';
+    inner=document.createElement('div');inner.className='rot-ov-inner';
+    ov.appendChild(inner);document.body.appendChild(ov);
+    closeBtn=document.createElement('button');closeBtn.type='button';closeBtn.className='rot-ov-close';closeBtn.innerHTML='✕';
+    closeBtn.addEventListener('click',closeOv);document.body.appendChild(closeBtn);
   }
-  function spaceVisible(){var p=document.getElementById('page-rspace');return !!(p&&p.classList.contains('show'));}
-  function setLabel(){ if(!fab)return; var s=fab.querySelector('.rl'); if(s)s.textContent=ar()?'تدوير':'Rotate'; }
-  function poke(){ if(!fab)return; fab.classList.add('awake'); clearTimeout(idleT); idleT=setTimeout(function(){fab.classList.remove('awake');},3000); }
-  function showFab(){ if(!isMobile())return; build(); setLabel(); fab.classList.add('show'); poke(); }
-  function hideFab(){ if(fab)fab.classList.remove('show'); }
+  function curKey(){for(var id in REPS){var p=document.getElementById(id);if(p&&p.classList.contains('show'))return REPS[id];}return null;}
+  function setLbl(){if(!fab)return;var s=fab.querySelector('.rl');if(s)s.textContent=ar()?'تدوير':'Rotate';}
+  function poke(){if(!fab)return;fab.classList.add('awake');clearTimeout(idleT);idleT=setTimeout(function(){fab.classList.remove('awake');},3000);}
+  function showFab(){if(!isMobile())return;build();setLbl();fab.classList.add('show');poke();}
+  function hideFab(){if(fab)fab.classList.remove('show');}
   function openOv(){
-    build();
-    var t=document.querySelector('#rep-space-wrap .sp-table');
-    if(!t){ try{if(typeof syncToast==='function')syncToast(ar()?'لا يوجد جدول لعرضه':'No table to show','err');}catch(e){} return; }
+    build();var key=curKey();if(!key)return;
+    var wrap=document.getElementById('rep-'+key+'-wrap');if(!wrap)return;
     inner.innerHTML='';
-    var h=document.createElement('div'); h.className='rot-title';
-    h.textContent=ar()?'المساحات في المستودعات — عرض أفقي':'Space in Warehouses — landscape';
-    inner.appendChild(h);
-    inner.appendChild(t.cloneNode(true));
-    ov.classList.add('show'); closeBtn.classList.add('show');
-    try{document.body.style.overflow='hidden';}catch(e){}
+    var t=document.createElement('div');t.className='rot-ttl';
+    t.textContent=(ar()?TITLES[key][1]:TITLES[key][0])+' — '+(ar()?'عرض أفقي':'landscape');
+    inner.appendChild(t);
+    var table=wrap.querySelector('.sp-table')||wrap.querySelector('table.fg-table')||wrap.querySelector('table.dr-table')||wrap.querySelector('table.pivot');
+    var any=false;
+    if(table){var c=document.createElement('div');c.className='rot-card';c.appendChild(table.cloneNode(true));inner.appendChild(c);any=true;}
+    var charts=wrap.querySelector('.sp-charts');
+    if(charts){var cc=document.createElement('div');cc.className='rot-card charts';cc.appendChild(charts.cloneNode(true));inner.appendChild(cc);any=true;}
+    if(!any){var e=document.createElement('div');e.className='rot-empty';
+      e.textContent=ar()?'لا توجد بيانات لعرضها — تأكد من رفع/مزامنة التقرير.':'No data to show — make sure the report is uploaded/synced.';
+      inner.appendChild(e);}
+    ov.classList.add('show');closeBtn.classList.add('show');try{document.body.style.overflow='hidden';}catch(e){}
   }
-  function closeOv(){ if(ov)ov.classList.remove('show'); if(closeBtn)closeBtn.classList.remove('show'); try{document.body.style.overflow='';}catch(e){} }
-  function refresh(){ if(isMobile()&&spaceVisible()){showFab();} else {hideFab();closeOv();} }
-  function onInteract(){ if(isMobile()&&spaceVisible()){ if(!fab||!fab.classList.contains('show'))showFab(); else poke(); } }
-  function hookGo(){ if(typeof window.go==='function'){ var o=window.go; window.go=function(){ var r=o.apply(this,arguments); setTimeout(refresh,40); return r; }; } }
-  function start(){
-    build(); hookGo();
+  function closeOv(){if(ov)ov.classList.remove('show');if(closeBtn)closeBtn.classList.remove('show');try{document.body.style.overflow='';}catch(e){}}
+  function refresh(){if(isMobile()&&curKey())showFab();else{hideFab();closeOv();}}
+  function onInteract(){if(isMobile()&&curKey()){if(!fab||!fab.classList.contains('show'))showFab();else poke();}}
+  function hookGo(){if(typeof window.go==='function'){var o=window.go;window.go=function(){var r=o.apply(this,arguments);setTimeout(refresh,40);return r;};}}
+  function start(){build();hookGo();
     document.addEventListener('scroll',onInteract,true);
     document.addEventListener('touchstart',onInteract,{passive:true});
     document.addEventListener('keydown',function(e){if(e.key==='Escape')closeOv();});
-    if(MQ.addEventListener)MQ.addEventListener('change',refresh); else if(MQ.addListener)MQ.addListener(refresh);
-    setTimeout(refresh,600);
-  }
-  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
+    if(MQ.addEventListener)MQ.addEventListener('change',refresh);else if(MQ.addListener)MQ.addListener(refresh);
+    setTimeout(refresh,600);}
+  if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
 })();
 </script>
 
