@@ -7726,9 +7726,8 @@ function renderBottleReport(rep){
     if(!CURRENT_USER){
       var prov=(email===ADMIN_EMAIL);
       CURRENT_USER={u:email,email:email,r:(prov?'admin':'user'),perms:(prov?allPages().slice():['dash','sum','sku']),name:email,_prov:true};
-      var _lp;try{_lp=(LS.getItem('dr_last_page')||'home');}catch(e){_lp='home';}
-      /* let the browser repaint (login screen vanishes) BEFORE the heavy first render */
-      setTimeout(function(){ try{applyRole();}catch(e){} try{go(_lp);}catch(e){try{go('home');}catch(_){}} },0);
+      /* always land on the Home screen after login (let the browser repaint first) */
+      setTimeout(function(){ try{applyRole();}catch(e){} try{go('home');}catch(e){} },0);
     }
     if(!_syncedOnce){_syncedOnce=true;setTimeout(_attachCloudSync,40);}   /* then load data */
   }
