@@ -2690,7 +2690,7 @@ let DATA = [];
    ============================================================================ */
 var LS=(function(){
   var mem=Object.create(null);
-  var NO_DISK={'dash_data_v1':1,'dash_users':1};   /* cloud is the source of truth */
+  var NO_DISK={'dash_users':1};                    /* users stay cloud-only; data is cached locally for instant start */
   var MAX=200000;                                   /* ~200KB cap per value */
   function disk(){try{return window.localStorage||null;}catch(e){return null;}}
   return {
@@ -2701,7 +2701,7 @@ var LS=(function(){
       try{var v=d.getItem(k);if(v!=null)mem[k]=v;return v==null?null:v;}catch(e){return null;}},
     setItem:function(k,v){k=String(k);v=String(v);mem[k]=v;
       if(NO_DISK[k])return;
-      if(v.length>MAX)return;
+      if(v.length>MAX && k!=='dash_data_v1')return;   /* allow the large data cache */
       var d=disk();if(!d)return;
       try{d.setItem(k,v);}catch(e){try{d.removeItem(k);}catch(_e){}}},
     removeItem:function(k){k=String(k);delete mem[k];
@@ -7706,28 +7706,38 @@ function renderBottleReport(rep){
   function profileRef(email){return fbDB.collection(PROF_COL).doc(String(email).toLowerCase());}
   function fetchProfile(email){return profileRef(email).get().then(function(d){return d.exists?d.data():null;}).catch(function(){return null;});}
 
-  function onAuthChanged(user){
-    if(!user){ CURRENT_USER=null; var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex'; return; }
-    var email=String(user.email||'').toLowerCase();
-    fetchProfile(email).then(function(p){
-      if(!p && email===ADMIN_EMAIL){     /* bootstrap admin profile on first login */
-        p={email:email,role:'admin',perms:allPages().slice(),name:'Admin',createdAt:Date.now()};
-        try{profileRef(email).set(p);}catch(e){}
-      }
-      if(!p){ loginErr(T('This account has no access profile. Contact the admin.','هذا الحساب لا يملك صلاحية وصول. تواصل مع الأدمن.')); try{_auth.signOut();}catch(e){} return; }
-      if(p.disabled){ loginErr(T('This account is disabled.','هذا الحساب موقوف.')); try{_auth.signOut();}catch(e){} return; }
-      CURRENT_USER={u:email,email:email,r:(p.role==='admin'?'admin':'user'),perms:p.perms||['dash','sum','sku'],name:p.name||email};
-      try{var le=document.getElementById('login-err');if(le)le.textContent='';}catch(e){}
-      try{document.getElementById('login-pass').value='';}catch(e){}
-      var ov=document.getElementById('login-ov'); if(ov)ov.style.display='none';
+  function _attachCloudSync(){
+    try{if(typeof fbSettingsSync==='function')fbSettingsSync();}catch(e){}
+    try{if(typeof drSync==='function')drSync();}catch(e){}
+    try{var _lc=document.getElementById('cloud-live'); if(typeof toggleLive==='function'){ if(_lc&&!_lc.checked)_lc.checked=true; toggleLive(); } else if(typeof loadFromCloud==='function'){ loadFromCloud(true); } }catch(e){}
+  }
+  var _syncedOnce=false;
+  function _reveal(email){
+    var ov=document.getElementById('login-ov'); if(ov)ov.style.display='none';
+    try{var le=document.getElementById('login-err');if(le)le.textContent='';}catch(e){}
+    try{document.getElementById('login-pass').value='';}catch(e){}
+    if(!CURRENT_USER){
+      var prov=(email===ADMIN_EMAIL);
+      CURRENT_USER={u:email,email:email,r:(prov?'admin':'user'),perms:(prov?allPages().slice():['dash','sum','sku']),name:email,_prov:true};
       try{applyRole();}catch(e){}
       try{var lp=(LS.getItem('dr_last_page')||'home');go(lp);}catch(e){try{go('home');}catch(_){}}
+    }
+    if(!_syncedOnce){_syncedOnce=true;setTimeout(_attachCloudSync,0);}   /* paint the app first, then load data */
+  }
+  function onAuthChanged(user){
+    var ov=document.getElementById('login-ov');
+    if(!user){ CURRENT_USER=null; _syncedOnce=false; if(ov)ov.style.display='flex'; return; }
+    var email=String(user.email||'').toLowerCase();
+    /* INSTANT: reveal the app the moment auth succeeds; refine role + sync in the background */
+    _reveal(email);
+    fetchProfile(email).then(function(p){
+      if(!p && email===ADMIN_EMAIL){ p={email:email,role:'admin',perms:allPages().slice(),name:'Admin',createdAt:Date.now()}; try{profileRef(email).set(p);}catch(e){} }
+      if(!p){ CURRENT_USER=null; if(ov)ov.style.display='flex'; loginErr(T('This account has no access profile. Contact the admin.','هذا الحساب لا يملك صلاحية وصول. تواصل مع الأدمن.')); try{_auth.signOut();}catch(e){} return; }
+      if(p.disabled){ CURRENT_USER=null; if(ov)ov.style.display='flex'; loginErr(T('This account is disabled.','هذا الحساب موقوف.')); try{_auth.signOut();}catch(e){} return; }
+      CURRENT_USER={u:email,email:email,r:(p.role==='admin'?'admin':'user'),perms:p.perms||['dash','sum','sku'],name:p.name||email};
+      try{applyRole();}catch(e){}
       try{if(typeof logLogin==='function')logLogin(email,'login');}catch(e){}
-      /* (re)attach cloud data listeners now that we're authenticated (secured rules) */
-      try{if(typeof fbSettingsSync==='function')fbSettingsSync();}catch(e){}
-      try{if(typeof drSync==='function')drSync();}catch(e){}
-      try{var _lc=document.getElementById('cloud-live'); if(typeof toggleLive==='function'){ if(_lc&&!_lc.checked)_lc.checked=true; toggleLive(); } else if(typeof loadFromCloud==='function'){ loadFromCloud(true); } }catch(e){}
-    });
+    }).catch(function(){ /* keep provisional access; sync already running */ });
   }
 
   function mapErr(err){
@@ -7753,7 +7763,7 @@ function renderBottleReport(rep){
     if(!pass){loginErr(T('Enter your password.','أدخل كلمة المرور.'));if(pEl){pEl.classList.add('login-input-err');pEl.focus();}return;}
     if(!tryInitAuth()){loginErr(T('Cloud not ready yet — wait a moment and retry.','السحابة لم تجهز بعد — انتظر لحظة وأعد المحاولة.'));return;}
     loginErr(T('Signing in…','جارٍ تسجيل الدخول…'));
-    _auth.signInWithEmailAndPassword(email,pass).then(function(){/* onAuthChanged finishes */})
+    _auth.signInWithEmailAndPassword(email,pass).then(function(){var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';})
       .catch(function(err){loginErr(mapErr(err));if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}try{if(typeof logLogin==='function')logLogin(email,'failed');}catch(e){}});
   };
 
@@ -7930,6 +7940,147 @@ function renderBottleReport(rep){
   var _lblT=setInterval(relabel, 1500);
 })();
 </script>
+
+<!-- ===================================================================
+     PREMIUM MOBILE UI LAYER  (phone-only, visual elevation)
+     Pure presentation. No functional or desktop changes. Scoped to
+     phone widths so the desktop layout is untouched.
+     =================================================================== -->
+<style id="mb-premium-css">
+@media (max-width:860px){
+  /* ---------- Foundation ---------- */
+  body{background:linear-gradient(180deg,#e9eef7 0%,#f4f6fb 26%,#f4f6fb 100%) !important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .content{padding:66px 14px 30px !important}
+  .wrap{max-width:100% !important}
+  /* unified premium surface for every card-like block */
+  .card,.fbox,.kpi,.sec-card,.cb-form-card,.cb-preview-card,.mb-card,.dr-slot{
+    border-radius:18px !important;
+    border:1px solid #eaf0f8 !important;
+    box-shadow:0 1px 2px rgba(16,40,80,.04),0 12px 28px rgba(16,40,80,.07) !important;
+    background:#fff !important;
+  }
+
+  /* ---------- Header / topbar ---------- */
+  .topbar{gap:10px 12px !important;margin-bottom:16px !important;align-items:center !important}
+  .htext h1{font-size:18px !important;font-weight:800 !important;letter-spacing:-.4px !important;color:#142f57 !important}
+  .htext .upd{font-size:11px !important;padding:4px 11px !important;border-radius:999px !important;box-shadow:0 2px 8px rgba(16,40,80,.06) !important}
+  .whicon{width:44px !important;height:44px !important;border-radius:14px !important;font-size:23px !important;box-shadow:0 8px 20px rgba(20,70,140,.28) !important}
+  .home-logo{height:32px !important}
+  .btn-print{border-radius:12px !important}
+
+  /* section headers — consistent, executive */
+  .sec-h,.card h2,.card h5,.card .ch h5{letter-spacing:-.2px !important}
+  .card h5{font-size:14px !important;font-weight:800 !important;color:#16233b !important}
+  .card .ch{align-items:center !important;gap:9px !important;margin-bottom:6px !important}
+  .card .ch .acc{width:4px !important;height:18px !important;border-radius:4px !important}
+  .card .sub{font-size:11px !important;color:#8a97a9 !important;font-weight:600 !important}
+
+  /* ---------- Dashboard: natural mobile flow ---------- */
+  #page-dash .wrap{display:flex !important;flex-direction:column !important;gap:14px !important}
+  #page-dash .topbar{margin-bottom:2px !important}
+  #page-dash .kpis{display:grid !important;grid-template-columns:1fr 1fr !important;gap:12px !important;margin:0 !important}
+  #page-dash .kpis.custom-kpis:empty{display:none !important}
+  #page-dash .main{display:flex !important;flex-direction:column !important;gap:14px !important}
+  #page-dash .side{display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important}
+
+  /* ---------- KPI cards — premium ---------- */
+  .kpi{padding:16px 15px !important;min-height:118px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
+  .kpi::before{width:100% !important;height:4px !important;inset-inline-start:0 !important;top:0 !important;bottom:auto !important;opacity:.95}
+  .kpi .row{align-items:center !important;gap:10px !important}
+  .kpi .ic{width:40px !important;height:40px !important;border-radius:13px !important;font-size:19px !important;box-shadow:0 6px 16px rgba(20,60,120,.18) !important}
+  .t-total .ic{background:linear-gradient(135deg,#2a5fa8,#163f73) !important}
+  .t-60 .ic{background:linear-gradient(135deg,#16b29f,#0c8276) !important}
+  .t-90 .ic{background:linear-gradient(135deg,#3f8ee0,#2563b8) !important}
+  .t-g90 .ic{background:linear-gradient(135deg,#f08a3e,#d8651f) !important}
+  .kpi h3{font-size:10.5px !important;letter-spacing:.6px !important;color:#8a97a9 !important;line-height:1.25 !important;margin:0 !important}
+  .kpi .v{font-size:25px !important;font-weight:800 !important;letter-spacing:-.6px !important;margin-top:10px !important;color:#13233d !important}
+  .kpi .pill{margin-top:8px !important;font-size:10.5px !important;padding:3px 9px !important;border-radius:999px !important;align-self:flex-start !important}
+  .kpi .ktrend{font-size:10px !important;margin-top:4px !important;color:#9aa6b6 !important}
+  .kpi .bar{height:5px !important;border-radius:99px !important;margin-top:auto !important;background:#eef2f8 !important}
+  .kpi .bar i{border-radius:99px !important}
+
+  /* ---------- Filters / slicer — premium ---------- */
+  .fbox{padding:13px 14px !important}
+  .fbox h4{font-size:11px !important;letter-spacing:.6px !important;color:#8a97a9 !important;padding-bottom:9px !important;margin-bottom:9px !important;border-bottom:1px solid #eef2f7 !important}
+  .fbox .reset{font-size:11px !important;color:#2f7ed8 !important;font-weight:700 !important}
+  /* filter chips/checkboxes a touch airier */
+  .side .fbox label,.fbox .opt{border-radius:10px !important}
+
+  /* ---------- Charts — focal, framed, breathable ---------- */
+  .card{padding:16px 16px 12px !important}
+  .chartbox{height:300px !important;margin-top:4px !important}
+  .cl-pie{height:220px !important}
+  #page-dash .classify-card .cl-top{flex-direction:row !important;align-items:center !important;gap:14px !important}
+  #page-dash .classify-card .cl-pie{width:46% !important;height:190px !important}
+  #page-dash .classify-card .cl-kpis{flex:1 1 auto !important;min-width:0 !important}
+  .cl-item{margin-bottom:9px !important}
+  .cl-item .sw{width:12px !important;height:12px !important;border-radius:4px !important}
+  .cl-item .b{font-size:16px !important;font-weight:800 !important;color:#16233b !important}
+  .cl-item .l{font-size:11px !important;color:#7c8aa0 !important;line-height:1.2 !important}
+  .cat2tabs{gap:6px !important;margin:2px 0 8px !important}
+
+  /* ---------- Report cards (Option B) — premium ---------- */
+  .mb-cards{gap:12px !important}
+  .mb-card{box-shadow:0 1px 2px rgba(16,40,80,.04),0 12px 26px rgba(16,40,80,.07) !important}
+  .mb-card-head{padding:15px 16px !important}
+  .mb-card-title{font-size:13.5px !important;font-weight:800 !important;color:#16233b !important}
+  .mb-card-sub{font-size:10.5px !important;color:#9aa6b6 !important}
+  .mb-card-val{font-size:19px !important;font-weight:800 !important;letter-spacing:-.4px !important;color:#163f73 !important}
+  .mb-chev{width:24px !important;height:24px !important;background:#eef4fb !important;color:#2f7ed8 !important}
+  .mb-row{padding:8px 2px !important;font-size:12.5px !important}
+  .mb-row .l{color:#5b6b82 !important}
+  .mb-row .v{color:#1c2c46 !important}
+  .mb-row.tot{background:#f1f7ff !important;border-top:1px solid #dbeafd !important}
+
+  /* group/summary cards used by Space & rich reports */
+  .sp-cards,.fg-cards{gap:12px !important}
+  .sp-card,.fg-card{border-radius:16px !important;box-shadow:0 8px 22px rgba(16,40,80,.08) !important}
+
+  /* ---------- Tables that stay tabular (cleaner) ---------- */
+  .pivot{border-radius:12px !important;overflow:hidden !important}
+  .pivot th{font-size:10.5px !important;letter-spacing:.3px !important;text-transform:uppercase !important;color:#64748b !important;background:#f6f9fe !important}
+  .pivot td,.pivot th{padding:8px 9px !important}
+  .pivot tbody tr:nth-child(even) td{background:#fafcff !important}
+
+  /* ---------- Buttons & inputs — premium ---------- */
+  .btn-primary,.lbtn,.fpc-btn,.btn-cols,.btn-print{border-radius:12px !important;font-weight:700 !important}
+  .btn-primary,.lbtn{box-shadow:0 8px 20px rgba(30,90,160,.22) !important}
+  input,select,textarea{border-radius:11px !important}
+  .sf label,label{font-size:11.5px !important;font-weight:700 !important;color:#5b6b82 !important}
+
+  /* ---------- Navigation drawer — premium ---------- */
+  .nav{width:272px !important;max-width:86vw !important;padding:20px 14px !important;border-radius:0 22px 22px 0 !important}
+  [dir=rtl] .nav{border-radius:22px 0 0 22px !important}
+  .navbtn{padding:12px 13px !important;border-radius:12px !important;font-size:13.5px !important;gap:13px !important}
+  .navbtn .ico{font-size:20px !important}
+  .menu-btn{width:44px !important;height:44px !important;border-radius:13px !important;top:12px !important;box-shadow:0 8px 20px rgba(10,30,64,.34) !important}
+
+  /* ---------- Modals — premium ---------- */
+  .modal-box,.fg-modal-box,.fa-perm-box{border-radius:20px !important;box-shadow:0 24px 64px rgba(8,22,44,.38) !important}
+  .modal-head{border-top-left-radius:20px !important;border-top-right-radius:20px !important}
+
+  /* ---------- Stat cards (users page etc.) ---------- */
+  .u-stats{gap:12px !important}
+}
+
+@media (max-width:640px){
+  .content{padding:64px 12px 26px !important}
+  #page-dash .kpis{gap:10px !important}
+  .kpi{min-height:112px !important;padding:14px 13px !important}
+  .kpi .v{font-size:23px !important}
+  .htext h1{font-size:16.5px !important}
+  .chartbox{height:288px !important}
+}
+
+@media (max-width:430px){
+  #page-dash .kpis{grid-template-columns:1fr 1fr !important;gap:9px !important}
+  .kpi{min-height:106px !important}
+  .kpi .ic{width:36px !important;height:36px !important;font-size:17px !important}
+  .kpi .v{font-size:21px !important}
+  .chartbox{height:264px !important}
+  #page-dash .classify-card .cl-pie{height:165px !important}
+}
+</style>
 
 </body>
 </html>
