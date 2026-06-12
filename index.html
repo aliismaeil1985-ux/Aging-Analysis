@@ -8111,5 +8111,164 @@ function renderBottleReport(rep){
 }
 </style>
 
+<!-- ===================================================================
+     SPACE REPORT — rotate-to-landscape (phone only)
+     A faint, auto-hiding rotate arrow at the bottom of the Space in
+     Warehouses screen. Tapping it shows the full table rotated to
+     landscape, filling the screen width, vertically scrollable.
+     =================================================================== -->
+<style id="rot-css">
+.rot-fab{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:6000;
+  width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(22,63,115,.55);color:#fff;font-size:22px;line-height:1;
+  display:none;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px rgba(10,30,64,.22);
+  opacity:.22;transition:opacity .5s ease;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.rot-fab.show{display:flex}
+.rot-fab.awake{opacity:.95}
+.rot-fab .rl{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);font-size:8.5px;font-weight:700;color:#1e4e8c;white-space:nowrap;opacity:0;transition:opacity .4s}
+.rot-fab.awake .rl{opacity:.7}
+@media (min-width:861px){.rot-fab{display:none !important}}
+
+.rot-ov{position:fixed;inset:0;background:#f4f6fb;z-index:9600;display:none}
+.rot-ov.show{display:block}
+.rot-ov-inner{position:absolute;top:50%;left:50%;width:100vh;height:100vw;
+  transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;
+  overflow:auto;-webkit-overflow-scrolling:touch;padding:16px 18px 26px;box-sizing:border-box;background:#f4f6fb}
+.rot-ov-inner .rot-title{font-size:14px;font-weight:800;color:#142f57;margin:0 0 10px}
+.rot-ov-inner table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(16,40,80,.08)}
+.rot-ov-inner .sp-table{min-width:0 !important;font-size:12.5px}
+.rot-ov-inner .sp-table th,.rot-ov-inner .sp-table td{padding:7px 9px}
+.rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:42px;height:42px;border-radius:50%;
+  border:none;background:rgba(20,40,70,.9);color:#fff;font-size:18px;cursor:pointer;
+  display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.28)}
+.rot-ov.show ~ .rot-ov-close,.rot-ov-close.show{display:flex}
+</style>
+<script id="rot-js">
+(function(){
+  'use strict';
+  var MQ=window.matchMedia('(max-width:860px)');
+  function isMobile(){return MQ.matches;}
+  function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  var fab,ov,inner,closeBtn,idleT;
+  function build(){
+    if(fab)return;
+    fab=document.createElement('button'); fab.className='rot-fab'; fab.type='button';
+    fab.setAttribute('aria-label','Rotate to landscape');
+    fab.innerHTML='⟳<span class="rl"></span>';
+    fab.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openOv();});
+    document.body.appendChild(fab);
+    ov=document.createElement('div'); ov.className='rot-ov';
+    inner=document.createElement('div'); inner.className='rot-ov-inner';
+    ov.appendChild(inner); document.body.appendChild(ov);
+    closeBtn=document.createElement('button'); closeBtn.className='rot-ov-close'; closeBtn.type='button';
+    closeBtn.innerHTML='✕';
+    closeBtn.addEventListener('click',closeOv);
+    document.body.appendChild(closeBtn);
+  }
+  function spaceVisible(){var p=document.getElementById('page-rspace');return !!(p&&p.classList.contains('show'));}
+  function setLabel(){ if(!fab)return; var s=fab.querySelector('.rl'); if(s)s.textContent=ar()?'تدوير':'Rotate'; }
+  function poke(){ if(!fab)return; fab.classList.add('awake'); clearTimeout(idleT); idleT=setTimeout(function(){fab.classList.remove('awake');},3000); }
+  function showFab(){ if(!isMobile())return; build(); setLabel(); fab.classList.add('show'); poke(); }
+  function hideFab(){ if(fab)fab.classList.remove('show'); }
+  function openOv(){
+    build();
+    var t=document.querySelector('#rep-space-wrap .sp-table');
+    if(!t){ try{if(typeof syncToast==='function')syncToast(ar()?'لا يوجد جدول لعرضه':'No table to show','err');}catch(e){} return; }
+    inner.innerHTML='';
+    var h=document.createElement('div'); h.className='rot-title';
+    h.textContent=ar()?'المساحات في المستودعات — عرض أفقي':'Space in Warehouses — landscape';
+    inner.appendChild(h);
+    inner.appendChild(t.cloneNode(true));
+    ov.classList.add('show'); closeBtn.classList.add('show');
+    try{document.body.style.overflow='hidden';}catch(e){}
+  }
+  function closeOv(){ if(ov)ov.classList.remove('show'); if(closeBtn)closeBtn.classList.remove('show'); try{document.body.style.overflow='';}catch(e){} }
+  function refresh(){ if(isMobile()&&spaceVisible()){showFab();} else {hideFab();closeOv();} }
+  function onInteract(){ if(isMobile()&&spaceVisible()){ if(!fab||!fab.classList.contains('show'))showFab(); else poke(); } }
+  function hookGo(){ if(typeof window.go==='function'){ var o=window.go; window.go=function(){ var r=o.apply(this,arguments); setTimeout(refresh,40); return r; }; } }
+  function start(){
+    build(); hookGo();
+    document.addEventListener('scroll',onInteract,true);
+    document.addEventListener('touchstart',onInteract,{passive:true});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeOv();});
+    if(MQ.addEventListener)MQ.addEventListener('change',refresh); else if(MQ.addListener)MQ.addListener(refresh);
+    setTimeout(refresh,600);
+  }
+  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+
+<!-- ===================================================================
+     UI EXTRAS: move "Edit titles" into the sidebar (hide floating FAB),
+     and show an auto-incrementing version number at the sidebar bottom.
+     =================================================================== -->
+<style id="uix-css">
+#edit-fab{display:none !important}   /* hidden — moved into the side menu */
+.nav-version{margin-top:auto;padding:11px 8px 6px;text-align:center;font-size:10.5px;font-weight:700;
+  color:rgba(255,255,255,.42);letter-spacing:.3px;border-top:1px solid rgba(255,255,255,.08)}
+.nav-version b{color:rgba(255,255,255,.72)}
+.navbtn.em-on{background:linear-gradient(95deg,#16a34a,#0f7a37) !important;color:#fff !important;box-shadow:0 6px 16px rgba(16,120,60,.4) !important}
+</style>
+<script id="uix-js">
+(function(){
+  'use strict';
+  var BASE='6.0';
+  function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function store(){try{return (typeof LS!=='undefined'&&LS)?LS:window.localStorage;}catch(e){return null;}}
+  function getBuild(){try{return parseInt(store().getItem('app_build')||'0',10)||0;}catch(e){return 0;}}
+  function setBuild(n){try{store().setItem('app_build',String(n));}catch(e){}}
+  function renderVersion(){var el=document.getElementById('nav-version');if(!el)return;
+    el.innerHTML=(ar()?'الإصدار ':'Version ')+'<b>v'+BASE+'.'+getBuild()+'</b>';}
+  function bump(){ setBuild(getBuild()+1); renderVersion(); }
+
+  function inject(){
+    var nav=document.getElementById('nav'); if(!nav)return;
+    /* 1) Edit-titles button inside the Settings group (admin-only) */
+    var sub=nav.querySelector('.nav-group[data-grp="settings"] .nav-sub');
+    if(sub && !document.getElementById('nav-edit-titles')){
+      var b=document.createElement('button');
+      b.type='button'; b.id='nav-edit-titles'; b.className='navbtn admin-only';
+      b.style.setProperty('--c','#16a34a');
+      b.innerHTML='<span class="nico">✎</span><span class="lbl">'+(ar()?'تعديل المسميات':'Edit titles')+'</span>';
+      b.addEventListener('click',function(){ try{toggleEditMode();}catch(e){} });
+      sub.appendChild(b);
+      try{if(typeof applyRole==='function')applyRole();}catch(e){}
+    }
+    /* 2) version number pinned at the very bottom of the sidebar */
+    if(!document.getElementById('nav-version')){
+      var v=document.createElement('div'); v.id='nav-version'; v.className='nav-version';
+      nav.appendChild(v); renderVersion();
+    }
+  }
+
+  /* reflect edit-mode state on the new sidebar button */
+  function hookEdit(){
+    if(typeof window.toggleEditMode!=='function')return;
+    var o=window.toggleEditMode;
+    window.toggleEditMode=function(){ var r=o.apply(this,arguments);
+      try{ var on=document.body.classList.contains('editmode');
+        var nb=document.getElementById('nav-edit-titles');
+        if(nb){ nb.classList.toggle('em-on',on);
+          var l=nb.querySelector('.lbl'); if(l)l.textContent=on?(ar()?'إنهاء التعديل':'Done editing'):(ar()?'تعديل المسميات':'Edit titles'); }
+      }catch(e){} return r; };
+  }
+
+  /* bump the version number after real user edits / additions */
+  function hookBumps(){
+    ['userEdited','addRecord','saveUsers'].forEach(function(fn){
+      if(typeof window[fn]==='function'){ var o=window[fn];
+        window[fn]=function(){ var r=o.apply(this,arguments); try{bump();}catch(e){} return r; }; }
+    });
+  }
+  /* keep label language in sync if user switches EN/AR */
+  function relabel(){ var nb=document.getElementById('nav-edit-titles'); if(nb){var on=document.body.classList.contains('editmode');var l=nb.querySelector('.lbl');if(l)l.textContent=on?(ar()?'إنهاء التعديل':'Done editing'):(ar()?'تعديل المسميات':'Edit titles');} renderVersion(); }
+
+  function start(){ inject(); hookEdit(); hookBumps(); renderVersion();
+    setInterval(inject,2500); setInterval(relabel,1800); }
+  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+
 </body>
 </html>
