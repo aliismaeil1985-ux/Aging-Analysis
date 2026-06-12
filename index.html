@@ -8037,8 +8037,6 @@ function _lbPulse(){
   window.fbtnReveal=_showAll; /* للاستدعاء البرمجي عند فتح نافذة مثلاً */
 })();
 </script>
-
-<div id="__bld" style="position:fixed;left:6px;bottom:40px;z-index:2147483647;background:#0c7d72;color:#fff;font:800 11px/1.2 system-ui,Arial,sans-serif;padding:5px 9px;border-radius:7px;pointer-events:none;letter-spacing:.4px;box-shadow:0 2px 8px rgba(0,0,0,.3)">BUILD MB7-B (cards module)</div>
 <script>window.__MRMODE="B";</script>
 <!-- ════════════════════════════════════════════════════════════════
      MOBILE REPORT MODULE · إضافة عرض الجوال (مودال أفقي + بطاقات)
@@ -8148,12 +8146,12 @@ html.mrl-lock,html.mrl-lock body{overflow:hidden!important}
   ready(function(){
     try{ document.body.classList.add('mrmode-'+MODE); }catch(e){}
     var MQ=window.matchMedia('(max-width:820px)');
-    try{ console.info('[TANIA mobile '+MODE+'] module ACTIVE · innerWidth='+window.innerWidth+'px · mobile(<=820)='+MQ.matches+' · build MB6-CLEAN'); }catch(e){}
+    try{ console.info('[TANIA mobile '+MODE+'] module ACTIVE · innerWidth='+window.innerWidth+'px · mobile(<=820)='+MQ.matches+' · build MB-3'); }catch(e){}
     /* one-time confirmation toast (phones only) so deployment is verifiable */
     function mrToast(msg,ms){
       try{
         var t=document.createElement('div'); t.textContent=msg;
-        t.style.cssText='position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(16px);z-index:100001;max-width:90vw;padding:12px 18px;border-radius:12px;background:linear-gradient(135deg,#0f9b8e,#0c7d72);color:#fff;font-family:inherit;font-size:13.5px;font-weight:800;box-shadow:0 10px 30px -6px rgba(12,125,114,.6);opacity:0;transition:opacity .3s ease,transform .3s ease;text-align:center;pointer-events:none';
+        t.style.cssText='position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(16px);z-index:100001;max-width:90vw;padding:12px 18px;border-radius:12px;background:linear-gradient(135deg,#0f9b8e,#0c7d72);color:#fff;font-family:inherit;font-size:13.5px;font-weight:800;box-shadow:0 10px 30px -6px rgba(12,125,114,.6);opacity:0;transition:opacity .3s ease,transform .3s ease;text-align:center';
         document.body.appendChild(t);
         requestAnimationFrame(function(){ t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
         setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(16px)'; setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },400); }, ms||3800);
@@ -8273,7 +8271,7 @@ html.mrl-lock,html.mrl-lock body{overflow:hidden!important}
     /* observe page show + data loads */
     var mo=new MutationObserver(function(){ try{ refresh(); }catch(e){} });
     document.querySelectorAll('.page').forEach(function(el){ mo.observe(el,{attributes:true,attributeFilter:['class']}); });
-    REPORTS.forEach(function(id){ var el=document.getElementById(id); if(el){ var w=wrapOf(el); if(w) mo.observe(w,{childList:true}); } });
+    REPORTS.forEach(function(id){ var el=document.getElementById(id); if(el){ var w=wrapOf(el); if(w) mo.observe(w,{childList:true,subtree:true}); } });
     if(MQ.addEventListener) MQ.addEventListener('change',refresh); else if(MQ.addListener) MQ.addListener(refresh);
     setInterval(refresh, 1200);
     refresh();
