@@ -7723,6 +7723,10 @@ function renderBottleReport(rep){
       try{applyRole();}catch(e){}
       try{var lp=(LS.getItem('dr_last_page')||'home');go(lp);}catch(e){try{go('home');}catch(_){}}
       try{if(typeof logLogin==='function')logLogin(email,'login');}catch(e){}
+      /* (re)attach cloud data listeners now that we're authenticated (secured rules) */
+      try{if(typeof fbSettingsSync==='function')fbSettingsSync();}catch(e){}
+      try{if(typeof drSync==='function')drSync();}catch(e){}
+      try{var _lc=document.getElementById('cloud-live'); if(typeof toggleLive==='function'){ if(_lc&&!_lc.checked)_lc.checked=true; toggleLive(); } else if(typeof loadFromCloud==='function'){ loadFromCloud(true); } }catch(e){}
     });
   }
 
