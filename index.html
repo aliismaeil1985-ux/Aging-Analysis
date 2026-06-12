@@ -7663,6 +7663,9 @@ function renderBottleReport(rep){
      The configured admin self-provisions its profile on first sign-in.
      =================================================================== -->
 <style id="fbauth-css">
+.lbtn.loading{position:relative;color:transparent !important;pointer-events:none}
+.lbtn.loading::after{content:'';position:absolute;top:50%;left:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border:2.5px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:lbtnspin .6s linear infinite}
+@keyframes lbtnspin{to{transform:rotate(360deg)}}
 .fa-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fa-badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:800}
 .fa-badge.admin{background:#e7f0ff;color:#1e4e8c}
@@ -7703,6 +7706,7 @@ function renderBottleReport(rep){
       if(typeof firebase==='undefined'||!firebase.auth)return false;
       if(typeof fbApp==='undefined'||!fbApp)return false;
       _auth=firebase.auth(fbApp);
+      try{_auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
       _auth.onAuthStateChanged(onAuthChanged);
       _authReady=true;
       return true;
@@ -7770,9 +7774,10 @@ function renderBottleReport(rep){
     if(!pass){loginErr(T('Enter your password.','أدخل كلمة المرور.'));if(pEl){pEl.classList.add('login-input-err');pEl.focus();}return;}
     if(!tryInitAuth()){loginErr(T('Cloud not ready yet — wait a moment and retry.','السحابة لم تجهز بعد — انتظر لحظة وأعد المحاولة.'));return;}
     loginErr(T('Signing in…','جارٍ تسجيل الدخول…'));
-    var _t0=Date.now();
-    _auth.signInWithEmailAndPassword(email,pass).then(function(){var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';var _ms=Date.now()-_t0;try{if(typeof syncToast==='function')syncToast(T('Signed in in ','تم الدخول خلال ')+(_ms/1000).toFixed(1)+T('s',' ث'),'ok');}catch(e){}})
-      .catch(function(err){loginErr(mapErr(err));if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}try{if(typeof logLogin==='function')logLogin(email,'failed');}catch(e){}});
+    var _btn=document.querySelector('.lbtn'); if(_btn){_btn.disabled=true;_btn.classList.add('loading');}
+    function _btnDone(){if(_btn){_btn.disabled=false;_btn.classList.remove('loading');}}
+    _auth.signInWithEmailAndPassword(email,pass).then(function(){var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';_btnDone();})
+      .catch(function(err){_btnDone();loginErr(mapErr(err));if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}try{if(typeof logLogin==='function')logLogin(email,'failed');}catch(e){}});
   };
 
   window.logout=function(){
@@ -7838,25 +7843,41 @@ function renderBottleReport(rep){
     function m(t){if(msg)msg.textContent=t;}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){m(T('Enter a valid email.','أدخل بريداً صحيحاً.'));return;}
     if(pass.length<6){m(T('Password must be at least 6 characters.','كلمة المرور 6 أحرف على الأقل.'));return;}
-    if(typeof firebase==='undefined'||!firebase.auth||typeof fbApp==='undefined'||!fbApp){m(T('Cloud not ready.','السحابة غير جاهزة.'));return;}
+    var apiKey=(typeof fbApp!=='undefined'&&fbApp&&fbApp.options&&fbApp.options.apiKey)||'';
+    if(!apiKey){m(T('Cloud not ready.','السحابة غير جاهزة.'));return;}
     m(T('Creating…','جارٍ الإنشاء…'));
-    try{ if(!_secApp)_secApp=firebase.initializeApp(fbApp.options,'fa_secondary'); }catch(e){ try{_secApp=firebase.app('fa_secondary');}catch(_){} }
-    var sAuth=_secApp.auth();
-    sAuth.createUserWithEmailAndPassword(email,pass).then(function(cred){
+    function writeProfile(){
       var perms=(role==='admin')?allPages().slice():['dash','sum','sku'];
-      return profileRef(email).set({email:email,role:(role==='admin'?'admin':'user'),perms:perms,name:name||email,createdAt:Date.now()})
-        .then(function(){ return sAuth.signOut(); });
-    }).then(function(){
-      m(''); toast(T('User created: '+email,'تم إنشاء المستخدم: '+email),'ok');
+      return profileRef(email).set({email:email,role:(role==='admin'?'admin':'user'),perms:perms,name:name||email,createdAt:Date.now()},{merge:true});
+    }
+    function restMsg(code){
+      if(/WEAK_PASSWORD/.test(code))return T('Password is too weak (min 6).','كلمة المرور ضعيفة (6 أحرف على الأقل).');
+      if(/INVALID_EMAIL/.test(code))return T('Invalid email.','بريد غير صالح.');
+      if(/OPERATION_NOT_ALLOWED/.test(code))return T('Enable Email/Password in Firebase Authentication.','فعّل Email/Password في Firebase Authentication.');
+      if(/TOO_MANY_ATTEMPTS|QUOTA/.test(code))return T('Too many attempts, try later.','محاولات كثيرة، حاول لاحقاً.');
+      return T('Create failed: ','فشل الإنشاء: ')+code;
+    }
+    /* hard timeout so the UI never sticks on "Creating…" */
+    var timed=setTimeout(function(){m(T('Network timeout — check your connection and retry.','انتهت المهلة — تحقق من الاتصال وأعد المحاولة.'));},15000);
+    /* create the Auth account via Firebase REST (does NOT touch your session, never hangs the app) */
+    fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+encodeURIComponent(apiKey),{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,password:pass,returnSecureToken:false})
+    }).then(function(r){return r.json();}).then(function(res){
+      var existed=false;
+      if(res&&res.error){ var em=(res.error.message||''); if(/EMAIL_EXISTS/.test(em)){existed=true;} else {throw new Error(restMsg(em));} }
+      return writeProfile().then(function(){return existed;});
+    }).then(function(existed){
+      clearTimeout(timed); m('');
+      toast((existed?T('Profile updated for existing account: ','تم تحديث ملف حساب موجود: ')
+                    :T('User created: ','تم إنشاء المستخدم: '))+email,'ok');
       ['nu-user','nu-email','nu-mobile','nu-pass'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
       renderUsers();
     }).catch(function(err){
-      var c=(err&&err.code)||'';
-      if(/email-already-in-use/.test(c)){ /* account exists -> just (re)write profile */
-        var perms=(role==='admin')?allPages().slice():['dash','sum','sku'];
-        profileRef(email).set({email:email,role:(role==='admin'?'admin':'user'),perms:perms,name:name||email,createdAt:Date.now()},{merge:true})
-          .then(function(){m('');toast(T('Profile updated for existing account: '+email,'تم تحديث ملف حساب موجود: '+email),'ok');renderUsers();});
-      } else { m(mapErr(err)); }
+      clearTimeout(timed);
+      var em=(err&&err.message)||T('Create failed.','فشل الإنشاء.');
+      if(/permission|insufficient|PERMISSION_DENIED/i.test(em)) em=T('Account created, but saving permissions was blocked by database rules — publish firestore.rules.','تم إنشاء الحساب لكن حفظ الصلاحيات مرفوض بقواعد قاعدة البيانات — انشر firestore.rules.');
+      m(em);
     });
   };
 
