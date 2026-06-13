@@ -266,7 +266,7 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 
 .pivot-wrap{overflow:auto;border-radius:10px}
 .pivot{border-collapse:collapse;width:100%;font-size:12.5px;background:#fff;min-width:900px}
-.pivot th{background:linear-gradient(180deg,#23578f,#1a4480);color:#fff;padding:10px 8px;font-weight:700;border:1px solid #2f63a0;white-space:nowrap;text-align:center;position:sticky;top:0}
+.pivot th{background:linear-gradient(180deg,#23578f,#1a4480);color:#fff;padding:10px 8px;font-weight:700;border:1px solid #2f63a0;white-space:nowrap;text-align:center;position:sticky;top:0;z-index:3}
 .pivot td{padding:7px 9px;border:1px solid var(--line);text-align:center;white-space:nowrap}
 .pivot td.zero{color:#cbd5e1}
 .pivot td.yr{background:#e9f0fa;font-weight:800;font-size:15px;color:var(--navy)}
@@ -804,6 +804,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .sp-table th,.sp-table td{border-bottom:1px solid #eef2f8;border-right:1px solid #f1f5fa;text-align:center;padding:3px 8px;white-space:nowrap;font-size:11.5px;line-height:1.4;transition:background .12s}
 .sp-corner{background:linear-gradient(180deg,#0aa39f,#00827f);color:#fff;font-weight:800;font-size:13px;border:none;letter-spacing:.3px;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 4px rgba(0,0,0,.12)}
 .sp-bh{background:linear-gradient(180deg,#0fa8a3,#008d89);color:#fff;font-weight:800;font-size:11.5px;line-height:1.15;border:none;text-shadow:0 1px 2px rgba(0,0,0,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 4px rgba(0,0,0,.1);padding:7px 8px}
+/* تثبيت رؤوس أعمدة جدول المساحات أثناء التمرير */
+.sp-table thead th,.sp-corner,.sp-bh{position:sticky;top:0;z-index:3}
 .sp-bh small{display:block;color:rgba(255,255,255,.82);font-weight:700;font-size:10px;margin-top:2px}
 .sp-bh.sp-toth,.sp-bh.sp-grandh{background:linear-gradient(180deg,#017f7c,#006663);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 4px rgba(0,0,0,.16)}
 .sp-vsep{border:none !important;background:transparent !important;padding:0 !important;width:12px;min-width:12px}
@@ -948,7 +950,7 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-clear:hover{background:#fdecea;border-color:#f0c4bd}
 .fg-count{font-size:12.5px;font-weight:800;color:var(--navy);margin-inline-start:auto}
 .fg-table{min-width:1120px}
-.fg-table thead th{position:static}
+.fg-table thead th{position:sticky;top:0;z-index:3}
 .fg-table tbody tr.fg-hl td:not(.fg-vsep){background:#dbe8f7 !important;font-weight:700;color:#1e3a5f}
 .fg-cards{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}
 .fg-card{flex:1 1 150px;min-width:140px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px 12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
@@ -1009,7 +1011,7 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .bt-num{color:#243b53;font-weight:600}
 .bt-num.zero{color:#cbd5e1}
 .bt-total td{background:linear-gradient(180deg,#13a3c4,#0e8aa8);color:#fff;font-weight:800}
-.bt-table thead th{position:static}
+.bt-table thead th{position:sticky;top:0;z-index:3}
 /* ===================== PRINT SYSTEM (match on-screen layout) ===================== */
 
 /* ===== HOME HUB ===== */
@@ -8576,7 +8578,7 @@ function renderBottleReport(rep){
   #page-dash .kpis.custom-kpis:empty{display:none !important}
   #page-dash .main{display:contents !important}
   /* عمود السلايسر بنفس ارتفاع عمود البطاقات الأربع تقريباً (4 بطاقات × 132 + 3 فواصل × 12) */
-  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:628px !important;max-height:628px !important}
+  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:676px !important;max-height:676px !important}
   #page-dash .main>div:last-child{grid-area:charts !important;min-width:0 !important}
   #page-dash .foot{grid-area:foot !important}
   /* إخفاء زر «New card» في نسخة الجوال */
@@ -8585,6 +8587,9 @@ function renderBottleReport(rep){
      بحيث ينتهي العمود تقريباً عند نهاية البطاقات الأربع */
   #page-dash .side .fbox{flex:1 1 0 !important;min-height:0 !important;display:flex !important;flex-direction:column !important;overflow:hidden !important}
   #page-dash .side .fbox>div:last-child{flex:1 1 auto !important;min-height:138px !important;max-height:none !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
+  /* سلايسر الهوية يُظهر 4 فلاتر (أطول قليلاً من البقية) */
+  #page-dash .side .fbox.f-identity{flex:1.35 1 0 !important}
+  #page-dash .side .fbox.f-identity>div:last-child{min-height:184px !important}
 
   /* ---------- KPI cards — premium ---------- */
   .kpi{padding:18px 16px !important;min-height:148px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
