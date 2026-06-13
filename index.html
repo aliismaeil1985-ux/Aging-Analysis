@@ -7939,6 +7939,14 @@ function renderBottleReport(rep){
     if(!heads.length)return null;
     var trs=[].slice.call(table.querySelectorAll('tbody tr.sp-row'));
     if(!trs.length)return null;
+    /* حدّد مواضع Total و Grand Total من الرؤوس (أكثر موثوقية من فئات الخلايا) */
+    var totHi=-1, grandHi=-1;
+    heads.forEach(function(hd,i){
+      var L=String(hd.label||'').toLowerCase().replace(/\s+/g,' ').trim();
+      if(L==='grand total')grandHi=i;
+      else if(L==='total'&&totHi<0)totHi=i;
+    });
+    if(grandHi<0)grandHi=heads.length-1; /* آخر عمود = Grand Total */
     var out=[];
     trs.forEach(function(tr){
       var mEl=tr.querySelector('td.sp-metric'); if(!mEl)return;
@@ -7948,9 +7956,11 @@ function renderBottleReport(rep){
       var items=[],tot=null,grand=null;
       vcells.forEach(function(td,i){
         var it={label:heads[i].label,code:heads[i].code,val:txt(td),
-                isTot:td.classList.contains('sp-totcell'),isGrand:td.classList.contains('sp-gcell')};
+                isTot:(i===totHi)||td.classList.contains('sp-totcell'),
+                isGrand:(i===grandHi)||td.classList.contains('sp-gcell')};
         items.push(it); if(it.isTot&&!tot)tot=it; if(it.isGrand)grand=it;
       });
+      /* قيمة البطاقة = Grand Total دائماً (الإجمالي الكلي شامل المصانع) */
       var hv=grand||tot||items[items.length-1];
       out.push({title:metric,headVal:hv?hv.val:'',items:items});
     });
