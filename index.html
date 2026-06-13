@@ -8133,6 +8133,12 @@ function renderBottleReport(rep){
 .rot-stage .rot-card table{border-collapse:collapse;background:#fff;width:auto}
 .rot-stage .rot-card table th,.rot-stage .rot-card table td{white-space:nowrap}
 .rot-stage .rot-card.charts{width:980px;padding:14px}
+.rot-stage .rot-card.rot-full{width:-webkit-max-content;width:max-content;min-width:640px;padding:14px}
+.rot-stage .rot-full .fg-top{margin-bottom:10px}
+.rot-stage .rot-full .fg-cards{flex-wrap:wrap !important;overflow:visible !important;padding-bottom:0 !important}
+.rot-stage .rot-full .fg-bar,.rot-stage .rot-full .fg-slicers{overflow:visible !important}
+.rot-stage .rot-full .pivot-wrap,.rot-stage .rot-full .sp-scroll,.rot-stage .rot-full .fg-wrap{overflow:visible !important}
+.rot-stage .rot-full .sp-charts{margin-top:18px}
 .rot-stage .rot-card.charts .sp-charts{width:100%;margin:0;grid-template-columns:2.4fr 1fr !important}
 .rot-empty{padding:34px 18px;text-align:center;color:#94a3b8;font-weight:700;line-height:1.8}
 .rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,40,70,.92);color:#fff;font-size:19px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
@@ -8146,7 +8152,7 @@ function renderBottleReport(rep){
   function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
   var REPS={'page-rspace':'space','page-rfgbal':'fgbal','page-roldid':'oldid','page-rtransit':'transit','page-rbottle':'bottle'};
   var TITLES={space:['Space in Warehouses','المساحات في المستودعات'],fgbal:['FG Balance','أرصدة المنتجات'],oldid:['OLD Identity','الهوية القديمة'],transit:['FG Transit','الترانزيت'],bottle:['FG Bottle Stock','أرصدة القارورة']};
-  var fab,ov,inner,closeBtn,idleT,hint,hintT,ts=null,lastTap=0;
+  var fab,ov,inner,closeBtn,idleT,hint,hintT,ts=null,lastTap=0,rcEl=null,srcWrap=null,rotObs=null,syncT=null;
   var PZ={stage:null,vp:null,z:1,tx:0,ty:0,min:0.15,max:8};
   function build(){
     if(fab)return;
@@ -8186,17 +8192,21 @@ function renderBottleReport(rep){
     var wrap=document.getElementById('rep-'+key+'-wrap');if(!wrap)return;
     inner.innerHTML='';
     var stage=document.createElement('div');stage.className='rot-stage';
-    var table=wrap.querySelector('.sp-table')||wrap.querySelector('table.fg-table')||wrap.querySelector('table.dr-table')||wrap.querySelector('table.pivot')||wrap.querySelector('table');
-    var any=false;
-    if(table){var c=document.createElement('div');c.className='rot-card';c.appendChild(table.cloneNode(true));stage.appendChild(c);any=true;}
-    var charts=wrap.querySelector('.sp-charts');
-    if(charts){var cc=document.createElement('div');cc.className='rot-card charts';cc.appendChild(charts.cloneNode(true));stage.appendChild(cc);any=true;}
-    if(!any){var e=document.createElement('div');e.className='rot-empty';e.textContent=ar()?'لا توجد بيانات لعرضها — تأكد من رفع/مزامنة التقرير.':'No data to show — make sure the report is uploaded/synced.';stage.appendChild(e);}
+    var has=!!(wrap&&wrap.innerHTML&&wrap.innerHTML.trim().length>0);
+    if(has){var rc=document.createElement('div');rc.className='rot-card rot-full';rc.innerHTML=wrap.innerHTML;stage.appendChild(rc);rcEl=rc;}
+    else{var e=document.createElement('div');e.className='rot-empty';e.textContent=ar()?'لا توجد بيانات لعرضها — تأكد من رفع/مزامنة التقرير.':'No data to show — make sure the report is uploaded/synced.';stage.appendChild(e);rcEl=null;}
     inner.appendChild(stage);
+    srcWrap=wrap;bindLiveSync();
     PZ.stage=stage;PZ.vp=inner;PZ.z=1;PZ.tx=0;PZ.ty=0;
     ov.classList.add('show');closeBtn.classList.add('show');try{document.body.style.overflow='hidden';}catch(e){}
     goLandscape();showHint();
     setTimeout(fitPZ,130);setTimeout(fitPZ,460);setTimeout(fitPZ,1000);
+  }
+  function bindLiveSync(){
+    try{if(rotObs)rotObs.disconnect();}catch(e){}
+    if(!rcEl||!srcWrap)return;
+    try{rotObs=new MutationObserver(function(){clearTimeout(syncT);syncT=setTimeout(function(){try{if(rcEl&&srcWrap&&ov&&ov.classList.contains('show'))rcEl.innerHTML=srcWrap.innerHTML;}catch(e){}},130);});
+      rotObs.observe(srcWrap,{childList:true,subtree:true,characterData:true});}catch(e){}
   }
   function applyPZ(){if(PZ.stage)PZ.stage.style.transform='translate('+PZ.tx+'px,'+PZ.ty+'px) scale('+PZ.z+')';}
   function fitPZ(){
@@ -8231,7 +8241,7 @@ function renderBottleReport(rep){
       else if(e.touches.length===1){ts={m:1,x:e.touches[0].clientX,y:e.touches[0].clientY,tx:PZ.tx,ty:PZ.ty};}
     },{passive:false});
   }
-  function closeOv(){exitLandscape();if(ov)ov.classList.remove('show');if(closeBtn)closeBtn.classList.remove('show');try{document.body.style.overflow='';}catch(e){}}
+  function closeOv(){exitLandscape();try{if(rotObs)rotObs.disconnect();}catch(e){}if(ov)ov.classList.remove('show');if(closeBtn)closeBtn.classList.remove('show');try{document.body.style.overflow='';}catch(e){}}
   function refresh(){if(isMobile()&&curKey())showFab();else{hideFab();closeOv();}}
   function onInteract(){if(isMobile()&&curKey()){if(!fab||!fab.classList.contains('show'))showFab();else poke();}}
   function hookGo(){if(typeof window.go==='function'){var o=window.go;window.go=function(){var r=o.apply(this,arguments);setTimeout(refresh,40);return r;};}}
