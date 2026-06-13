@@ -855,7 +855,25 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .sp-chart-fac .cyl-row{justify-content:center;gap:30px}
 .sp-chart-fac .cyl-item{flex:0 0 auto;max-width:90px}
 @media screen and (max-width:1200px){.cyl{max-width:50px}.cyl-row{gap:14px}}
-@media screen and (max-width:860px){.sp-charts{grid-template-columns:1fr;gap:22px}.cyl-row{gap:12px;height:175px}.cyl{max-width:48px;height:158px;border-radius:24px/15px}.cyl-pct{font-size:13px}.cyl-lbl{font-size:10px}}
+@media screen and (max-width:860px){
+  .sp-charts{grid-template-columns:1fr;gap:22px}
+  /* الأنابيب في صف واحد دائماً مع تمرير أفقي عند الحاجة (لا تكسير ولا تزاحم) */
+  .cyl-row{gap:10px;height:170px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:0 6px 6px;scroll-snap-type:x proximity}
+  .cyl-row::-webkit-scrollbar{height:6px}
+  .cyl-row::-webkit-scrollbar-thumb{background:#bcd0e8;border-radius:6px}
+  .cyl-item{flex:0 0 auto;width:52px;max-width:52px;scroll-snap-align:center}
+  .cyl{max-width:48px;height:150px;border-radius:24px/15px}
+  .cyl-pct{font-size:12.5px}
+  .cyl-lbl{font-size:9.5px}
+  /* المصانع: تبقى في المنتصف بدون تمرير (عددها قليل) */
+  .sp-chart-fac .cyl-row{justify-content:center;overflow-x:visible}
+  .sp-chart-fac .cyl-item{width:64px;max-width:64px}
+}
+@media screen and (max-width:480px){
+  .cyl-item{width:46px;max-width:46px}
+  .cyl{max-width:42px;height:140px}
+  .cyl-row{gap:8px;height:160px}
+}
 /* ===== FG Balance: single-row slicers + elegant global search ===== */
 .fg-bar{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
 .fg-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
@@ -5383,7 +5401,44 @@ function renderDailyReport(key){
 }
 function currentReportKey(){for(var p in DR_PAGE2KEY){var el=document.getElementById('page-'+p);if(el&&el.classList.contains('show'))return DR_PAGE2KEY[p];}return null;}
 
+function recomputeSpacePercentages(rep){
+  /* النسب موحّدة من الكرتون:
+       صف «Percentage Spaces used %» (المستخدم)  = Total current balance Carton ÷ Actual space enough Qty for carton
+       صف «Percentage Spaces used %» (الترانزيت) = Total  Carton ( Transit)     ÷ Actual space enough Qty for carton
+     ونسبة الأنبوب (cyl) = نسبة الرصيد + نسبة الترانزيت (مجموع الصفّين). */
+  try{
+    var g=rep&&rep.groups;if(!g||g.length<3)return rep;
+    function num(v){return typeof v==='number'?v:(parseFloat(String(v==null?'':v).replace(/[,%\s]/g,''))||0);}
+    var qtyRow=(g[0]&&g[0].rows&&g[0].rows[2])?g[0].rows[2]:null; /* Actual space enough Qty for carton */
+    if(!qtyRow)return rep;
+    var usedBal=(g[1]&&g[1].rows&&g[1].rows[1])?g[1].rows[1]:null;  /* Total current balance Carton */
+    var trBal  =(g[2]&&g[2].rows&&g[2].rows[1])?g[2].rows[1]:null;  /* Total Carton (Transit) */
+    var usedPctRow=(g[1]&&g[1].rows)?g[1].rows[g[1].rows.length-1]:null;
+    var trPctRow  =(g[2]&&g[2].rows)?g[2].rows[g[2].rows.length-1]:null;
+    var N=qtyRow.length;
+    var usedP=[],trP=[];
+    for(var c=1;c<N;c++){
+      var q=num(qtyRow[c]);
+      var up=(q>0&&usedBal)?Math.round(num(usedBal[c])/q*100):0;
+      var tp=(q>0&&trBal)?Math.round(num(trBal[c])/q*100):0;
+      usedP[c]=up;trP[c]=tp;
+      if(usedPctRow&&/percentage/i.test(String(usedPctRow[0]||'')))usedPctRow[c]=up+'%';
+      if(trPctRow&&/percentage/i.test(String(trPctRow[0]||'')))trPctRow[c]=tp+'%';
+    }
+    /* مزامنة المصفوفة المسطّحة */
+    var flat=[];g.forEach(function(gr){flat=flat.concat(gr.rows);});rep.rows=flat;
+    /* نِسب الأنابيب = رصيد% + ترانزيت% ، حسب أعمدة الفروع ثم المصانع */
+    var B=rep.branches||SPACE_BRANCHES||[],F=rep.factories||SPACE_FACT||[];
+    var bPct=[],fPct=[];
+    for(var bI=0;bI<B.length;bI++){var ci=bI+1;bPct.push((usedP[ci]||0)+(trP[ci]||0));}
+    var facStart=B.length+2; /* بعد أعمدة الفروع + Total */
+    for(var fI=0;fI<F.length;fI++){var fc=facStart+fI;fPct.push((usedP[fc]||0)+(trP[fc]||0));}
+    rep.branchPct=bPct;rep.factoryPct=fPct;
+  }catch(e){}
+  return rep;
+}
 function renderSpaceReport(rep){
+  try{recomputeSpacePercentages(rep);}catch(e){}
   try{window._spaceRep=rep;}catch(e){}
   var wrap=document.getElementById('rep-space-wrap'); if(!wrap)return;
   var B=rep.branches||SPACE_BRANCHES,BC=rep.branchCodes||SPACE_BCODES,F=rep.factories||SPACE_FACT,FC=rep.factoryCodes||SPACE_FCODES;
@@ -8229,6 +8284,8 @@ function renderBottleReport(rep){
 .rot-stage .rot-full .pivot-wrap,.rot-stage .rot-full .sp-scroll,.rot-stage .rot-full .fg-wrap{overflow:visible !important}
 .rot-stage .rot-full .sp-charts{margin-top:18px}
 .rot-stage .rot-card.charts .sp-charts{width:100%;margin:0;grid-template-columns:2.4fr 1fr !important}
+/* داخل العرض الأفقي: الأنابيب تظهر كاملة بصف واحد بلا تمرير داخلي (الستيج نفسه يتكفّل بالتكبير) */
+.rot-stage .cyl-row{overflow:visible !important;flex-wrap:nowrap !important;justify-content:center !important}
 .rot-empty{padding:34px 18px;text-align:center;color:#94a3b8;font-weight:700;line-height:1.8}
 .rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,40,70,.92);color:#fff;font-size:19px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .rot-ov-close.show{display:flex}
