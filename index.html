@@ -8500,7 +8500,7 @@ function renderBottleReport(rep){
   #page-dash .kpis.custom-kpis:empty{display:none !important}
   #page-dash .main{display:contents !important}
   /* عمود السلايسر بنفس ارتفاع عمود البطاقات الأربع تقريباً (4 بطاقات × 132 + 3 فواصل × 12) */
-  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:564px !important;max-height:564px !important}
+  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:628px !important;max-height:628px !important}
   #page-dash .main>div:last-child{grid-area:charts !important;min-width:0 !important}
   #page-dash .foot{grid-area:foot !important}
   /* إخفاء زر «New card» في نسخة الجوال */
@@ -8508,10 +8508,10 @@ function renderBottleReport(rep){
   /* محاذاة عمود السلايسر مع عمود البطاقات: كل صندوق فلتر يبدأ من الأعلى وقائمته تتمرّر داخلياً
      بحيث ينتهي العمود تقريباً عند نهاية البطاقات الأربع */
   #page-dash .side .fbox{flex:1 1 0 !important;min-height:0 !important;display:flex !important;flex-direction:column !important;overflow:hidden !important}
-  #page-dash .side .fbox>div:last-child{flex:1 1 auto !important;min-height:0 !important;max-height:none !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
+  #page-dash .side .fbox>div:last-child{flex:1 1 auto !important;min-height:138px !important;max-height:none !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
 
   /* ---------- KPI cards — premium ---------- */
-  .kpi{padding:17px 16px !important;min-height:132px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
+  .kpi{padding:18px 16px !important;min-height:148px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
   .kpi::before{width:100% !important;height:4px !important;inset-inline-start:0 !important;top:0 !important;bottom:auto !important;opacity:.95}
   .kpi .row{align-items:center !important;gap:10px !important}
   .kpi .ic{width:40px !important;height:40px !important;border-radius:13px !important;font-size:19px !important;box-shadow:0 6px 16px rgba(20,60,120,.18) !important}
@@ -8593,17 +8593,19 @@ function renderBottleReport(rep){
 @media (max-width:640px){
   .content{padding:64px 12px 26px !important}
   #page-dash .kpis{gap:12px !important}
-  .kpi{min-height:126px !important;padding:15px 14px !important}
+  .kpi{min-height:140px !important;padding:16px 14px !important}
   .kpi .v{font-size:25px !important}
-  #page-dash .side{height:540px !important;max-height:540px !important}
+  #page-dash .side{height:596px !important;max-height:596px !important}
+  #page-dash .side .fbox>div:last-child{min-height:128px !important}
   .htext h1{font-size:16.5px !important}
   .chartbox{height:288px !important}
 }
 
 @media (max-width:430px){
-  #page-dash .kpis .kpi{min-height:118px !important}
-  .kpi{min-height:118px !important}
-  #page-dash .side{height:510px !important;max-height:510px !important}
+  #page-dash .kpis .kpi{min-height:130px !important}
+  .kpi{min-height:130px !important}
+  #page-dash .side{height:558px !important;max-height:558px !important}
+  #page-dash .side .fbox>div:last-child{min-height:120px !important}
   .kpi .ic{width:36px !important;height:36px !important;font-size:17px !important}
   .kpi .v{font-size:23px !important}
   .chartbox{height:264px !important}
