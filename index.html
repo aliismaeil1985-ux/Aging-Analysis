@@ -2630,7 +2630,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
       </div>
       <div class="card" style="padding:16px">
         <h4 style="font-size:15px;font-weight:800;margin-bottom:6px;color:var(--navy)">&#127981; المساحات والطاقة التخزينية · Spaces &amp; Storage Capacity</h4>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7">أدخل لكل مستودع: <b>المساحة الفعلية (m²)</b>، <b>مساحة البلت الواحد (m²)</b>، <b>عدد الرصّات</b>، و<b>متوسط الوحدات على البلت</b>. تُحسب تلقائياً: <b>عدد البلتات</b> = المساحة ÷ مساحة البلت الواحد، و<b>الطاقة (كرتون/شرنك)</b> = عدد البلتات × عدد الرصّات × متوسط الوحدات.</p>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7">أدخل لكل مستودع: <b>المساحة الفعلية (m²)</b>، <b>مساحة البلت الواحد (m²)</b>، <b>عدد الرصّات</b>، و<b>متوسط الوحدات على البلت</b>. تُحسب تلقائياً: <b>عدد البلتات</b> = (المساحة ÷ مساحة البلت الواحد) × عدد الرصّات، و<b>الطاقة (كرتون/شرنك)</b> = عدد البلتات × متوسط الوحدات على البلت. مرّر الماوس على أي خلية محسوبة لرؤية تفاصيل الحساب.</p>
         <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px">
           <table class="sp-act-tbl"><thead><tr>
             <th>المستودع · Warehouse</th>
@@ -6635,7 +6635,7 @@ function saveSpaceActuals(act){
   /* أعد حساب عدد البلتات والطاقة لكل صف قبل الحفظ لضمان التناسق */
   function recompute(r){
     var po=r.palOne||act.palOne||SP_PALONE_DEFAULT,ly=r.layers||act.layers||SP_LAYERS_DEFAULT,un=r.units||act.units||SP_UNITS_DEFAULT;
-    r.pallets=spCalcPallets(r.m2,po);r.qty=spCalcCap(r.pallets,ly,un);
+    r.pallets=spCalcPallets(r.m2,po,ly);r.qty=spCalcCap(r.pallets,un);
   }
   (act.branches||[]).forEach(recompute);(act.factories||[]).forEach(recompute);
   var s=getDR();s.space_actuals=act;saveDR(s);_drCloudReady=true;
@@ -6690,9 +6690,11 @@ function _spApplyActuals(act){
   try{renderDailyReport('space');}catch(e){}
 }
 /* عدد البلتات = المساحة الفعلية ÷ مساحة البلت الواحد */
-function spCalcPallets(m2,palOne){m2=parseFloat(m2)||0;palOne=parseFloat(palOne)||0;return palOne>0?Math.round(m2/palOne):0;}
+/* عدد البلتات = (المساحة الفعلية ÷ مساحة البلت الواحد) × عدد الرصّات */
+function spCalcPallets(m2,palOne,layers){m2=parseFloat(m2)||0;palOne=parseFloat(palOne)||0;layers=parseFloat(layers)||0;return (palOne>0&&layers>0)?Math.round(m2/palOne*layers):0;}
 /* الطاقة = عدد البلتات × عدد الرصّات × متوسط الوحدات على البلت */
-function spCalcCap(pallets,layers,units){pallets=parseFloat(pallets)||0;layers=parseFloat(layers)||0;units=parseFloat(units)||0;return Math.round(pallets*layers*units);}
+/* الطاقة = عدد البلتات × متوسط الوحدات على البلت الواحد (لا تدخل الرصّات في الحساب) */
+function spCalcCap(pallets,units){pallets=parseFloat(pallets)||0;units=parseFloat(units)||0;return Math.round(pallets*units);}
 function _spFmtInt(n){n=Math.round(parseFloat(n)||0);return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
 /* الجدول الموحّد: كل البيانات والإعدادات والحسابات في جدول واحد.
    الإدخال: المساحة الفعلية، مساحة البلت الواحد، عدد الرصّات، متوسط الوحدات/البلت.
@@ -6704,18 +6706,21 @@ function renderSpaceActuals(){
   var html='';
   function rowHtml(r,idx,type){
     var po=r.palOne||act.palOne||SP_PALONE_DEFAULT, ly=r.layers||act.layers||SP_LAYERS_DEFAULT, un=r.units||act.units||SP_UNITS_DEFAULT;
-    var pallets=spCalcPallets(r.m2,po);
-    var cap=spCalcCap(pallets,ly,un);
+    var pallets=spCalcPallets(r.m2,po,ly);
+    var cap=spCalcCap(pallets,un);
+    var m2v=parseFloat(r.m2)||0;
+    var palTip='عدد البلتات = (المساحة الفعلية ÷ مساحة البلت الواحد) × عدد الرصّات\n= ('+_spFmtInt(m2v)+' ÷ '+po+') × '+ly+' = '+_spFmtInt(pallets)+' بلت';
+    var capTip='الطاقة = عدد البلتات × متوسط الوحدات على البلت\n= '+_spFmtInt(pallets)+' × '+un+' = '+_spFmtInt(cap)+' كرتون/شرنك';
     return '<tr data-idx="'+idx+'" data-type="'+type+'">'
       +'<td class="act-branch">'+drEsc(r.name)+'<span class="act-code">'+drEsc(r.code||'')+'</span></td>'
       +'<td><input type="text" style="width:74px;padding:4px 7px;border:1px solid var(--line);border-radius:7px;font-size:12px" data-idx="'+idx+'" data-type="'+type+'" data-fld="code" value="'+drEsc(r.code||'')+'" onchange="spActFieldChange(this)"></td>'
       +'<td style="font-size:11px;color:var(--muted)">'+(type==='factory'?'مصنع · Factory':'فرع · Branch')+'</td>'
       +'<td><input class="num" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="m2" value="'+(r.m2||'')+'" onchange="spActFieldChange(this)" title="المساحة الفعلية m²"></td>'
       +'<td><input class="num sp-po" type="number" min="0" step="0.01" data-idx="'+idx+'" data-type="'+type+'" data-fld="palOne" value="'+(r.palOne||'')+'" onchange="spActFieldChange(this)" title="مساحة البلت الواحد m²"></td>'
-      +'<td><input class="num sp-ly" type="number" min="0" step="0.5" data-idx="'+idx+'" data-type="'+type+'" data-fld="layers" value="'+(r.layers||'')+'" onchange="spActFieldChange(this)" title="عدد الرصّات"></td>'
+      +'<td><input class="num sp-ly" type="number" min="0" step="0.5" data-idx="'+idx+'" data-type="'+type+'" data-fld="layers" value="'+(r.layers||'')+'" onchange="spActFieldChange(this)" title="عدد الرصّات (يدخل في حساب عدد البلتات)"></td>'
       +'<td><input class="num sp-un" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="units" value="'+(r.units||'')+'" onchange="spActFieldChange(this)" title="متوسط عدد الوحدات على البلت الواحد"></td>'
-      +'<td><input class="num qty-locked" type="number" value="'+pallets+'" readonly title="عدد البلتات = المساحة ÷ مساحة البلت الواحد"></td>'
-      +'<td><input class="num qty-locked" type="text" value="'+_spFmtInt(cap)+'" readonly title="الطاقة = البلتات × الرصّات × الوحدات"><span class="qty-auto-tag" title="محسوبة تلقائياً">محسوبة</span></td>'
+      +'<td><input class="num qty-locked" type="text" value="'+_spFmtInt(pallets)+'" readonly title="'+drEsc(palTip)+'"></td>'
+      +'<td><input class="num qty-locked" type="text" value="'+_spFmtInt(cap)+'" readonly title="'+drEsc(capTip)+'"><span class="qty-auto-tag" title="'+drEsc(capTip)+'">محسوبة</span></td>'
       +'<td><button class="act-del" title="حذف هذا المستودع" onclick="spActDelete('+idx+',\''+type+'\')">&#x1F5D1;</button></td>'
       +'</tr>';
   }
@@ -6735,7 +6740,7 @@ function spActFieldChange(input){
   /* أي تعديل يُعيد حساب البلتات والطاقة فوراً */
   var r=arr[idx];
   var po=r.palOne||_spActPending.palOne||SP_PALONE_DEFAULT, ly=r.layers||_spActPending.layers||SP_LAYERS_DEFAULT, un=r.units||_spActPending.units||SP_UNITS_DEFAULT;
-  r.qty=spCalcCap(spCalcPallets(r.m2,po),ly,un);
+  r.qty=spCalcCap(spCalcPallets(r.m2,po,ly),un);
   renderSpaceActualsMain();
   spActMsg('','');
 }
@@ -6765,7 +6770,7 @@ function spActAddRow(){
   if(!name.trim()){spActMsg('أدخل اسم المستودع.','err');return;}
   if(!_spActPending)_spActLoad();
   var _po=_spActPending.palOne||SP_PALONE_DEFAULT, _ly=_spActPending.layers||SP_LAYERS_DEFAULT, _un=_spActPending.units||SP_UNITS_DEFAULT;
-  var row={name:name.trim(),code:code.trim(),m2:m2,palOne:_po,layers:_ly,units:_un,qty:spCalcCap(spCalcPallets(m2,_po),_ly,_un)};
+  var row={name:name.trim(),code:code.trim(),m2:m2,palOne:_po,layers:_ly,units:_un,qty:spCalcCap(spCalcPallets(m2,_po,_ly),_un)};
   if(type==='factory')_spActPending.factories.push(row);else _spActPending.branches.push(row);
   ['sp-act-new-name','sp-act-new-code','sp-act-new-m2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   renderSpaceActuals();
@@ -6800,12 +6805,12 @@ function exportSpaceActuals(){
   var aoa=[['Type','Name','Code','Actual_m2','Pallet_one_m2','Layers','Units_per_pallet','Pallets','Capacity_cartons']];
   function row(t,r){
     var po=r.palOne||act.palOne||SP_PALONE_DEFAULT,ly=r.layers||act.layers||SP_LAYERS_DEFAULT,un=r.units||act.units||SP_UNITS_DEFAULT;
-    var pl=spCalcPallets(r.m2,po);return [t,r.name,r.code||'',r.m2||0,po,ly,un,pl,spCalcCap(pl,ly,un)];
+    var pl=spCalcPallets(r.m2,po,ly);return [t,r.name,r.code||'',r.m2||0,po,ly,un,pl,spCalcCap(pl,un)];
   }
   act.branches.forEach(function(r){aoa.push(row('branch',r));});
   act.factories.forEach(function(r){aoa.push(row('factory',r));});
   aoa.push([]);
-  aoa.push(['Formula','Pallets = Actual_m2 / Pallet_one_m2','Capacity = Pallets × Layers × Units_per_pallet']);
+  aoa.push(['Formula','Pallets = (Actual_m2 / Pallet_one_m2) × Layers','Capacity = Pallets × Units_per_pallet']);
   var wb=XLSX.utils.book_new();
   var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:10},{wch:18},{wch:12},{wch:12},{wch:14},{wch:10},{wch:16},{wch:12},{wch:16}];
   XLSX.utils.book_append_sheet(wb,ws,'Space Actuals');
@@ -7037,7 +7042,7 @@ function spActAddRowMain(){
   if(!name){spActMsg('أدخل اسم المستودع.','err');return;}
   if(!_spActPending)_spActLoad();
   var _poM=_spActPending.palOne||SP_PALONE_DEFAULT, _lyM=_spActPending.layers||SP_LAYERS_DEFAULT, _unM=_spActPending.units||SP_UNITS_DEFAULT;
-  var row={name:name,code:code,m2:m2,palOne:_poM,layers:_lyM,units:_unM,qty:spCalcCap(spCalcPallets(m2,_poM),_lyM,_unM)};
+  var row={name:name,code:code,m2:m2,palOne:_poM,layers:_lyM,units:_unM,qty:spCalcCap(spCalcPallets(m2,_poM,_lyM),_unM)};
   if(type==='factory')_spActPending.factories.push(row);else _spActPending.branches.push(row);
   ['sp-act-new-name-main','sp-act-new-code-main','sp-act-new-m2-main'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   renderSpaceActualsMain();
