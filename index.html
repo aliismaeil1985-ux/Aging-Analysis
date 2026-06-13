@@ -2629,30 +2629,34 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
         <button class="btn-soft sm" onclick="exportSpaceActuals()">&#x1F4E5; تصدير</button>
       </div>
       <div class="card" style="padding:16px">
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7">عدّل المساحة الفعلية (m²)، حجم البلت (m²)، وطاقة التخزين (كرتون) لكل مستودع. التغييرات تُزامَن وتُؤثر فوراً على شاشة Space. يمكنك إضافة مستودعات جديدة أو حذف غير المستخدمة.</p>
-        <div class="sp-formula-bar" id="sp-formula-bar-main">
-          <label class="sp-fx-sw" title="عند التفعيل: تُحسب الطاقة (كرتون/شرنك) تلقائياً بالمعادلة">
-            <input type="checkbox" id="sp-qty-auto-main" onchange="spActSetQtyMode(this.checked)">
-            <span>ربط الطاقة بالمساحة · Link capacity to area</span>
-          </label>
-          <span class="sp-fx-eq">الطاقة (كرتون/شرنك) = المساحة (m²) ÷ مساحة البلت الواحد
-            <input type="number" id="sp-palone-main" class="sp-fx-num" min="0.01" step="0.01" value="1.2" onchange="spActSetPalOne(this.value)" title="مساحة البلت الواحد m² (افتراضي عام)">
-            <small>m²</small>
-            × عدد الرصّات
-            <input type="number" id="sp-layers-main" class="sp-fx-num" min="1" step="1" value="8" onchange="spActSetLayers(this.value)" title="عدد الرصّات (افتراضي عام)">
-          </span>
-          <button class="btn-soft sm" type="button" onclick="spActApplyFormulaAll()" title="إعادة حساب الطاقة لكل المستودعات بالمعادلة">♻️ تطبيق على الكل</button>
+        <h4 style="font-size:15px;font-weight:800;margin-bottom:6px;color:var(--navy)">&#9881;&#65039; إعدادات الحساب · Pallet &amp; Layers Settings</h4>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7">حدّد لكل مستودع <b>مساحة البلت الواحد (m²)</b> و<b>متوسط عدد الرصّات</b>. تُستخدم هاتان القيمتان لحساب عدد البلتات والطاقة في الجدول الأساسي تلقائياً.</p>
+        <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px">
+          <table class="sp-act-tbl"><thead><tr>
+            <th>المستودع · Warehouse</th>
+            <th>النوع · Type</th>
+            <th>مساحة البلت الواحد (m²)</th>
+            <th>متوسط عدد الرصّات</th>
+          </tr></thead>
+          <tbody id="sp-set-tbody"></tbody></table>
         </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-soft sm" onclick="spActSave()">&#128190; حفظ وتطبيق · Save &amp; Apply</button>
+        </div>
+        <div id="sp-set-msg" style="margin-top:8px;font-size:12px"></div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <h4 style="font-size:15px;font-weight:800;margin-bottom:6px;color:var(--navy)">&#127981; المساحات والطاقة · Actual Spaces &amp; Capacity</h4>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7">أدخل <b>المساحة الفعلية (m²)</b> فقط. تُحسب <b>عدد البلتات</b> = المساحة ÷ مساحة البلت الواحد، و<b>الطاقة (كرتون/شرنك)</b> = عدد البلتات × عدد الرصّات تلقائياً.</p>
         <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px">
           <table class="sp-act-tbl"><thead><tr>
             <th>المستودع · Warehouse</th>
             <th>كود · Code</th>
             <th>النوع · Type</th>
             <th>المساحة الفعلية (m²)</th>
-            <th>حجم البلت (m²)</th>
-            <th>مساحة البلت الواحد (m²)</th>
-            <th>عدد الرصّات</th>
-            <th>الطاقة (كرتون)</th>
+            <th>عدد البلتات</th>
+            <th>الطاقة (كرتون/شرنك)</th>
             <th></th>
           </tr></thead>
           <tbody id="sp-act-tbody-main"></tbody></table>
@@ -2667,42 +2671,15 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
           <input class="add-num" type="number" id="sp-act-new-m2-main" placeholder="m²" min="0">
           <button class="add-btn" onclick="spActAddRowMain()">&#43; إضافة</button>
         </div>
-        <div id="sp-act-msg-main" style="margin-top:8px;font-size:12px"></div>
-      </div>
-      <div class="card sp-act-card" id="sp-act-card">
-          <h4>&#9317; المساحات الفعلية · Actual Warehouse Spaces</h4>
-          <p>عدّل المساحة الفعلية (m²)، حجم البلت (m²)، وطاقة التخزين (كرتون) لكل مستودع. أضف مستودعاً جديداً من الأسفل أو احذف مستودعاً غير مستخدم. التغييرات تُزامَن وتُؤثر فوراً على شاشة Space.</p>
-          <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px">
-            <table class="sp-act-tbl"><thead><tr>
-              <th>المستودع · Warehouse</th>
-              <th>كود · Code</th>
-              <th>نوع · Type</th>
-              <th>المساحة الفعلية (m²)</th>
-              <th>حجم البلت (m²)</th>
-              <th>مساحة البلت الواحد (m²)</th>
-              <th>عدد الرصّات</th>
-              <th>الطاقة (كرتون)</th>
-              <th></th>
-            </tr></thead>
-            <tbody id="sp-act-tbody"></tbody></table>
-          </div>
-          <div class="sp-act-add" id="sp-act-add">
-            <input class="add-name" type="text" id="sp-act-new-name" placeholder="اسم المستودع الجديد">
-            <input class="add-code" type="text" id="sp-act-new-code" placeholder="الكود">
-            <select id="sp-act-new-type" style="padding:6px 8px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;font-family:inherit">
-              <option value="branch">فرع · Branch</option>
-              <option value="factory">مصنع · Factory</option>
-            </select>
-            <input class="add-num" type="number" id="sp-act-new-m2" placeholder="m²" min="0">
-            <button class="add-btn" onclick="spActAddRow()">&#43; إضافة</button>
-          </div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn-soft sm" onclick="spActSave()">&#128190; حفظ وتطبيق · Save & Apply</button>
-            <button class="btn-soft sm" onclick="spActReset()" title="استعادة المساحات الافتراضية">&#x21BA; استعادة الافتراضي</button>
-            <button class="btn-soft sm" onclick="exportSpaceActuals()" title="تصدير Excel">&#x1F4E5; تصدير</button>
-          </div>
-          <div id="sp-act-msg" style="margin-top:8px;font-size:12px"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-soft sm" onclick="spActSave()">&#128190; حفظ وتطبيق · Save &amp; Apply</button>
+          <button class="btn-soft sm" onclick="spActReset()" title="استعادة المساحات الافتراضية">&#x21BA; استعادة الافتراضي</button>
+          <button class="btn-soft sm" onclick="exportSpaceActuals()" title="تصدير Excel">&#x1F4E5; تصدير</button>
         </div>
+        <div id="sp-act-msg-main" style="margin-top:8px;font-size:12px"></div>
+        <div id="sp-act-tbody" style="display:none"></div>
+        <div id="sp-act-msg" style="display:none"></div>
+      </div>
     </div></div>
     <div class="page" id="page-dailyup"><div class="wrap">
       <div class="topbar"><div class="htext"><h1 data-i18n="nav_dailyup">Daily Reports Upload</h1><span class="upd"><span class="dot"></span> رفع ومزامنة بيانات التقارير اليومية</span></div></div>
@@ -2911,7 +2888,7 @@ function go(p){
   if(p==='dash'){setTimeout(function(){try{renderCustomCards();}catch(e){}},30);}
   if(p==='cardbuilder'){try{initCardBuilder();}catch(e){}setTimeout(function(){try{initCardBuilder();}catch(e){}},60);}
   if(p==='masterdata'){setTimeout(function(){try{renderMasterTable();}catch(e){}try{renderDALTable();}catch(e){}try{applyDALColors();}catch(e){}try{renderSpaceConvStatus();}catch(e){}try{renderCppAvgTable();}catch(e){}try{var _dc=LS.getItem('dal_collapsed')==='1';var _card=document.getElementById('dal-card');if(_card){_card.classList.toggle('dal-collapsed',_dc);_dalSyncToggleUI(_dc);}}catch(e){}try{var _mdc=LS.getItem('md_collapsed')==='1';var _mcard=document.getElementById('md-card');if(_mcard){_mcard.classList.toggle('md-collapsed',_mdc);_mdSyncToggleUI(_mdc);}}catch(e){}},50);}
-  if(p==='spaceact'){setTimeout(function(){try{renderSpaceActualsMain();}catch(e){}try{renderSpaceActuals();}catch(e){}},50);}
+  if(p==='spaceact'){setTimeout(function(){try{_spActLoad();}catch(e){}try{renderSpaceActuals();}catch(e){}},50);}
   if(p==='home'){try{updateHomeDates();}catch(e){}}
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
   document.getElementById('page-users').classList.toggle('show',p==='users');
@@ -4886,7 +4863,16 @@ function fbConnect(silent){
   const cfg=fbCfgFromFields();
   if(!cfg.apiKey||!cfg.projectId){cloudStatus('err',fbMsg('Enter at least API Key and Project ID.','أدخل على الأقل API Key و Project ID.'));return false;}
   try{
-    fbApp=firebase.initializeApp(cfg,'app_'+Date.now());
+    /* اسم تطبيق ثابت بدل اسم متغيّر كل تحديث — ضروري كي تبقى جلسة الدخول محفوظة
+       بعد تحديث الصفحة (Firebase يربط استمرارية الجلسة باسم التطبيق). */
+    var FB_APP_NAME='tania_app';
+    try{
+      var _existing=null;
+      try{ (firebase.apps||[]).forEach(function(a){ if(a&&a.name===FB_APP_NAME)_existing=a; }); }catch(e){}
+      fbApp=_existing||firebase.initializeApp(cfg,FB_APP_NAME);
+    }catch(e){
+      try{fbApp=firebase.app(FB_APP_NAME);}catch(e2){fbApp=firebase.initializeApp(cfg,'app_'+Date.now());}
+    }
     fbDB=firebase.firestore(fbApp);
     fbReady=true;
     try{LS.setItem('fb_config_fields',JSON.stringify(cfg));}catch(e){}
@@ -6653,6 +6639,9 @@ function spCalcQty(m2,palOne,layers){
   return (palOne>0&&layers>0)?Math.round(m2/palOne*layers):0;
 }
 function saveSpaceActuals(act){
+  /* أعد حساب عدد البلتات والطاقة لكل صف قبل الحفظ لضمان التناسق */
+  function recompute(r){var po=r.palOne||act.palOne||SP_PALONE_DEFAULT,ly=r.layers||act.layers||SP_LAYERS_DEFAULT;r.pallets=spCalcPallets(r.m2,po);r.qty=spCalcCap(r.pallets,ly);}
+  (act.branches||[]).forEach(recompute);(act.factories||[]).forEach(recompute);
   var s=getDR();s.space_actuals=act;saveDR(s);_drCloudReady=true;
   try{drPush();}catch(e){}
   _spApplyActuals(act);
@@ -6704,83 +6693,53 @@ function _spApplyActuals(act){
   /* إعادة رسم الشاشة */
   try{renderDailyReport('space');}catch(e){}
 }
-function renderSpaceActuals(){
-  var wrap=document.getElementById('sp-act-tbody');if(!wrap)return;
-  var act=getSpaceActuals();
-  var auto=(act.qtyMode==='auto');
-  /* مزامنة حالة شريط المعادلة */
-  spSyncFormulaBar(auto,act.palOne,act.layers);
+/* عدد البلتات = المساحة الفعلية ÷ مساحة البلت الواحد */
+function spCalcPallets(m2,palOne){m2=parseFloat(m2)||0;palOne=parseFloat(palOne)||0;return palOne>0?Math.round(m2/palOne):0;}
+/* الطاقة = عدد البلتات × عدد الرصّات */
+function spCalcCap(pallets,layers){pallets=parseFloat(pallets)||0;layers=parseFloat(layers)||0;return Math.round(pallets*layers);}
+/* جدول الإعدادات: مساحة البلت الواحد + متوسط عدد الرصّات لكل مستودع */
+function renderSpaceSettings(){
+  var wrap=document.getElementById('sp-set-tbody');if(!wrap)return;
+  if(!_spActPending)_spActLoad();
+  var act=_spActPending;
   var html='';
   function rowHtml(r,idx,type){
-    var po=r.palOne||act.palOne||SP_PALONE_DEFAULT, ly=r.layers||act.layers||SP_LAYERS_DEFAULT;
-    var qVal=auto?spCalcQty(r.m2,po,ly):(r.qty||'');
-    var qCell=auto
-      ? '<input class="num qty-locked" type="number" data-idx="'+idx+'" data-type="'+type+'" data-fld="qty" value="'+qVal+'" readonly title="محسوبة: المساحة ÷ مساحة البلت × عدد الرصّات">'
-        +'<span class="qty-auto-tag" title="الطاقة محسوبة تلقائياً من المساحة">محسوبة</span>'
-      : '<input class="num" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="qty" value="'+(r.qty||'')+'" onchange="spActFieldChange(this)">';
     return '<tr data-idx="'+idx+'" data-type="'+type+'">'
       +'<td class="act-branch">'+drEsc(r.name)+'<span class="act-code">'+drEsc(r.code||'')+'</span></td>'
-      +'<td><input type="text" style="width:80px;padding:4px 7px;border:1px solid var(--line);border-radius:7px;font-size:12px" data-idx="'+idx+'" data-type="'+type+'" data-fld="code" value="'+drEsc(r.code||'')+'" onchange="spActFieldChange(this)"></td>'
       +'<td style="font-size:11px;color:var(--muted)">'+(type==='factory'?'مصنع · Factory':'فرع · Branch')+'</td>'
-      +'<td><input class="num" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="m2" value="'+(r.m2||'')+'" onchange="spActFieldChange(this)"></td>'
-      +'<td><input class="num" type="number" min="0" step="0.1" data-idx="'+idx+'" data-type="'+type+'" data-fld="pal" value="'+(r.pal||'')+'" onchange="spActFieldChange(this)"></td>'
       +'<td><input class="num sp-po" type="number" min="0" step="0.01" data-idx="'+idx+'" data-type="'+type+'" data-fld="palOne" value="'+(r.palOne||'')+'" onchange="spActFieldChange(this)" title="مساحة البلت الواحد m²"></td>'
-      +'<td><input class="num sp-ly" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="layers" value="'+(r.layers||'')+'" onchange="spActFieldChange(this)" title="عدد الرصّات"></td>'
-      +'<td>'+qCell+'</td>'
-      +'<td><button class="act-del" title="حذف هذا المستودع" onclick="spActDelete('+idx+',\''+type+'\')">&#x1F5D1;</button></td>'
+      +'<td><input class="num sp-ly" type="number" min="0" step="0.5" data-idx="'+idx+'" data-type="'+type+'" data-fld="layers" value="'+(r.layers||'')+'" onchange="spActFieldChange(this)" title="متوسط عدد الرصّات"></td>'
       +'</tr>';
   }
   act.branches.forEach(function(r,i){html+=rowHtml(r,i,'branch');});
   act.factories.forEach(function(r,i){html+=rowHtml(r,i,'factory');});
   wrap.innerHTML=html;
 }
-/* مزامنة عناصر شريط المعادلة في الجدولين (الرئيسي والثانوي) */
-function spSyncFormulaBar(auto,palOne,layers){
-  ['sp-qty-auto-main','sp-qty-auto'].forEach(function(id){var e=document.getElementById(id);if(e)e.checked=!!auto;});
-  ['sp-palone-main','sp-palone'].forEach(function(id){var e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=palOne;});
-  ['sp-layers-main','sp-layers'].forEach(function(id){var e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=layers;});
-}
-function _spRecalcAll(a){
-  if(a.qtyMode!=='auto')return;
-  function f(r){var po=r.palOne||a.palOne||SP_PALONE_DEFAULT,ly=r.layers||a.layers||SP_LAYERS_DEFAULT;r.qty=spCalcQty(r.m2,po,ly);}
-  a.branches.forEach(f);a.factories.forEach(f);
-}
-/* تفعيل/إلغاء ربط الطاقة بالمساحة */
-function spActSetQtyMode(on){
+/* الجدول الأساسي: المساحة الفعلية (إدخال) + عدد البلتات والطاقة (محسوبان مقفلان) */
+function renderSpaceActuals(){
   if(!_spActPending)_spActLoad();
-  _spActPending.qtyMode=on?'auto':'manual';
-  if(on)_spRecalcAll(_spActPending);
-  renderSpaceActualsMain();
-  var msg=document.getElementById('sp-act-msg-main')||document.getElementById('sp-act-msg');
-  if(msg)msg.innerHTML='<span style="color:#15803d">'+(on?'✓ تم ربط الطاقة بالمساحة — اضغط «حفظ وتطبيق».':'تم فكّ الربط — يمكنك تعديل الطاقة يدوياً. اضغط «حفظ وتطبيق».')+'</span>';
-}
-/* القيم الافتراضية العامة (مساحة البلت الواحد / عدد الرصّات) */
-function spActSetPalOne(val){
-  if(!_spActPending)_spActLoad();
-  var v=parseFloat(val);if(!(v>0)){renderSpaceActualsMain();return;}
-  _spActPending.palOne=v;
-  _spActPending.branches.forEach(function(r){if(!(r.palOne>0))r.palOne=v;});
-  _spActPending.factories.forEach(function(r){if(!(r.palOne>0))r.palOne=v;});
-  _spRecalcAll(_spActPending);renderSpaceActualsMain();
-}
-function spActSetLayers(val){
-  if(!_spActPending)_spActLoad();
-  var v=parseFloat(val);if(!(v>0)){renderSpaceActualsMain();return;}
-  _spActPending.layers=v;
-  _spActPending.branches.forEach(function(r){if(!(r.layers>0))r.layers=v;});
-  _spActPending.factories.forEach(function(r){if(!(r.layers>0))r.layers=v;});
-  _spRecalcAll(_spActPending);renderSpaceActualsMain();
-}
-/* تطبيق المعادلة على الكل: يفرض القيم العامة على جميع الصفوف ويفعّل الربط */
-function spActApplyFormulaAll(){
-  if(!_spActPending)_spActLoad();
-  var po=parseFloat(_spActPending.palOne)||SP_PALONE_DEFAULT, ly=parseFloat(_spActPending.layers)||SP_LAYERS_DEFAULT;
-  _spActPending.qtyMode='auto';_spActPending.palOne=po;_spActPending.layers=ly;
-  _spActPending.branches.forEach(function(r){r.palOne=po;r.layers=ly;r.qty=spCalcQty(r.m2,po,ly);});
-  _spActPending.factories.forEach(function(r){r.palOne=po;r.layers=ly;r.qty=spCalcQty(r.m2,po,ly);});
-  renderSpaceActualsMain();
-  var msg=document.getElementById('sp-act-msg-main')||document.getElementById('sp-act-msg');
-  if(msg)msg.innerHTML='<span style="color:#15803d">✓ أُعيد حساب الطاقة لكل المستودعات بالمعادلة — اضغط «حفظ وتطبيق».</span>';
+  var act=_spActPending;
+  /* ارسم جدول الإعدادات أيضاً */
+  renderSpaceSettings();
+  var wrap=document.getElementById('sp-act-tbody-main');if(!wrap)return;
+  var html='';
+  function rowHtml(r,idx,type){
+    var po=r.palOne||act.palOne||SP_PALONE_DEFAULT, ly=r.layers||act.layers||SP_LAYERS_DEFAULT;
+    var pallets=spCalcPallets(r.m2,po);
+    var cap=spCalcCap(pallets,ly);
+    return '<tr data-idx="'+idx+'" data-type="'+type+'">'
+      +'<td class="act-branch">'+drEsc(r.name)+'<span class="act-code">'+drEsc(r.code||'')+'</span></td>'
+      +'<td><input type="text" style="width:80px;padding:4px 7px;border:1px solid var(--line);border-radius:7px;font-size:12px" data-idx="'+idx+'" data-type="'+type+'" data-fld="code" value="'+drEsc(r.code||'')+'" onchange="spActFieldChange(this)"></td>'
+      +'<td style="font-size:11px;color:var(--muted)">'+(type==='factory'?'مصنع · Factory':'فرع · Branch')+'</td>'
+      +'<td><input class="num" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="m2" value="'+(r.m2||'')+'" onchange="spActFieldChange(this)"></td>'
+      +'<td><input class="num qty-locked" type="number" value="'+pallets+'" readonly title="عدد البلتات = المساحة ÷ مساحة البلت الواحد"></td>'
+      +'<td><input class="num qty-locked" type="number" value="'+cap+'" readonly title="الطاقة = عدد البلتات × عدد الرصّات"><span class="qty-auto-tag" title="محسوبة تلقائياً">محسوبة</span></td>'
+      +'<td><button class="act-del" title="حذف هذا المستودع" onclick="spActDelete('+idx+',\''+type+'\')">&#x1F5D1;</button></td>'
+      +'</tr>';
+  }
+  act.branches.forEach(function(r,i){html+=rowHtml(r,i,'branch');});
+  act.factories.forEach(function(r,i){html+=rowHtml(r,i,'factory');});
+  wrap.innerHTML=html;
 }
 var _spActPending=JSON.parse(JSON.stringify(SPACE_ACT_DEFAULTS));
 function _spActLoad(){_spActPending=getSpaceActuals();}
@@ -6790,22 +6749,19 @@ function spActFieldChange(input){
   if(!_spActPending)_spActLoad();
   var arr=type==='factory'?_spActPending.factories:_spActPending.branches;
   if(!arr[idx])return;
-  var auto=(_spActPending.qtyMode==='auto');
-  if(fld==='qty'&&auto)return; /* الطاقة مقفلة (محسوبة) عند الربط */
   arr[idx][fld]=v;
-  /* عند الربط: تعديل المساحة أو مساحة البلت أو عدد الرصّات يُعيد حساب الطاقة فوراً */
-  if(auto&&(fld==='m2'||fld==='palOne'||fld==='layers')){
-    var r=arr[idx];
-    var po=r.palOne||_spActPending.palOne||SP_PALONE_DEFAULT, ly=r.layers||_spActPending.layers||SP_LAYERS_DEFAULT;
-    r.qty=spCalcQty(r.m2,po,ly);renderSpaceActualsMain();
-  }
+  /* أي تعديل على المساحة أو مساحة البلت أو الرصّات يُعيد حساب البلتات والطاقة */
+  var r=arr[idx];
+  var po=r.palOne||_spActPending.palOne||SP_PALONE_DEFAULT, ly=r.layers||_spActPending.layers||SP_LAYERS_DEFAULT;
+  r.qty=spCalcCap(spCalcPallets(r.m2,po),ly);
+  renderSpaceActualsMain();
 }
 function spActDelete(idx,type){
   if(!_spActPending)_spActLoad();
   var arr=type==='factory'?_spActPending.factories:_spActPending.branches;
   if(typeof confirm==='function'&&!confirm('حذف «'+((arr[idx]&&arr[idx].name)||'')+'»؟\nDelete this warehouse?'))return;
   arr.splice(idx,1);renderSpaceActuals();
-  var msg=document.getElementById('sp-act-msg');if(msg)msg.innerHTML='<span style="color:var(--orange)">⚠ اضغط «حفظ وتطبيق» لتأكيد الحذف.</span>';
+  var msg=document.getElementById('sp-act-msg-main');if(msg)msg.innerHTML='<span style="color:var(--orange)">⚠ اضغط «حفظ وتطبيق» لتأكيد الحذف.</span>';
 }
 function spActAddRow(){
   var name=(document.getElementById('sp-act-new-name')||{}).value||'';
@@ -6826,15 +6782,15 @@ function spActSave(){
   if(!_spActPending.branches.length){alert('يجب وجود فرع واحد على الأقل.');return;}
   saveSpaceActuals(JSON.parse(JSON.stringify(_spActPending)));
   renderSpaceActuals();
-  var msg=document.getElementById('sp-act-msg');if(msg)msg.innerHTML='<span style="color:#15803d">✓ تم الحفظ والتطبيق — شاشة Space محدّثة.</span>';
-  setTimeout(function(){var m=document.getElementById('sp-act-msg');if(m)m.innerHTML='';},3500);
+  ['sp-act-msg-main','sp-set-msg'].forEach(function(id){var m=document.getElementById(id);if(m)m.innerHTML='<span style="color:#15803d">✓ تم الحفظ والتطبيق — شاشة Space محدّثة.</span>';});
+  setTimeout(function(){['sp-act-msg-main','sp-set-msg'].forEach(function(id){var m=document.getElementById(id);if(m)m.innerHTML='';});},3500);
 }
 function spActReset(){
   if(typeof confirm==='function'&&!confirm('استعادة المستودعات الافتراضية؟\nRestore default warehouses?'))return;
   _spActPending=JSON.parse(JSON.stringify(SPACE_ACT_DEFAULTS));
   saveSpaceActuals(_spActPending);renderSpaceActuals();
-  var msg=document.getElementById('sp-act-msg');if(msg)msg.innerHTML='<span style="color:#15803d">✓ تم استعادة الافتراضي.</span>';
-  setTimeout(function(){var m=document.getElementById('sp-act-msg');if(m)m.innerHTML='';},3000);
+  var m=document.getElementById('sp-act-msg-main');if(m)m.innerHTML='<span style="color:#15803d">✓ تم استعادة الافتراضي.</span>';
+  setTimeout(function(){var mm=document.getElementById('sp-act-msg-main');if(mm)mm.innerHTML='';},3000);
 }
 function exportSpaceActuals(){
   var act=getSpaceActuals();
@@ -7066,9 +7022,6 @@ function renderMdCppTable(){
 /* ===== Space Actuals standalone page ===== */
 function renderSpaceActualsMain(){
   renderSpaceActuals();
-  var src2=document.getElementById('sp-act-tbody');
-  var dst=document.getElementById('sp-act-tbody-main');
-  if(dst&&src2)dst.innerHTML=src2.innerHTML;
 }
 function spActAddRowMain(){
   var name=((document.getElementById('sp-act-new-name-main')||{}).value||'').trim();
@@ -7079,7 +7032,7 @@ function spActAddRowMain(){
   if(!name){if(msgEl)msgEl.innerHTML='<span style="color:var(--orange)">\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639.</span>';return;}
   if(!_spActPending)_spActLoad();
   var _poM=_spActPending.palOne||SP_PALONE_DEFAULT, _lyM=_spActPending.layers||SP_LAYERS_DEFAULT;
-  var row={name:name,code:code,m2:m2,pal:Math.round(m2*1.2*10)/10,palOne:_poM,layers:_lyM,qty:spCalcQty(m2,_poM,_lyM)};
+  var row={name:name,code:code,m2:m2,palOne:_poM,layers:_lyM,qty:spCalcCap(spCalcPallets(m2,_poM),_lyM)};
   if(type==='factory')_spActPending.factories.push(row);else _spActPending.branches.push(row);
   ['sp-act-new-name-main','sp-act-new-code-main','sp-act-new-m2-main'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   renderSpaceActualsMain();
@@ -7924,14 +7877,30 @@ function renderBottleReport(rep){
   function toast(m,t){try{if(typeof syncToast==='function')syncToast(m,t||'ok');}catch(_){}}
 
   /* ---- wait for the firebase app created by fbConnect(), then attach Auth ---- */
+  var _authListenerBound=false;
+  function _bindAuthListener(){
+    if(_authListenerBound||!_auth)return;
+    _authListenerBound=true;
+    _auth.onAuthStateChanged(onAuthChanged);
+  }
   function tryInitAuth(){
     try{
       if(_auth)return true;
       if(typeof firebase==='undefined'||!firebase.auth)return false;
       if(typeof fbApp==='undefined'||!fbApp)return false;
       _auth=firebase.auth(fbApp);
-      try{_auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
-      _auth.onAuthStateChanged(onAuthChanged);
+      /* تثبيت الجلسة محلياً (تبقى بعد تحديث الصفحة) — يجب ضبطها قبل مراقبة حالة الدخول.
+         ننتظر اكتمال setPersistence ثم نربط المراقب حتى يُستعاد المستخدم المحفوظ بشكل موثوق،
+         مع ربط احتياطي في حال فشل/تأخّر الوعد. */
+      var bound=false;
+      try{
+        var pr=_auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        if(pr&&pr.then){
+          pr.then(function(){_bindAuthListener();}).catch(function(){_bindAuthListener();});
+          /* احتياط: لو لم يُحسم الوعد سريعاً، اربط المراقب بعد مهلة قصيرة */
+          setTimeout(_bindAuthListener,800);
+        }else{_bindAuthListener();}
+      }catch(e){_bindAuthListener();}
       _authReady=true;
       return true;
     }catch(e){return false;}
