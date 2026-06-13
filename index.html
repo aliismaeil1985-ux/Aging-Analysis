@@ -8149,8 +8149,26 @@ function renderBottleReport(rep){
 .rot-stage table.pivot th.fg-toth{background:#163f73 !important;color:#fff !important;font-weight:800 !important}
 .rot-stage table.pivot th.fg-trth{background:#e0792f !important;color:#fff !important}
 .rot-stage table.pivot tr.grand td{background:#eaf1fb !important;font-weight:800 !important;color:#15406f !important}
-.rot-stage table.pivot .fg-vsep{border:0 !important;background:transparent !important;width:8px !important;min-width:8px !important;padding:0 !important}
+.rot-stage .fg-vsep,.rot-stage table.pivot .fg-vsep{border:0 !important;background:transparent !important;width:8px !important;min-width:8px !important;padding:0 !important}
+/* ===== العرض الأفقي: التقرير الحيّ كاملاً (بطاقات + سلايسر + فلاتر + جدول) ===== */
+.rot-stage .rot-card{display:block !important}
+.rot-stage .rot-live{overflow:visible !important;width:auto !important;max-width:none !important;min-width:560px}
+/* البطاقات: تلتفّ وتظهر كاملة (لا تمرير داخلي) */
+.rot-stage .rot-live .fg-cards,.rot-stage .rot-live .sp-cards{display:flex !important;flex-wrap:wrap !important;overflow:visible !important;gap:9px !important;padding-bottom:0 !important;margin-bottom:12px !important}
+.rot-stage .rot-live .fg-card,.rot-stage .rot-live .sp-card{flex:0 0 auto !important;cursor:pointer}
+/* شريط السلايسر والفلاتر: ظاهر بالكامل وقابل للالتفاف */
+.rot-stage .rot-live .fg-bar{display:flex !important;flex-direction:column !important;gap:10px !important;margin-bottom:12px !important;overflow:visible !important}
+.rot-stage .rot-live .fg-slicers{display:flex !important;flex-wrap:wrap !important;overflow:visible !important;gap:12px !important}
+.rot-stage .rot-live .fg-slicer{display:flex !important;align-items:center;gap:8px;flex-wrap:wrap}
+.rot-stage .rot-live .fg-chips{display:flex !important;flex-wrap:wrap !important;gap:6px !important}
+.rot-stage .rot-live .fg-chip{cursor:pointer;white-space:nowrap}
+/* إظهار شريط البحث/الإخفاء داخل العرض الأفقي (كانت مخفية على الجوال) */
+.rot-stage .rot-live .fg-top,.rot-stage .rot-live .fg-search,.rot-stage .rot-live .fg-zero,.rot-stage .rot-live .fg-clear{display:flex !important}
+/* الجدول نفسه: لا تمرير داخلي — يتمدّد كاملاً ويتكفّل بالتكبير/السحب المجمّع */
+.rot-stage .rot-live .pivot-wrap,.rot-stage .rot-live .fg-wrap,.rot-stage .rot-live .sp-scroll,.rot-stage .rot-live .bt-scroll{overflow:visible !important;width:auto !important;max-width:none !important}
 .rot-empty{padding:34px 18px;text-align:center;color:#94a3b8;font-weight:700;line-height:1.8}
+/* نافذة تفاصيل البطاقة فوق العرض الأفقي */
+.fg-modal-ov.rot-modal-lift{z-index:10050 !important}
 .rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,40,70,.92);color:#fff;font-size:19px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .rot-ov-close.show{display:flex}
 </style>
@@ -8197,55 +8215,58 @@ function renderBottleReport(rep){
       if(ef&&(document.fullscreenElement||document.webkitFullscreenElement))ef.call(document);}catch(e){}
   }
   function showHint(){if(!hint)return;hint.textContent=ar()?'+/− أو إصبعان للتكبير · اسحب للتحريك':'+/- or two fingers to zoom · drag to pan';hint.style.opacity='.92';clearTimeout(hintT);hintT=setTimeout(function(){hint.style.opacity='0';},3500);}
-  /* يبني محتوى نظيفاً لنافذة التدوير: الجدول فقط (بدون البطاقات أو أزرار الفلترة
-     التي كانت تُكدّس التخطيط وتظهر غير مرتبة). نُعيد بناء الجدول كما هو في الكمبيوتر. */
-  function buildCleanContent(wrap){
-    var frag=document.createElement('div');
-    var tables=wrap.querySelectorAll('table.pivot');
-    if(!tables.length)return null;
-    tables.forEach(function(tbl){
-      var card=document.createElement('div');card.className='rot-card';
-      var holder=document.createElement('div');holder.className='rot-tbl';
-      var clone=tbl.cloneNode(true);
-      /* إزالة السمات التفاعلية التي لا تعمل داخل النسخة (onclick على الصفوف/الخلايا) */
-      clone.querySelectorAll('[onclick]').forEach(function(e){e.removeAttribute('onclick');e.style.cursor='default';});
-      clone.removeAttribute('id');
-      clone.querySelectorAll('[id]').forEach(function(e){e.removeAttribute('id');});
-      holder.appendChild(clone);card.appendChild(holder);frag.appendChild(card);
-    });
-    return frag;
+  /* نقل التقرير الحقيقي (البطاقات + السلايسر + الفلاتر + الجدول) إلى نافذة التدوير
+     بدل استنساخه — هكذا تبقى الأزرار والفلاتر تعمل فعلياً (rrToggleChip/rrRefresh)
+     لأنها تعتمد على نفس العناصر والمعرّفات الأصلية. نُعيدها لمكانها عند الإغلاق. */
+  var movedWrap=null,wrapHome=null,wrapNext=null,movedModal=null,modalHome=null,modalNext=null;
+  function moveWrapIn(wrap,host){
+    wrapHome=wrap.parentNode;wrapNext=wrap.nextSibling;movedWrap=wrap;
+    wrap.classList.add('rot-live');
+    host.appendChild(wrap);
+    /* نافذة تفاصيل البطاقة (modal) يجب أن تخرج من الحاوية المُكبَّرة لتظهر فوق العرض الأفقي بشكل سليم */
+    try{var md=wrap.querySelector('.fg-modal-ov');
+      if(md){modalHome=md.parentNode;modalNext=md.nextSibling;movedModal=md;md.classList.add('rot-modal-lift');(ov||document.body).appendChild(md);}
+    }catch(e){}
+  }
+  function restoreWrap(){
+    if(movedModal){try{movedModal.classList.remove('rot-modal-lift','show');if(modalHome){if(modalNext&&modalNext.parentNode===modalHome)modalHome.insertBefore(movedModal,modalNext);else modalHome.appendChild(movedModal);}}catch(e){}movedModal=null;modalHome=null;modalNext=null;}
+    if(!movedWrap)return;
+    try{movedWrap.classList.remove('rot-live');
+      if(wrapHome){if(wrapNext&&wrapNext.parentNode===wrapHome)wrapHome.insertBefore(movedWrap,wrapNext);else wrapHome.appendChild(movedWrap);}
+    }catch(e){}
+    movedWrap=null;wrapHome=null;wrapNext=null;
   }
   function openOv(){
     build();var key=curKey();if(!key)return;
     var wrap=document.getElementById('rep-'+key+'-wrap');if(!wrap)return;
+    restoreWrap(); /* احتياطاً لو بقيت نافذة سابقة */
     inner.innerHTML='';
     var stage=document.createElement('div');stage.className='rot-stage';
-    var content=buildCleanContent(wrap);
-    if(content&&content.childNodes.length){stage.appendChild(content);rcEl=stage;}
-    else{var e=document.createElement('div');e.className='rot-empty';e.textContent=ar()?'لا توجد بيانات لعرضها — تأكد من رفع/مزامنة التقرير.':'No data to show — make sure the report is uploaded/synced.';stage.appendChild(e);rcEl=null;}
+    var has=!!(wrap&&wrap.querySelector&&wrap.querySelector('table.pivot'));
+    if(has){
+      var card=document.createElement('div');card.className='rot-card';
+      moveWrapIn(wrap,card);
+      stage.appendChild(card);rcEl=stage;
+    }else{
+      var e=document.createElement('div');e.className='rot-empty';e.textContent=ar()?'لا توجد بيانات لعرضها — تأكد من رفع/مزامنة التقرير.':'No data to show — make sure the report is uploaded/synced.';stage.appendChild(e);rcEl=null;
+    }
     inner.appendChild(stage);
     srcWrap=wrap;bindLiveSync();
     PZ.stage=stage;PZ.vp=inner;PZ.z=1;PZ.tx=0;PZ.ty=0;
     ov.classList.add('show');closeBtn.classList.add('show');try{document.body.style.overflow='hidden';}catch(e){}
     goLandscape();showHint();
-    setTimeout(fitPZ,130);setTimeout(fitPZ,460);setTimeout(fitPZ,1000);
+    setTimeout(fitPZ,160);setTimeout(fitPZ,520);setTimeout(fitPZ,1100);
   }
   function bindLiveSync(){
+    /* العنصر منقول حيّاً، فلا حاجة لإعادة نسخ المحتوى — نراقب فقط لإعادة ضبط المقاس
+       عند تغيّر عدد الصفوف بسبب الفلترة، مع تجنّب ذلك أثناء لمس المستخدم. */
     try{if(rotObs)rotObs.disconnect();}catch(e){}
-    if(!rcEl||!srcWrap)return;
-    function doSync(){
-      /* لا نعيد البناء أثناء لمس/تكبير المستخدم — كان سبب توقّف الشاشة أثناء التدوير */
-      if(PZ.busy){clearTimeout(syncT);syncT=setTimeout(doSync,300);return;}
-      try{
-        if(!(rcEl&&srcWrap&&ov&&ov.classList.contains('show')))return;
-        var content=buildCleanContent(srcWrap);
-        if(content&&content.childNodes.length){
-          rcEl.innerHTML='';
-          while(content.firstChild)rcEl.appendChild(content.firstChild);
-        }
-      }catch(e){}
+    if(!srcWrap)return;
+    function onMut(){
+      if(PZ.busy){clearTimeout(syncT);syncT=setTimeout(onMut,320);return;}
+      if(ov&&ov.classList.contains('show')){clearTimeout(syncT);syncT=setTimeout(function(){if(!PZ.busy)fitPZ();},120);}
     }
-    try{rotObs=new MutationObserver(function(){clearTimeout(syncT);syncT=setTimeout(doSync,300);});
+    try{rotObs=new MutationObserver(function(){clearTimeout(syncT);syncT=setTimeout(onMut,260);});
       rotObs.observe(srcWrap,{childList:true,subtree:true,characterData:true});}catch(e){}
   }
   function applyPZ(){if(!PZ.stage)return;if(PZ._raf)return;PZ._raf=requestAnimationFrame(function(){PZ._raf=0;if(PZ.stage)PZ.stage.style.transform='translate('+PZ.tx+'px,'+PZ.ty+'px) scale('+PZ.z+')';});}
@@ -8266,8 +8287,11 @@ function renderBottleReport(rep){
   window.rotZoom=function(mult){if(!PZ.stage||!PZ.vp)return;var r=PZ.vp.getBoundingClientRect();zoomAt(r.left+PZ.vp.clientWidth/2,r.top+PZ.vp.clientHeight/2,PZ.z*mult);};
   window.rotZoomReset=function(){fitPZ();};
   function pzDist(t){var dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
+  function isInteractive(t){try{return !!(t&&t.closest&&t.closest('button,input,select,textarea,a,.fg-chip,.fg-card,.sp-card,.fg-search,label'));}catch(e){return false;}}
   function bindPZ(el){
     el.addEventListener('touchstart',function(e){
+      /* السماح بنقر الفلاتر/الأزرار/البحث دون تفعيل السحب أو التكبير */
+      if(e.touches.length===1&&isInteractive(e.target)){ts=null;return;}
       PZ.busy=true;clearTimeout(PZ.busyT);window.__rotBusy=true;
       if(e.touches.length===1){ts={m:1,x:e.touches[0].clientX,y:e.touches[0].clientY,tx:PZ.tx,ty:PZ.ty};}
       else if(e.touches.length>=2){ts={m:2,d:pzDist(e.touches),z:PZ.z,cx:(e.touches[0].clientX+e.touches[1].clientX)/2,cy:(e.touches[0].clientY+e.touches[1].clientY)/2};}
@@ -8278,11 +8302,15 @@ function renderBottleReport(rep){
       else if(ts.m===2&&e.touches.length>=2){zoomAt(ts.cx,ts.cy,ts.z*(pzDist(e.touches)/ts.d));}
     },{passive:false});
     el.addEventListener('touchend',function(e){
-      if(e.touches.length===0){ts=null;PZ.busyT=setTimeout(function(){PZ.busy=false;window.__rotBusy=false;},350);var now=Date.now();if(now-lastTap<300&&e.changedTouches.length){var t=e.changedTouches[0];if(PZ.z>1.02){fitPZ();}else{zoomAt(t.clientX,t.clientY,2.2);}}lastTap=now;}
+      if(e.touches.length===0){var hadGesture=!!ts;ts=null;PZ.busyT=setTimeout(function(){PZ.busy=false;window.__rotBusy=false;},350);
+        /* النقر المزدوج للتكبير — فقط إذا لم يكن على عنصر تفاعلي */
+        if(hadGesture&&!isInteractive(e.target)){var now=Date.now();if(now-lastTap<300&&e.changedTouches.length){var t=e.changedTouches[0];if(PZ.z>1.02){fitPZ();}else{zoomAt(t.clientX,t.clientY,2.2);}}lastTap=now;}
+      }
       else if(e.touches.length===1){ts={m:1,x:e.touches[0].clientX,y:e.touches[0].clientY,tx:PZ.tx,ty:PZ.ty};}
     },{passive:false});
   }
-  function closeOv(){exitLandscape();try{if(rotObs)rotObs.disconnect();}catch(e){}if(ov)ov.classList.remove('show');if(closeBtn)closeBtn.classList.remove('show');try{document.body.style.overflow='';}catch(e){}}
+  function closeOv(){exitLandscape();try{if(rotObs)rotObs.disconnect();}catch(e){}restoreWrap();if(ov)ov.classList.remove('show');if(closeBtn)closeBtn.classList.remove('show');if(inner)inner.innerHTML='';PZ.stage=null;try{document.body.style.overflow='';}catch(e){}}
+  window.__rotRestore=restoreWrap;window.__rotOpen=openOv;
   function refresh(){if(isMobile()&&curKey())showFab();else{hideFab();closeOv();}}
   function onInteract(){if(isMobile()&&curKey()){if(!fab||!fab.classList.contains('show'))showFab();else poke();}}
   function hookGo(){if(typeof window.go==='function'){var o=window.go;window.go=function(){var r=o.apply(this,arguments);setTimeout(refresh,40);return r;};}}
@@ -8931,8 +8959,9 @@ function renderBottleReport(rep){
   }
   function switchReport(dir){
     var p=step(REPS,curPage(),dir);if(!p)return;
+    try{if(window.__rotRestore)window.__rotRestore();}catch(e){}
     goTo(p);
-    setTimeout(function(){clickEl('.rot-fab');setTimeout(injectOvBar,60);},110);
+    setTimeout(function(){clickEl('.rot-fab');setTimeout(injectOvBar,60);},120);
   }
 
   function ovOpen(){var ov=document.querySelector('.rot-ov');return !!(ov&&ov.classList.contains('show'));}
