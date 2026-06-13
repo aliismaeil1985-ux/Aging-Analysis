@@ -8496,17 +8496,22 @@ function renderBottleReport(rep){
   #page-dash .topbar{grid-area:top !important;margin-bottom:2px !important}
   #page-dash .kpis{grid-area:kpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important}
   #page-dash .kpis .kpi{width:auto !important;min-width:0 !important;max-width:none !important}
-  #page-dash .custom-kpis{grid-area:ckpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important}
+  #page-dash .custom-kpis{grid-area:ckpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important}
   #page-dash .kpis.custom-kpis:empty{display:none !important}
   #page-dash .main{display:contents !important}
-  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important}
+  /* عمود السلايسر بنفس ارتفاع عمود البطاقات الأربع تقريباً (4 بطاقات × 132 + 3 فواصل × 12) */
+  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:564px !important;max-height:564px !important}
   #page-dash .main>div:last-child{grid-area:charts !important;min-width:0 !important}
   #page-dash .foot{grid-area:foot !important}
   /* إخفاء زر «New card» في نسخة الجوال */
   #page-dash .kpi-add{display:none !important}
+  /* محاذاة عمود السلايسر مع عمود البطاقات: كل صندوق فلتر يبدأ من الأعلى وقائمته تتمرّر داخلياً
+     بحيث ينتهي العمود تقريباً عند نهاية البطاقات الأربع */
+  #page-dash .side .fbox{flex:1 1 0 !important;min-height:0 !important;display:flex !important;flex-direction:column !important;overflow:hidden !important}
+  #page-dash .side .fbox>div:last-child{flex:1 1 auto !important;min-height:0 !important;max-height:none !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
 
   /* ---------- KPI cards — premium ---------- */
-  .kpi{padding:16px 15px !important;min-height:118px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
+  .kpi{padding:17px 16px !important;min-height:132px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
   .kpi::before{width:100% !important;height:4px !important;inset-inline-start:0 !important;top:0 !important;bottom:auto !important;opacity:.95}
   .kpi .row{align-items:center !important;gap:10px !important}
   .kpi .ic{width:40px !important;height:40px !important;border-radius:13px !important;font-size:19px !important;box-shadow:0 6px 16px rgba(20,60,120,.18) !important}
@@ -8515,7 +8520,7 @@ function renderBottleReport(rep){
   .t-90 .ic{background:linear-gradient(135deg,#3f8ee0,#2563b8) !important}
   .t-g90 .ic{background:linear-gradient(135deg,#f08a3e,#d8651f) !important}
   .kpi h3{font-size:10.5px !important;letter-spacing:.6px !important;color:#8a97a9 !important;line-height:1.25 !important;margin:0 !important}
-  .kpi .v{font-size:25px !important;font-weight:800 !important;letter-spacing:-.6px !important;margin-top:10px !important;color:#13233d !important}
+  .kpi .v{font-size:27px !important;font-weight:800 !important;letter-spacing:-.6px !important;margin-top:10px !important;color:#13233d !important}
   .kpi .pill{margin-top:8px !important;font-size:10.5px !important;padding:3px 9px !important;border-radius:999px !important;align-self:flex-start !important}
   .kpi .ktrend{font-size:10px !important;margin-top:4px !important;color:#9aa6b6 !important}
   .kpi .bar{height:5px !important;border-radius:99px !important;margin-top:auto !important;background:#eef2f8 !important}
@@ -8587,18 +8592,20 @@ function renderBottleReport(rep){
 
 @media (max-width:640px){
   .content{padding:64px 12px 26px !important}
-  #page-dash .kpis{gap:10px !important}
-  .kpi{min-height:112px !important;padding:14px 13px !important}
-  .kpi .v{font-size:23px !important}
+  #page-dash .kpis{gap:12px !important}
+  .kpi{min-height:126px !important;padding:15px 14px !important}
+  .kpi .v{font-size:25px !important}
+  #page-dash .side{height:540px !important;max-height:540px !important}
   .htext h1{font-size:16.5px !important}
   .chartbox{height:288px !important}
 }
 
 @media (max-width:430px){
-  #page-dash .kpis .kpi{min-height:106px !important}
-  .kpi{min-height:106px !important}
+  #page-dash .kpis .kpi{min-height:118px !important}
+  .kpi{min-height:118px !important}
+  #page-dash .side{height:510px !important;max-height:510px !important}
   .kpi .ic{width:36px !important;height:36px !important;font-size:17px !important}
-  .kpi .v{font-size:21px !important}
+  .kpi .v{font-size:23px !important}
   .chartbox{height:264px !important}
   #page-dash .classify-card .cl-pie{height:165px !important}
 }
