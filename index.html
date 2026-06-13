@@ -7098,7 +7098,7 @@ function drPush(){
     var json=JSON.stringify(getDR()||{});
     if(json===_lastDRJson)return;_lastDRJson=json;
     if(_drPushT)clearTimeout(_drPushT);
-    _drPushT=setTimeout(function(){try{fbDB.collection(FB_COL).doc('daily_reports').set({data:JSON.parse(json),updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}},500);
+    _drPushT=setTimeout(function(){try{fbDB.collection(FB_COL).doc('daily_reports').set({json:json,updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}},500);
   }catch(e){}
 }
 function drSync(){
@@ -7106,10 +7106,10 @@ function drSync(){
     if(!fbReady||!fbDB)return;
     if(fbDRUnsub){fbDRUnsub();fbDRUnsub=null;}
     fbDRUnsub=fbDB.collection(FB_COL).doc('daily_reports').onSnapshot({includeMetadataChanges:false},function(doc){
-      if(!doc.exists){_drCloudReady=true;var loc=getDR();if(loc&&Object.keys(loc).length){_lastDRJson=JSON.stringify(loc);try{fbDB.collection(FB_COL).doc('daily_reports').set({data:loc,updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}}return;}
+      if(!doc.exists){_drCloudReady=true;var loc=getDR();if(loc&&Object.keys(loc).length){_lastDRJson=JSON.stringify(loc);try{fbDB.collection(FB_COL).doc('daily_reports').set({json:JSON.stringify(loc),updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}}return;}
       if(doc.metadata&&doc.metadata.hasPendingWrites)return;
-      var dd=doc.data();if(!dd||!dd.data)return;
-      var data=dd.data;
+      var dd=doc.data();if(!dd||(!dd.data&&!dd.json))return;
+      var data=(dd.json?JSON.parse(dd.json):dd.data);
       if(data&&(!data.space||!data.space.groups||!data.space.groups.length)&&DEFAULT_DAILY_REPORTS.space&&DEFAULT_DAILY_REPORTS.space.groups){data.space=DEFAULT_DAILY_REPORTS.space;}
       if(data&&(!data.bottle||!data.bottle.spec)&&DEFAULT_DAILY_REPORTS.bottle&&DEFAULT_DAILY_REPORTS.bottle.spec){data.bottle=DEFAULT_DAILY_REPORTS.bottle;}
       var json=JSON.stringify(data);_lastDRJson=json;_drCloudReady=true;
@@ -8282,7 +8282,7 @@ function renderBottleReport(rep){
     try{ if(!ready()||typeof getDR!=='function')return false;
       var d=getDR()||{}; if(!d||!Object.keys(d).length)return false;
       var cid=(typeof FB_CLIENT_ID!=='undefined')?FB_CLIENT_ID:'';
-      fbDB.collection(FB_COL).doc('daily_reports').set({data:d,updatedAt:Date.now(),clientId:cid});
+      fbDB.collection(FB_COL).doc('daily_reports').set({json:JSON.stringify(d),updatedAt:Date.now(),clientId:cid});
       return true;
     }catch(e){return false;}
   }
@@ -8341,7 +8341,7 @@ function renderBottleReport(rep){
     c.innerHTML='';
     f.db.collection(f.col).doc('daily_reports').get().then(function(doc){
       if(!doc.exists){c.appendChild(line('daily_reports','MISSING','#c0392b'));return;}
-      var dd=doc.data()||{},data=dd.data||{};
+      var dd=doc.data()||{},data=(dd.json?JSON.parse(dd.json):(dd.data||{}));
       c.appendChild(line('daily_reports updated',dd.updatedAt?new Date(dd.updatedAt).toLocaleString():'-'));
       keys.forEach(function(k){c.appendChild(line('cloud '+k,rowsOf(data[k]),rowsOf(data[k])?'#0f9b8e':'#c0392b'));});
     }).catch(function(e){c.appendChild(line('daily_reports error',(e&&e.message)||e,'#c0392b'));});
@@ -8355,7 +8355,7 @@ function renderBottleReport(rep){
     var d=getDRsafe(); var n=Object.keys(d).length;
     if(!n){setMsg(ar()?'لا توجد تقارير محلية لدفعها على هذا الجهاز':'No local reports on this device to push','#c0392b');return;}
     setMsg(ar()?'جارٍ الدفع…':'Pushing…','#2f7ed8');
-    f.db.collection(f.col).doc('daily_reports').set({data:d,updatedAt:Date.now(),clientId:f.cid})
+    f.db.collection(f.col).doc('daily_reports').set({json:JSON.stringify(d),updatedAt:Date.now(),clientId:f.cid})
       .then(function(){ setMsg((ar()?'✅ تم الدفع بنجاح — حدّث الجوال الآن. صفوف: ':'✅ Pushed OK — reload mobile now. rows: ')+'space '+rowsOf(d.space)+', fgbal '+rowsOf(d.fgbal)+', oldid '+rowsOf(d.oldid)+', transit '+rowsOf(d.transit),'#0f9b8e'); refreshCloud(); })
       .catch(function(e){ setMsg((ar()?'❌ فشل الدفع: ':'❌ Push failed: ')+((e&&e.message)||e),'#c0392b'); });
   }
@@ -8364,7 +8364,7 @@ function renderBottleReport(rep){
     setMsg(ar()?'جارٍ التحميل من السحابة…':'Loading from cloud…','#2f7ed8');
     f.db.collection(f.col).doc('daily_reports').get().then(function(doc){
       if(!doc.exists){setMsg(ar()?'لا توجد تقارير في السحابة بعد — ادفعها من سطح المكتب أولاً':'No reports in cloud yet — push from desktop first','#c0392b');return;}
-      var data=(doc.data()||{}).data||{};
+      var _d=doc.data()||{};var data=(_d.json?JSON.parse(_d.json):(_d.data||{}));
       try{if(typeof saveDR==='function')saveDR(data);}catch(e){}
       try{var cur=(typeof currentReportKey==='function')?currentReportKey():null; if(cur&&typeof renderDailyReport==='function')renderDailyReport(cur); if(typeof renderUploadStatus==='function')renderUploadStatus(); if(typeof updateHomeDates==='function')updateHomeDates();}catch(e){}
       setMsg((ar()?'✅ تم التحميل — انتقل للتقارير. صفوف: ':'✅ Loaded — open the reports. rows: ')+'fgbal '+rowsOf(data.fgbal)+', oldid '+rowsOf(data.oldid)+', transit '+rowsOf(data.transit),'#0f9b8e');
@@ -8716,19 +8716,19 @@ function renderBottleReport(rep){
   function rowsCount(o){if(!o||typeof o!=='object')return 0;if(o.rows&&o.rows.length!=null)return o.rows.length;if(o.groups&&o.groups.length!=null)return o.groups.reduce(function(a,g){return a+((g&&g.rows&&g.rows.length)||0);},0);return 0;}
   /* reliable, auth-aware push (replaces the fragile guarded drPush) */
   var _pt=null;
-  window.drPush=function(){ if(!ready()||!authed())return; if(_pt)clearTimeout(_pt); _pt=setTimeout(function(){ try{var d=(typeof getDR==='function'?getDR():{})||{}; if(Object.keys(d).length)fbDB.collection(FB_COL).doc('daily_reports').set({data:d,updatedAt:Date.now(),clientId:cid()});}catch(e){} },500); };
+  window.drPush=function(){ if(!ready()||!authed())return; if(_pt)clearTimeout(_pt); _pt=setTimeout(function(){ try{var d=(typeof getDR==='function'?getDR():{})||{}; if(Object.keys(d).length)fbDB.collection(FB_COL).doc('daily_reports').set({json:JSON.stringify(d),updatedAt:Date.now(),clientId:cid()});}catch(e){} },500); };
   /* one-time post-auth reconcile: keep the RICHER of local vs cloud per report (no data loss) */
   var done=false;
   function reconcile(){
     if(done||!ready()||!authed()||typeof getDR!=='function')return; done=true;
     fbDB.collection(FB_COL).doc('daily_reports').get().then(function(doc){
-      var cloud=doc.exists?((doc.data()||{}).data||{}):{};
+      var cloud=doc.exists?(function(){var _d=doc.data()||{};return _d.json?JSON.parse(_d.json):(_d.data||{});})():{};
       var local=getDR()||{}; var keys={};
       Object.keys(local).forEach(function(k){keys[k]=1;}); Object.keys(cloud).forEach(function(k){keys[k]=1;});
       var merged={},changedUp=false;
       Object.keys(keys).forEach(function(k){var l=local[k],c=cloud[k],lr=rowsCount(l),cr=rowsCount(c);if(lr>=cr){merged[k]=l;if(lr>cr)changedUp=true;}else{merged[k]=c;}});
       try{saveDR(merged);_drCloudReady=true;}catch(e){}
-      if(changedUp){try{fbDB.collection(FB_COL).doc('daily_reports').set({data:merged,updatedAt:Date.now(),clientId:cid()});}catch(e){}}
+      if(changedUp){try{fbDB.collection(FB_COL).doc('daily_reports').set({json:JSON.stringify(merged),updatedAt:Date.now(),clientId:cid()});}catch(e){}}
       try{['space','fgbal','oldid','transit','bottle'].forEach(function(k){if(typeof renderDailyReport==='function')renderDailyReport(k);});}catch(e){}
       try{if(typeof renderUploadStatus==='function')renderUploadStatus();if(typeof updateHomeDates==='function')updateHomeDates();}catch(e){}
     }).catch(function(){done=false;});
