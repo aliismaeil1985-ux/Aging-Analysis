@@ -857,22 +857,25 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 @media screen and (max-width:1200px){.cyl{max-width:50px}.cyl-row{gap:14px}}
 @media screen and (max-width:860px){
   .sp-charts{grid-template-columns:1fr;gap:22px}
-  /* الأنابيب في صف واحد دائماً مع تمرير أفقي عند الحاجة (لا تكسير ولا تزاحم) */
-  .cyl-row{gap:10px;height:170px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:0 6px 6px;scroll-snap-type:x proximity}
-  .cyl-row::-webkit-scrollbar{height:6px}
-  .cyl-row::-webkit-scrollbar-thumb{background:#bcd0e8;border-radius:6px}
-  .cyl-item{flex:0 0 auto;width:52px;max-width:52px;scroll-snap-align:center}
-  .cyl{max-width:48px;height:150px;border-radius:24px/15px}
-  .cyl-pct{font-size:12.5px}
-  .cyl-lbl{font-size:9.5px}
-  /* المصانع: تبقى في المنتصف بدون تمرير (عددها قليل) */
-  .sp-chart-fac .cyl-row{justify-content:center;overflow-x:visible}
-  .sp-chart-fac .cyl-item{width:64px;max-width:64px}
+  /* الأنابيب: صف واحد دائماً — تتقلّص لتملأ العرض المتاح بلا تمرير ولا التفاف */
+  .cyl-row{gap:6px;height:168px;flex-wrap:nowrap;justify-content:space-between;overflow:visible;padding:0 2px}
+  .cyl-item{flex:1 1 0;min-width:0;width:auto;max-width:none}
+  .cyl{width:100%;max-width:100%;height:148px;border-radius:22px/14px}
+  .cyl-pct{font-size:12px}
+  .cyl-lbl{font-size:9px;margin-top:8px}
+  .cyl-code{font-size:8px;margin-top:2px}
+  .cyl:after{left:20%;width:5px}
+  /* المصانع: أنبوبان فقط — في المنتصف بحجم مريح */
+  .sp-chart-fac .cyl-row{justify-content:center;gap:26px}
+  .sp-chart-fac .cyl-item{flex:0 0 auto;width:64px;max-width:64px}
 }
 @media screen and (max-width:480px){
-  .cyl-item{width:46px;max-width:46px}
-  .cyl{max-width:42px;height:140px}
-  .cyl-row{gap:8px;height:160px}
+  .cyl-row{gap:4px;height:150px}
+  .cyl{height:132px;border-radius:18px/12px}
+  .cyl-pct{font-size:10.5px}
+  .cyl-lbl{font-size:8px}
+  .cyl-code{display:none}
+  .sp-chart-fac .cyl-item{width:56px;max-width:56px}
 }
 /* ===== FG Balance: single-row slicers + elegant global search ===== */
 .fg-bar{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
@@ -1346,6 +1349,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 .sp-act-tbl .act-code{font-size:11px;color:var(--muted);display:block}
 .sp-act-tbl input.num{width:110px;padding:5px 9px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-weight:700;color:var(--navy);text-align:end;background:#fff}
 .sp-act-tbl input.num:focus{outline:2px solid var(--blue);outline-offset:-1px}
+.sp-act-tbl input.num.sp-po,.sp-act-tbl input.num.sp-ly{width:78px}
 .sp-act-tbl .act-del{border:none;background:none;color:#e05050;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:6px;font-weight:700}
 .sp-act-tbl .act-del:hover{background:#fee2e2}
 .sp-act-add{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
@@ -2627,15 +2631,17 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
       <div class="card" style="padding:16px">
         <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7">عدّل المساحة الفعلية (m²)، حجم البلت (m²)، وطاقة التخزين (كرتون) لكل مستودع. التغييرات تُزامَن وتُؤثر فوراً على شاشة Space. يمكنك إضافة مستودعات جديدة أو حذف غير المستخدمة.</p>
         <div class="sp-formula-bar" id="sp-formula-bar-main">
-          <label class="sp-fx-sw" title="عند التفعيل: تُحسب الطاقة (كرتون) تلقائياً من المساحة بالمتر">
+          <label class="sp-fx-sw" title="عند التفعيل: تُحسب الطاقة (كرتون/شرنك) تلقائياً بالمعادلة">
             <input type="checkbox" id="sp-qty-auto-main" onchange="spActSetQtyMode(this.checked)">
             <span>ربط الطاقة بالمساحة · Link capacity to area</span>
           </label>
-          <span class="sp-fx-eq">الطاقة (كرتون) = المساحة (m²) ÷
-            <input type="number" id="sp-m2pc-main" class="sp-fx-num" min="0.0001" step="0.0001" value="0.0125" onchange="spActSetM2PerCarton(this.value)" title="m² لكل كرتون">
-            <small>m² / كرتون</small>
+          <span class="sp-fx-eq">الطاقة (كرتون/شرنك) = المساحة (m²) ÷ مساحة البلت الواحد
+            <input type="number" id="sp-palone-main" class="sp-fx-num" min="0.01" step="0.01" value="1.2" onchange="spActSetPalOne(this.value)" title="مساحة البلت الواحد m² (افتراضي عام)">
+            <small>m²</small>
+            × عدد الرصّات
+            <input type="number" id="sp-layers-main" class="sp-fx-num" min="1" step="1" value="8" onchange="spActSetLayers(this.value)" title="عدد الرصّات (افتراضي عام)">
           </span>
-          <button class="btn-soft sm" type="button" onclick="spActApplyFormulaAll()" title="إعادة حساب الطاقة لكل المستودعات من المساحة">♻️ تطبيق على الكل</button>
+          <button class="btn-soft sm" type="button" onclick="spActApplyFormulaAll()" title="إعادة حساب الطاقة لكل المستودعات بالمعادلة">♻️ تطبيق على الكل</button>
         </div>
         <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px">
           <table class="sp-act-tbl"><thead><tr>
@@ -2644,6 +2650,8 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
             <th>النوع · Type</th>
             <th>المساحة الفعلية (m²)</th>
             <th>حجم البلت (m²)</th>
+            <th>مساحة البلت الواحد (m²)</th>
+            <th>عدد الرصّات</th>
             <th>الطاقة (كرتون)</th>
             <th></th>
           </tr></thead>
@@ -2671,6 +2679,8 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
               <th>نوع · Type</th>
               <th>المساحة الفعلية (m²)</th>
               <th>حجم البلت (m²)</th>
+              <th>مساحة البلت الواحد (m²)</th>
+              <th>عدد الرصّات</th>
               <th>الطاقة (كرتون)</th>
               <th></th>
             </tr></thead>
@@ -5427,6 +5437,39 @@ function recomputeSpacePercentages(rep){
     }
     /* مزامنة المصفوفة المسطّحة */
     var flat=[];g.forEach(function(gr){flat=flat.concat(gr.rows);});rep.rows=flat;
+    /* المساحة الفارغة → Enough Carton Storage = (المساحة الفارغة ÷ مساحة البلت الواحد) × عدد الرصّات
+       تُستخدم مصفوفات المعامل المخزّنة (spPalOne/spLayers)؛ وإلا fallback نسبي. */
+    try{
+      var eg=g[3];
+      if(eg&&eg.rows&&eg.rows.length>=3){
+        var emptyRow=eg.rows[0], enoughRow=eg.rows[eg.rows.length-1];
+        var actRow=g[0].rows[0]; /* Actual spaces (M2) */
+        var po=rep.spPalOne||null, ly=rep.spLayers||null;
+        if(emptyRow&&enoughRow){
+          var B0=(rep.branches||SPACE_BRANCHES||[]).length;
+          var F0=(rep.factories||SPACE_FACT||[]).length;
+          var totIdx=B0+1, grandIdx=enoughRow.length-1;
+          var sumBr=0,sumFac=0;
+          for(var ec=1;ec<emptyRow.length;ec++){
+            if(ec===totIdx||ec===grandIdx)continue; /* تُحسب كمجموع لاحقاً */
+            var em=num(emptyRow[ec]);
+            var val;
+            if(po&&ly&&num(po[ec])>0&&num(ly[ec])>0){
+              val=Math.round(em/num(po[ec])*num(ly[ec]));
+            }else{
+              var a=num(actRow?actRow[ec]:0),q=num(qtyRow[ec]);
+              val=(a>0)?Math.round(em*q/a):0;
+            }
+            enoughRow[ec]=val;
+            if(ec>=1&&ec<totIdx)sumBr+=val; else if(ec>totIdx&&ec<grandIdx)sumFac+=val;
+          }
+          if(totIdx<enoughRow.length)enoughRow[totIdx]=sumBr;
+          if(grandIdx>0)enoughRow[grandIdx]=sumBr+sumFac;
+          /* أعد بناء المصفوفة المسطّحة */
+          var flat2=[];g.forEach(function(gr){flat2=flat2.concat(gr.rows);});rep.rows=flat2;
+        }
+      }
+    }catch(e){}
     /* نِسب الأنابيب = رصيد% + ترانزيت% ، حسب أعمدة الفروع ثم المصانع */
     var B=rep.branches||SPACE_BRANCHES||[],F=rep.factories||SPACE_FACT||[];
     var bPct=[],fPct=[];
@@ -6566,23 +6609,28 @@ function renderSpaceAvgTable(){
 }
 
 /* ===== ⑥ Space Actuals Editor ===== */
-/* معادلة الطاقة (للمستقبل): إن فُعّل الربط، الطاقة (كرتون) = المساحة (m²) ÷ m²-لكل-كرتون.
+/* معادلة الطاقة الجديدة:
+     الطاقة (كرتون/شرنك) = المساحة التخزينية (m²) ÷ مساحة البلت الواحد (m²) × عدد الرصّات
+   وتُطبّق نفس المعادلة على المساحة الفارغة → Enough Carton Storage.
+   حقلان جديدان لكل مستودع: palOne (مساحة البلت الواحد m²) و layers (عدد الرصّات).
    الربط مُطفأ افتراضياً للحفاظ على الأرقام المُدخلة يدوياً حتى يختار المستخدم تفعيله. */
-var SP_M2PC_DEFAULT=0.0125; /* m² لكل كرتون (≈ 80 كرتون/m²) — قابل للتعديل من الشاشة */
+var SP_PALONE_DEFAULT=1.2;   /* مساحة البلت الواحد m² (افتراضي) */
+var SP_LAYERS_DEFAULT=8;     /* عدد الرصّات الافتراضي */
+var SP_M2PC_DEFAULT=0.0125;  /* (قديم) m² لكل كرتون — يبقى للتوافق فقط */
 var SPACE_ACT_DEFAULTS={
-  qtyMode:'manual', m2PerCarton:SP_M2PC_DEFAULT,
+  qtyMode:'manual', palOne:SP_PALONE_DEFAULT, layers:SP_LAYERS_DEFAULT,
   branches:[
-    {name:'Kharj Store',code:'1051-1062',m2:5227,pal:6272.4,qty:407706},
-    {name:'Riyadh',code:'1151',m2:3009,pal:4212.6,qty:387559.2},
-    {name:'Heat',code:'1160',m2:2250,pal:3150,qty:289800},
-    {name:'Dammam',code:'1251',m2:1960,pal:2744,qty:207564},
-    {name:'Al Ahsa',code:'1401',m2:180,pal:216,qty:19062},
-    {name:'Jeddah',code:'1356',m2:520,pal:624,qty:66976},
-    {name:'Qassim',code:'1701',m2:457,pal:639.8,qty:48396.3}
+    {name:'Kharj Store',code:'1051-1062',m2:5227,pal:6272.4,palOne:1.2,layers:78,qty:407706},
+    {name:'Riyadh',code:'1151',m2:3009,pal:4212.6,palOne:1.2,layers:129,qty:387559.2},
+    {name:'Heat',code:'1160',m2:2250,pal:3150,palOne:1.2,layers:129,qty:289800},
+    {name:'Dammam',code:'1251',m2:1960,pal:2744,palOne:1.2,layers:106,qty:207564},
+    {name:'Al Ahsa',code:'1401',m2:180,pal:216,palOne:1.2,layers:106,qty:19062},
+    {name:'Jeddah',code:'1356',m2:520,pal:624,palOne:1.2,layers:129,qty:66976},
+    {name:'Qassim',code:'1701',m2:457,pal:639.8,palOne:1.2,layers:106,qty:48396.3}
   ],
   factories:[
-    {name:'Jeddah Factory',code:'1301',m2:4808,pal:4808,qty:451952},
-    {name:'Kharj Factory',code:'1001',m2:850,pal:680,qty:100000}
+    {name:'Jeddah Factory',code:'1301',m2:4808,pal:4808,palOne:1.2,layers:94,qty:451952},
+    {name:'Kharj Factory',code:'1001',m2:850,pal:680,palOne:1.2,layers:118,qty:100000}
   ]
 };
 function getSpaceActuals(){
@@ -6592,11 +6640,18 @@ function getSpaceActuals(){
   else a=JSON.parse(JSON.stringify(SPACE_ACT_DEFAULTS));
   /* ضمان وجود حقول المعادلة على البيانات القديمة */
   if(a.qtyMode!=='auto')a.qtyMode='manual';
-  if(!(typeof a.m2PerCarton==='number'&&a.m2PerCarton>0))a.m2PerCarton=SP_M2PC_DEFAULT;
+  if(!(typeof a.palOne==='number'&&a.palOne>0))a.palOne=SP_PALONE_DEFAULT;
+  if(!(typeof a.layers==='number'&&a.layers>0))a.layers=SP_LAYERS_DEFAULT;
+  /* تعبئة الحقول الجديدة لكل صف إن كانت ناقصة (بيانات قديمة) */
+  function fillRow(r){if(!(typeof r.palOne==='number'&&r.palOne>0))r.palOne=a.palOne;if(!(typeof r.layers==='number'&&r.layers>0))r.layers=a.layers;}
+  (a.branches||[]).forEach(fillRow);(a.factories||[]).forEach(fillRow);
   return a;
 }
-/* الطاقة المحسوبة من المساحة: round(m² ÷ m²-لكل-كرتون) */
-function spCalcQty(m2,m2pc){m2=parseFloat(m2)||0;m2pc=parseFloat(m2pc)||0;return m2pc>0?Math.round(m2/m2pc):0;}
+/* الطاقة المحسوبة: round( المساحة ÷ مساحة البلت الواحد × عدد الرصّات ) */
+function spCalcQty(m2,palOne,layers){
+  m2=parseFloat(m2)||0;palOne=parseFloat(palOne)||0;layers=parseFloat(layers)||0;
+  return (palOne>0&&layers>0)?Math.round(m2/palOne*layers):0;
+}
 function saveSpaceActuals(act){
   var s=getDR();s.space_actuals=act;saveDR(s);_drCloudReady=true;
   try{drPush();}catch(e){}
@@ -6612,14 +6667,16 @@ function _spApplyActuals(act){
   SPACE_BRANCHES=B;SPACE_BCODES=BC;SPACE_FACT=F;SPACE_FCODES=FC;
   SPACE_HEADERS=['Metric'].concat(B,['Total'],F,['Grand Total']);
   SPACE_NB=B.length;
-  var actM2=[],palV=[],qtyR=[];
-  act.branches.forEach(function(r){actM2.push(r.m2||0);palV.push(r.pal||0);qtyR.push(r.qty||0);});
+  var actM2=[],palV=[],qtyR=[],palOneA=[],layersA=[];
+  act.branches.forEach(function(r){actM2.push(r.m2||0);palV.push(r.pal||0);qtyR.push(r.qty||0);palOneA.push(r.palOne||act.palOne||SP_PALONE_DEFAULT);layersA.push(r.layers||act.layers||SP_LAYERS_DEFAULT);});
   var totM2=actM2.reduce(function(s,v){return s+v;},0);
   var totPal=palV.reduce(function(s,v){return s+v;},0);
   var totQty=qtyR.reduce(function(s,v){return s+v;},0);
   var factM2=act.factories.map(function(r){return r.m2||0;});
   var factPal=act.factories.map(function(r){return r.pal||0;});
   var factQty=act.factories.map(function(r){return r.qty||0;});
+  var factPalOne=act.factories.map(function(r){return r.palOne||act.palOne||SP_PALONE_DEFAULT;});
+  var factLayers=act.factories.map(function(r){return r.layers||act.layers||SP_LAYERS_DEFAULT;});
   var grandM2=totM2+factM2.reduce(function(s,v){return s+v;},0);
   var grandPal=totPal+factPal.reduce(function(s,v){return s+v;},0);
   var grandQty=totQty+factQty.reduce(function(s,v){return s+v;},0);
@@ -6629,6 +6686,10 @@ function _spApplyActuals(act){
   var actRow=mkRow('Actual spaces  (M2)',actM2,totM2,factM2,grandM2);
   var palRow=mkRow('Pallet Volume',palV,totPal,factPal,grandPal);
   var qtyRow_=mkRow('Actual space enough Qty for carton',qtyR,totQty,factQty,grandQty);
+  /* مصفوفات معامل المعادلة بمحاذاة أعمدة الصفوف (الفهرس 0 = عمود التسمية):
+     [label، فروع...، Total، مصانع...، Grand Total] */
+  var palOneCols=[0].concat(palOneA,[0],factPalOne,[0]);
+  var layersCols=[0].concat(layersA,[0],factLayers,[0]);
   /* حفظ الصفوف الأولى الثلاثة في DEFAULT_DAILY_REPORTS.space بحيث يقرأها decorateSpaceRep */
   var sp=DEFAULT_DAILY_REPORTS.space;
   if(sp&&sp.groups&&sp.groups[0]){
@@ -6637,6 +6698,8 @@ function _spApplyActuals(act){
     var flat=[];sp.groups.forEach(function(g){flat=flat.concat(g.rows);});sp.rows=flat;
     sp.headers=SPACE_HEADERS;
     sp.branches=B;sp.branchCodes=BC;sp.factories=F;sp.factoryCodes=FC;
+    sp.spPalOne=palOneCols;sp.spLayers=layersCols;
+    sp.qtyMode=act.qtyMode;
   }
   /* إعادة رسم الشاشة */
   try{renderDailyReport('space');}catch(e){}
@@ -6644,14 +6707,15 @@ function _spApplyActuals(act){
 function renderSpaceActuals(){
   var wrap=document.getElementById('sp-act-tbody');if(!wrap)return;
   var act=getSpaceActuals();
-  var auto=(act.qtyMode==='auto'),m2pc=act.m2PerCarton||SP_M2PC_DEFAULT;
+  var auto=(act.qtyMode==='auto');
   /* مزامنة حالة شريط المعادلة */
-  spSyncFormulaBar(auto,m2pc);
+  spSyncFormulaBar(auto,act.palOne,act.layers);
   var html='';
   function rowHtml(r,idx,type){
-    var qVal=auto?spCalcQty(r.m2,m2pc):(r.qty||'');
+    var po=r.palOne||act.palOne||SP_PALONE_DEFAULT, ly=r.layers||act.layers||SP_LAYERS_DEFAULT;
+    var qVal=auto?spCalcQty(r.m2,po,ly):(r.qty||'');
     var qCell=auto
-      ? '<input class="num qty-locked" type="number" data-idx="'+idx+'" data-type="'+type+'" data-fld="qty" value="'+qVal+'" readonly title="محسوبة: المساحة ÷ '+m2pc+' m²/كرتون">'
+      ? '<input class="num qty-locked" type="number" data-idx="'+idx+'" data-type="'+type+'" data-fld="qty" value="'+qVal+'" readonly title="محسوبة: المساحة ÷ مساحة البلت × عدد الرصّات">'
         +'<span class="qty-auto-tag" title="الطاقة محسوبة تلقائياً من المساحة">محسوبة</span>'
       : '<input class="num" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="qty" value="'+(r.qty||'')+'" onchange="spActFieldChange(this)">';
     return '<tr data-idx="'+idx+'" data-type="'+type+'">'
@@ -6660,6 +6724,8 @@ function renderSpaceActuals(){
       +'<td style="font-size:11px;color:var(--muted)">'+(type==='factory'?'مصنع · Factory':'فرع · Branch')+'</td>'
       +'<td><input class="num" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="m2" value="'+(r.m2||'')+'" onchange="spActFieldChange(this)"></td>'
       +'<td><input class="num" type="number" min="0" step="0.1" data-idx="'+idx+'" data-type="'+type+'" data-fld="pal" value="'+(r.pal||'')+'" onchange="spActFieldChange(this)"></td>'
+      +'<td><input class="num sp-po" type="number" min="0" step="0.01" data-idx="'+idx+'" data-type="'+type+'" data-fld="palOne" value="'+(r.palOne||'')+'" onchange="spActFieldChange(this)" title="مساحة البلت الواحد m²"></td>'
+      +'<td><input class="num sp-ly" type="number" min="0" step="1" data-idx="'+idx+'" data-type="'+type+'" data-fld="layers" value="'+(r.layers||'')+'" onchange="spActFieldChange(this)" title="عدد الرصّات"></td>'
       +'<td>'+qCell+'</td>'
       +'<td><button class="act-del" title="حذف هذا المستودع" onclick="spActDelete('+idx+',\''+type+'\')">&#x1F5D1;</button></td>'
       +'</tr>';
@@ -6669,43 +6735,52 @@ function renderSpaceActuals(){
   wrap.innerHTML=html;
 }
 /* مزامنة عناصر شريط المعادلة في الجدولين (الرئيسي والثانوي) */
-function spSyncFormulaBar(auto,m2pc){
+function spSyncFormulaBar(auto,palOne,layers){
   ['sp-qty-auto-main','sp-qty-auto'].forEach(function(id){var e=document.getElementById(id);if(e)e.checked=!!auto;});
-  ['sp-m2pc-main','sp-m2pc'].forEach(function(id){var e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=m2pc;});
+  ['sp-palone-main','sp-palone'].forEach(function(id){var e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=palOne;});
+  ['sp-layers-main','sp-layers'].forEach(function(id){var e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=layers;});
+}
+function _spRecalcAll(a){
+  if(a.qtyMode!=='auto')return;
+  function f(r){var po=r.palOne||a.palOne||SP_PALONE_DEFAULT,ly=r.layers||a.layers||SP_LAYERS_DEFAULT;r.qty=spCalcQty(r.m2,po,ly);}
+  a.branches.forEach(f);a.factories.forEach(f);
 }
 /* تفعيل/إلغاء ربط الطاقة بالمساحة */
 function spActSetQtyMode(on){
   if(!_spActPending)_spActLoad();
   _spActPending.qtyMode=on?'auto':'manual';
-  if(on){var m2pc=_spActPending.m2PerCarton||SP_M2PC_DEFAULT;
-    _spActPending.branches.forEach(function(r){r.qty=spCalcQty(r.m2,m2pc);});
-    _spActPending.factories.forEach(function(r){r.qty=spCalcQty(r.m2,m2pc);});
-  }
+  if(on)_spRecalcAll(_spActPending);
   renderSpaceActualsMain();
   var msg=document.getElementById('sp-act-msg-main')||document.getElementById('sp-act-msg');
   if(msg)msg.innerHTML='<span style="color:#15803d">'+(on?'✓ تم ربط الطاقة بالمساحة — اضغط «حفظ وتطبيق».':'تم فكّ الربط — يمكنك تعديل الطاقة يدوياً. اضغط «حفظ وتطبيق».')+'</span>';
 }
-/* تغيير معامل m² لكل كرتون */
-function spActSetM2PerCarton(val){
+/* القيم الافتراضية العامة (مساحة البلت الواحد / عدد الرصّات) */
+function spActSetPalOne(val){
   if(!_spActPending)_spActLoad();
   var v=parseFloat(val);if(!(v>0)){renderSpaceActualsMain();return;}
-  _spActPending.m2PerCarton=v;
-  if(_spActPending.qtyMode==='auto'){
-    _spActPending.branches.forEach(function(r){r.qty=spCalcQty(r.m2,v);});
-    _spActPending.factories.forEach(function(r){r.qty=spCalcQty(r.m2,v);});
-  }
-  renderSpaceActualsMain();
+  _spActPending.palOne=v;
+  _spActPending.branches.forEach(function(r){if(!(r.palOne>0))r.palOne=v;});
+  _spActPending.factories.forEach(function(r){if(!(r.palOne>0))r.palOne=v;});
+  _spRecalcAll(_spActPending);renderSpaceActualsMain();
 }
-/* إعادة حساب الطاقة لكل المستودعات من المساحة (يدوياً) ويفعّل الربط */
+function spActSetLayers(val){
+  if(!_spActPending)_spActLoad();
+  var v=parseFloat(val);if(!(v>0)){renderSpaceActualsMain();return;}
+  _spActPending.layers=v;
+  _spActPending.branches.forEach(function(r){if(!(r.layers>0))r.layers=v;});
+  _spActPending.factories.forEach(function(r){if(!(r.layers>0))r.layers=v;});
+  _spRecalcAll(_spActPending);renderSpaceActualsMain();
+}
+/* تطبيق المعادلة على الكل: يفرض القيم العامة على جميع الصفوف ويفعّل الربط */
 function spActApplyFormulaAll(){
   if(!_spActPending)_spActLoad();
-  var v=parseFloat(_spActPending.m2PerCarton)||SP_M2PC_DEFAULT;
-  _spActPending.qtyMode='auto';_spActPending.m2PerCarton=v;
-  _spActPending.branches.forEach(function(r){r.qty=spCalcQty(r.m2,v);});
-  _spActPending.factories.forEach(function(r){r.qty=spCalcQty(r.m2,v);});
+  var po=parseFloat(_spActPending.palOne)||SP_PALONE_DEFAULT, ly=parseFloat(_spActPending.layers)||SP_LAYERS_DEFAULT;
+  _spActPending.qtyMode='auto';_spActPending.palOne=po;_spActPending.layers=ly;
+  _spActPending.branches.forEach(function(r){r.palOne=po;r.layers=ly;r.qty=spCalcQty(r.m2,po,ly);});
+  _spActPending.factories.forEach(function(r){r.palOne=po;r.layers=ly;r.qty=spCalcQty(r.m2,po,ly);});
   renderSpaceActualsMain();
   var msg=document.getElementById('sp-act-msg-main')||document.getElementById('sp-act-msg');
-  if(msg)msg.innerHTML='<span style="color:#15803d">✓ أُعيد حساب الطاقة لكل المستودعات — اضغط «حفظ وتطبيق».</span>';
+  if(msg)msg.innerHTML='<span style="color:#15803d">✓ أُعيد حساب الطاقة لكل المستودعات بالمعادلة — اضغط «حفظ وتطبيق».</span>';
 }
 var _spActPending=JSON.parse(JSON.stringify(SPACE_ACT_DEFAULTS));
 function _spActLoad(){_spActPending=getSpaceActuals();}
@@ -6715,11 +6790,15 @@ function spActFieldChange(input){
   if(!_spActPending)_spActLoad();
   var arr=type==='factory'?_spActPending.factories:_spActPending.branches;
   if(!arr[idx])return;
-  var auto=(_spActPending.qtyMode==='auto'),m2pc=_spActPending.m2PerCarton||SP_M2PC_DEFAULT;
+  var auto=(_spActPending.qtyMode==='auto');
   if(fld==='qty'&&auto)return; /* الطاقة مقفلة (محسوبة) عند الربط */
   arr[idx][fld]=v;
-  /* عند الربط: تعديل المساحة يُعيد حساب الطاقة فوراً */
-  if(fld==='m2'&&auto){arr[idx].qty=spCalcQty(v,m2pc);renderSpaceActualsMain();}
+  /* عند الربط: تعديل المساحة أو مساحة البلت أو عدد الرصّات يُعيد حساب الطاقة فوراً */
+  if(auto&&(fld==='m2'||fld==='palOne'||fld==='layers')){
+    var r=arr[idx];
+    var po=r.palOne||_spActPending.palOne||SP_PALONE_DEFAULT, ly=r.layers||_spActPending.layers||SP_LAYERS_DEFAULT;
+    r.qty=spCalcQty(r.m2,po,ly);renderSpaceActualsMain();
+  }
 }
 function spActDelete(idx,type){
   if(!_spActPending)_spActLoad();
@@ -6735,8 +6814,8 @@ function spActAddRow(){
   var m2=parseFloat((document.getElementById('sp-act-new-m2')||{}).value)||0;
   if(!name.trim()){var msg=document.getElementById('sp-act-msg');if(msg)msg.innerHTML='<span style="color:var(--orange)">أدخل اسم المستودع.</span>';return;}
   if(!_spActPending)_spActLoad();
-  var _m2pc=_spActPending.m2PerCarton||SP_M2PC_DEFAULT;
-  var row={name:name.trim(),code:code.trim(),m2:m2,pal:Math.round(m2*1.2*10)/10,qty:spCalcQty(m2,_m2pc)};
+  var _po=_spActPending.palOne||SP_PALONE_DEFAULT, _ly=_spActPending.layers||SP_LAYERS_DEFAULT;
+  var row={name:name.trim(),code:code.trim(),m2:m2,pal:Math.round(m2*1.2*10)/10,palOne:_po,layers:_ly,qty:spCalcQty(m2,_po,_ly)};
   if(type==='factory')_spActPending.factories.push(row);else _spActPending.branches.push(row);
   ['sp-act-new-name','sp-act-new-code','sp-act-new-m2'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   renderSpaceActuals();
@@ -6759,13 +6838,14 @@ function spActReset(){
 }
 function exportSpaceActuals(){
   var act=getSpaceActuals();
-  var aoa=[['Type','Name','Code','Actual_m2','Pallet_m2','Qty_enough']];
-  act.branches.forEach(function(r){aoa.push(['branch',r.name,r.code||'',r.m2||0,r.pal||0,r.qty||0]);});
-  act.factories.forEach(function(r){aoa.push(['factory',r.name,r.code||'',r.m2||0,r.pal||0,r.qty||0]);});
+  var aoa=[['Type','Name','Code','Actual_m2','Pallet_m2','Pallet_one_m2','Layers','Qty_enough']];
+  function row(t,r){return [t,r.name,r.code||'',r.m2||0,r.pal||0,r.palOne||act.palOne||SP_PALONE_DEFAULT,r.layers||act.layers||SP_LAYERS_DEFAULT,r.qty||0];}
+  act.branches.forEach(function(r){aoa.push(row('branch',r));});
+  act.factories.forEach(function(r){aoa.push(row('factory',r));});
   aoa.push([]);
-  aoa.push(['Capacity formula',(act.qtyMode==='auto'?'AUTO (linked)':'MANUAL'),'Qty_enough = Actual_m2 / m2_per_carton','m2_per_carton',act.m2PerCarton||SP_M2PC_DEFAULT]);
+  aoa.push(['Capacity formula',(act.qtyMode==='auto'?'AUTO (linked)':'MANUAL'),'Qty = Actual_m2 / Pallet_one_m2 × Layers','default_pallet_one',act.palOne||SP_PALONE_DEFAULT,'default_layers',act.layers||SP_LAYERS_DEFAULT]);
   var wb=XLSX.utils.book_new();
-  var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:14},{wch:20},{wch:12},{wch:14},{wch:14},{wch:14}];
+  var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:14},{wch:20},{wch:12},{wch:13},{wch:13},{wch:14},{wch:10},{wch:14}];
   XLSX.utils.book_append_sheet(wb,ws,'Space Actuals');
   XLSX.writeFile(wb,'Space_Actuals.xlsx');
 }
@@ -6998,8 +7078,8 @@ function spActAddRowMain(){
   var msgEl=document.getElementById('sp-act-msg-main');
   if(!name){if(msgEl)msgEl.innerHTML='<span style="color:var(--orange)">\u0623\u062f\u062e\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639.</span>';return;}
   if(!_spActPending)_spActLoad();
-  var _m2pcM=_spActPending.m2PerCarton||SP_M2PC_DEFAULT;
-  var row={name:name,code:code,m2:m2,pal:Math.round(m2*1.2*10)/10,qty:spCalcQty(m2,_m2pcM)};
+  var _poM=_spActPending.palOne||SP_PALONE_DEFAULT, _lyM=_spActPending.layers||SP_LAYERS_DEFAULT;
+  var row={name:name,code:code,m2:m2,pal:Math.round(m2*1.2*10)/10,palOne:_poM,layers:_lyM,qty:spCalcQty(m2,_poM,_lyM)};
   if(type==='factory')_spActPending.factories.push(row);else _spActPending.branches.push(row);
   ['sp-act-new-name-main','sp-act-new-code-main','sp-act-new-m2-main'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   renderSpaceActualsMain();
