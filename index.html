@@ -8523,5 +8523,241 @@ function renderBottleReport(rep){
 })();
 </script>
 
+<!-- ===================================================================
+     COLUMN-LABEL EDITOR — rename Brand / Size / Category / Pack across
+     all reports & tables. Editor lives on the Master Data page.
+     =================================================================== -->
+<style id="colalias-css">
+#colalias-card{margin-bottom:16px}
+.ca-table{width:100%;border-collapse:collapse;margin-top:8px}
+.ca-table th,.ca-table td{padding:8px 10px;border-bottom:1px solid var(--line,#eef2f7);text-align:start;font-size:13px}
+.ca-table th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted,#7c8aa0)}
+.ca-table td input{width:100%;padding:8px 10px;border:1px solid var(--line,#e2e8f0);border-radius:9px;font-size:13px;font-family:inherit}
+.ca-orig{font-weight:800;color:#1e4e8c;white-space:nowrap}
+.ca-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+</style>
+<script id="colalias-js">
+(function(){
+  'use strict';
+  function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function store(){try{return (typeof LS!=='undefined'&&LS)?LS:window.localStorage;}catch(e){return null;}}
+  var CANON=['Brand','Size','Category','Pack'];
+  var CANON_AR={Brand:'العلامة (Brand)',Size:'الحجم (Size)',Category:'الفئة (Category)',Pack:'الشد (Pack)'};
+  var ALIAS={};
+  function load(){try{ALIAS=JSON.parse(store().getItem('col_alias_v1')||'{}')||{};}catch(e){ALIAS={};}}
+  function save(){try{store().setItem('col_alias_v1',JSON.stringify(ALIAS));}catch(e){}
+    /* best-effort cloud sync via the settings push if available */
+    try{if(typeof pushSettingsToCloud==='function'){}}catch(e){} }
+  function aliasFor(name){var a=ALIAS[name];return (a&&String(a).trim())?String(a).trim():name;}
+
+  /* apply aliases to every plain-text table header matching a canonical name */
+  function apply(){
+    try{
+      load();
+      var ths=document.querySelectorAll('th'); 
+      for(var i=0;i<ths.length;i++){
+        var th=ths[i];
+        if(th.children&&th.children.length)continue;           /* skip headers with code <small> etc. */
+        var orig=th.getAttribute('data-colorig');
+        var cur=(th.textContent||'').trim();
+        var base=orig||(CANON.indexOf(cur)>=0?cur:null);
+        if(!base)continue;
+        if(!orig)th.setAttribute('data-colorig',base);
+        var want=aliasFor(base);
+        if(cur!==want)th.textContent=want;
+      }
+    }catch(e){}
+  }
+
+  function injectEditor(){
+    var page=document.getElementById('page-masterdata'); if(!page)return;
+    var wrap=page.querySelector('.wrap'); if(!wrap)return;
+    if(document.getElementById('colalias-card'))return;
+    var a=ar();
+    var card=document.createElement('div'); card.className='card'; card.id='colalias-card';
+    var html='<h2 class="sec-h"><span>✏️</span> <span>'+(a?'تعديل مسميات الأعمدة':'Edit column labels')+'</span></h2>'
+      +'<p style="font-size:12px;color:var(--muted,#7c8aa0);margin:2px 0 6px">'+(a?'غيّر الاسم الظاهر لهذه الأعمدة في كل التقارير والجداول. اتركه فارغاً للاسم الافتراضي.':'Rename these columns across all reports & tables. Leave blank for default.')+'</p>'
+      +'<table class="ca-table"><thead><tr><th>'+(a?'العمود':'Column')+'</th><th>'+(a?'الاسم المخصّص':'Custom label')+'</th></tr></thead><tbody>';
+    CANON.forEach(function(c){
+      html+='<tr><td class="ca-orig">'+(a?CANON_AR[c]:c)+'</td><td><input type="text" data-ca="'+c+'" value="'+(ALIAS[c]?String(ALIAS[c]).replace(/"/g,'&quot;'):'')+'" placeholder="'+c+'"></td></tr>';
+    });
+    html+='</tbody></table><div class="ca-actions"><button class="btn-primary" id="ca-save">'+(a?'💾 حفظ وتطبيق':'💾 Save & apply')+'</button><button class="btn-soft sm" id="ca-reset">'+(a?'استرجاع الافتراضي':'Reset')+'</button></div>';
+    card.innerHTML=html;
+    wrap.insertBefore(card, wrap.querySelector('.card')||wrap.children[1]||null);
+    card.querySelectorAll('input[data-ca]').forEach(function(inp){
+      inp.addEventListener('input',function(){ ALIAS[this.getAttribute('data-ca')]=this.value; save(); apply(); });
+    });
+    var sv=document.getElementById('ca-save'); if(sv)sv.addEventListener('click',function(){save();apply();try{if(typeof syncToast==='function')syncToast(ar()?'تم حفظ مسميات الأعمدة':'Column labels saved','ok');}catch(e){}});
+    var rs=document.getElementById('ca-reset'); if(rs)rs.addEventListener('click',function(){ALIAS={};save();card.querySelectorAll('input[data-ca]').forEach(function(i){i.value='';});apply();});
+  }
+
+  function start(){ load(); apply(); setInterval(injectEditor,1200); setInterval(apply,900); setTimeout(injectEditor,500); }
+  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+
+<!-- ===================================================================
+     MASTER DATA — item classification override (by Item Code).
+     Edit Brand / Size / Category / Pack per item code; applied (unified)
+     across FG Balance & OLD Identity reports automatically.
+     =================================================================== -->
+<style id="mditems-css">
+#mditems-card .mdi-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+#mditems-card .mdi-search{flex:1 1 200px;padding:9px 12px;border:1px solid var(--line,#e2e8f0);border-radius:10px;font-size:13px;font-family:inherit}
+#mditems-card .mdi-scroll{max-height:440px;overflow:auto;border:1px solid var(--line,#eef2f7);border-radius:12px}
+.mdi-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.mdi-table th,.mdi-table td{padding:6px 8px;border-bottom:1px solid var(--line,#eef2f7);text-align:start;white-space:nowrap}
+.mdi-table thead th{position:sticky;top:0;background:#f6f9fe;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;color:#64748b;z-index:1}
+.mdi-table td.code{font-weight:800;color:#1e4e8c}
+.mdi-table td input{width:120px;padding:5px 7px;border:1px solid #e6edf5;border-radius:7px;font-size:12.5px;font-family:inherit}
+.mdi-table tr.edited td.code{color:#0f9b8e}
+.mdi-empty{padding:24px;text-align:center;color:#94a3b8;font-weight:600}
+</style>
+<script id="mditems-js">
+(function(){
+  'use strict';
+  function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function store(){try{return (typeof LS!=='undefined'&&LS)?LS:window.localStorage;}catch(e){return null;}}
+  var MD={};
+  function load(){try{MD=JSON.parse(store().getItem('md_items_v1')||'{}')||{};}catch(e){MD={};}}
+  function save(){try{store().setItem('md_items_v1',JSON.stringify(MD));}catch(e){}}
+  var FIELDS=['Brand','Size','Category','Pack'];
+  function hidx(h,n){for(var i=0;i<h.length;i++){if(String(h[i]).toLowerCase().trim()===n)return i;}return -1;}
+  function colmap(h){return {code:(hidx(h,'product code')>=0?hidx(h,'product code'):0),Brand:hidx(h,'brand'),Size:hidx(h,'size'),Category:hidx(h,'category'),Pack:hidx(h,'pack')};}
+
+  /* collect unique items (code + current values) from FG Balance + OLD Identity */
+  function collect(){
+    var out={}; var d=(typeof getDR==='function'?getDR():{})||{};
+    ['fgbal','oldid'].forEach(function(k){
+      var rep=d[k]; if(!rep||!rep.rows)return; var cm=colmap(rep.headers||[]);
+      rep.rows.forEach(function(row){
+        var code=String(row[cm.code]==null?'':row[cm.code]).trim(); if(!code||/total|الاجمال|الإجمال/i.test(code))return;
+        if(!out[code])out[code]={code:code,Brand:'',Size:'',Category:'',Pack:''};
+        FIELDS.forEach(function(f){ if(cm[f]>=0 && !out[code][f]){var v=row[cm[f]];out[code][f]=(v==null?'':String(v));} });
+      });
+    });
+    return out;
+  }
+  function effective(code,base){var m=MD[code]||{};var o={};FIELDS.forEach(function(f){o[f]=(m[f]!=null&&m[f]!=='')?m[f]:(base&&base[f])||'';});return o;}
+
+  /* overlay: rewrite report rows' Brand/Size/Category/Pack from MD (non-destructive: rep is a fresh getDR parse) */
+  function overlay(rep){
+    try{ load(); if(!rep||!rep.rows)return; var cm=colmap(rep.headers||[]);
+      rep.rows.forEach(function(row){ var code=String(row[cm.code]==null?'':row[cm.code]).trim(); var m=MD[code]; if(!m)return;
+        FIELDS.forEach(function(f){ if(cm[f]>=0 && m[f]!=null && m[f]!=='')row[cm[f]]=m[f]; }); });
+    }catch(e){}
+  }
+  function hookRender(){
+    if(typeof window.renderRichReport==='function' && !window.renderRichReport.__mdi){
+      var o=window.renderRichReport;
+      window.renderRichReport=function(key,rep){ try{ if(key==='fgbal'||key==='oldid')overlay(rep); }catch(e){} return o.apply(this,arguments); };
+      window.renderRichReport.__mdi=true;
+    }
+  }
+  function rerender(){ try{['fgbal','oldid'].forEach(function(k){if(typeof renderDailyReport==='function')renderDailyReport(k);});}catch(e){} }
+
+  function inject(){
+    var page=document.getElementById('page-masterdata'); if(!page)return;
+    var wrap=page.querySelector('.wrap'); if(!wrap||document.getElementById('mditems-card'))return;
+    var a=ar();
+    var card=document.createElement('div'); card.className='card'; card.id='mditems-card'; card.style.marginBottom='16px';
+    card.innerHTML='<h2 class="sec-h"><span>🗂️</span> <span>'+(a?'بيانات الأصناف (Master Data)':'Item master data')+'</span></h2>'
+      +'<p style="font-size:12px;color:var(--muted,#7c8aa0);margin:2px 0 4px">'+(a?'عدّل Brand / Size / Category / Pack لكل كود صنف — تُوحَّد تلقائياً في تقارير الأرصدة والهوية.':'Edit Brand / Size / Category / Pack per item code — unified across FG Balance & OLD Identity.')+'</p>'
+      +'<div class="mdi-tools"><input class="mdi-search" id="mdi-search" placeholder="'+(a?'بحث بالكود أو الاسم…':'Search code or name…')+'"><span class="dr-meta" id="mdi-count"></span></div>'
+      +'<div class="mdi-scroll"><table class="mdi-table"><thead><tr><th>'+(a?'كود الصنف':'Item Code')+'</th><th>Brand</th><th>Size</th><th>Category</th><th>Pack</th></tr></thead><tbody id="mdi-body"></tbody></table></div>';
+    wrap.insertBefore(card, wrap.querySelector('.card')||null);
+    document.getElementById('mdi-search').addEventListener('input',function(){renderBody(this.value);});
+    renderBody('');
+  }
+  function renderBody(q){
+    var body=document.getElementById('mdi-body'); if(!body)return;
+    load();
+    var base=collect(); var codes=Object.keys(base).sort();
+    q=(q||'').toLowerCase().trim();
+    var shown=0,html='';
+    codes.forEach(function(code){
+      var eff=effective(code,base[code]);
+      var hay=(code+' '+eff.Brand+' '+eff.Size+' '+eff.Category+' '+eff.Pack).toLowerCase();
+      if(q&&hay.indexOf(q)<0)return;
+      shown++;
+      var edited=!!MD[code]&&FIELDS.some(function(f){return MD[code][f];});
+      html+='<tr'+(edited?' class="edited"':'')+'><td class="code">'+esc(code)+'</td>'
+        +FIELDS.map(function(f){return '<td><input data-code="'+esc(code)+'" data-f="'+f+'" value="'+esc(eff[f])+'"></td>';}).join('')
+        +'</tr>';
+    });
+    body.innerHTML=html||'<tr><td colspan="5" class="mdi-empty">'+(ar()?'لا توجد أصناف — ارفع تقرير الأرصدة أولاً.':'No items — upload FG Balance first.')+'</td></tr>';
+    var cnt=document.getElementById('mdi-count'); if(cnt)cnt.textContent=(ar()?'الأصناف: ':'Items: ')+shown;
+    body.querySelectorAll('input[data-code]').forEach(function(inp){
+      inp.addEventListener('change',function(){
+        var code=this.getAttribute('data-code'),f=this.getAttribute('data-f');
+        MD[code]=MD[code]||{}; MD[code][f]=this.value; save(); rerender();
+        var tr=this.closest('tr'); if(tr)tr.classList.add('edited');
+      });
+    });
+  }
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  function start(){ load(); hookRender(); setInterval(inject,1200); setTimeout(inject,500); }
+  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
+  try{window.__mdItemsOverlay=overlay;}catch(e){}
+})();
+</script>
+
+
+<!-- ===================================================================
+     DAILY-REPORTS SYNC (permanent fix) + LABELS CLOUD SYNC
+     =================================================================== -->
+<script id="dailysync-js">
+(function(){
+  'use strict';
+  function ready(){try{return typeof fbReady!=='undefined'&&fbReady&&typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined';}catch(e){return false;}}
+  function authed(){try{return typeof CURRENT_USER!=='undefined'&&!!CURRENT_USER;}catch(e){return false;}}
+  function cid(){return (typeof FB_CLIENT_ID!=='undefined')?FB_CLIENT_ID:'l';}
+  function rowsCount(o){if(!o||typeof o!=='object')return 0;if(o.rows&&o.rows.length!=null)return o.rows.length;if(o.groups&&o.groups.length!=null)return o.groups.reduce(function(a,g){return a+((g&&g.rows&&g.rows.length)||0);},0);return 0;}
+  /* reliable, auth-aware push (replaces the fragile guarded drPush) */
+  var _pt=null;
+  window.drPush=function(){ if(!ready()||!authed())return; if(_pt)clearTimeout(_pt); _pt=setTimeout(function(){ try{var d=(typeof getDR==='function'?getDR():{})||{}; if(Object.keys(d).length)fbDB.collection(FB_COL).doc('daily_reports').set({data:d,updatedAt:Date.now(),clientId:cid()});}catch(e){} },500); };
+  /* one-time post-auth reconcile: keep the RICHER of local vs cloud per report (no data loss) */
+  var done=false;
+  function reconcile(){
+    if(done||!ready()||!authed()||typeof getDR!=='function')return; done=true;
+    fbDB.collection(FB_COL).doc('daily_reports').get().then(function(doc){
+      var cloud=doc.exists?((doc.data()||{}).data||{}):{};
+      var local=getDR()||{}; var keys={};
+      Object.keys(local).forEach(function(k){keys[k]=1;}); Object.keys(cloud).forEach(function(k){keys[k]=1;});
+      var merged={},changedUp=false;
+      Object.keys(keys).forEach(function(k){var l=local[k],c=cloud[k],lr=rowsCount(l),cr=rowsCount(c);if(lr>=cr){merged[k]=l;if(lr>cr)changedUp=true;}else{merged[k]=c;}});
+      try{saveDR(merged);_drCloudReady=true;}catch(e){}
+      if(changedUp){try{fbDB.collection(FB_COL).doc('daily_reports').set({data:merged,updatedAt:Date.now(),clientId:cid()});}catch(e){}}
+      try{['space','fgbal','oldid','transit','bottle'].forEach(function(k){if(typeof renderDailyReport==='function')renderDailyReport(k);});}catch(e){}
+      try{if(typeof renderUploadStatus==='function')renderUploadStatus();if(typeof updateHomeDates==='function')updateHomeDates();}catch(e){}
+    }).catch(function(){done=false;});
+  }
+  setInterval(reconcile,1500);
+})();
+</script>
+<script id="labelsync-js">
+(function(){
+  'use strict';
+  function ready(){try{return typeof fbReady!=='undefined'&&fbReady&&typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined';}catch(e){return false;}}
+  function authed(){try{return typeof CURRENT_USER!=='undefined'&&!!CURRENT_USER;}catch(e){return false;}}
+  function S(){try{return (typeof LS!=='undefined'&&LS)?LS:window.localStorage;}catch(e){return null;}}
+  var cid=(typeof FB_CLIENT_ID!=='undefined'&&FB_CLIENT_ID)?FB_CLIENT_ID:('lbl_'+Math.random().toString(36).slice(2,8));
+  var lastJson='', attached=false, _pt=null;
+  function gather(){ try{return {col_alias:JSON.parse(S().getItem('col_alias_v1')||'{}')||{}, md_items:JSON.parse(S().getItem('md_items_v1')||'{}')||{}};}catch(e){return {col_alias:{},md_items:{}};} }
+  function push(){ if(!ready()||!authed())return; var g=gather(); var json=JSON.stringify(g); if(json===lastJson||json==='{"col_alias":{},"md_items":{}}'&&lastJson==='')return; lastJson=json; if(_pt)clearTimeout(_pt); _pt=setTimeout(function(){ try{fbDB.collection(FB_COL).doc('labels').set({col_alias:g.col_alias,md_items:g.md_items,updatedAt:Date.now(),clientId:cid});}catch(e){} },700); }
+  function attach(){ if(attached||!ready())return; attached=true;
+    try{ fbDB.collection(FB_COL).doc('labels').onSnapshot(function(doc){
+      if(!doc.exists)return; var dd=doc.data()||{}; if(dd.clientId===cid)return;
+      var g={col_alias:dd.col_alias||{},md_items:dd.md_items||{}}; lastJson=JSON.stringify(g);
+      try{S().setItem('col_alias_v1',JSON.stringify(g.col_alias));S().setItem('md_items_v1',JSON.stringify(g.md_items));}catch(e){}
+      /* colalias re-applies on its interval (reloads from LS); refresh reports for md overlay */
+      try{['fgbal','oldid'].forEach(function(k){if(typeof renderDailyReport==='function')renderDailyReport(k);});}catch(e){}
+    },function(){}); }catch(e){}
+  }
+  setInterval(function(){ if(ready()&&authed()){ attach(); push(); } },1600);
+})();
+</script>
+
 </body>
 </html>
