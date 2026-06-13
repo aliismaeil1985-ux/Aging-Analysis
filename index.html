@@ -643,25 +643,30 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   .modal-head{padding:12px 12px}
   .modal-head h3{font-size:15px}
 }
-/* ===== نوافذ التقارير/التفاصيل على الجوال: تُعرض رأسياً مثل سطح المكتب (بدون دوران)،
-   مع تمرير أفقي للجدول داخل النافذة، وبنفس ألوان سطح المكتب (الأزرق/الكحلي). ===== */
+/* ===== عرض نافذة التقرير/التفاصيل أفقياً (دوران 90°) على الجوال في الوضع الرأسي =====
+   عند النقر على أي عمود/دائرة/بطاقة يظهر الجدول المُفلتَر بشكل أفقي ملء الشاشة،
+   بترويسة بدرجات الألوان الكحلي/الأزرق وصف إجمالي بنفس النمط. */
 @media screen and (max-width:900px) and (orientation:portrait){
-  #detail-ov{padding:10px}
+  #detail-ov{padding:0}
   #detail-ov .modal-box{
-    position:relative;top:auto;left:auto;
-    width:96vw;max-width:96vw;height:auto;max-height:90vh;
-    transform:none;border-radius:16px;animation:fade .25s ease;
+    position:fixed;top:50%;left:50%;
+    width:100vh;height:100vw;max-width:100vh;max-height:100vw;
+    transform:translate(-50%,-50%) rotate(90deg);
+    transform-origin:center center;
+    border-radius:0;animation:none;
     display:flex;flex-direction:column;
   }
-  #detail-ov .modal-head{flex:0 0 auto}
   #detail-ov .modal-body{flex:1 1 auto;min-height:0;overflow:auto}
-  #detail-ov .pivot-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #detail-ov .modal-head{flex:0 0 auto}
 
-  .fg-modal-ov{padding:10px !important}
+  .fg-modal-ov{padding:0 !important}
   .fg-modal-ov.show .fg-modal-box{
-    position:relative;top:auto;left:auto;
-    width:96vw !important;max-width:96vw !important;height:auto !important;max-height:90vh !important;
-    transform:none;border-radius:16px !important;animation:fade .25s ease !important;
+    position:fixed;top:50%;left:50%;
+    width:100vh !important;height:100vw !important;
+    max-width:100vh !important;max-height:100vw !important;
+    transform:translate(-50%,-50%) rotate(90deg);
+    transform-origin:center center;
+    border-radius:0 !important;animation:none !important;
     display:flex;flex-direction:column;
   }
   .fg-modal-ov.show .fg-modal-body{flex:1 1 auto;min-height:0;overflow:auto}
@@ -670,6 +675,23 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   .fg-modal-ov.show .fg-dt th,.fg-modal-ov.show .fg-dt td{padding:4px 6px}
   #detail-ov .modal-box .pivot{font-size:11.5px}
   #detail-ov .modal-box .pivot th,#detail-ov .modal-box .pivot td{padding:4px 6px}
+
+  /* ===== تحسين مظهر الترويسة: تدرّج كحلي/أزرق ونص أبيض ===== */
+  #detail-ov .modal-head,.fg-modal-ov.show .fg-modal-head{
+    background:linear-gradient(135deg,#0d2a4e,#1e5398) !important;
+    border-bottom:none !important;padding:14px 18px !important;
+  }
+  #detail-ov .modal-head h3,.fg-modal-ov.show .fg-modal-head h3{color:#fff !important}
+  #detail-ov .modal-head .modal-badge{background:rgba(255,255,255,.18) !important;color:#fff !important}
+  #detail-ov .modal-head .mexcel,.fg-modal-ov.show .fg-modal-head .mexcel{
+    background:rgba(255,255,255,.16) !important;color:#fff !important;border:1px solid rgba(255,255,255,.28) !important;
+  }
+  #detail-ov .modal-head .mclose,.fg-modal-ov.show .fg-modal-head .fg-modal-x{color:#fff !important;opacity:.9}
+
+  /* ===== صف الإجمالي بنفس النمط الكحلي/الأزرق ===== */
+  #detail-ov .pivot tr.grand td,.fg-modal-ov.show .fg-dt tr.grand td,.fg-modal-ov.show .fg-dt tr.fg-grand td{
+    background:linear-gradient(135deg,#0d2a4e,#1e5398) !important;color:#fff !important;font-weight:800 !important;
+  }
 }
 /* ===== Readable, content-sized report table on phones (numbers stay legible) =====
    Columns shrink to their data, wide header/text columns wrap, numbers keep a
