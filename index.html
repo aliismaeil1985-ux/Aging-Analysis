@@ -8125,12 +8125,12 @@ function renderBottleReport(rep){
 @media (min-width:861px){.rot-fab{display:none !important}}
 .rot-ov{position:fixed;inset:0;background:#eef2f8;z-index:9600;display:none}
 .rot-ov.show{display:block}
-.rot-ov-inner{position:absolute;top:50%;left:50%;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 26px;box-sizing:border-box}
+.rot-ov-inner{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 10px 28px;box-sizing:border-box;touch-action:pan-y pinch-zoom}
 .rot-ttl{font-size:15px;font-weight:800;color:#142f57;margin:0 0 12px}
-.rot-card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(16,40,80,.08);padding:8px;margin-bottom:14px;width:100%;overflow:hidden;box-sizing:border-box}
-.rot-card table{border-collapse:collapse;width:100%;min-width:0;table-layout:fixed;font-size:10.5px;background:#fff}
-.rot-card table th,.rot-card table td{padding:3px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
-.rot-card .sp-metric,.rot-card .sp-side,.rot-card td.cat,.rot-card th{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.15}
+.rot-card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(16,40,80,.08);padding:6px;margin-bottom:14px;width:100%;overflow:hidden;box-sizing:border-box}
+.rot-card table{border-collapse:collapse;width:100%;min-width:0;table-layout:fixed;font-size:9px;background:#fff}
+.rot-card table th,.rot-card table td{padding:1px 2px;white-space:nowrap;font-size:8.5px;overflow:visible}
+.rot-card .sp-metric,.rot-card .sp-side,.rot-card td.cat,.rot-card th{white-space:normal;word-break:break-word;line-height:1.1}
 .rot-card.charts{display:block;padding:14px 10px;overflow-x:hidden;overflow-y:visible}
 .rot-card.charts .sp-charts{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;justify-content:center;gap:10px;width:100%;transform-origin:top center}
 .rot-card.charts .sp-chart{flex:0 0 auto;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;gap:8px}
@@ -8169,7 +8169,7 @@ function renderBottleReport(rep){
     var wrap=document.getElementById('rep-'+key+'-wrap');if(!wrap)return;
     inner.innerHTML='';
     var t=document.createElement('div');t.className='rot-ttl';
-    t.textContent=(ar()?TITLES[key][1]:TITLES[key][0])+' — '+(ar()?'عرض أفقي':'landscape');
+    t.textContent=(ar()?TITLES[key][1]:TITLES[key][0])+' — '+(ar()?'قرّب بإصبعين للتكبير':'pinch to zoom');
     inner.appendChild(t);
     var table=wrap.querySelector('.sp-table')||wrap.querySelector('table.fg-table')||wrap.querySelector('table.dr-table')||wrap.querySelector('table.pivot');
     var any=false;
