@@ -1897,6 +1897,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
           <option value="A<60">A&lt;60</option>
           <option value="B<90">B&lt;90</option>
           <option value="C>90">C&gt;90</option>
+          <option value="91to180">91-180 يوم</option>
         </select></div>
     </div>
     <div class="ce-row">
@@ -2262,7 +2263,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:10px 16px;border-radius:12px;margin-bottom:14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:10px">&#127919; منشئ البطاقات — الإصدار v5.8 &middot; إذا رأيت هذا الشريط فالنسخة محدّثة بنجاح</div>
+      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:10px 16px;border-radius:12px;margin-bottom:14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:10px">&#127919; منشئ البطاقات — أنشئ بطاقات مؤشرات مخصّصة وفئات أعمار متعددة</div>
       <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
 
       <div class="cb-layout">
@@ -2286,6 +2287,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
                 <option value="A&lt;60">A&lt;60</option>
                 <option value="B&lt;90">B&lt;90</option>
                 <option value="C&gt;90">C&gt;90</option>
+                <option value="91to180">91-180 يوم</option>
               </select>
             </div>
             <div class="sf"><label data-i18n="cb_f_month">الشهر</label><select id="cbs-month" onchange="cbPreview()"><option value="all" data-i18n="cb_month_all">كل الشهور</option></select></div>
@@ -3100,11 +3102,12 @@ function _cbFillMonths(){
 }
 /* قراءة البطاقة من النموذج */
 function _cbReadForm(){
+  function val(id,dflt){var el=document.getElementById(id);return el?el.value:dflt;}
   return {
-    title:(document.getElementById('cbs-title').value||'').trim(),
-    calc:document.getElementById('cbs-calc').value,
-    cls:document.getElementById('cbs-cls').value,
-    month:document.getElementById('cbs-month').value,
+    title:(val('cbs-title','')||'').trim(),
+    calc:val('cbs-calc','sum'),
+    cls:val('cbs-cls','all'),
+    month:val('cbs-month','all'),
     icon:_cbIcon,color:_cbColor
   };
 }
