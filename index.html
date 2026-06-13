@@ -8127,33 +8127,32 @@ function renderBottleReport(rep){
 .rot-ov.show{display:block}
 .rot-ov-inner{position:absolute;inset:0;overflow:hidden;background:#eef2f8;touch-action:none;box-sizing:border-box}
 .rot-hint{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:9650;font-size:11.5px;font-weight:800;color:#142f57;background:rgba(255,255,255,.85);padding:4px 12px;border-radius:14px;box-shadow:0 2px 8px rgba(10,30,64,.15);pointer-events:none;transition:opacity .6s;opacity:0;white-space:nowrap}
-.rot-stage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;display:inline-block;padding:4px}
-.rot-stage .rot-card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(16,40,80,.10);padding:12px;margin:0 0 14px;display:block;width:-webkit-max-content;width:max-content;box-sizing:border-box}
+.rot-stage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;display:inline-block;padding:6px}
+/* بطاقة بيضاء واحدة تحتوي الجدول فقط — نظيفة ومرتّبة كما في الكمبيوتر */
+.rot-stage .rot-card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(16,40,80,.10);padding:10px;margin:0 0 14px;display:block;width:-webkit-max-content;width:max-content;box-sizing:border-box;border:1px solid #e3eaf4}
 .rot-stage .rot-card:last-child{margin-bottom:0}
-.rot-stage .rot-card table{border-collapse:collapse;background:#fff;width:auto}
-.rot-stage .rot-card table th,.rot-stage .rot-card table td{white-space:nowrap}
-.rot-stage .rot-card.charts{width:980px;padding:14px}
-.rot-stage .rot-card.rot-full{width:-webkit-max-content;width:max-content;min-width:640px;padding:14px}
-.rot-stage .rot-full .fg-top{margin-bottom:10px}
-.rot-stage .rot-full .fg-cards{flex-wrap:wrap !important;overflow:visible !important;padding-bottom:0 !important}
-.rot-stage .rot-full .fg-bar,.rot-stage .rot-full .fg-slicers{overflow:visible !important}
-.rot-stage .rot-full .pivot-wrap,.rot-stage .rot-full .sp-scroll,.rot-stage .rot-full .fg-wrap{overflow:visible !important}
-.rot-stage .rot-full .sp-charts{margin-top:18px}
-.rot-stage .rot-card.charts .sp-charts{width:100%;margin:0;grid-template-columns:2.4fr 1fr !important}
+.rot-stage .rot-tbl{overflow:visible}
+/* الجدول: حدود كاملة ومحاذاة سليمة لكل الأعمدة */
+.rot-stage table.pivot{border-collapse:collapse !important;background:#fff;width:auto !important;min-width:0 !important;table-layout:auto !important}
+.rot-stage table.pivot th,.rot-stage table.pivot td{white-space:nowrap !important;border:1px solid #d7e0ee !important;text-align:center !important;vertical-align:middle !important}
+/* رؤوس بلون الكحلي كما في الكمبيوتر (إلغاء تنسيق الجوال الرمادي) */
+.rot-stage table.pivot thead th{background:linear-gradient(180deg,#23578f,#1a4480) !important;color:#fff !important;border:1px solid #2f63a0 !important;font-size:12px !important;font-weight:700 !important;letter-spacing:normal !important;text-transform:none !important;padding:9px 10px !important;position:static !important;line-height:1.25 !important}
+.rot-stage table.pivot tbody td{font-size:12px !important;padding:7px 10px !important;color:#1e293b !important}
+.rot-stage table.pivot tbody tr:nth-child(even) td{background:#f7faff !important}
+.rot-stage table.pivot td.yr{background:#e9f0fa !important;color:var(--navy) !important;font-weight:800 !important;font-size:13.5px !important}
+.rot-stage table.pivot td.mo{background:#f5f9fe !important;color:#334155 !important;font-weight:700 !important}
+.rot-stage table.pivot td.zero{color:#cbd5e1 !important}
+.rot-stage table.pivot td.cat,.rot-stage table.pivot td.idc{text-align:start !important;font-weight:700 !important;color:#1e293b !important}
+.rot-stage table.pivot td.tot{font-weight:800 !important;color:#15406f !important}
+.rot-stage table.pivot td.pct{color:#64748b !important;font-weight:700 !important}
+/* رؤوس الإجمالي والترانزيت بلونها المميّز (FG table) */
+.rot-stage table.pivot th.fg-toth{background:#163f73 !important;color:#fff !important;font-weight:800 !important}
+.rot-stage table.pivot th.fg-trth{background:#e0792f !important;color:#fff !important}
+.rot-stage table.pivot tr.grand td{background:#eaf1fb !important;font-weight:800 !important;color:#15406f !important}
+.rot-stage table.pivot .fg-vsep{border:0 !important;background:transparent !important;width:8px !important;min-width:8px !important;padding:0 !important}
 .rot-empty{padding:34px 18px;text-align:center;color:#94a3b8;font-weight:700;line-height:1.8}
 .rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,40,70,.92);color:#fff;font-size:19px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .rot-ov-close.show{display:flex}
-/* داخل نافذة التدوير: استعادة ألوان جداول الكمبيوتر (إلغاء إعادة تنسيق الجوال الرمادية) */
-.rot-stage .pivot th{background:linear-gradient(180deg,#23578f,#1a4480) !important;color:#fff !important;border:1px solid #2f63a0 !important;font-size:12.5px !important;font-weight:700 !important;letter-spacing:normal !important;text-transform:none !important;padding:10px 8px !important}
-.rot-stage .pivot td{font-size:12.5px !important;padding:7px 9px !important}
-.rot-stage .pivot td.yr{background:#e9f0fa !important;color:var(--navy) !important;font-weight:800 !important;font-size:15px !important}
-.rot-stage .pivot td.mo{background:#f5f9fe !important;color:#334155 !important}
-.rot-stage .pivot td.zero{color:#cbd5e1 !important}
-.rot-stage .pivot tbody tr:nth-child(even) td{background:transparent !important}
-.rot-stage .pivot td.yr:first-child,.rot-stage .pivot td:first-child{background:#e9f0fa !important}
-/* جداول المساحات/الأرصدة/القارورة: حشوة تطابق الكمبيوتر */
-.rot-stage .fg-table th,.rot-stage .fg-table td,.rot-stage .sp-table th,.rot-stage .sp-table td,.rot-stage .bt-table th,.rot-stage .bt-table td{padding:5px 8px !important}
-.rot-stage .fg-table th.fg-trth{background:#e0792f !important;color:#fff !important}
 </style>
 <script id="rot-js">
 (function(){
@@ -8198,13 +8197,31 @@ function renderBottleReport(rep){
       if(ef&&(document.fullscreenElement||document.webkitFullscreenElement))ef.call(document);}catch(e){}
   }
   function showHint(){if(!hint)return;hint.textContent=ar()?'+/− أو إصبعان للتكبير · اسحب للتحريك':'+/- or two fingers to zoom · drag to pan';hint.style.opacity='.92';clearTimeout(hintT);hintT=setTimeout(function(){hint.style.opacity='0';},3500);}
+  /* يبني محتوى نظيفاً لنافذة التدوير: الجدول فقط (بدون البطاقات أو أزرار الفلترة
+     التي كانت تُكدّس التخطيط وتظهر غير مرتبة). نُعيد بناء الجدول كما هو في الكمبيوتر. */
+  function buildCleanContent(wrap){
+    var frag=document.createElement('div');
+    var tables=wrap.querySelectorAll('table.pivot');
+    if(!tables.length)return null;
+    tables.forEach(function(tbl){
+      var card=document.createElement('div');card.className='rot-card';
+      var holder=document.createElement('div');holder.className='rot-tbl';
+      var clone=tbl.cloneNode(true);
+      /* إزالة السمات التفاعلية التي لا تعمل داخل النسخة (onclick على الصفوف/الخلايا) */
+      clone.querySelectorAll('[onclick]').forEach(function(e){e.removeAttribute('onclick');e.style.cursor='default';});
+      clone.removeAttribute('id');
+      clone.querySelectorAll('[id]').forEach(function(e){e.removeAttribute('id');});
+      holder.appendChild(clone);card.appendChild(holder);frag.appendChild(card);
+    });
+    return frag;
+  }
   function openOv(){
     build();var key=curKey();if(!key)return;
     var wrap=document.getElementById('rep-'+key+'-wrap');if(!wrap)return;
     inner.innerHTML='';
     var stage=document.createElement('div');stage.className='rot-stage';
-    var has=!!(wrap&&wrap.innerHTML&&wrap.innerHTML.trim().length>0);
-    if(has){var rc=document.createElement('div');rc.className='rot-card rot-full';rc.innerHTML=wrap.innerHTML;stage.appendChild(rc);rcEl=rc;}
+    var content=buildCleanContent(wrap);
+    if(content&&content.childNodes.length){stage.appendChild(content);rcEl=stage;}
     else{var e=document.createElement('div');e.className='rot-empty';e.textContent=ar()?'لا توجد بيانات لعرضها — تأكد من رفع/مزامنة التقرير.':'No data to show — make sure the report is uploaded/synced.';stage.appendChild(e);rcEl=null;}
     inner.appendChild(stage);
     srcWrap=wrap;bindLiveSync();
@@ -8217,11 +8234,18 @@ function renderBottleReport(rep){
     try{if(rotObs)rotObs.disconnect();}catch(e){}
     if(!rcEl||!srcWrap)return;
     function doSync(){
-      /* لا نعيد بناء الجدول أثناء لمس/تكبير المستخدم — هذا كان سبب توقّف الشاشة أثناء التدوير */
+      /* لا نعيد البناء أثناء لمس/تكبير المستخدم — كان سبب توقّف الشاشة أثناء التدوير */
       if(PZ.busy){clearTimeout(syncT);syncT=setTimeout(doSync,300);return;}
-      try{if(rcEl&&srcWrap&&ov&&ov.classList.contains('show'))rcEl.innerHTML=srcWrap.innerHTML;}catch(e){}
+      try{
+        if(!(rcEl&&srcWrap&&ov&&ov.classList.contains('show')))return;
+        var content=buildCleanContent(srcWrap);
+        if(content&&content.childNodes.length){
+          rcEl.innerHTML='';
+          while(content.firstChild)rcEl.appendChild(content.firstChild);
+        }
+      }catch(e){}
     }
-    try{rotObs=new MutationObserver(function(){clearTimeout(syncT);syncT=setTimeout(doSync,260);});
+    try{rotObs=new MutationObserver(function(){clearTimeout(syncT);syncT=setTimeout(doSync,300);});
       rotObs.observe(srcWrap,{childList:true,subtree:true,characterData:true});}catch(e){}
   }
   function applyPZ(){if(!PZ.stage)return;if(PZ._raf)return;PZ._raf=requestAnimationFrame(function(){PZ._raf=0;if(PZ.stage)PZ.stage.style.transform='translate('+PZ.tx+'px,'+PZ.ty+'px) scale('+PZ.z+')';});}
