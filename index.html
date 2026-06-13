@@ -701,6 +701,23 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   #detail-ov .pivot thead th:first-child,.fg-modal-ov.show .fg-dt thead th:first-child{
     background:linear-gradient(180deg,#23578f,#1a4480) !important;color:#fff !important;
   }
+
+  /* ===== تقرير Summary: عرض الجدول أفقياً (دوران 90°) على الجوال، أسفل شريط الفلاتر ===== */
+  #page-sum .sum-table-card{
+    position:fixed;left:50%;top:calc(50% + 46px);
+    width:calc(100vh - 96px);height:100vw;max-width:none;max-height:100vw;
+    transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;
+    margin:0 !important;padding:0 !important;border-radius:0 !important;z-index:30;
+    background:#fff;box-shadow:0 0 36px rgba(8,22,44,.28);
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  #page-sum .sum-table-card .pivot-wrap{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;border-radius:0}
+  #page-sum .sum-table-card .pivot{min-width:0;width:auto;font-size:12px}
+  #page-sum .sum-table-card .pivot th{background:linear-gradient(180deg,#23578f,#1a4480) !important;color:#fff !important;border-color:#2f63a0 !important;padding:6px 7px;font-size:11px;white-space:nowrap;text-transform:none !important;letter-spacing:0 !important;position:sticky;top:0}
+  #page-sum .sum-table-card .pivot td{padding:5px 7px;font-size:12px;white-space:nowrap}
+  #page-sum .sum-table-card .pivot tr.grand td{background:linear-gradient(135deg,#0d2a4e,#1e5398) !important;color:#fff !important;font-weight:800 !important}
+  /* إخفاء الرسوم أسفل جدول Summary أثناء العرض الأفقي لتفادي التداخل */
+  #page-sum .grid{display:none !important}
 }
 /* ===== Readable, content-sized report table on phones (numbers stay legible) =====
    Columns shrink to their data, wide header/text columns wrap, numbers keep a
@@ -2174,7 +2191,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
         <div class="colmenu admin-only"><button class="btn-cols" onclick="toggleColMenu('sum')">&#9881;&#65039; <span data-i18n="cols_btn">Columns</span></button><div class="colmenu-pop" id="colpop-sum"></div></div>
         <span class="sf-count" id="sum-count"></span>
       </div>
-      <div class="card"><div class="pivot-wrap" id="pivot-wrap"></div></div>
+      <div class="card sum-table-card" id="sum-table-card"><div class="pivot-wrap" id="pivot-wrap"></div></div>
       <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px">
         <div class="card"><div class="ch"><span class="acc" style="background:var(--teal)"></span><h5 data-i18n="ch_brand">Inventory by Category (Brand)</h5></div><div class="chartbox"><canvas id="s_brand"></canvas></div></div>
         <div class="card"><div class="ch"><span class="acc" style="background:var(--teal)"></span><h5 data-i18n="ch_monthly">Monthly Totals</h5></div><div class="chartbox"><canvas id="s_month"></canvas></div></div>
@@ -8552,7 +8569,7 @@ function renderBottleReport(rep){
   /* ---------- Dashboard: عمودان متحاذيان (البطاقات الأربع | السلايسر) ثم الرسوم بعرض كامل ---------- */
   #page-dash .wrap{display:grid !important;grid-template-columns:1fr 1fr !important;grid-template-areas:"top top" "kpis side" "ckpis ckpis" "charts charts" "foot foot" !important;gap:12px !important;align-items:start !important}
   #page-dash .topbar{grid-area:top !important;margin-bottom:2px !important}
-  #page-dash .kpis{grid-area:kpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important;margin-top:-22px !important}
+  #page-dash .kpis{grid-area:kpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important}
   #page-dash .side{align-self:start !important}
   #page-dash .kpis .kpi{width:auto !important;min-width:0 !important;max-width:none !important}
   #page-dash .custom-kpis{grid-area:ckpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important}
