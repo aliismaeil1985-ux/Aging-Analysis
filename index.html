@@ -7920,15 +7920,16 @@ function renderBottleReport(rep){
       if(typeof firebase==='undefined'||!firebase.auth)return false;
       if(typeof fbApp==='undefined'||!fbApp)return false;
       _auth=firebase.auth(fbApp);
-      /* تثبيت الجلسة محلياً (تبقى بعد تحديث الصفحة) — يجب ضبطها قبل مراقبة حالة الدخول.
-         ننتظر اكتمال setPersistence ثم نربط المراقب حتى يُستعاد المستخدم المحفوظ بشكل موثوق،
-         مع ربط احتياطي في حال فشل/تأخّر الوعد. */
-      var bound=false;
+      /* أمان: استخدام استمرارية الجلسة SESSION بدل LOCAL —
+         • تبقى الجلسة بعد «تحديث الصفحة» (نفس التبويب) فلا يُعاد طلب الدخول.
+         • تُمسح تلقائياً عند إغلاق المتصفح/التبويب، فيُطلب الدخول عند فتح النظام من جديد.
+         • تسجيل الخروج يمسحها أيضاً.
+         يجب ضبطها قبل مراقبة حالة الدخول، وننتظر اكتمال الوعد ثم نربط المراقب،
+         مع ربط احتياطي عند أي تأخّر/فشل. */
       try{
-        var pr=_auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        var pr=_auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
         if(pr&&pr.then){
           pr.then(function(){_bindAuthListener();}).catch(function(){_bindAuthListener();});
-          /* احتياط: لو لم يُحسم الوعد سريعاً، اربط المراقب بعد مهلة قصيرة */
           setTimeout(_bindAuthListener,800);
         }else{_bindAuthListener();}
       }catch(e){_bindAuthListener();}
