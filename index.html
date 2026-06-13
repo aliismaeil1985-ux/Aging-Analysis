@@ -4703,33 +4703,13 @@ function addUser(){
 function delUser(i){let us=getUsers()||[];if(!us[i])return;if(CURRENT_USER&&us[i].u===CURRENT_USER.u)return;us.splice(i,1);saveUsers(us);renderUsers();}
 function initAuth(){
   seedUsers();
-  /* ===== استعادة الجلسة عند التحديث ===== */
-  var _restored=false;
-  try{
-    var _sess=sessionStorage.getItem('dash_session');
-    if(_sess){
-      var _su=JSON.parse(_sess);
-      if(_su&&_su.u){
-        /* التحقق من وجود المستخدم لا يزال في قائمة المستخدمين */
-        var _users=getUsers()||[];
-        var _fnd=_users.find(function(x){return x.u===_su.u;});
-        if(_fnd){
-          CURRENT_USER={u:_fnd.u,r:_fnd.r,perms:_fnd.perms||['dash','sum','sku']};
-          var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';
-          applyRole();
-          /* استعادة الصفحة الأخيرة */
-          var _lastP=LS.getItem('dr_last_page')||'home';
-          go(_lastP);
-          _restored=true;
-        }
-      }
-    }
-  }catch(e){}
-  if(!_restored){
-    try{sessionStorage.removeItem('dash_session');LS.removeItem('dash_session');}catch(e){}
-    var ov2=document.getElementById('login-ov');if(ov2)ov2.style.display='flex';
-    var lu=document.getElementById('login-user');if(lu)setTimeout(function(){try{lu.focus();}catch(e){}},60);
-  }
+  /* أمان: لا يوجد دخول تلقائي محلي إطلاقاً.
+     المصادقة الوحيدة المعتمدة هي Firebase (onAuthChanged). نمسح أي جلسة محلية قديمة
+     ونُظهر شاشة الدخول دائماً، ثم يقرر Firebase ما إذا كانت هناك جلسة صالحة (بعد تحديث الصفحة فقط). */
+  try{sessionStorage.removeItem('dash_session');LS.removeItem('dash_session');}catch(e){}
+  CURRENT_USER=null;
+  var ov2=document.getElementById('login-ov');if(ov2)ov2.style.display='flex';
+  var lu=document.getElementById('login-user');if(lu)setTimeout(function(){try{lu.focus();}catch(e){}},60);
 }
 /* ===== FIREBASE CLOUD SYNC ===== */
 /* ==================================================================================
@@ -6667,31 +6647,78 @@ function saveSpaceActuals(act){
    • تُضاف القيمة 0 للصفوف الموجودة حتى لا تُفقد بيانات.
    • يشمل: القالب DR_TEMPLATES، النسخة الافتراضية DEFAULT_DAILY_REPORTS، والبيانات المرفوعة getDR(). */
 function _spSyncReportColumns(act){
-  var names=[];
-  (act.branches||[]).forEach(function(r){if(r&&r.name)names.push(String(r.name).trim());});
-  (act.factories||[]).forEach(function(r){if(r&&r.name)names.push(String(r.name).trim());});
-  if(!names.length)return;
+  /* تطبيع قوي لاسم المستودع لاكتشاف التكرار رغم اختلاف التهجئة:
+     يزيل الكلمات الزائدة (factory/store/branch/مصنع/مستودع/فرع) والبادئة al-،
+     ويوحّد المتغيرات الإملائية الشائعة (heet=heat، qasim=qassim ...). */
+  function norm(s){
+    var x=String(s||'').toLowerCase();
+    x=x.replace(/[\u0660-\u0669]/g,function(d){return d.charCodeAt(0)-0x0660;}); /* أرقام عربية */
+    x=x.replace(/[^a-z0-9\u0600-\u06ff]+/g,' ');           /* رموز -> مسافة */
+    /* احتفظ بتمييز «مصنع» لأن مستودع الفرع قد يحمل نفس الاسم الأساسي للمصنع
+       (مثال: Jeddah Factory مقابل Jeddah، Kharj Factory مقابل Kharj Store) */
+    var isFac=/\b(factory|مصنع)\b/.test(x);
+    x=x.replace(/\b(factory|store|stores|warehouse|branch|cust|packing|مصنع|مستودع|مخزن|فرع|فروع)\b/g,' ');
+    x=x.replace(/\bal\s*/g,' ').replace(/\s+/g,' ').trim();
+    var map={'heet':'heat','qasim':'qassim','quassim':'qassim','reyadh':'riyadh','ryad':'riyadh','riyad':'riyadh','jedah':'jeddah','jiddah':'jeddah','damam':'dammam','ahsaa':'ahsa','alahsa':'ahsa','kharij':'kharj','elkharj':'kharj'};
+    x=x.split(' ').map(function(w){return map[w]||w;}).join(' ').trim();
+    return (isFac?'fac:':'br:')+x;
+  }
+  /* قائمة المستودعات الواردة، منزوعة التكرار حسب الكود ثم حسب الاسم المطبّع */
+  var seenCode={}, seenNorm={}, wh=[];
+  function pushWh(r){
+    if(!r||!r.name)return;
+    var nm=String(r.name).trim(), code=String(r.code||'').trim();
+    if(code){ if(seenCode[code])return; seenCode[code]=1; }
+    var nz=norm(nm); if(nz&&seenNorm[nz])return; if(nz)seenNorm[nz]=1;
+    wh.push({name:nm,code:code,nz:nz});
+  }
+  (act.branches||[]).forEach(pushWh);
+  (act.factories||[]).forEach(pushWh);
+  if(!wh.length)return;
   var targets=['fgbal','transit']; /* التقارير الرئيسية فقط */
   function findTotalIdx(headers){
     for(var i=0;i<headers.length;i++){if(/^\s*total\s*$/i.test(String(headers[i]||'')))return i;}
-    return -1; /* لا يوجد Total */
+    return -1;
   }
-  function hasCol(headers,name){
-    var n=String(name).toLowerCase().replace(/\s+/g,' ').trim();
-    return headers.some(function(h){return String(h||'').toLowerCase().replace(/\s+/g,' ').trim()===n;});
+  function colExists(headers,nz){
+    return headers.some(function(h){return norm(h)===nz;});
   }
-  /* أدرج عموداً جديداً في الرؤوس + كل صفوف البيانات (بقيمة 0) قبل Total */
+  /* تنظيف الأعمدة المكررة الفارغة التي سبق إضافتها خطأً:
+     إن وُجد عمودان يطابقان نفس الاسم المطبّع، نحذف العمود الذي كل قيمه أصفار/فارغة. */
+  function dedupeExisting(obj){
+    if(!obj||!obj.headers)return false;
+    var changed=false, i=0;
+    while(i<obj.headers.length){
+      var nz=norm(obj.headers[i]);
+      if(!nz){i++;continue;}
+      var dup=-1;
+      for(var j=i+1;j<obj.headers.length;j++){ if(norm(obj.headers[j])===nz){dup=j;break;} }
+      if(dup>=0){
+        function isEmptyCol(idx){
+          if(!obj.rows||!obj.rows.length)return true;
+          return obj.rows.every(function(row){var v=row&&row[idx];return v===''||v==null||v===0||v==='0';});
+        }
+        var ei=isEmptyCol(i), ed=isEmptyCol(dup);
+        if(!ei && !ed){ i++; continue; } /* كلاهما يحوي بيانات — لا تحذف (قد يكونان مستودعين مختلفين) */
+        var del=ed?dup:i; /* احذف الفارغ، مع تفضيل حذف العمود اللاحق إن كان كلاهما فارغاً */
+        if(ei&&ed)del=dup;
+        obj.headers.splice(del,1);
+        if(obj.rows&&obj.rows.length)obj.rows.forEach(function(row){if(Array.isArray(row))row.splice(del,1);});
+        changed=true;
+        /* لا تزد i — أعد الفحص من نفس الموضع */
+      } else { i++; }
+    }
+    return changed;
+  }
   function injectInto(obj){
     if(!obj||!obj.headers||!obj.headers.length)return false;
-    var changed=false;
-    names.forEach(function(nm){
-      if(hasCol(obj.headers,nm))return;
+    var changed=dedupeExisting(obj); /* نظّف المكرر أولاً */
+    wh.forEach(function(w){
+      if(colExists(obj.headers,w.nz))return; /* موجود بالفعل (بأي تهجئة) */
       var tIdx=findTotalIdx(obj.headers);
-      var insAt=(tIdx>=0)?tIdx:obj.headers.length; /* قبل Total أو في النهاية */
-      obj.headers.splice(insAt,0,nm);
-      if(obj.rows&&obj.rows.length){
-        obj.rows.forEach(function(row){if(Array.isArray(row))row.splice(insAt,0,0);});
-      }
+      var insAt=(tIdx>=0)?tIdx:obj.headers.length;
+      obj.headers.splice(insAt,0,w.name);
+      if(obj.rows&&obj.rows.length)obj.rows.forEach(function(row){if(Array.isArray(row))row.splice(insAt,0,0);});
       changed=true;
     });
     return changed;
@@ -6699,15 +6726,11 @@ function _spSyncReportColumns(act){
   var anyData=false;
   var s=getDR();
   targets.forEach(function(key){
-    /* القالب */
     try{if(typeof DR_TEMPLATES!=='undefined'&&DR_TEMPLATES[key])injectInto(DR_TEMPLATES[key]);}catch(e){}
-    /* النسخة الافتراضية */
     try{if(DEFAULT_DAILY_REPORTS[key])injectInto(DEFAULT_DAILY_REPORTS[key]);}catch(e){}
-    /* البيانات المرفوعة المحفوظة */
     try{if(s&&s[key]&&s[key].headers){if(injectInto(s[key]))anyData=true;}}catch(e){}
   });
   if(anyData){saveDR(s);try{drPush();}catch(e){}}
-  /* إعادة رسم التقارير المتأثرة إن كانت مفتوحة */
   targets.forEach(function(key){try{renderDailyReport(key);}catch(e){}});
 }
 function _spApplyActuals(act){
@@ -7122,6 +7145,18 @@ function renderMdCppTable(){
 function renderSpaceActualsMain(){
   renderSpaceActuals();
 }
+function _spActDupCheck(name,code){
+  if(!_spActPending)return null;
+  var all=(_spActPending.branches||[]).concat(_spActPending.factories||[]);
+  var c=String(code||'').trim().toLowerCase();
+  var n=String(name||'').trim().toLowerCase().replace(/\s+/g,' ');
+  for(var i=0;i<all.length;i++){
+    var r=all[i];
+    if(c && String(r.code||'').trim().toLowerCase()===c)return r.name||code;
+    if(n && String(r.name||'').trim().toLowerCase().replace(/\s+/g,' ')===n)return r.name||name;
+  }
+  return null;
+}
 function spActAddRowMain(){
   var name=((document.getElementById('sp-act-new-name-main')||{}).value||'').trim();
   var code=((document.getElementById('sp-act-new-code-main')||{}).value||'').trim();
@@ -7129,6 +7164,8 @@ function spActAddRowMain(){
   var m2=parseFloat((document.getElementById('sp-act-new-m2-main')||{}).value)||0;
   if(!name){spActMsg('أدخل اسم المستودع.','err');return;}
   if(!_spActPending)_spActLoad();
+  var dup=_spActDupCheck(name,code);
+  if(dup){spActMsg('المستودع موجود مسبقاً («'+dup+'») — لن يُضاف مكرراً. راجع الكود/الاسم.','err');return;}
   var _poM=_spActPending.palOne||SP_PALONE_DEFAULT, _lyM=_spActPending.layers||SP_LAYERS_DEFAULT, _unM=_spActPending.units||SP_UNITS_DEFAULT;
   var row={name:name,code:code,m2:m2,palOne:_poM,layers:_lyM,units:_unM,qty:spCalcCap(spCalcPallets(m2,_poM,_lyM),_unM)};
   if(type==='factory')_spActPending.factories.push(row);else _spActPending.branches.push(row);
@@ -8028,9 +8065,21 @@ function renderBottleReport(rep){
     }
     if(!_syncedOnce){_syncedOnce=true;setTimeout(_attachCloudSync,40);}   /* then load data */
   }
+  function _hasLiveSession(){try{return sessionStorage.getItem('tania_live_session')==='1';}catch(e){return false;}}
+  function _markLiveSession(){try{sessionStorage.setItem('tania_live_session','1');}catch(e){}}
   function onAuthChanged(user){
     var ov=document.getElementById('login-ov');
     if(!user){ CURRENT_USER=null; _syncedOnce=false; if(ov)ov.style.display='flex'; return; }
+    /* أمان: إن وُجدت جلسة Firebase محفوظة لكن بلا «علامة جلسة حيّة» في هذا التبويب،
+       فهذا يعني فتحاً جديداً للنظام (وليس تحديث صفحة) — نُسجّل الخروج ونطلب الدخول.
+       العلامة تُضبط فقط بعد تسجيل دخول فعلي، وتبقى عند تحديث الصفحة (sessionStorage)،
+       وتُمسح عند إغلاق المتصفح/التبويب. */
+    if(!_hasLiveSession()){
+      CURRENT_USER=null; _syncedOnce=false;
+      try{_auth.signOut();}catch(e){}
+      if(ov)ov.style.display='flex';
+      return;
+    }
     var email=String(user.email||'').toLowerCase();
     /* INSTANT: reveal the app the moment auth succeeds; refine role + sync in the background */
     _reveal(email);
@@ -8069,12 +8118,13 @@ function renderBottleReport(rep){
     loginErr(T('Signing in…','جارٍ تسجيل الدخول…'));
     var _btn=document.querySelector('.lbtn'); if(_btn){_btn.disabled=true;_btn.classList.add('loading');}
     function _btnDone(){if(_btn){_btn.disabled=false;_btn.classList.remove('loading');}}
-    _auth.signInWithEmailAndPassword(email,pass).then(function(){var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';_btnDone();})
+    _auth.signInWithEmailAndPassword(email,pass).then(function(){_markLiveSession();var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';_btnDone();})
       .catch(function(err){_btnDone();loginErr(mapErr(err));if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}try{if(typeof logLogin==='function')logLogin(email,'failed');}catch(e){}});
   };
 
   window.logout=function(){
     try{CURRENT_USER=null;}catch(e){}
+    try{sessionStorage.removeItem('tania_live_session');}catch(e){}
     try{document.body.classList.remove('is-admin');}catch(e){}
     try{if(_auth)_auth.signOut();}catch(e){}
     var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex';
