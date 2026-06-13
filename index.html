@@ -8494,7 +8494,8 @@ function renderBottleReport(rep){
   /* ---------- Dashboard: عمودان متحاذيان (البطاقات الأربع | السلايسر) ثم الرسوم بعرض كامل ---------- */
   #page-dash .wrap{display:grid !important;grid-template-columns:1fr 1fr !important;grid-template-areas:"top top" "kpis side" "ckpis ckpis" "charts charts" "foot foot" !important;gap:12px !important;align-items:start !important}
   #page-dash .topbar{grid-area:top !important;margin-bottom:2px !important}
-  #page-dash .kpis{grid-area:kpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important}
+  #page-dash .kpis{grid-area:kpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important}
+  #page-dash .side{align-self:start !important}
   #page-dash .kpis .kpi{width:auto !important;min-width:0 !important;max-width:none !important}
   #page-dash .custom-kpis{grid-area:ckpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important}
   #page-dash .kpis.custom-kpis:empty{display:none !important}
