@@ -692,6 +692,15 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   #detail-ov .pivot tr.grand td,.fg-modal-ov.show .fg-dt tr.grand td,.fg-modal-ov.show .fg-dt tr.fg-grand td{
     background:linear-gradient(135deg,#0d2a4e,#1e5398) !important;color:#fff !important;font-weight:800 !important;
   }
+  /* ===== رؤوس أعمدة الجدول داخل النافذة: لون كحلي بنص أبيض (تجاوز النمط الفاتح) ===== */
+  #detail-ov .pivot th,.fg-modal-ov.show .fg-dt th{
+    background:linear-gradient(180deg,#23578f,#1a4480) !important;color:#fff !important;
+    border-color:#2f63a0 !important;text-transform:none !important;letter-spacing:0 !important;font-weight:700 !important;
+  }
+  /* عمود/خلية أول صف ثابتة تبقى كحلية أيضاً */
+  #detail-ov .pivot thead th:first-child,.fg-modal-ov.show .fg-dt thead th:first-child{
+    background:linear-gradient(180deg,#23578f,#1a4480) !important;color:#fff !important;
+  }
 }
 /* ===== Readable, content-sized report table on phones (numbers stay legible) =====
    Columns shrink to their data, wide header/text columns wrap, numbers keep a
