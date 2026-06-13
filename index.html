@@ -5488,8 +5488,9 @@ function renderSpaceReport(rep){
       var _isPctRow=/Percentage/i.test(String(row[0]||''))||row.slice(1).filter(function(x){return typeof x==='string'&&/^\d+%$/.test(x.trim());}).length>row.length/2;
       var _isEnoughRow=/Enough Carton/i.test(String(row[0]||''));
       var _qtyEnoughRow=(rep&&rep.groups&&rep.groups[0])?rep.groups[0].rows[2]:null;
+      var _totIdx=B.length+1; /* موضع عمود Total الديناميكي = عدد الفروع + 1 */
       for(var c=1;c<row.length;c++){
-        var v=row[c]; var isGrand=(c===row.length-1); var isTot=(c===8);
+        var v=row[c]; var isGrand=(c===row.length-1); var isTot=(c===_totIdx);
         var neg=(typeof v==='number'&&v<0)||(typeof v==='string'&&/^-/.test(v));
         var cls='sp-num'+(isGrand?' sp-gcell':'')+(isTot?' sp-totcell':'')+(neg?' sp-neg':'');
         if(_isPctRow&&typeof v==='string'){var _pv=parseInt(v,10);if(!isNaN(_pv)){if(_pv>=100)cls+=' sp-pct-over';else if(_pv>=85)cls+=' sp-pct-warn';}}
@@ -7950,7 +7951,7 @@ function renderBottleReport(rep){
                 isTot:td.classList.contains('sp-totcell'),isGrand:td.classList.contains('sp-gcell')};
         items.push(it); if(it.isTot&&!tot)tot=it; if(it.isGrand)grand=it;
       });
-      var hv=tot||grand||items[items.length-1];
+      var hv=grand||tot||items[items.length-1];
       out.push({title:metric,headVal:hv?hv.val:'',items:items});
     });
     return out.length?out:null;
