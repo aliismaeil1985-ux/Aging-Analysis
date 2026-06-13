@@ -8587,7 +8587,8 @@ function renderBottleReport(rep){
   /* ---------- Dashboard: عمودان متحاذيان (البطاقات الأربع | السلايسر) ثم الرسوم بعرض كامل ---------- */
   #page-dash .wrap{display:grid !important;grid-template-columns:1fr 1fr !important;grid-template-areas:"top top" "kpis side" "ckpis ckpis" "charts charts" "foot foot" !important;gap:12px !important;align-items:start !important}
   #page-dash .topbar{grid-area:top !important;margin-bottom:2px !important}
-  #page-dash .kpis{grid-area:kpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important}
+  #page-dash .kpis{grid-area:kpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important;height:724px !important;max-height:724px !important}
+  #page-dash .kpis .kpi{flex:1 1 0 !important;min-height:0 !important}
   #page-dash .side{align-self:start !important}
   #page-dash .kpis .kpi{width:auto !important;min-width:0 !important;max-width:none !important}
   #page-dash .custom-kpis{grid-area:ckpis !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;align-self:start !important}
@@ -8688,8 +8689,9 @@ function renderBottleReport(rep){
 
 @media (max-width:640px){
   .content{padding:64px 12px 26px !important}
-  #page-dash .kpis{gap:12px !important}
-  .kpi{min-height:140px !important;padding:16px 14px !important}
+  #page-dash .kpis{gap:12px !important;height:596px !important;max-height:596px !important}
+  #page-dash .kpis .kpi{flex:1 1 0 !important;min-height:0 !important}
+  .kpi{padding:16px 14px !important}
   .kpi .v{font-size:25px !important}
   #page-dash .side{height:596px !important;max-height:596px !important}
   #page-dash .side .fbox>div:last-child{min-height:128px !important}
@@ -8698,8 +8700,8 @@ function renderBottleReport(rep){
 }
 
 @media (max-width:430px){
-  #page-dash .kpis .kpi{min-height:130px !important}
-  .kpi{min-height:130px !important}
+  #page-dash .kpis{height:558px !important;max-height:558px !important}
+  #page-dash .kpis .kpi{flex:1 1 0 !important;min-height:0 !important}
   #page-dash .side{height:558px !important;max-height:558px !important}
   #page-dash .side .fbox>div:last-child{min-height:120px !important}
   .kpi .ic{width:36px !important;height:36px !important;font-size:17px !important}
