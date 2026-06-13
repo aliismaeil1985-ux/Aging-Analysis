@@ -8592,13 +8592,9 @@ function renderBottleReport(rep){
   /* محاذاة عمود السلايسر مع عمود البطاقات: كل صندوق فلتر يبدأ من الأعلى وقائمته تتمرّر داخلياً
      بحيث ينتهي العمود تقريباً عند نهاية البطاقات الأربع */
   #page-dash .side .fbox{flex:1 1 0 !important;min-height:0 !important;display:flex !important;flex-direction:column !important;overflow:hidden !important}
-  #page-dash .side .fbox>div:last-child{flex:1 1 auto !important;min-height:138px !important;max-height:none !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
-  /* سلايسر الهوية يُظهر 4 فلاتر (أطول قليلاً من البقية) */
-  #page-dash .side .fbox.f-identity{flex:1.7 1 0 !important}
-  #page-dash .side .fbox.f-identity>div:last-child{min-height:230px !important}
-  /* تكبير سلايسر الفرع والتصنيف ليُظهرا 4 فلاتر مثل الهوية */
-  #page-dash .side .fbox.f-branch,#page-dash .side .fbox.f-classify{flex:1.35 1 0 !important}
-  #page-dash .side .fbox.f-branch>div:last-child,#page-dash .side .fbox.f-classify>div:last-child{min-height:184px !important}
+  #page-dash .side .fbox>div:last-child{flex:1 1 auto !important;min-height:0 !important;max-height:none !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
+  /* السلايسرات الثلاثة تتقاسم ارتفاع العمود بالتساوي فينتهي تماماً عند نهاية البطاقات */
+  #page-dash .side .fbox.f-identity,#page-dash .side .fbox.f-branch,#page-dash .side .fbox.f-classify{flex:1 1 0 !important}
 
   /* ---------- KPI cards — premium ---------- */
   .kpi{padding:22px 16px !important;min-height:192px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
