@@ -5257,6 +5257,10 @@ try{window.addEventListener('afterprint',_clearReportPrintStage);}catch(e){}
 function setUpdDate(){const v=document.getElementById('upd-input').value;if(!v)return;const s=fmtDate(v);applyDateStr(s);try{LS.setItem('upd_date',s);}catch(e){}const m=document.getElementById('upd-msg');if(m)m.textContent=tr('saved_date');try{_cloudSynced=true;cloudAutoSave();}catch(e){}}
 function applySavedDate(){let s='';try{s=LS.getItem('upd_date')||'';}catch(e){}if(s){applyDateStr(s);const inp=document.getElementById('upd-input');if(inp){const p=s.split('/');if(p.length===3)inp.value=p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');}}}
 function heat(v,mn,mx){if(mx<=mn)return 'hsl(80,68%,86%)';const t=(v-mn)/(mx-mn);const hue=125*(1-t);return 'hsl('+hue.toFixed(0)+',72%,'+(87-t*6).toFixed(0)+'%)';}
+/* تلوين حسب قِدَم التاريخ: الأقدم أحمر، الأجدث أخضر (rank الأكبر = الأحدث) */
+function dateHeat(rank,minR,maxR){if(maxR<=minR)return 'hsl(80,68%,86%)';var t=(rank-minR)/(maxR-minR);var hue=125*t;/* 0=أحمر للأقدم، 125=أخضر للأحدث */return 'hsl('+hue.toFixed(0)+',72%,86%)';}
+/* رتبة التاريخ لصف حسب السنة والشهر (للترتيب الزمني) */
+function _dateRank(month){var MO=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];var mi=MO.indexOf(month);if(mi<0)mi=0;/* السنة: أغسطس–ديسمبر = 2025، يناير–مايو = 2026 */var y=(mi<=4)?2025:2026;return y*12+mi;}
 function closeDetail(){document.getElementById('detail-ov').classList.remove('show');try{var t=document.querySelector('#detail-wrap table.pivot');if(t){t.style.zoom='';t.style.transform='';}}catch(e){}}
 let _lastDetail=null;
 function exportDetailExcel(){try{if(!_lastDetail||!_lastDetail.aoa||!window.XLSX)return;const ws=XLSX.utils.aoa_to_sheet(_lastDetail.aoa);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Report');let nm=(_lastDetail.title||'report').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,28)||'report';XLSX.writeFile(wb,nm+'.xlsx');}catch(e){}}
@@ -5266,13 +5270,15 @@ function showDetailRows(rows,title){
   const M={};rows.forEach(d=>{const k=d.identity+'\u0001'+d.month+'\u0001'+d.pack;if(!M[k])M[k]={i:d.identity,m:d.month,p:d.pack,b:{},t:0};M[k].b[d.branch]=(M[k].b[d.branch]||0)+d.qty;M[k].t+=d.qty;});
   let keys=Object.keys(M).sort((a,b)=>{const A=M[a],B=M[b];const ai=A.i.localeCompare(B.i);if(ai!==0)return ai;return (MO.indexOf(A.m)-MO.indexOf(B.m))|| (B.t-A.t);});
   const _tots=keys.map(k=>M[k].t);const _mx=_tots.length?Math.max.apply(null,_tots):0,_mn=_tots.length?Math.min.apply(null,_tots):0;
+  /* رتب التواريخ لتلوين عمود الإجمالي: الأقدم أحمر، الأحدث أخضر */
+  const _ranks=keys.map(k=>_dateRank(M[k].m));const _maxR=_ranks.length?Math.max.apply(null,_ranks):0,_minR=_ranks.length?Math.min.apply(null,_ranks):0;
   let html='<table class="pivot"><thead><tr><th>'+tr('c_year')+'</th><th>'+tr('f_identity')+'</th><th>'+tr('c_month')+'</th><th>'+tr('c_pack2')+'</th>';
   branches.forEach(b=>html+='<th>'+bn(b)+'</th>');
   html+='<th>'+tr('c_total')+'</th></tr></thead><tbody>';
   let gt=0;const gb={};
   keys.forEach(k=>{const r=M[k];gt+=r.t;html+='<tr><td class="yr">'+yearOf(r.m)+'</td><td class="cat">'+escHtml(mv('identity',r.i))+'</td><td class="mo">'+mn(r.m)+'</td><td class="cat">'+escHtml(r.p||'')+'</td>';
     branches.forEach(b=>{const v=r.b[b]||0;gb[b]=(gb[b]||0)+v;html+='<td class="'+(v?'':'zero')+'">'+fmt(v)+'</td>';});
-    html+='<td class="tot" style="background:'+heat(r.t,_mn,_mx)+';color:#14532d">'+fmt(r.t)+'</td></tr>';});
+    html+='<td class="tot" style="background:'+dateHeat(_dateRank(r.m),_minR,_maxR)+';color:#1e293b;font-weight:800">'+fmt(r.t)+'</td></tr>';});
   html+='<tr class="grand"><td colspan="4">'+tr('sum_grand')+'</td>';branches.forEach(b=>html+='<td>'+fmt(gb[b]||0)+'</td>');html+='<td>'+fmt(gt)+'</td></tr></tbody></table>';
   const _aoa=[[tr('c_year'),tr('f_identity'),tr('c_month'),tr('c_pack2')].concat(branches.map(b=>bn(b))).concat([tr('c_total')])];
   keys.forEach(k=>{const r=M[k];_aoa.push([yearOf(r.m),mv('identity',r.i),mn(r.m),r.p||''].concat(branches.map(b=>r.b[b]||0)).concat([r.t]));});
@@ -8578,7 +8584,7 @@ function renderBottleReport(rep){
   #page-dash .kpis.custom-kpis:empty{display:none !important}
   #page-dash .main{display:contents !important}
   /* عمود السلايسر بنفس ارتفاع عمود البطاقات الأربع تقريباً (4 بطاقات × 132 + 3 فواصل × 12) */
-  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:760px !important;max-height:760px !important}
+  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:806px !important;max-height:806px !important}
   #page-dash .main>div:last-child{grid-area:charts !important;min-width:0 !important}
   #page-dash .foot{grid-area:foot !important}
   /* إخفاء زر «New card» في نسخة الجوال */
@@ -8588,14 +8594,14 @@ function renderBottleReport(rep){
   #page-dash .side .fbox{flex:1 1 0 !important;min-height:0 !important;display:flex !important;flex-direction:column !important;overflow:hidden !important}
   #page-dash .side .fbox>div:last-child{flex:1 1 auto !important;min-height:138px !important;max-height:none !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
   /* سلايسر الهوية يُظهر 4 فلاتر (أطول قليلاً من البقية) */
-  #page-dash .side .fbox.f-identity{flex:1.35 1 0 !important}
-  #page-dash .side .fbox.f-identity>div:last-child{min-height:184px !important}
+  #page-dash .side .fbox.f-identity{flex:1.7 1 0 !important}
+  #page-dash .side .fbox.f-identity>div:last-child{min-height:230px !important}
   /* تكبير سلايسر الفرع والتصنيف ليُظهرا 4 فلاتر مثل الهوية */
   #page-dash .side .fbox.f-branch,#page-dash .side .fbox.f-classify{flex:1.35 1 0 !important}
   #page-dash .side .fbox.f-branch>div:last-child,#page-dash .side .fbox.f-classify>div:last-child{min-height:184px !important}
 
   /* ---------- KPI cards — premium ---------- */
-  .kpi{padding:20px 16px !important;min-height:178px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
+  .kpi{padding:22px 16px !important;min-height:192px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
   .kpi::before{width:100% !important;height:4px !important;inset-inline-start:0 !important;top:0 !important;bottom:auto !important;opacity:.95}
   .kpi .row{align-items:center !important;gap:10px !important}
   .kpi .ic{width:40px !important;height:40px !important;border-radius:13px !important;font-size:19px !important;box-shadow:0 6px 16px rgba(20,60,120,.18) !important}
