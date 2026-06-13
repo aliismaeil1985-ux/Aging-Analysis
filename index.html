@@ -582,10 +582,11 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   .spacer{display:none}
   .gsearch{order:5;width:100%}
   .print-head{display:none}
-  /* Dashboard: KPI cards in a vertical column beside the filters (Slicer); charts full-width below */
-  #page-dash .wrap{display:grid;grid-template-columns:minmax(128px,42%) 1fr;grid-template-areas:"top top" "kpis side" "charts charts" "foot foot";gap:12px;align-items:start}
+  /* Dashboard: عمودان — البطاقات الأربع + السلايسر بمحاذاتها، ثم البطاقات المخصّصة، ثم الرسوم بعرض كامل */
+  #page-dash .wrap{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"top top" "kpis side" "ckpis ckpis" "charts charts" "foot foot";gap:12px;align-items:start}
   #page-dash .topbar{grid-area:top;margin-bottom:0}
   #page-dash .kpis{grid-area:kpis;display:flex !important;flex-direction:column;gap:10px;margin:0;overflow:visible}
+  #page-dash .custom-kpis{grid-area:ckpis}
   #page-dash .side{grid-area:side}
   #page-dash .side{display:flex;flex-direction:column;gap:10px}
   #page-dash .side .fbox{flex:0 0 auto;min-height:auto;padding:11px 12px}
@@ -625,8 +626,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 @media screen and (max-width:540px){
   .content{padding:62px 10px 16px}
   .htext h1{font-size:15px}
-  /* Tighter KPI column + Slicer */
-  #page-dash .wrap{grid-template-columns:minmax(118px,44%) 1fr;gap:10px}
+  /* Tighter two columns on small phones */
+  #page-dash .wrap{grid-template-columns:1fr 1fr;gap:9px}
   .kpi{padding:10px 11px}
   .kpi h3{font-size:10px}
   .kpi .v{font-size:18px}
@@ -1094,11 +1095,20 @@ h1[data-i18n="title"], .lb-title{white-space:pre-line;line-height:1.22;text-alig
    Placed last so it wins the cascade on phones.
    ============================================================ */
 @media screen and (max-width:860px){
-  /* ---- Dashboard KPI cards: one horizontal swipeable row ---- */
-  #page-dash .wrap{grid-template-columns:1fr;grid-template-areas:"top" "kpis" "side" "charts" "foot";gap:12px}
-  #page-dash .kpis{flex-direction:row !important;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;padding-bottom:6px;margin:0}
-  #page-dash .kpi{flex:0 0 auto;width:46%;min-width:148px;max-width:210px;scroll-snap-align:start}
-  #page-dash .side{max-width:100%}
+  /* ---- Dashboard: عمودان متحاذيان — البطاقات الأربع في عمود + السلايسر في العمود المقابل، ثم الرسوم بعرض كامل أسفلهما ---- */
+  #page-dash .wrap{display:grid !important;grid-template-columns:1fr 1fr;grid-template-areas:"top top" "kpis side" "ckpis ckpis" "charts charts" "foot foot";gap:12px;align-items:start}
+  #page-dash .topbar{grid-area:top}
+  #page-dash .kpis{grid-area:kpis;display:flex !important;flex-direction:column;flex-wrap:nowrap;gap:10px;margin:0;overflow:visible}
+  #page-dash .kpi{flex:0 0 auto;width:auto;min-width:0;max-width:none}
+  #page-dash .custom-kpis{grid-area:ckpis;display:flex !important;flex-direction:column;gap:10px;margin:0}
+  #page-dash .side{grid-area:side;display:flex;flex-direction:column;gap:10px;max-width:100%;min-width:0}
+  #page-dash .main{display:contents}
+  #page-dash .main>div:last-child{grid-area:charts;min-width:0}
+  #page-dash .foot{grid-area:foot}
+  /* السلايسرات: ارتفاع تلقائي محاذٍ للبطاقات */
+  #page-dash .side .fbox{flex:0 0 auto;min-height:auto;padding:11px 12px}
+  #page-dash .side .fbox h4{padding-bottom:7px;margin-bottom:8px}
+  #page-dash .side .fbox>div:last-child{flex:0 0 auto;min-height:auto;max-height:none;overflow:visible}
   .kpis::-webkit-scrollbar,.fg-cards::-webkit-scrollbar,.sp-cards::-webkit-scrollbar,.pivot-wrap::-webkit-scrollbar,.sp-scroll::-webkit-scrollbar,.bt-scroll::-webkit-scrollbar{height:7px}
   .kpis::-webkit-scrollbar-thumb,.fg-cards::-webkit-scrollbar-thumb,.sp-cards::-webkit-scrollbar-thumb,.pivot-wrap::-webkit-scrollbar-thumb,.sp-scroll::-webkit-scrollbar-thumb,.bt-scroll::-webkit-scrollbar-thumb{background:#bcd0e8;border-radius:6px}
 
@@ -2267,60 +2277,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
-      <div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:10px 16px;border-radius:12px;margin-bottom:14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:10px">&#127919; منشئ البطاقات — يعمل &#10003; (إصدار البناء CB-R2) &middot; أنشئ بطاقات وفئات أعمار متعددة</div>
-      <div class="topbar"><div class="htext"><h1 data-i18n="cb_title">منشئ البطاقات</h1><span class="upd"><span class="dot"></span> <span data-i18n="cb_sub">أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات</span></span></div><div class="spacer"></div><div class="whicon">&#128202;</div></div>
-
-      <div class="cb-layout">
-        <!-- نموذج البناء -->
-        <div class="card cb-form-card">
-          <h2 class="sec-h"><span>&#10133;</span> <span id="cb-form-h" data-i18n="cb_new">بطاقة جديدة</span></h2>
-          <div class="cb-fields">
-            <div class="sf"><label data-i18n="cb_f_title">عنوان البطاقة</label><input type="text" id="cbs-title" oninput="cbPreview()" placeholder="مثال: مخزون راكد"></div>
-            <div class="sf"><label data-i18n="cb_f_calc">نوع الحساب</label>
-              <select id="cbs-calc" onchange="cbPreview()">
-                <option value="sum" data-i18n="cb_calc_sum">مجموع الكمية</option>
-                <option value="avg" data-i18n="cb_calc_avg">متوسط الكمية</option>
-                <option value="count" data-i18n="cb_calc_count">عدد الأصناف</option>
-                <option value="max" data-i18n="cb_calc_max">أعلى قيمة</option>
-                <option value="min" data-i18n="cb_calc_min">أدنى قيمة</option>
-              </select>
-            </div>
-            <div class="sf"><label data-i18n="cb_f_age">فئة العمر</label>
-              <select id="cbs-cls" onchange="cbPreview()">
-                <option value="all" data-i18n="cb_age_all">كل الفئات</option>
-                <option value="A&lt;60">A&lt;60</option>
-                <option value="B&lt;90">B&lt;90</option>
-                <option value="C&gt;90">C&gt;90</option>
-                <option value="91to180">91-180 يوم</option>
-              </select>
-            </div>
-            <div class="sf"><label data-i18n="cb_f_month">الشهر</label><select id="cbs-month" onchange="cbPreview()"><option value="all" data-i18n="cb_month_all">كل الشهور</option></select></div>
-          </div>
-          <div class="cb-fields">
-            <div class="sf full"><label data-i18n="cb_f_icon">الأيقونة</label><div class="cb-icons" id="cbs-icons"></div></div>
-            <div class="sf full"><label data-i18n="cb_f_color">اللون</label><div class="cb-colors" id="cbs-colors"></div></div>
-          </div>
-          <div class="cb-actions">
-            <button class="btn-primary" onclick="cbSave()"><span>&#128190;</span> <span id="cb-save-lbl" data-i18n="cb_save">حفظ البطاقة</span></button>
-            <button class="btn-cols" onclick="cbReset()"><span>&#10005;</span> <span data-i18n="cb_cancel">إلغاء</span></button>
-            <span class="sf-count" id="cb-msg"></span>
-          </div>
-        </div>
-
-        <!-- المعاينة الحية -->
-        <div class="card cb-preview-card">
-          <h2 class="sec-h"><span>&#128065;&#65039;</span> <span data-i18n="cb_preview">معاينة حية</span></h2>
-          <div class="cb-preview-wrap"><div class="kpis"><div id="cb-preview-host"></div></div></div>
-          <div class="cb-hint" data-i18n="cb_preview_hint">القيمة محسوبة من البيانات الحالية وتتأثر بالفلاتر المطبّقة في لوحة المعلومات.</div>
-        </div>
-      </div>
-
-      <!-- قائمة البطاقات المنشأة -->
-      <div class="card">
-        <h2 class="sec-h"><span>&#128203;</span> <span data-i18n="cb_list">البطاقات المنشأة</span> <span class="cb-count" id="cb-list-count"></span></h2>
-        <div class="cb-list" id="cb-list"></div>
-      </div>
-
+      <div id="cb-root" style="font-family:inherit"></div>
     </div></div></div>
 
     <!-- TABLE DESIGNER -->
@@ -3081,8 +3038,76 @@ var CB_ICONS=['&#128202;','&#128230;','&#9989;','&#9888;&#65039;','&#128176;','&
 var CB_COLORS=['#2f7ed8','#16a34a','#ea580c','#9333ea','#0891b2','#dc2626','#ca8a04','#0d9488','#6366f1','#db2777'];
 var _cbIcon=CB_ICONS[0],_cbColor=CB_COLORS[0],_cbEditIdx=-1;
 /* تهيئة الشاشة عند فتحها */
+/* ═══════════════════════════════════════════════════════════════
+   منشئ البطاقات — إعادة بناء كاملة ومستقلة (CB-R3)
+   تُبنى الشاشة بالكامل عبر JS بأنماط inline حتى لا تتأثر بأي CSS
+   أو سكربت خارجي قد يكون مكسوراً. لا تعتمد على عناصر HTML ثابتة. */
 function initCardBuilder(){
-  /* حماية كل خطوة على حدة حتى لا يفشل البناء بالكامل عند خطأ في جزء */
+  var root=document.getElementById('cb-root');
+  if(!root){ /* fallback: ربما تُستدعى قبل وجود الجذر */ return; }
+  var ar=(typeof drIsAr==='function'&&drIsAr());
+  var L=ar?{
+    badge:'منشئ البطاقات — يعمل ✓ (CB-R3)',
+    h:'منشئ البطاقات', sub:'أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات',
+    fnew:'بطاقة جديدة', ftitle:'عنوان البطاقة', tph:'مثال: مخزون راكد',
+    fcalc:'نوع الحساب', csum:'مجموع الكمية', cavg:'متوسط الكمية', ccount:'عدد الأصناف', cmax:'أعلى قيمة', cmin:'أدنى قيمة',
+    fage:'فئة العمر', aall:'كل الفئات', fmonth:'الشهر', mall:'كل الشهور',
+    ficon:'الأيقونة', fcolor:'اللون', save:'حفظ البطاقة', cancel:'إلغاء',
+    preview:'معاينة حية', phint:'القيمة محسوبة من البيانات الحالية وتتأثر بالفلاتر المطبّقة في لوحة المعلومات.',
+    list:'البطاقات المنشأة', empty:'لا توجد بطاقات بعد. أنشئ بطاقتك الأولى من النموذج أعلاه.'
+  }:{
+    badge:'Card Builder — working ✓ (CB-R3)',
+    h:'Card Builder', sub:'Create custom KPI cards that appear on the dashboard',
+    fnew:'New card', ftitle:'Card title', tph:'e.g. Slow-moving stock',
+    fcalc:'Calculation', csum:'Sum of quantity', cavg:'Average quantity', ccount:'Item count', cmax:'Max value', cmin:'Min value',
+    fage:'Age class', aall:'All classes', fmonth:'Month', mall:'All months',
+    ficon:'Icon', fcolor:'Color', save:'Save card', cancel:'Cancel',
+    preview:'Live preview', phint:'The value is computed from current data and reflects dashboard filters.',
+    list:'Created cards', empty:'No cards yet. Create your first card from the form above.'
+  };
+  var fld='display:block;width:100%;padding:9px 11px;border:1px solid #d4dfec;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#1e293b;box-sizing:border-box';
+  var lbl='display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px';
+  var card='background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px 20px;box-shadow:0 2px 10px rgba(16,40,80,.05)';
+  var sech='display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;color:#1e3a5f;margin:0 0 14px';
+  var opt=function(v,t,sel){return '<option value="'+v+'"'+(sel?' selected':'')+'>'+t+'</option>';};
+  root.innerHTML=''
+  +'<div style="background:linear-gradient(90deg,#8b5cf6,#6366f1);color:#fff;padding:10px 16px;border-radius:12px;margin-bottom:14px;font-weight:700;font-size:13.5px">🎯 '+L.badge+'</div>'
+  +'<div style="margin-bottom:14px"><h1 style="margin:0;font-size:22px;color:#1e3a5f">'+L.h+'</h1><div style="color:#64748b;font-size:13px;margin-top:3px">'+L.sub+'</div></div>'
+  +'<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px" id="cb-grid">'
+    /* النموذج */
+    +'<div style="'+card+'">'
+      +'<h2 style="'+sech+'">➕ <span id="cb-form-h">'+L.fnew+'</span></h2>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin-bottom:14px">'
+        +'<div><label style="'+lbl+'">'+L.ftitle+'</label><input type="text" id="cbs-title" oninput="cbPreview()" placeholder="'+L.tph+'" style="'+fld+'"></div>'
+        +'<div><label style="'+lbl+'">'+L.fcalc+'</label><select id="cbs-calc" onchange="cbPreview()" style="'+fld+'">'
+          +opt('sum',L.csum,1)+opt('avg',L.cavg)+opt('count',L.ccount)+opt('max',L.cmax)+opt('min',L.cmin)+'</select></div>'
+        +'<div><label style="'+lbl+'">'+L.fage+'</label><select id="cbs-cls" onchange="cbPreview()" style="'+fld+'">'
+          +opt('all',L.aall,1)+opt('A&lt;60','A&lt;60')+opt('B&lt;90','B&lt;90')+opt('C&gt;90','C&gt;90')+opt('91to180','91-180 '+(ar?'يوم':'days'))+'</select></div>'
+        +'<div><label style="'+lbl+'">'+L.fmonth+'</label><select id="cbs-month" onchange="cbPreview()" style="'+fld+'">'+opt('all',L.mall,1)+'</select></div>'
+      +'</div>'
+      +'<div style="margin-bottom:12px"><label style="'+lbl+'">'+L.ficon+'</label><div id="cbs-icons" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>'
+      +'<div style="margin-bottom:14px"><label style="'+lbl+'">'+L.fcolor+'</label><div id="cbs-colors" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>'
+      +'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+        +'<button onclick="cbSave()" style="background:linear-gradient(135deg,#2f7ed8,#1e5398);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">💾 <span id="cb-save-lbl">'+L.save+'</span></button>'
+        +'<button onclick="cbReset()" style="background:#eef2f8;color:#475569;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">✕ '+L.cancel+'</button>'
+        +'<span id="cb-msg" style="font-size:12.5px;font-weight:700"></span>'
+      +'</div>'
+    +'</div>'
+    /* المعاينة */
+    +'<div style="'+card+'">'
+      +'<h2 style="'+sech+'">👁️ '+L.preview+'</h2>'
+      +'<div id="cb-preview-host"></div>'
+      +'<div style="font-size:11.5px;color:#94a3b8;margin-top:12px;line-height:1.5">'+L.phint+'</div>'
+    +'</div>'
+  +'</div>'
+  /* القائمة */
+  +'<div style="'+card+'">'
+    +'<h2 style="'+sech+'">📋 '+L.list+' <span id="cb-list-count" style="color:#94a3b8;font-weight:700;font-size:13px"></span></h2>'
+    +'<div id="cb-list" style="display:flex;flex-direction:column;gap:9px"></div>'
+  +'</div>';
+  /* تصغير الشبكة على الجوال */
+  try{ if((window.innerWidth||999)<=860){var g=document.getElementById('cb-grid');if(g)g.style.gridTemplateColumns='1fr';} }catch(e){}
+  /* تهيئة المكوّنات */
   try{ _cbRenderIconPicker(); }catch(e){ console.warn('cb icons',e); }
   try{ _cbRenderColorPicker(); }catch(e){ console.warn('cb colors',e); }
   try{ _cbFillMonths(); }catch(e){ console.warn('cb months',e); }
@@ -3092,11 +3117,17 @@ function initCardBuilder(){
 }
 function _cbRenderIconPicker(){
   var box=document.getElementById('cbs-icons');if(!box)return;
-  box.innerHTML=CB_ICONS.map(function(x){return '<button type="button" class="cb-ic'+(x===_cbIcon?' on':'')+'" onclick="_cbPickIcon(\''+x+'\')">'+x+'</button>';}).join('');
+  box.innerHTML=CB_ICONS.map(function(x){
+    var on=(x===_cbIcon);
+    return '<button type="button" onclick="_cbPickIcon(\''+x+'\')" style="width:38px;height:38px;border-radius:10px;border:2px solid '+(on?'#2f7ed8':'#e2e8f0')+';background:'+(on?'#eef5ff':'#fff')+';font-size:18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center">'+x+'</button>';
+  }).join('');
 }
 function _cbRenderColorPicker(){
   var box=document.getElementById('cbs-colors');if(!box)return;
-  box.innerHTML=CB_COLORS.map(function(x){return '<button type="button" class="cb-col'+(x===_cbColor?' on':'')+'" style="background:'+x+'" onclick="_cbPickColor(\''+x+'\')"></button>';}).join('');
+  box.innerHTML=CB_COLORS.map(function(x){
+    var on=(x===_cbColor);
+    return '<button type="button" onclick="_cbPickColor(\''+x+'\')" style="width:30px;height:30px;border-radius:50%;background:'+x+';border:3px solid '+(on?'#1e293b':'#fff')+';box-shadow:0 0 0 1px #e2e8f0;cursor:pointer"></button>';
+  }).join('');
 }
 function _cbPickIcon(x){_cbIcon=x;_cbRenderIconPicker();cbPreview();}
 function _cbPickColor(x){_cbColor=x;_cbRenderColorPicker();cbPreview();}
@@ -3127,12 +3158,18 @@ function cbPreview(){
   var ar=drIsAr&&drIsAr();
   var calcLbl={sum:ar?'مجموع':'Sum',avg:ar?'متوسط':'Avg',count:ar?'عدد':'Count',max:ar?'أعلى':'Max',min:ar?'أدنى':'Min'}[card.calc||'sum'];
   var clsLbl=card.cls&&card.cls!=='all'?card.cls:(ar?'الكل':'All');
-  host.innerHTML='<div class="kpi kpi-custom" style="--cc:'+card.color+'">'
-    +'<div class="row"><h3>'+drEsc(card.title)+'</h3><div class="ic">'+card.icon+'</div></div>'
-    +'<div class="v">'+fmt(Math.round(v))+'</div>'
-    +'<span class="cc-meta">'+calcLbl+' &middot; '+drEsc(clsLbl)+(card.month&&card.month!=='all'?' &middot; '+drEsc(card.month):'')+'</span>'
+  var cc=card.color||'#2f7ed8';
+  host.innerHTML='<div style="background:#fff;border:1px solid #e2e8f0;border-top:3px solid '+cc+';border-radius:14px;padding:16px 18px;max-width:260px">'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">'
+      +'<h3 style="margin:0;font-size:12.5px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.3px">'+drEsc(card.title)+'</h3>'
+      +'<div style="width:38px;height:38px;border-radius:11px;background:'+_cbHexA(cc,0.14)+';color:'+cc+';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+card.icon+'</div>'
+    +'</div>'
+    +'<div style="font-size:28px;font-weight:800;color:#1e293b;margin-top:8px;line-height:1">'+fmt(Math.round(v))+'</div>'
+    +'<div style="font-size:11.5px;color:#94a3b8;font-weight:600;margin-top:8px">'+calcLbl+' · '+drEsc(clsLbl)+(card.month&&card.month!=='all'?' · '+drEsc(card.month):'')+'</div>'
     +'</div>';
 }
+/* تحويل لون hex إلى rgba بشفافية (لخلفية الأيقونة) */
+function _cbHexA(hex,a){try{hex=String(hex).replace('#','');if(hex.length===3)hex=hex.split('').map(function(c){return c+c;}).join('');var r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);return 'rgba('+r+','+g+','+b+','+a+')';}catch(e){return 'rgba(47,126,216,'+a+')';}}
 /* حفظ البطاقة */
 function cbSave(){
   var ar=drIsAr&&drIsAr();var msg=document.getElementById('cb-msg');
@@ -3162,19 +3199,20 @@ function cbRenderList(){
   var box=document.getElementById('cb-list');if(!box)return;var ar=drIsAr&&drIsAr();
   var cards=getCustomCards();
   var cnt=document.getElementById('cb-list-count');if(cnt)cnt.textContent='('+cards.length+')';
-  if(!cards.length){box.innerHTML='<div class="cb-empty">'+(ar?'لا توجد بطاقات بعد. أنشئ بطاقتك الأولى من النموذج أعلاه.':'No cards yet. Create your first card from the form above.')+'</div>';return;}
+  if(!cards.length){box.innerHTML='<div style="text-align:center;color:#94a3b8;font-size:13px;padding:24px">'+(ar?'لا توجد بطاقات بعد. أنشئ بطاقتك الأولى من النموذج أعلاه.':'No cards yet. Create your first card from the form above.')+'</div>';return;}
   var calcL={sum:ar?'مجموع':'Sum',avg:ar?'متوسط':'Avg',count:ar?'عدد':'Count',max:ar?'أعلى':'Max',min:ar?'أدنى':'Min'};
   box.innerHTML=cards.map(function(card,i){
     var v=0;try{v=computeCustomCard(card);}catch(e){}
     var clsLbl=card.cls&&card.cls!=='all'?card.cls:(ar?'الكل':'All');
-    return '<div class="cb-row" style="--cc:'+(card.color||'#2f7ed8')+'">'
-      +'<div class="cb-row-ic">'+(card.icon||'&#128202;')+'</div>'
-      +'<div class="cb-row-body"><div class="cb-row-title">'+drEsc(card.title||'')+'</div>'
-      +'<div class="cb-row-meta">'+(calcL[card.calc||'sum'])+' &middot; '+drEsc(clsLbl)+(card.month&&card.month!=='all'?' &middot; '+(ar?'شهر ':'M')+drEsc(card.month):'')+'</div></div>'
-      +'<div class="cb-row-val">'+fmt(Math.round(v))+'</div>'
-      +'<div class="cb-row-acts">'
-      +'<button class="cb-act" onclick="cbEdit('+i+')" title="'+(ar?'تعديل':'Edit')+'">&#9881;&#65039;</button>'
-      +'<button class="cb-act cb-act-del" onclick="cbDelete('+i+')" title="'+(ar?'حذف':'Delete')+'">&#128465;&#65039;</button>'
+    var cc=card.color||'#2f7ed8';
+    return '<div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #eef2f8;border-inline-start:4px solid '+cc+';border-radius:12px;padding:12px 14px">'
+      +'<div style="width:42px;height:42px;border-radius:11px;background:'+_cbHexA(cc,0.12)+';display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+(card.icon||'📊')+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-weight:800;color:#1e293b;font-size:14.5px">'+drEsc(card.title||'')+'</div>'
+      +'<div style="font-size:11.5px;color:#64748b;font-weight:600;margin-top:2px">'+(calcL[card.calc||'sum'])+' · '+drEsc(clsLbl)+(card.month&&card.month!=='all'?' · '+(ar?'شهر ':'M')+drEsc(card.month):'')+'</div></div>'
+      +'<div style="font-size:20px;font-weight:800;color:'+cc+';padding:0 8px">'+fmt(Math.round(v))+'</div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0">'
+      +'<button onclick="cbEdit('+i+')" title="'+(ar?'تعديل':'Edit')+'" style="border:none;background:#eef2f8;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px">⚙️</button>'
+      +'<button onclick="cbDelete('+i+')" title="'+(ar?'حذف':'Delete')+'" style="border:none;background:#fde8e8;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px">🗑️</button>'
       +'</div></div>';
   }).join('');
 }
