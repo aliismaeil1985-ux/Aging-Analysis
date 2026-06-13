@@ -8336,6 +8336,7 @@ function renderBottleReport(rep){
 
   /* ===================== overrides ===================== */
   window.doLogin=function(){
+    if(window._loginBusy)return;   /* منع تكرار الإرسال عند النقر/Enter المتسارع */
     var email=((document.getElementById('login-user')||{}).value||'').trim().toLowerCase();
     var pass=((document.getElementById('login-pass')||{}).value||'');
     var uEl=document.getElementById('login-user'),pEl=document.getElementById('login-pass');
@@ -8343,15 +8344,20 @@ function renderBottleReport(rep){
     if(!email){loginErr(T('Enter your email.','أدخل بريدك.'));if(uEl){uEl.classList.add('login-input-err');uEl.focus();}return;}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){loginErr(T('Enter a valid email.','أدخل بريداً صحيحاً.'));if(uEl){uEl.classList.add('login-input-err');uEl.focus();}return;}
     if(!pass){loginErr(T('Enter your password.','أدخل كلمة المرور.'));if(pEl){pEl.classList.add('login-input-err');pEl.focus();}return;}
+    window._loginBusy=true;
     var _btn=document.querySelector('.lbtn'); if(_btn){_btn.disabled=true;_btn.classList.add('loading');}
-    function _btnDone(){if(_btn){_btn.disabled=false;_btn.classList.remove('loading');}}
+    function _btnDone(){window._loginBusy=false;if(_btn){_btn.disabled=false;_btn.classList.remove('loading');}}
     loginErr(T('Signing in…','جارٍ تسجيل الدخول…'));
     /* انتظر تجهيز المصادقة تلقائياً (حتى ~6 ثوانٍ) بدل مطالبة المستخدم بإعادة النقر */
     var _tries=0,_max=30;
     (function _attempt(){
       if(tryInitAuth()&&_auth){
-        _auth.signInWithEmailAndPassword(email,pass).then(function(){_markLiveSession();var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';_btnDone();})
-          .catch(function(err){_btnDone();loginErr(mapErr(err));if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}try{if(typeof logLogin==='function')logLogin(email,'failed');}catch(e){}});
+        /* ضبط «علامة الجلسة الحيّة» قبل تسجيل الدخول مباشرةً —
+           يمنع سباق onAuthChanged الذي كان يعيد إظهار شاشة الدخول
+           ويُجبر المستخدم على النقر مرّة ثانية. الدخول الآن بنقرة واحدة. */
+        _markLiveSession();
+        _auth.signInWithEmailAndPassword(email,pass).then(function(){var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';_btnDone();})
+          .catch(function(err){try{sessionStorage.removeItem('tania_live_session');}catch(_){}_btnDone();loginErr(mapErr(err));if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}try{if(typeof logLogin==='function')logLogin(email,'failed');}catch(e){}});
         return;
       }
       if(++_tries>=_max){_btnDone();loginErr(T('Cloud not ready — check your connection and retry.','تعذّر تجهيز السحابة — تحقق من الاتصال وأعد المحاولة.'));return;}
