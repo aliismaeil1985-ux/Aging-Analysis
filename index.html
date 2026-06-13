@@ -8125,14 +8125,15 @@ function renderBottleReport(rep){
 @media (min-width:861px){.rot-fab{display:none !important}}
 .rot-ov{position:fixed;inset:0;background:#eef2f8;z-index:9600;display:none}
 .rot-ov.show{display:block}
-.rot-ov-inner{position:absolute;top:50%;left:50%;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;overflow:auto;-webkit-overflow-scrolling:touch;padding:18px 20px 30px;box-sizing:border-box}
+.rot-ov-inner{position:absolute;top:50%;left:50%;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 26px;box-sizing:border-box}
 .rot-ttl{font-size:15px;font-weight:800;color:#142f57;margin:0 0 12px}
-.rot-card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(16,40,80,.08);padding:8px;margin-bottom:14px;overflow:auto;-webkit-overflow-scrolling:touch}
-.rot-card table{border-collapse:collapse;width:auto;min-width:100%;font-size:12.5px;background:#fff}
-.rot-card table th,.rot-card table td{padding:7px 10px;white-space:nowrap}
-.rot-card.charts{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:flex-start;padding:16px;overflow:visible}
-.rot-card.charts .sp-charts{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;width:100%}
-.rot-card.charts .sp-chart{flex:0 0 auto}
+.rot-card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(16,40,80,.08);padding:8px;margin-bottom:14px;width:100%;overflow:hidden;box-sizing:border-box}
+.rot-card table{border-collapse:collapse;width:100%;min-width:0;table-layout:fixed;font-size:10.5px;background:#fff}
+.rot-card table th,.rot-card table td{padding:3px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.rot-card .sp-metric,.rot-card .sp-side,.rot-card td.cat,.rot-card th{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.15}
+.rot-card.charts{display:block;padding:14px 10px;overflow-x:hidden;overflow-y:visible}
+.rot-card.charts .sp-charts{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;justify-content:center;gap:10px;width:100%;transform-origin:top center}
+.rot-card.charts .sp-chart{flex:0 0 auto;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;gap:8px}
 .rot-empty{padding:34px 18px;text-align:center;color:#94a3b8;font-weight:700;line-height:1.8}
 .rot-ov-close{position:fixed;top:12px;right:12px;z-index:9700;width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,40,70,.92);color:#fff;font-size:19px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .rot-ov-close.show{display:flex}
@@ -8179,6 +8180,13 @@ function renderBottleReport(rep){
       e.textContent=ar()?'لا توجد بيانات لعرضها — تأكد من رفع/مزامنة التقرير.':'No data to show — make sure the report is uploaded/synced.';
       inner.appendChild(e);}
     ov.classList.add('show');closeBtn.classList.add('show');try{document.body.style.overflow='hidden';}catch(e){}
+    setTimeout(fitCharts,90);
+  }
+  function fitCharts(){
+    try{var cc=inner.querySelector('.rot-card.charts'); if(!cc)return; var sc=cc.querySelector('.sp-charts'); if(!sc)return;
+      sc.style.transform=''; var avail=cc.clientWidth-14, nat=sc.scrollWidth;
+      if(nat>avail && avail>0){ var r=Math.max(0.35, avail/nat); sc.style.transform='scale('+r+')'; }
+    }catch(e){}
   }
   function closeOv(){if(ov)ov.classList.remove('show');if(closeBtn)closeBtn.classList.remove('show');try{document.body.style.overflow='';}catch(e){}}
   function refresh(){if(isMobile()&&curKey())showFab();else{hideFab();closeOv();}}
