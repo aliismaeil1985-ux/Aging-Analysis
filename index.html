@@ -3041,8 +3041,25 @@ function renderCustomCards(){
       +(admin?'<div class="cc-actions"><button class="cc-btn" onclick="recalcCustomCard('+i+')" title="'+(ar?'إعادة حساب':'Recalculate')+'">&#128260;</button><button class="cc-btn" onclick="editCustomCard('+i+')" title="'+(ar?'تعديل':'Edit')+'">&#9881;&#65039;</button><button class="cc-btn cc-del" onclick="deleteCustomCard('+i+')" title="'+(ar?'حذف':'Delete')+'">&#128465;&#65039;</button></div>':'')
       +'</div>';
   });
-  if(admin)html+='<button class="kpi kpi-add" onclick="openCardEditor(-1)"><div class="kpi-add-ic">&#10133;</div><div class="kpi-add-lbl">'+(ar?'إنشاء بطاقة':'New card')+'</div></button>';
+  if(admin)html+='<button class="kpi kpi-add" onclick="openCardBuilderNew()"><div class="kpi-add-ic">&#10133;</div><div class="kpi-add-lbl">'+(ar?'إنشاء بطاقة':'New card')+'</div></button>';
   host.innerHTML=html;
+}
+/* فتح شاشة Card Builder لإنشاء بطاقة جديدة (نقل المستخدم للشاشة وتجهيز النموذج) */
+function openCardBuilderNew(){
+  try{go('cardbuilder');}catch(e){}
+  setTimeout(function(){
+    try{if(typeof initCardBuilder==='function')initCardBuilder();}catch(e){}
+    try{if(typeof cbReset==='function')cbReset();}catch(e){}
+    try{var t=document.getElementById('cbs-title');if(t)t.focus();}catch(e){}
+  },80);
+}
+/* فتح شاشة Card Builder لتعديل بطاقة موجودة */
+function openCardBuilderEdit(i){
+  try{go('cardbuilder');}catch(e){}
+  setTimeout(function(){
+    try{if(typeof initCardBuilder==='function')initCardBuilder();}catch(e){}
+    try{if(typeof cbEdit==='function')cbEdit(i);}catch(e){}
+  },80);
 }
 function recalcCustomCard(i){renderCustomCards();
   try{var host=document.getElementById('custom-kpis');var c=host&&host.children[i];if(c){c.classList.add('cc-flash');setTimeout(function(){c.classList.remove('cc-flash');},600);}}catch(e){}
@@ -3178,7 +3195,7 @@ function deleteCustomCard(i){
   if(!confirm(ar?'حذف هذه البطاقة؟':'Delete this card?'))return;
   var cards=getCustomCards();cards.splice(i,1);saveCustomCards(cards);renderCustomCards();
 }
-function editCustomCard(i){openCardEditor(i);}
+function editCustomCard(i){openCardBuilderEdit(i);}
 var _cardEditIdx=-1;
 function openCardEditor(idx){
   _cardEditIdx=idx;
