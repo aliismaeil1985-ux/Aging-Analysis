@@ -6653,12 +6653,15 @@ function _spApplyActuals(act){
   SPACE_HEADERS=['Metric'].concat(B,['Total'],F,['Grand Total']);
   SPACE_NB=B.length;
   var actM2=[],palV=[],qtyR=[],palOneA=[],layersA=[];
-  act.branches.forEach(function(r){actM2.push(r.m2||0);palV.push(r.pal||0);qtyR.push(r.qty||0);palOneA.push(r.palOne||act.palOne||SP_PALONE_DEFAULT);layersA.push((r.layers||act.layers||SP_LAYERS_DEFAULT)*(r.units||act.units||SP_UNITS_DEFAULT));});
+  act.branches.forEach(function(r){
+    var po=r.palOne||act.palOne||SP_PALONE_DEFAULT,ly=r.layers||act.layers||SP_LAYERS_DEFAULT,un=r.units||act.units||SP_UNITS_DEFAULT;
+    actM2.push(r.m2||0);palV.push(spCalcPallets(r.m2,po,ly));qtyR.push(r.qty||0);palOneA.push(po);layersA.push(ly*un);
+  });
   var totM2=actM2.reduce(function(s,v){return s+v;},0);
   var totPal=palV.reduce(function(s,v){return s+v;},0);
   var totQty=qtyR.reduce(function(s,v){return s+v;},0);
   var factM2=act.factories.map(function(r){return r.m2||0;});
-  var factPal=act.factories.map(function(r){return r.pal||0;});
+  var factPal=act.factories.map(function(r){var po=r.palOne||act.palOne||SP_PALONE_DEFAULT,ly=r.layers||act.layers||SP_LAYERS_DEFAULT;return spCalcPallets(r.m2,po,ly);});
   var factQty=act.factories.map(function(r){return r.qty||0;});
   var factPalOne=act.factories.map(function(r){return r.palOne||act.palOne||SP_PALONE_DEFAULT;});
   var factLayers=act.factories.map(function(r){return (r.layers||act.layers||SP_LAYERS_DEFAULT)*(r.units||act.units||SP_UNITS_DEFAULT);});
@@ -6686,6 +6689,23 @@ function _spApplyActuals(act){
     sp.spPalOne=palOneCols;sp.spLayers=layersCols;
     sp.qtyMode=act.qtyMode;
   }
+  /* الأهم: اكتب نفس الصفوف في تقرير Space المحفوظ (getDR().space) إن وُجد،
+     لأن getSpaceRep() يفضّل البيانات المحفوظة على الافتراضية — فبهذا تصل
+     الطاقة المحسوبة فعلاً إلى صف «Actual space enough Qty for carton» في الشاشة. */
+  try{
+    var _s=getDR();
+    if(_s && _s.space && _s.space.groups && _s.space.groups[0]){
+      var sv=_s.space;
+      sv.groups[0].rows[0]=actRow.slice();
+      sv.groups[0].rows[1]=palRow.slice();
+      sv.groups[0].rows[2]=qtyRow_.slice();
+      var fl2=[];sv.groups.forEach(function(g){fl2=fl2.concat(g.rows);});sv.rows=fl2;
+      sv.headers=SPACE_HEADERS;
+      sv.branches=B;sv.branchCodes=BC;sv.factories=F;sv.factoryCodes=FC;
+      sv.spPalOne=palOneCols;sv.spLayers=layersCols;
+      saveDR(_s);try{drPush();}catch(e){}
+    }
+  }catch(e){}
   /* إعادة رسم الشاشة */
   try{renderDailyReport('space');}catch(e){}
 }
