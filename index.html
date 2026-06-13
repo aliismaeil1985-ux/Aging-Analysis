@@ -3669,13 +3669,32 @@ function dzReportCols(repKey,contId){var cont=document.getElementById(contId);if
   if(!rep||!rep.headers||!rep.headers.length){cont.innerHTML='<div class="cf-mini-help">'+tr('rpt_no_data')+'</div>';return;}
   var st=RPT[repKey]||{};var labels=st.labels||{},colcol=st.colcol||{},cf=st.cf||{};
   var nf=(rep.numFrom!=null?rep.numFrom:1);
-  var html='<table class="dz-table"><thead><tr><th>'+tr('dz_col')+'</th><th>'+tr('dz_name')+'</th><th>'+tr('dz_color')+'</th><th>'+tr('dz_cf')+'</th></tr></thead><tbody>';
+  var html='<div class="cf-mini-help">'+tr('rpt_cols_hint')+' — يمكنك ترتيب الأعمدة بالأسهم.</div><table class="dz-table"><thead><tr><th>ترتيب</th><th>'+tr('dz_col')+'</th><th>'+tr('dz_name')+'</th><th>'+tr('dz_color')+'</th><th>'+tr('dz_cf')+'</th></tr></thead><tbody>';
+  var _n=rep.headers.length;
   rep.headers.forEach(function(hdr,i){var hh=String(hdr).replace(/'/g,"\\'").replace(/"/g,'&quot;');var cur=labels[hdr]!=null?labels[hdr]:'';var cc=colcol[hdr]||{};var isNum=(i>=nf);
+    var ord='<span class="dz-ord"><button onclick="rptMoveCol(\''+repKey+'\','+i+',-1)" '+(i===0?'disabled':'')+' title="لأعلى/يمين">&#9650;</button><button onclick="rptMoveCol(\''+repKey+'\','+i+',1)" '+(i===_n-1?'disabled':'')+' title="لأسفل/يسار">&#9660;</button></span>';
     var colorCtl='<span class="dz-hd-color"><input type="color" title="'+tr('cc_hbg')+'" value="'+(cc.hbg||'#1e4e8c')+'" oninput="rptSetColor(\''+repKey+'\',\''+hh+'\',\'hbg\',this.value)"><input type="color" title="'+tr('cc_cbg')+'" value="'+(cc.cbg||'#ffffff')+'" oninput="rptSetColor(\''+repKey+'\',\''+hh+'\',\'cbg\',this.value)"><input type="color" title="'+tr('cc_cfg')+'" value="'+(cc.cfg||'#1e293b')+'" oninput="rptSetColor(\''+repKey+'\',\''+hh+'\',\'cfg\',this.value)"><button class="cf-del" title="'+tr('cc_clear')+'" style="background:#eef3fa;color:#64748b" onclick="rptClearColor(\''+repKey+'\',\''+hh+'\')">&#8635;</button></span>';
     var n=(cf[hdr]||[]).length;
     var cfBtn=isNum?('<button class="dz-cc-add" style="padding:5px 9px" onclick="openRptCF(\''+repKey+'\',\''+hh+'\')">&#9881;&#65039; '+tr('dz_cf')+(n?' ('+n+')':'')+'</button>'):'<span style="color:#cbd5e1">—</span>';
-    html+='<tr><td>'+String(hdr).replace(/</g,'&lt;')+'</td><td><input type="text" value="'+String(cur).replace(/"/g,'&quot;')+'" placeholder="'+String(hdr).replace(/"/g,'&quot;')+'" oninput="rptSetLabel(\''+repKey+'\',\''+hh+'\',this.value)"></td><td>'+colorCtl+'</td><td>'+cfBtn+'</td></tr>';});
+    html+='<tr><td>'+ord+'</td><td>'+String(hdr).replace(/</g,'&lt;')+'</td><td><input type="text" value="'+String(cur).replace(/"/g,'&quot;')+'" placeholder="'+String(hdr).replace(/"/g,'&quot;')+'" oninput="rptSetLabel(\''+repKey+'\',\''+hh+'\',this.value)"></td><td>'+colorCtl+'</td><td>'+cfBtn+'</td></tr>';});
   html+='</tbody></table>';cont.innerHTML=html;}
+/* تحريك عمود في تقرير: يعيد ترتيب الرؤوس وكل صفوف البيانات (النسخة المحفوظة + الافتراضية + القالب) */
+function rptMoveCol(repKey,idx,dir){
+  var j=idx+dir;
+  function swap(obj){
+    if(!obj||!obj.headers||idx<0||j<0||idx>=obj.headers.length||j>=obj.headers.length)return;
+    var h=obj.headers;var t=h[idx];h[idx]=h[j];h[j]=t;
+    if(obj.rows&&obj.rows.length){obj.rows.forEach(function(row){if(Array.isArray(row)&&idx<row.length&&j<row.length){var x=row[idx];row[idx]=row[j];row[j]=x;}});}
+  }
+  try{
+    var s=getDR();
+    if(s&&s[repKey]&&s[repKey].headers){swap(s[repKey]);saveDR(s);try{drPush();}catch(e){}}
+    if(DEFAULT_DAILY_REPORTS[repKey])swap(DEFAULT_DAILY_REPORTS[repKey]);
+    if(typeof DR_TEMPLATES!=='undefined'&&DR_TEMPLATES[repKey])swap(DR_TEMPLATES[repKey]);
+  }catch(e){}
+  try{renderDailyReport(repKey);}catch(e){}
+  try{dzReportCols(repKey,'dz-rpt-'+repKey);}catch(e){}
+}
 // ----- Decorator applied to the three rich reports (fgbal / oldid / transit) -----
 function decorateRich(){
   try{
@@ -6641,6 +6660,55 @@ function saveSpaceActuals(act){
   var s=getDR();s.space_actuals=act;saveDR(s);_drCloudReady=true;
   try{drPush();}catch(e){}
   _spApplyActuals(act);
+  try{_spSyncReportColumns(act);}catch(e){}
+}
+/* مزامنة أعمدة المستودعات إلى التقارير الرئيسية (FG Balance + Transit) وقوالبها:
+   • يُضاف أي مستودع جديد (فرع/مصنع) كعمود قبل عمود Total مباشرةً.
+   • تُضاف القيمة 0 للصفوف الموجودة حتى لا تُفقد بيانات.
+   • يشمل: القالب DR_TEMPLATES، النسخة الافتراضية DEFAULT_DAILY_REPORTS، والبيانات المرفوعة getDR(). */
+function _spSyncReportColumns(act){
+  var names=[];
+  (act.branches||[]).forEach(function(r){if(r&&r.name)names.push(String(r.name).trim());});
+  (act.factories||[]).forEach(function(r){if(r&&r.name)names.push(String(r.name).trim());});
+  if(!names.length)return;
+  var targets=['fgbal','transit']; /* التقارير الرئيسية فقط */
+  function findTotalIdx(headers){
+    for(var i=0;i<headers.length;i++){if(/^\s*total\s*$/i.test(String(headers[i]||'')))return i;}
+    return -1; /* لا يوجد Total */
+  }
+  function hasCol(headers,name){
+    var n=String(name).toLowerCase().replace(/\s+/g,' ').trim();
+    return headers.some(function(h){return String(h||'').toLowerCase().replace(/\s+/g,' ').trim()===n;});
+  }
+  /* أدرج عموداً جديداً في الرؤوس + كل صفوف البيانات (بقيمة 0) قبل Total */
+  function injectInto(obj){
+    if(!obj||!obj.headers||!obj.headers.length)return false;
+    var changed=false;
+    names.forEach(function(nm){
+      if(hasCol(obj.headers,nm))return;
+      var tIdx=findTotalIdx(obj.headers);
+      var insAt=(tIdx>=0)?tIdx:obj.headers.length; /* قبل Total أو في النهاية */
+      obj.headers.splice(insAt,0,nm);
+      if(obj.rows&&obj.rows.length){
+        obj.rows.forEach(function(row){if(Array.isArray(row))row.splice(insAt,0,0);});
+      }
+      changed=true;
+    });
+    return changed;
+  }
+  var anyData=false;
+  var s=getDR();
+  targets.forEach(function(key){
+    /* القالب */
+    try{if(typeof DR_TEMPLATES!=='undefined'&&DR_TEMPLATES[key])injectInto(DR_TEMPLATES[key]);}catch(e){}
+    /* النسخة الافتراضية */
+    try{if(DEFAULT_DAILY_REPORTS[key])injectInto(DEFAULT_DAILY_REPORTS[key]);}catch(e){}
+    /* البيانات المرفوعة المحفوظة */
+    try{if(s&&s[key]&&s[key].headers){if(injectInto(s[key]))anyData=true;}}catch(e){}
+  });
+  if(anyData){saveDR(s);try{drPush();}catch(e){}}
+  /* إعادة رسم التقارير المتأثرة إن كانت مفتوحة */
+  targets.forEach(function(key){try{renderDailyReport(key);}catch(e){}});
 }
 function _spApplyActuals(act){
   /* تحديث SPACE_BRANCHES, SPACE_BCODES, SPACE_FACT, SPACE_FCODES, SPACE_HEADERS
