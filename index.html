@@ -8578,7 +8578,7 @@ function renderBottleReport(rep){
   #page-dash .kpis.custom-kpis:empty{display:none !important}
   #page-dash .main{display:contents !important}
   /* عمود السلايسر بنفس ارتفاع عمود البطاقات الأربع تقريباً (4 بطاقات × 132 + 3 فواصل × 12) */
-  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:676px !important;max-height:676px !important}
+  #page-dash .side{grid-area:side !important;display:flex !important;flex-direction:column !important;gap:12px !important;margin:0 !important;min-width:0 !important;height:760px !important;max-height:760px !important}
   #page-dash .main>div:last-child{grid-area:charts !important;min-width:0 !important}
   #page-dash .foot{grid-area:foot !important}
   /* إخفاء زر «New card» في نسخة الجوال */
@@ -8590,9 +8590,12 @@ function renderBottleReport(rep){
   /* سلايسر الهوية يُظهر 4 فلاتر (أطول قليلاً من البقية) */
   #page-dash .side .fbox.f-identity{flex:1.35 1 0 !important}
   #page-dash .side .fbox.f-identity>div:last-child{min-height:184px !important}
+  /* تكبير سلايسر الفرع والتصنيف ليُظهرا 4 فلاتر مثل الهوية */
+  #page-dash .side .fbox.f-branch,#page-dash .side .fbox.f-classify{flex:1.35 1 0 !important}
+  #page-dash .side .fbox.f-branch>div:last-child,#page-dash .side .fbox.f-classify>div:last-child{min-height:184px !important}
 
   /* ---------- KPI cards — premium ---------- */
-  .kpi{padding:18px 16px !important;min-height:148px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
+  .kpi{padding:20px 16px !important;min-height:178px !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important;overflow:hidden !important;position:relative !important}
   .kpi::before{width:100% !important;height:4px !important;inset-inline-start:0 !important;top:0 !important;bottom:auto !important;opacity:.95}
   .kpi .row{align-items:center !important;gap:10px !important}
   .kpi .ic{width:40px !important;height:40px !important;border-radius:13px !important;font-size:19px !important;box-shadow:0 6px 16px rgba(20,60,120,.18) !important}
