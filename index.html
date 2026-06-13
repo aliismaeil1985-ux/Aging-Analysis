@@ -6342,73 +6342,85 @@ function decorateSpaceRep(rep){
   var prevTr=R.groups[2].rows;
   var u=computeUsedFromFG();var t=computeTransitFromFG();
   function actV(i){return _spN(actRow[i]);}
+  /* أعداد ديناميكية للفروع والمصانع ومواضع الأعمدة */
+  var nB=(R.branches&&R.branches.length)?R.branches.length:SPACE_NB;
+  var nF=(R.factories&&R.factories.length)?R.factories.length:0;
+  var totIdx=1+nB;            /* عمود Total */
+  var facStart=totIdx+1;      /* أول عمود مصنع */
+  var grandIdx=facStart+nF;   /* عمود Grand Total */
+  /* المصنع j له فهرس FG داخلي = nB + 1 + j (حسب computeUsedFromFG التي تستخدم 9،10 للمصنعين الأصليين) */
+  function facFGIndex(j){return (nB+1)+j;} /* للمصنعين الأصليين: nB=7 -> 8+? ; نُبقي التوافق أدناه */
   var u_used=['used Spaces   (M2 )'],u_bal=['Total current balance Carton'],u_pct=['Percentage Spaces used %'];
   var t_used=['used Spaces   (M2 ) ( Transit)'],t_bal=['Total  Carton  ( Transit)'],t_pct=['Percentage Spaces used %'];
-  for(var i=1;i<=SPACE_NB;i++){
-    u_used.push(_spRound1(u.usedM2[i]));u_bal.push(_spRound1(u.balCarton[i]));
-    var a=actV(i);u_pct.push((a>0?Math.round(u.usedM2[i]/a*100):0)+'%');
-    t_used.push(_spRound1(t.trM2[i]));t_bal.push(_spRound1(t.trCarton[i]));
-    t_pct.push((a>0?Math.round(t.trM2[i]/a*100):0)+'%');
+  /* الفروع */
+  for(var i=1;i<=nB;i++){
+    u_used.push(_spRound1(u.usedM2[i]||0));u_bal.push(_spRound1(u.balCarton[i]||0));
+    var a=actV(i);u_pct.push((a>0?Math.round((u.usedM2[i]||0)/a*100):0)+'%');
+    t_used.push(_spRound1(t.trM2[i]||0));t_bal.push(_spRound1(t.trCarton[i]||0));
+    t_pct.push((a>0?Math.round((t.trM2[i]||0)/a*100):0)+'%');
   }
-  u_used.push(_spRound1(_spSumArr(u_used,1,SPACE_NB)));
-  u_bal.push(_spRound1(_spSumArr(u_bal,1,SPACE_NB)));
-  var saU=_spSumArr(actRow,1,SPACE_NB),snU=_spSumArr(u_used,1,SPACE_NB);
+  /* Total (مجموع الفروع) */
+  u_used.push(_spRound1(_spSumArr(u_used,1,nB)));
+  u_bal.push(_spRound1(_spSumArr(u_bal,1,nB)));
+  var saU=_spSumArr(actRow,1,nB),snU=_spSumArr(u_used,1,nB);
   u_pct.push((saU>0?Math.round(snU/saU*100):0)+'%');
-  t_used.push(_spRound1(_spSumArr(t_used,1,SPACE_NB)));
-  t_bal.push(_spRound1(_spSumArr(t_bal,1,SPACE_NB)));
-  var snT=_spSumArr(t_used,1,SPACE_NB);
+  t_used.push(_spRound1(_spSumArr(t_used,1,nB)));
+  t_bal.push(_spRound1(_spSumArr(t_bal,1,nB)));
+  var snT=_spSumArr(t_used,1,nB);
   t_pct.push((saU>0?Math.round(snT/saU*100):0)+'%');
-  u_used.push(_spRound1(u.usedM2[9]));u_bal.push(_spRound1(u.balCarton[9]));
-  var a9=actV(9);u_pct.push((a9>0?Math.round(u.usedM2[9]/a9*100):0)+'%');
-  t_used.push(_spRound1(t.trM2[9]));t_bal.push(_spRound1(t.trCarton[9]));
-  t_pct.push((a9>0?Math.round(t.trM2[9]/a9*100):0)+'%');
-  var pUu=(prevUsed[0]&&prevUsed[0][10]!=null)?prevUsed[0][10]:0;
-  var pUb=(prevUsed[1]&&prevUsed[1][10]!=null)?prevUsed[1][10]:0;
-  var pTu=(prevTr[0]&&prevTr[0][10]!=null)?prevTr[0][10]:0;
-  var pTb=(prevTr[1]&&prevTr[1][10]!=null)?prevTr[1][10]:0;
-  u_used.push(pUu);u_bal.push(pUb);
-  var a10=actV(10),uK=_spN(pUu);u_pct.push((a10>0?Math.round(uK/a10*100):0)+'%');
-  t_used.push(pTu);t_bal.push(pTb);
-  var tK=_spN(pTu);t_pct.push((a10>0?Math.round(tK/a10*100):0)+'%');
-  u_used.push(_spRound1(_spN(u_used[8])+_spN(u_used[9])+_spN(u_used[10])));
-  u_bal.push(_spRound1(_spN(u_bal[8])+_spN(u_bal[9])+_spN(u_bal[10])));
-  var aG=_spN(actRow[8])+_spN(actRow[9])+_spN(actRow[10]);
-  u_pct.push((aG>0?Math.round(_spN(u_used[11])/aG*100):0)+'%');
-  t_used.push(_spRound1(_spN(t_used[8])+_spN(t_used[9])+_spN(t_used[10])));
-  t_bal.push(_spRound1(_spN(t_bal[8])+_spN(t_bal[9])+_spN(t_bal[10])));
-  t_pct.push((aG>0?Math.round(_spN(t_used[11])/aG*100):0)+'%');
+  /* المصانع — للمصنعين الأصليين تأتي قيمهما من u.usedM2[9],[10]؛ المصانع الإضافية تأخذ 0 */
+  var FAC_FG=[9,10]; /* مواضع FG للمصنعين الأصليين في computeUsedFromFG */
+  for(var fj=0;fj<nF;fj++){
+    var src=FAC_FG[fj];
+    var fu=src!=null?_spRound1(u.usedM2[src]||0):0, fb=src!=null?_spRound1(u.balCarton[src]||0):0;
+    var ft=src!=null?_spRound1(t.trM2[src]||0):0, ftc=src!=null?_spRound1(t.trCarton[src]||0):0;
+    var ai=actV(facStart+fj);
+    u_used.push(fu);u_bal.push(fb);u_pct.push((ai>0?Math.round(fu/ai*100):0)+'%');
+    t_used.push(ft);t_bal.push(ftc);t_pct.push((ai>0?Math.round(ft/ai*100):0)+'%');
+  }
+  /* Grand Total = Total (فروع) + مجموع المصانع */
+  var gU=_spN(u_used[totIdx]),gUb=_spN(u_bal[totIdx]),gT=_spN(t_used[totIdx]),gTb=_spN(t_bal[totIdx]);
+  for(var fj2=0;fj2<nF;fj2++){gU+=_spN(u_used[facStart+fj2]);gUb+=_spN(u_bal[facStart+fj2]);gT+=_spN(t_used[facStart+fj2]);gTb+=_spN(t_bal[facStart+fj2]);}
+  u_used.push(_spRound1(gU));u_bal.push(_spRound1(gUb));
+  var aG=0;for(var gi=1;gi<grandIdx;gi++){if(gi!==totIdx)aG+=actV(gi);}
+  u_pct.push((aG>0?Math.round(gU/aG*100):0)+'%');
+  t_used.push(_spRound1(gT));t_bal.push(_spRound1(gTb));
+  t_pct.push((aG>0?Math.round(gT/aG*100):0)+'%');
   R.groups[1]={label:'used Spaces',cls:'g-used',rows:[u_used,u_bal,u_pct]};
   R.groups[2]={label:'Transit Spaces',cls:'g-transit',rows:[t_used,t_bal,t_pct]};
   var palRow=R.groups[0].rows[1]||[];
-  function palV(i){return _spN(palRow[i]);}
   var e_empty=['Empty space (M2 ) '],e_pal=['The space is enough for pallet'],e_enough=['Enough Carton Storage  '];
-  for(var i2=1;i2<=SPACE_NB;i2++){
-    var a=actV(i2),uu=_spN(u_used[i2]),tt=_spN(t_used[i2]);
-    var e=_spRound1(a-uu-tt);e_empty.push(e);e_pal.push(_spRound1(e*0.8));
-    /* Enough Carton = Empty × (qty_enough / actual_m²) */
+  /* الفروع */
+  for(var i2=1;i2<=nB;i2++){
+    var a2=actV(i2),uu=_spN(u_used[i2]),tt=_spN(t_used[i2]);
+    var e=_spRound1(a2-uu-tt);e_empty.push(e);e_pal.push(_spRound1(e*0.8));
     var _qtyI=_spN(qtyRow[i2]);
-    e_enough.push(a>0?_spRound1(e*_qtyI/a):0);
+    e_enough.push(a2>0?_spRound1(e*_qtyI/a2):0);
   }
-  e_empty.push(_spRound1(_spSumArr(e_empty,1,SPACE_NB)));
-  e_pal.push(_spRound1(_spSumArr(e_pal,1,SPACE_NB)));
-  var eSumTot=_spSumArr(e_empty,1,SPACE_NB),aTotal=actV(8),_qtyTotal=_spN(qtyRow[8]);
+  /* Total */
+  e_empty.push(_spRound1(_spSumArr(e_empty,1,nB)));
+  e_pal.push(_spRound1(_spSumArr(e_pal,1,nB)));
+  var eSumTot=_spSumArr(e_empty,1,nB),aTotal=actV(totIdx),_qtyTotal=_spN(qtyRow[totIdx]);
   e_enough.push(aTotal>0?_spRound1(eSumTot*_qtyTotal/aTotal):0);
-  [9,10].forEach(function(c){
-    var a=actV(c),uu=_spN(u_used[c]),tt=_spN(t_used[c]);
-    var e=_spRound1(a-uu-tt);e_empty.push(e);e_pal.push(_spRound1(e*0.8));
-    /* Enough Carton = Empty × (qty_enough / actual_m²) */
+  /* المصانع */
+  for(var fj3=0;fj3<nF;fj3++){
+    var c=facStart+fj3;
+    var a3=actV(c),uu3=_spN(u_used[c]),tt3=_spN(t_used[c]);
+    var e3=_spRound1(a3-uu3-tt3);e_empty.push(e3);e_pal.push(_spRound1(e3*0.8));
     var _qtyC=_spN(qtyRow[c]);
-    e_enough.push(a>0?_spRound1(e*_qtyC/a):0);
-  });
-  e_empty.push(_spRound1(_spN(e_empty[8])+_spN(e_empty[9])+_spN(e_empty[10])));
-  e_pal.push(_spRound1(_spN(e_pal[8])+_spN(e_pal[9])+_spN(e_pal[10])));
-  var aGrand=actV(11),_qtyGrand=_spN(qtyRow[11]),_eGrand=_spN(e_empty[8])+_spN(e_empty[9])+_spN(e_empty[10]);
-  e_enough.push(aGrand>0?_spRound1(_eGrand*_qtyGrand/aGrand):0);
+    e_enough.push(a3>0?_spRound1(e3*_qtyC/a3):0);
+  }
+  /* Grand Total */
+  var eG=_spN(e_empty[totIdx]),epG=_spN(e_pal[totIdx]);
+  for(var fj4=0;fj4<nF;fj4++){eG+=_spN(e_empty[facStart+fj4]);epG+=_spN(e_pal[facStart+fj4]);}
+  e_empty.push(_spRound1(eG));e_pal.push(_spRound1(epG));
+  var aGrand=actV(grandIdx),_qtyGrand=_spN(qtyRow[grandIdx]);
+  e_enough.push(aGrand>0?_spRound1(eG*_qtyGrand/aGrand):0);
   R.groups[3]={label:'Empty space',cls:'g-empty',rows:[e_empty,e_pal,e_enough]};
   var flat=[];R.groups.forEach(function(g){flat=flat.concat(g.rows);});R.rows=flat;
   var bp=[],fp=[];
-  for(var bi=1;bi<=SPACE_NB;bi++){var aa=actV(bi),uu2=_spN(u_used[bi]),tt2=_spN(t_used[bi]);bp.push(aa>0?Math.round((uu2+tt2)/aa*100):0);}
-  [9,10].forEach(function(c){var aa=actV(c),uu2=_spN(u_used[c]),tt2=_spN(t_used[c]);fp.push(aa>0?Math.round((uu2+tt2)/aa*100):0);});
+  for(var bi=1;bi<=nB;bi++){var aa=actV(bi),uu2=_spN(u_used[bi]),tt2=_spN(t_used[bi]);bp.push(aa>0?Math.round((uu2+tt2)/aa*100):0);}
+  for(var fk=0;fk<nF;fk++){var cc=facStart+fk;var aa2=actV(cc),uu4=_spN(u_used[cc]),tt4=_spN(t_used[cc]);fp.push(aa2>0?Math.round((uu4+tt4)/aa2*100):0);}
   R.branchPct=bp;R.factoryPct=fp;
   R._autoComputed=true;
   return R;
@@ -6781,12 +6793,16 @@ function _spApplyActuals(act){
     sp.qtyMode=act.qtyMode;
   }
   /* الأهم: اكتب نفس الصفوف في تقرير Space المحفوظ (getDR().space) إن وُجد،
-     لأن getSpaceRep() يفضّل البيانات المحفوظة على الافتراضية — فبهذا تصل
-     الطاقة المحسوبة فعلاً إلى صف «Actual space enough Qty for carton» في الشاشة. */
+     مع إعادة محاذاة كل المجموعات (used/transit/empty) إلى ترتيب الأعمدة الجديد
+     [Metric, فروع..., Total, مصانع..., Grand Total] حتى لا يختل العمود عند إضافة مستودع. */
   try{
     var _s=getDR();
     if(_s && _s.space && _s.space.groups && _s.space.groups[0]){
       var sv=_s.space;
+      var oldB=(sv.branches||[]).slice(), oldF=(sv.factories||[]).slice();
+      /* أعد محاذاة كل صفوف المجموعات من التخطيط القديم إلى الجديد */
+      _spRealignSpaceGroups(sv,oldB,oldF,B,F);
+      /* اكتب صفوف «Actual» الثلاثة المحسوبة حديثاً */
       sv.groups[0].rows[0]=actRow.slice();
       sv.groups[0].rows[1]=palRow.slice();
       sv.groups[0].rows[2]=qtyRow_.slice();
@@ -6799,6 +6815,57 @@ function _spApplyActuals(act){
   }catch(e){}
   /* إعادة رسم الشاشة */
   try{renderDailyReport('space');}catch(e){}
+}
+/* إعادة محاذاة صفوف مجموعات تقرير Space عند تغيّر قائمة المستودعات:
+   تنقل قيم كل مستودع إلى موضعه الجديد حسب الاسم، وتضع 0 للمستودعات الجديدة،
+   وتعيد حساب عمودي Total (مجموع الفروع) و Grand Total (الفروع + المصانع) للصفوف الرقمية،
+   مع الحفاظ على صفوف النِسب (%) كما هي (تُعاد حسابها لاحقاً في recomputeSpacePercentages). */
+function _spRealignSpaceGroups(sv,oldB,oldF,newB,newF){
+  if(!sv||!sv.groups)return;
+  function nrm(x){return String(x||'').toLowerCase().replace(/\s+/g,' ').trim();}
+  /* خريطة: اسم مستودع -> فهرس العمود القديم في الصف (label=0) */
+  var oldIdx={}; /* للفروع */
+  oldB.forEach(function(nm,i){oldIdx['b:'+nrm(nm)]=1+i;});
+  var oldTotIdx=1+oldB.length;            /* عمود Total القديم */
+  var oldFacStart=oldTotIdx+1;            /* أول عمود مصنع قديم */
+  oldF.forEach(function(nm,i){oldIdx['f:'+nrm(nm)]=oldFacStart+i;});
+  /* تخطيط جديد */
+  var newTotIdx=1+newB.length, newGrandIdx=1+newB.length+1+newF.length;
+  var newLen=newGrandIdx+1;
+  function isPctRow(row){return /%/.test(String(row[row.length-1]))||/percentage/i.test(String(row[0]||''));}
+  function num(v){return typeof v==='number'?v:(parseFloat(String(v==null?'':v).replace(/[,%\s]/g,''))||0);}
+  sv.groups.forEach(function(g){
+    if(!g||!g.rows)return;
+    g.rows=g.rows.map(function(row){
+      if(!Array.isArray(row))return row;
+      var label=row[0];
+      var pct=isPctRow(row);
+      var nu=new Array(newLen);nu[0]=label;
+      /* الفروع */
+      var sumB=0;
+      newB.forEach(function(nm,i){
+        var oi=oldIdx['b:'+nrm(nm)];
+        var v=(oi!=null&&oi<row.length)?row[oi]:(pct?'0%':0);
+        nu[1+i]=v; if(!pct)sumB+=num(v);
+      });
+      /* المصانع */
+      var sumF=0;
+      newF.forEach(function(nm,i){
+        var oi=oldIdx['f:'+nrm(nm)];
+        var v=(oi!=null&&oi<row.length)?row[oi]:(pct?'0%':0);
+        nu[newTotIdx+1+i]=v; if(!pct)sumF+=num(v);
+      });
+      /* Total و Grand Total */
+      if(pct){
+        nu[newTotIdx]=row[oldTotIdx]!=null?row[oldTotIdx]:'0%';
+        nu[newGrandIdx]=row[row.length-1]!=null?row[row.length-1]:'0%';
+      }else{
+        nu[newTotIdx]=Math.round(sumB*10)/10;
+        nu[newGrandIdx]=Math.round((sumB+sumF)*10)/10;
+      }
+      return nu;
+    });
+  });
 }
 /* عدد البلتات = المساحة الفعلية ÷ مساحة البلت الواحد */
 /* عدد البلتات = (المساحة الفعلية ÷ مساحة البلت الواحد) × عدد الرصّات */
