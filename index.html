@@ -19,6 +19,7 @@
 <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -374,11 +375,12 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 html[dir=rtl] .login-shell{font-family:'Cairo','Inter',sans-serif}
 .login-brand{position:relative;flex:1.05;padding:48px 44px;color:#eaf2fc;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(700px 430px at 82% -12%,rgba(58,160,196,.30),transparent 60%),linear-gradient(160deg,#143f74 0%,#0e2f59 56%,#0a2444 100%)}
 .login-brand::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(118deg,rgba(255,255,255,.045) 0 2px,transparent 2px 28px);opacity:.6;pointer-events:none}
-.lb-logo{position:relative;width:126px;height:126px;border-radius:28px;background:linear-gradient(155deg,#fff 0%,#eef4fb 100%);display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 24px 54px -14px rgba(6,20,44,.6),0 6px 16px rgba(6,20,44,.34),inset 0 1px 0 rgba(255,255,255,.9),0 0 46px -6px rgba(232,62,140,.5),0 0 74px -10px rgba(47,126,216,.4);animation:lbFloat 6s ease-in-out infinite}
-.lb-logo::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:2.5px;background:linear-gradient(140deg,#ff4d97,#2f7ed8 52%,#12b5a3);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-.lb-logo img{width:88px;height:auto;display:block;position:relative;z-index:1;filter:drop-shadow(0 3px 6px rgba(6,20,44,.12))}
+.lb-logo{position:relative;width:144px;height:144px;border-radius:34px;background:linear-gradient(155deg,#fff 0%,#eef4fb 100%);display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 24px 54px -14px rgba(6,20,44,.6),0 6px 16px rgba(6,20,44,.34),inset 0 1px 0 rgba(255,255,255,.9),0 0 46px -6px rgba(232,62,140,.5),0 0 74px -10px rgba(47,126,216,.4);animation:lbFloat 6s ease-in-out infinite}
+.lb-logo::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;background:linear-gradient(140deg,#2f7ed8,#12b5a3 58%,#ff5e99);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.lb-logo img{width:130px;height:auto;display:block;position:relative;z-index:1;filter:drop-shadow(0 4px 9px rgba(6,20,44,.16))}
 @keyframes lbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@media (prefers-reduced-motion:reduce){.lb-logo{animation:none}}
+.lf-mini{animation:lbFloat 6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.lb-logo,.lf-mini,#page-home .d-logo{animation:none !important}}
 .lb-title{font-size:29px;font-weight:800;letter-spacing:-.5px;margin-top:30px;line-height:1.18;position:relative;z-index:2}
 .lb-tag{font-size:14.5px;color:#aecbed;font-weight:500;margin-top:13px;max-width:340px;line-height:1.65;position:relative;z-index:2}
 .lb-stats{display:flex;gap:30px;margin-top:auto;padding-top:36px;position:relative;z-index:2}
@@ -412,9 +414,9 @@ html[dir=rtl] .login-shell{font-family:'Cairo','Inter',sans-serif}
   .login-shell{flex-direction:column;min-height:0;max-height:none;width:100%}
   .login-brand{display:none}
   .login-form-side{padding:38px 26px;justify-content:flex-start}
-  .lf-mini{display:flex !important;justify-content:center;align-items:center;width:112px;height:112px;margin:6px auto 26px;padding:0;gap:0;position:relative;border-radius:27px;background:linear-gradient(155deg,#fff,#eef4fb);box-shadow:0 18px 40px -12px rgba(6,20,44,.32),inset 0 1px 0 rgba(255,255,255,.92),0 0 42px -8px rgba(47,126,216,.4),0 0 30px -8px rgba(232,62,140,.32)}
+  .lf-mini{display:flex !important;justify-content:center;align-items:center;width:128px;height:128px;margin:6px auto 26px;padding:0;gap:0;position:relative;border-radius:31px;background:linear-gradient(155deg,#fff,#eef4fb);box-shadow:0 18px 40px -12px rgba(6,20,44,.32),inset 0 1px 0 rgba(255,255,255,.92),0 0 42px -8px rgba(47,126,216,.4),0 0 30px -8px rgba(232,62,140,.32)}
   .lf-mini::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:2.5px;background:linear-gradient(140deg,#ff4d97,#2f7ed8 52%,#12b5a3);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-  .lf-mini .tania-logo{height:78px;width:auto}
+  .lf-mini .tania-logo{height:110px;width:auto}
 }
 .userbox{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:auto;width:100%;padding-top:14px;border-top:1px solid rgba(255,255,255,.10)}
 .ubadge{font-size:11px;color:#bcd2ec;text-align:center;font-weight:600;line-height:1.3}
@@ -680,7 +682,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   #detail-ov .modal-head{flex:0 0 auto}
   /* داخل النافذة المُدارة: اجعل حاوية الجدول هي القابلة للتمرير حتى تبقى رؤوس الأعمدة ثابتة (sticky) أثناء التمرير لأعلى/لأسفل */
   #detail-ov .modal-body .pivot-wrap{flex:1 1 auto;min-height:0;max-height:none !important;overflow:auto !important;-webkit-overflow-scrolling:touch}
-  #detail-ov .modal-body .pivot thead th{position:sticky !important;top:0;z-index:6}
+  #detail-ov .modal-body .pivot{border-collapse:separate !important;border-spacing:0 !important}
+  #detail-ov .modal-body .pivot thead th{position:relative !important;z-index:8;background-clip:padding-box;will-change:top}
 
   .fg-modal-ov{padding:0 !important}
   .fg-modal-ov.show .fg-modal-box{
@@ -694,6 +697,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   }
   .fg-modal-ov.show .fg-modal-body{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
   .fg-modal-ov.show .fg-modal-head{flex:0 0 auto}
+  .fg-modal-ov.show .fg-dt{border-collapse:separate !important;border-spacing:0 !important}
+  .fg-modal-ov.show .fg-dt thead th,.fg-modal-ov.show .fg-modal-body thead th,.fg-modal-ov.show .fg-modal-body .pivot thead th{position:relative !important;z-index:8;will-change:top}
   .fg-modal-ov.show .fg-modal-body .fg-wrap,.fg-modal-ov.show .fg-modal-body .pivot-wrap{max-height:none !important;overflow:visible !important}
   .fg-modal-ov.show .fg-dt{font-size:11px}
   .fg-modal-ov.show .fg-dt th,.fg-modal-ov.show .fg-dt td{padding:4px 6px}
@@ -1104,6 +1109,31 @@ html[dir=rtl] .hub-tile .tgo .ar{display:inline-block;transform:scaleX(-1)}
   body.use-print-stage #print-stage{display:block !important;position:fixed;inset:0;background:#fff;padding:0;margin:0}
   #print-stage .ps-table table{font-size:11px !important}
 }
+/* ===== مولّد تقرير الطباعة الاحترافي (#print-report-root) ===== */
+#print-report-root{display:none}
+@media print{
+  body.printing-report > *:not(#print-report-root){display:none !important}
+  body.printing-report #print-report-root{display:block !important}
+  #print-report-root{position:static;background:#fff;color:#0f2540;font-family:'Cairo','Inter',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print-report-root *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print-report-root .pr-head{display:flex;align-items:center;gap:16px;border-bottom:3px solid #13396b;padding-bottom:12px;margin-bottom:16px}
+  #print-report-root .pr-logo{height:48px;width:auto}
+  #print-report-root .pr-h-mid{flex:1}
+  #print-report-root .pr-title{font-size:20px;font-weight:800;color:#13396b;line-height:1.2}
+  #print-report-root .pr-org{font-size:10.5px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+  #print-report-root .pr-meta{text-align:end;font-size:11px;color:#5b6b82;line-height:1.7;white-space:nowrap}
+  #print-report-root .pr-meta b{color:#13396b}
+  #print-report-root .pr-tablewrap{margin-bottom:16px}
+  #print-report-root table.pr-table{border-collapse:collapse;width:100%;font-size:10.5px;font-variant-numeric:tabular-nums}
+  #print-report-root table.pr-table th{background:#13396b !important;color:#fff !important;font-weight:700;padding:6px 8px;border:1px solid #2f5488;text-align:center;white-space:nowrap}
+  #print-report-root table.pr-table td{padding:5px 8px;border:1px solid #cbd8e8;white-space:nowrap;text-align:center}
+  #print-report-root table.pr-table tbody tr:nth-child(even) td{background:#eef3fb !important}
+  #print-report-root table.pr-table tr.grand td,#print-report-root table.pr-table tfoot tr td,#print-report-root table.pr-table tr.fg-grand td{background:#13396b !important;color:#fff !important;font-weight:800}
+  #print-report-root table.pr-table td.tot{font-weight:800;color:#13396b}
+  #print-report-root .pr-fallback{font-size:11px}
+  #print-report-root .pr-footer{margin-top:16px;border-top:1px solid #cbd8e8;padding-top:8px;font-size:9.5px;color:#94a3b8;display:flex;justify-content:space-between}
+  #print-report-root .fg-vsep,#print-report-root .sp-vsep{display:none !important}
+}
 
 /* ===== Title-edit mode (inline editing of any title on the platform) ===== */
 body.editmode [data-i18n]:not(input):not(select):not(textarea){outline:1.5px dashed rgba(47,126,216,.55);outline-offset:2px;cursor:text;position:relative;border-radius:4px;transition:background .15s;}
@@ -1348,9 +1378,9 @@ h1[data-i18n="title"], .lb-title{white-space:pre-line;line-height:1.22;text-alig
 #page-home .icn{display:inline-flex}
 #page-home .icn svg{display:block}
 #page-home .d-hero{text-align:center;max-width:600px;margin:0 auto}
-#page-home .d-logo{width:80px;height:80px;border-radius:23px;margin:0 auto 20px;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 16px 36px -12px rgba(16,40,80,.26)}
+#page-home .d-logo{width:104px;height:104px;border-radius:28px;margin:0 auto 22px;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 16px 36px -12px rgba(16,40,80,.26);animation:lbFloat 6s ease-in-out infinite}
 #page-home .d-logo::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:linear-gradient(140deg,var(--rose),var(--blue) 52%,var(--teal));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-#page-home .d-logo img{width:58px;height:auto;position:relative;z-index:1}
+#page-home .d-logo img{width:92px;height:auto;position:relative;z-index:1;filter:drop-shadow(0 3px 7px rgba(16,40,80,.14))}
 #page-home .d-eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--faint)}
 #page-home .d-hero h1{font-size:34px;font-weight:800;letter-spacing:-1px;margin-top:9px;line-height:1.05;color:var(--white)}
 #page-home .d-hero p{font-size:14.5px;color:var(--soft);font-weight:450;margin-top:11px}
@@ -1391,8 +1421,8 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 @media (max-width:860px){#page-home .d-home{padding:24px 18px 36px}#page-home .d-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){
  #page-home .d-home{padding:18px 12px 28px}
- #page-home .d-logo{width:68px;height:68px;border-radius:20px;margin-bottom:16px}
- #page-home .d-logo img{width:48px}
+ #page-home .d-logo{width:92px;height:92px;border-radius:26px;margin-bottom:18px}
+ #page-home .d-logo img{width:76px}
  #page-home .d-hero h1{font-size:26px}
  #page-home .d-hero p{font-size:13.5px;margin-top:9px}
  #page-home .d-meta{gap:8px 14px}
@@ -1804,8 +1834,8 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 .dal-empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
 .dal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11.5px;color:var(--muted)}
 /* طي بطاقة DAL */
-.dal-card.dal-collapsed .dal-body{display:none}
-.md-card.md-collapsed .md-body{display:none}
+#dal-card.dal-collapsed .dal-body,.dal-card.dal-collapsed .dal-body{display:none}
+#md-card.md-collapsed .md-body,.md-card.md-collapsed .md-body{display:none}
 .card-toggle-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;cursor:pointer;user-select:none;padding:4px;border-radius:10px;transition:background .15s}
 .card-toggle-head:hover{background:#f4f8fd}
 .card-toggle-arrow{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:#eef4fb;color:#2f7ed8;font-size:11px;flex-shrink:0;transition:transform .2s}
@@ -1841,6 +1871,107 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 .fg-table td.dal-c3,.pivot td.dal-c3{background:#bbf7d0 !important}
 .fg-table td.dal-c4,.pivot td.dal-c4{background:#fef08a !important}
 .fg-table td.dal-c5,.pivot td.dal-c5{background:#f5b5b5 !important}
+
+/* ===== مفتاح وضع التلوين + عتبات الأيام ===== */
+.dal-mode-sw{display:inline-flex;background:#eef3fb;border:1px solid #dbe6f4;border-radius:10px;padding:3px;gap:2px}
+.dal-mode-sw button{border:none;background:transparent;color:#5a7290;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s,color .15s}
+.dal-mode-sw button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(20,60,120,.18)}
+.dal-days-box{margin:10px 0;padding:0;max-height:0;overflow:hidden;transition:max-height .25s ease,opacity .2s;opacity:0}
+.dal-days-box.open{max-height:300px;opacity:1;padding:14px 16px;background:linear-gradient(180deg,#f8fbff,#eef4fb);border:1px solid #dbe6f4;border-radius:12px}
+.dal-days-head{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dal-days-grid{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.dal-day-fld{display:flex;flex-direction:column;gap:5px}
+.dal-day-fld label{font-size:11px;font-weight:700;color:#5a7290;display:flex;align-items:center;gap:6px}
+.dal-day-fld label i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.dal-day-fld input{width:84px;padding:7px 9px;border:1px solid #cdd9e8;border-radius:8px;font-size:13px;font-weight:800;color:var(--navy);text-align:center;font-family:inherit;background:#fff}
+.dal-day-fld input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+.dal-day-fld .sfx{font-size:10px;font-weight:600;color:#94a3b8}
+.dal-days-note{font-size:11px;color:#64748b;margin-top:10px;line-height:1.7;background:#fff;padding:8px 11px;border-radius:8px;border:1px dashed #cdd9e8}
+.dal-bands-strip{display:flex;border-radius:8px;overflow:hidden;margin-top:10px;border:1px solid #dbe6f4;font-size:10.5px;font-weight:800;text-align:center}
+.dal-bands-strip span{padding:7px 4px;flex:1;line-height:1.3}
+.dal-bands-strip span small{display:block;font-size:9px;font-weight:700;opacity:.8}
+.dal-tbl thead th.dal-h-comp{min-width:78px;font-size:10.5px;font-weight:700}
+.dal-tbl td.dal-comp{font-weight:700;color:#475569;font-variant-numeric:tabular-nums;background:#fbfdff}
+.dal-tbl td.dal-comp small{display:block;font-size:9px;color:#94a3b8;font-weight:600}
+.dal-tbl td.dal-avg-cell input{width:90px}
+/* مصفوفة عتبات (فرع×فئة) */
+.dal-mtx{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:10px;overflow:hidden;font-size:12px;border:1px solid #dbe6f4}
+.dal-mtx th{background:#eef4fb;color:var(--navy);font-weight:800;padding:8px;border-bottom:1px solid #dbe6f4;text-align:center;font-size:11px;white-space:nowrap}
+.dal-mtx th.dal-mtx-cat{text-align:start}
+.dal-mtx-dot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-inline-end:5px;vertical-align:middle}
+.dal-mtx td{padding:5px 6px;border-bottom:1px solid #f1f5f9;text-align:center}
+.dal-mtx td.dal-mtx-cat{text-align:start;font-weight:800;color:#243b53;background:#fafcff;white-space:nowrap}
+.dal-mtx tr:last-child td{border-bottom:none}
+.dal-mtx input{width:74px;padding:6px 7px;border:1px solid #cdd9e8;border-radius:7px;font-size:12.5px;font-weight:800;color:var(--navy);text-align:center;font-family:inherit;background:#fff}
+.dal-mtx input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+.dal-tbl thead th.dal-h-cat{background:#eef2ff !important;color:#3730a3 !important;min-width:96px;font-size:11px}
+.dal-cat-cell{text-align:center}
+.dal-cat-sel{padding:4px 6px;border:1px solid #e2e8f0;border-radius:7px;font-size:11.5px;font-weight:700;color:var(--navy);font-family:inherit;background:#fff;cursor:pointer}
+.dal-cat-sel.auto{color:#94a3b8;border-style:dashed;font-style:italic}
+.dal-cat-sel:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+
+/* ===== SAP Import Hub ===== */
+.sap-card{padding:20px 22px}
+.sap-h{display:flex;align-items:flex-start;gap:13px;margin-bottom:16px}
+.sap-h-ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#0d2a4e,#1e5398);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.sap-h h3{font-size:16px;font-weight:800;color:var(--navy)}
+.sap-h p{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.6}
+.sap-gcfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.sap-f{display:flex;flex-direction:column;gap:6px}
+.sap-f.full{grid-column:1/-1}
+.sap-f label{font-size:11.5px;font-weight:700;color:#5a7290}
+.sap-f input{width:100%;border:1px solid #cdd9e8;border-radius:9px;padding:9px 11px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;transition:.15s}
+.sap-f input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,126,216,.13)}
+.sap-seg{display:inline-flex;background:#eef3fb;border:1px solid #dbe6f4;border-radius:9px;padding:3px;gap:2px;width:fit-content}
+.sap-seg button{border:none;background:transparent;color:#5a7290;font-weight:700;font-size:12px;padding:7px 14px;border-radius:7px;cursor:pointer;font-family:inherit;transition:.15s}
+.sap-seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(20,60,120,.18)}
+.sap-note{margin-top:14px;font-size:11.5px;color:#7c5a16;background:#fffbeb;border:1px solid #fde9b5;border-radius:10px;padding:10px 13px;line-height:1.7}
+.sap-plants{max-height:0;overflow:hidden;transition:max-height .25s ease,opacity .2s;opacity:0}
+.sap-plants.open{max-height:600px;opacity:1;margin-top:12px}
+.sap-plants-head{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6}
+.sap-plants-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px}
+.sap-plant-row{display:flex;align-items:center;gap:9px;background:#fafcff;border:1px solid var(--line);border-radius:9px;padding:7px 11px}
+.sap-plant-br{flex:1;font-size:12px;font-weight:700;color:#243b53;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sap-plant-row input{width:90px;border:1px solid #cdd9e8;border-radius:7px;padding:6px 8px;font-size:12.5px;font-weight:700;color:var(--navy);text-align:center;font-family:Menlo,Consolas,monospace}
+#sap-reports{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+.sap-rep{background:var(--card);border:1px solid var(--line);border-inline-start:5px solid var(--rc,#2f7ed8);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.sap-rep-h{display:flex;align-items:center;gap:12px;padding:16px 20px;background:linear-gradient(180deg,#fbfdff,#f3f7fc);border-bottom:1px solid var(--line)}
+.sap-rep-ic{width:40px;height:40px;border-radius:11px;background:color-mix(in srgb,var(--rc) 14%,#fff);color:var(--rc);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sap-rep-h h3{font-size:15.5px;font-weight:800;color:var(--navy)}
+.sap-rep-h h3 small{font-weight:600;color:var(--muted);font-size:12px}
+.sap-rep-st{font-size:11.5px;color:var(--muted);margin-top:2px}
+.sap-rep-st.ok{color:#157a4d;font-weight:700}.sap-rep-st.warn{color:#b45309;font-weight:700}
+.sap-rep-badge{margin-inline-start:auto;font-size:11px;font-weight:700;color:var(--navy);background:#eef3fb;border-radius:20px;padding:5px 12px;white-space:nowrap}
+.sap-rep-body{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
+.sap-block-h{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:9px}
+.sap-src{width:100%;border:1px solid #cdd9e8;border-radius:9px;padding:9px 11px;font-size:13px;font-family:Menlo,Consolas,monospace;color:var(--ink);background:#fff}
+.sap-src:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,126,216,.13)}
+.sap-od-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.sap-url-h{font-size:11px;font-weight:700;color:#5a7290;margin:11px 0 5px}
+.sap-url{font-family:Menlo,Consolas,monospace;font-size:11.5px;line-height:1.7;color:#0f2d52;background:#0d2a4e;color:#cfe3ff;border-radius:10px;padding:11px 13px;word-break:break-all;white-space:pre-wrap}
+.sap-od-acts{display:flex;gap:9px;margin-top:11px;flex-wrap:wrap}
+.sap-file-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.sap-file-row .dr-file{flex:1;min-width:160px}
+@media(max-width:620px){.sap-od-grid{grid-template-columns:1fr}}
+
+/* ===== النافذة المنبثقة لتغطية المخزون ===== */
+.dal-tip-pop{position:fixed;z-index:1300;width:288px;max-width:92vw;background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 22px 60px rgba(15,30,55,.26);font-size:12.5px;color:var(--ink);opacity:0;pointer-events:none;transform:translateY(5px);transition:opacity .15s,transform .15s;overflow:hidden}
+.dal-tip-pop.show{opacity:1;transform:none}
+.dal-tip-hd{display:flex;align-items:center;gap:9px;padding:12px 14px;background:linear-gradient(135deg,#0d2a4e,#1e5398);color:#fff}
+.dal-tip-hd .dal-tip-code{font-family:Menlo,Consolas,monospace;font-weight:800;font-size:13px;letter-spacing:.3px}
+.dal-tip-hd .dal-tip-brand{font-size:11px;opacity:.85;margin-top:1px}
+.dal-tip-pill{margin-inline-start:auto;font-size:11px;font-weight:800;padding:4px 11px;border-radius:20px;white-space:nowrap}
+.dal-tip-body{padding:12px 14px}
+.dal-tip-cov{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.dal-tip-cov b{font-size:30px;font-weight:800;line-height:1;color:var(--navy);font-variant-numeric:tabular-nums}
+.dal-tip-cov span{font-size:12px;color:#64748b;font-weight:700}
+.dal-tip-rows{display:flex;flex-direction:column;gap:1px;border-radius:10px;overflow:hidden;border:1px solid #eef2f7}
+.dal-tip-row{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:#f8fafc}
+.dal-tip-row:nth-child(even){background:#fff}
+.dal-tip-row .k{color:#64748b;font-weight:600;font-size:11.5px}
+.dal-tip-row .v{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.dal-tip-foot{padding:9px 14px;border-top:1px solid #eef2f7;font-size:10.5px;color:#94a3b8;line-height:1.6}
+html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
 
 /* ===== Master Data: unified table ===== */
 .md-master-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
@@ -2113,7 +2244,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
     <div class="nav-group collapsed" data-grp="settings">
       <button class="nav-head" onclick="toggleGroup('settings')"><span class="gbar" style="--gc:#8aa0c4"></span><span class="glbl" data-i18n="grp_settings">Settings</span><span class="gchev">▾</span></button>
       <div class="nav-sub">
-        <button class="navbtn admin-only" data-page="records" onclick="go('records')" style="--c:#3f6fd1"><span class="nico" data-icon="database"></span><span class="lbl" data-i18n="nav_records">Data</span></button>
+        <button class="navbtn admin-only" data-page="records" onclick="go('records')" style="--c:#3f6fd1"><span class="nico" data-icon="database"></span><span class="lbl">SAP Import</span></button>
         <button class="navbtn" data-page="imp" onclick="go('imp')" style="--c:#12b1a2"><span class="nico" data-icon="import"></span><span class="lbl" data-i18n="nav_imp">Import Data</span></button>
         <button class="navbtn" id="nav-cloud" data-page="cloud" onclick="go('cloud')" style="--c:#4a93f2"><span class="nico" data-icon="cloud"></span><span class="lbl" data-i18n="nav_cloud">Cloud</span> <span class="cdot"></span></button>
         <button class="navbtn admin-only" data-page="designer" onclick="go('designer')" style="--c:#9b7bf0"><span class="nico" data-icon="sliders"></span><span class="lbl" data-i18n="nav_designer">Designer</span></button>
@@ -2168,7 +2299,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
         <div class="d-grid">
         <button class="d-tile" data-page="imp" style="--c:var(--teal)" onclick="go('imp')"><div class="ti" data-icon="import"></div><div><div class="tt" data-i18n="nav_imp">Import Data</div><div class="td" data-i18n="desc_imp">Upload an Excel file to refresh data.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="cloud" style="--c:var(--blue)" onclick="go('cloud')"><div class="ti" data-icon="cloud"></div><div><div class="tt" data-i18n="nav_cloud">Cloud</div><div class="td" data-i18n="desc_cloud">Sync and back up to Firebase.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
-        <button class="d-tile" data-page="records" style="--c:var(--navy)" onclick="go('records')"><div class="ti" data-icon="database"></div><div><div class="tt" data-i18n="nav_records">Data Editor</div><div class="td" data-i18n="desc_records">Browse and edit the database.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
+        <button class="d-tile" data-page="records" style="--c:var(--navy)" onclick="go('records')"><div class="ti" data-icon="database"></div><div><div class="tt">SAP Import</div><div class="td" data-i18n="desc_records">Browse and edit the database.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="designer" style="--c:var(--purple)" onclick="go('designer')"><div class="ti" data-icon="sliders"></div><div><div class="tt" data-i18n="nav_designer">Designer</div><div class="td" data-i18n="desc_designer">Customise table columns and methods.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="users" style="--c:var(--orange)" onclick="go('users')"><div class="ti" data-icon="users"></div><div><div class="tt" data-i18n="nav_users">Users</div><div class="td" data-i18n="desc_users">Manage accounts and permissions.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="masterdata" style="--c:#7c5cbf" onclick="go('masterdata')"><div class="ti" data-icon="database"></div><div><div class="tt">Master Data</div><div class="td">جداول التحويل والكرتون — بيانات مرجعية لشاشة Space</div></div><div class="tgo"><span>فتح</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
@@ -2273,7 +2404,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
       </div>
       <div class="cat2tabs" id="sku-size-tabs" style="margin:2px 0 10px"></div>
       <div class="card"><div class="pivot-wrap" id="sku-wrap"></div></div>
-      <div class="card" style="margin-top:16px"><div class="ch"><span class="acc" style="background:var(--navy)"></span><h5 data-i18n="ch_topitems">Top Items by Quantity</h5></div><div class="chartbox"><canvas id="sku_top"></canvas></div></div>
+      <div class="card" style="margin-top:16px"><div class="ch"><span class="acc" style="background:var(--navy)"></span><h5 data-i18n="ch_topitems">Top Items by Quantity</h5></div><div class="cat2tabs" id="sku-top-dim" style="margin:-4px 0 8px"></div><div class="chartbox"><canvas id="sku_top"></canvas></div></div>
     </div></div>
 
     <div class="page" id="page-imp"><div class="imp">
@@ -2290,6 +2421,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
       <div class="imp-actions">
         <button class="btn-clear" onclick="clearData()"><span>&#128465;</span> <span data-i18n="clear_data">Clear Data</span></button>
         <button class="btn-reload" onclick="document.getElementById('file').click()"><span>&#8635;</span> <span data-i18n="update_data">Update with New Data</span></button>
+        <button class="btn-soft" onclick="downloadImportTemplate()"><span>&#11015;</span> <span>تنزيل القالب · Template</span></button>
       </div>
       <div class="upd-card">
         <div class="fld2"><label data-i18n="set_date_label">Report update date</label><input type="date" id="upd-input"></div>
@@ -2458,30 +2590,9 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
     <!-- DATA RECORDS -->
     <div class="page" id="page-records"><div class="wrap">
-      <div class="topbar"><div class="htext"><h1 data-i18n="rec_title">Database Records</h1></div><div class="spacer"></div>
-        <button class="btn-soft" onclick="saveToCloud(false)"><span>&#11014;&#65039;</span> <span data-i18n="rec_save">Save to Cloud</span></button></div>
-      <div class="card">
-        <div class="rec-edit-hint">&#9998;&nbsp;<span data-i18n="rec_edit_hint">Click any cell in the table to edit it directly. Changes are saved and synced to all devices automatically.</span></div>
-        <div class="recform">
-          <div class="sf"><label data-i18n="c_code">Item Code</label><input type="text" id="rc-code"></div>
-          <div class="sf"><label data-i18n="f_identity">Identity</label><select id="rc-id"></select></div>
-          <div class="sf"><label data-i18n="f_branch">Branch</label><select id="rc-br"></select></div>
-          <div class="sf"><label data-i18n="c_size">Size</label><select id="rc-size"></select></div>
-          <div class="sf"><label data-i18n="c_pack2">Pack</label><input type="text" id="rc-pack"></div>
-          <div class="sf"><label data-i18n="rec_cat2">Category 2</label><select id="rc-cat2"></select></div>
-          <div class="sf"><label data-i18n="c_month">Month</label><select id="rc-month"></select></div>
-          <div class="sf"><label data-i18n="f_classify">Classify</label><select id="rc-cls"></select></div>
-          <div class="sf"><label data-i18n="rec_qty">Quantity</label><input type="number" id="rc-qty" class="wq"></div>
-          <div class="sf"><label data-i18n="rec_logo">Logo</label><input type="text" id="rc-logo"></div>
-          <button class="btn-primary" onclick="addRecord()"><span>&#10133;</span> <span data-i18n="rec_add">Add Record</span></button>
-          <span class="sf-count" id="rc-msg"></span>
-        </div>
-        <div class="sumbar" style="margin-bottom:10px">
-          <div class="sf"><label data-i18n="rec_search">Search records</label><input type="text" id="rc-search" oninput="renderRecords()" style="min-width:220px"></div>
-          <span class="sf-count" id="rec-count"></span>
-        </div>
-        <div class="rec-wrap"><table class="utable" id="rec-table"></table></div>
-      </div>
+      <div class="topbar"><div class="htext"><h1 id="sap-title">SAP Import Hub</h1><span class="upd"><span class="dot"></span> <span id="sap-sub"></span></span></div><div class="spacer"></div>
+        <button class="btn-soft" onclick="saveToCloud(false)"><span>&#11014;&#65039;</span> <span id="sap-save">Save to Cloud</span></button></div>
+      <div id="sap-hub-root"></div>
     </div></div>
 
     <!-- CLOUD / FIREBASE -->    <!-- CLOUD / FIREBASE -->    <!-- CLOUD / FIREBASE -->
@@ -2604,16 +2715,30 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
           <button class="btn-soft sm" id="dal-toggle-btn" onclick="event.stopPropagation();dalToggleCard()" style="margin-inline-start:auto">&#9662; طي · Collapse</button>
         </div>
         <div class="dal-body">
-        <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.7">لكل صنف في كل فرع خمسة حدود (بالكراتين): متوسط التحميل · الحد الأدنى · حد الأمان · الحد الأقصى · الحد الأقصى جداً. اختر الفرع من القائمة للتعديل. ارفع القالب أول مرة عبر Excel (ورقة لكل فرع). تُلوَّن خلايا الرصيد في كل الشاشات حسب موقع الرصيد بين هذه الحدود.</p>
+        <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.7">أدخِل <b>الفئة</b> (كرتون/قارورة/شرنك/باكت) و<b>متوسط التحميل اليومي</b> (كرتون/يوم) لكل صنف في كل فرع، ثم اضبط <b>عتبات أيام التغطية لكل فرع × فئة</b> من زر «⚙ عتبات الأيام». يحسب النظام <b>أيام التغطية = الرصيد ÷ المتوسط اليومي</b> ويلوّن خلايا الرصيد في كل الشاشات حسب فئة الصنف وعتبات فرعه. مرّر الماوس (أو المس على الجوال) فوق أي خلية ملوّنة لرؤية التفاصيل. ارفع القالب (ورقة لكل فرع) أوّل مرّة.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+          <div class="dal-mode-sw" id="dal-mode-sw">
+            <button type="button" data-mode="days" onclick="dalSetModeUI('days')">&#128197; أيام التغطية</button>
+            <button type="button" data-mode="limits" onclick="dalSetModeUI('limits')">&#128208; حدود بالكراتين</button>
+          </div>
           <div style="display:flex;align-items:center;gap:6px"><label style="font-size:12px;font-weight:700;color:var(--navy)">&#127970; الفرع · Branch:</label>
             <select id="dal-branch-sel" class="sp-conv-search" style="width:auto;min-width:160px;margin:0;font-weight:700" onchange="dalSelectBranch(this.value)"></select></div>
+          <button class="btn-soft sm" id="dal-days-btn" onclick="dalToggleDays()" title="ضبط عتبات أيام التغطية">&#9881; عتبات الأيام</button>
           <label class="btn-soft sm" title="استيراد قالب Excel — ورقة لكل فرع">&#x1F4E4; استيراد القالب<input type="file" accept=".xlsx,.xls" onchange="importDAL(this)" style="display:none"></label>
-          <button class="btn-soft sm" onclick="exportDAL()">&#x1F4E5; تصدير قالب فارغ/معبأ</button>
+          <button class="btn-soft sm" onclick="exportDAL()">&#x1F4E5; تصدير قالب + مثال</button>
           <button class="btn-soft sm" onclick="renderDALTable()">&#x1F504; تحديث</button>
           <button class="btn-soft sm" onclick="dalToggleColors()" title="تخصيص ألوان الفئات">&#127912; ألوان الفئات</button>
           <span id="dal-kpi" style="font-size:12px;color:var(--navy);font-weight:700"></span>
           <span id="dal-status" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+        <!-- محرّر عتبات أيام التغطية لكل (فرع × فئة) -->
+        <div id="dal-days-box" class="dal-days-box">
+          <div class="dal-days-head"><span>&#9881; عتبات أيام التغطية — الفرع: <b id="dal-days-branch" style="color:var(--blue)"></b></span>
+            <button class="btn-soft sm" onclick="dalCopyDaysToAllUI()" style="margin-inline-start:auto" title="نسخ عتبات هذا الفرع إلى كل الفروع">&#x2398; نسخ لكل الفروع</button>
+            <button class="btn-soft sm" onclick="dalResetDaysBranchUI()" title="إعادة عتبات هذا الفرع للافتراضي">&#x21BA; افتراضي الفرع</button></div>
+          <div class="dal-days-grid" id="dal-days-grid"></div>
+          <div class="dal-bands-strip" id="dal-bands-strip"></div>
+          <div class="dal-days-note">عتبات مستقلة لكل (فرع × فئة). الحد بالكراتين = متوسط التحميل اليومي × عدد الأيام. غيّر «الفرع» من القائمة أعلاه لضبط فرع آخر، والفئة تُضبط لكل صنف من عمود «الفئة».</div>
         </div>
         <!-- صف تخصيص ألوان الفئات الخمس (قابل للطي) -->
         <div id="dal-color-box" class="dal-color-box">
@@ -2625,13 +2750,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
         <div style="overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:600px">
           <div id="dal-table"></div>
         </div>
-        <div class="dal-legend">
-          <span class="dal-lg"><i class="dal-sw dal-c1"></i> نقص حاد (&lt; الأدنى)</span>
-          <span class="dal-lg"><i class="dal-sw dal-c2"></i> منخفض (&lt; الأمان)</span>
-          <span class="dal-lg"><i class="dal-sw dal-c3"></i> مثالي (الأمان–الأقصى)</span>
-          <span class="dal-lg"><i class="dal-sw dal-c4"></i> عالٍ (&lt; الأقصى جداً)</span>
-          <span class="dal-lg"><i class="dal-sw dal-c5"></i> فائض (&gt; الأقصى جداً)</span>
-        </div>
+        <div class="dal-legend" id="dal-legend"></div>
         </div><!-- /dal-body -->
       </div>
       <div class="card sp-conv-slot" id="sp-conv-card">
@@ -2919,7 +3038,7 @@ function applyLang(){
   if(CURRENT_USER)applyRole();
   if(document.getElementById('page-users').classList.contains('show'))renderUsers();
   if(document.getElementById('page-designer').classList.contains('show'))renderDesigner();
-  if(document.getElementById('page-records').classList.contains('show'))renderRecords();
+  if(document.getElementById('page-records').classList.contains('show')){try{renderSapHub();}catch(e){}}
   if(EDITMODE){unbindEditables();bindEditables();}
 }
 function toggleGroup(g){const el=document.querySelector('.nav-group[data-grp="'+g+'"]');if(el)el.classList.toggle('collapsed');}
@@ -2990,10 +3109,13 @@ function go(p){
     var _e=document.getElementById('page-'+_p);
     if(_e)_e.classList.toggle('show',p===_p);
   });
+  /* دائماً ابدأ من أعلى الشاشة عند الدخول لأي صفحة (إصلاح: كان يفتح من المنتصف) */
+  try{var _ct=document.querySelector('.content');if(_ct)_ct.scrollTop=0;var _sp=document.getElementById('page-'+p);if(_sp)_sp.scrollTop=0;window.scrollTo(0,0);
+    if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(function(){try{if(_ct)_ct.scrollTop=0;window.scrollTo(0,0);}catch(e){}});}catch(e){}
   if(typeof DR_PAGE2KEY!=='undefined'&&DR_PAGE2KEY[p]&&typeof renderDailyReport==='function')renderDailyReport(DR_PAGE2KEY[p]);
   if(p==='dailyup'&&typeof renderUploadStatus==='function')renderUploadStatus();
   if(p==='users'){renderUsers();try{renderUserStats();}catch(e){}try{_fillEmailCfgInputs();renderLoginLog();}catch(e){}try{var _ut=LS.getItem('users_tab')||'users';switchUserTab(_ut);}catch(e){}}
-  if(p==='records')renderRecords();
+  if(p==='records'){try{renderSapHub();}catch(e){console.warn('sapHub',e);}}
   if(p==='designer'){renderDesigner();showDzScreen((document.getElementById('dz-screen')||{}).value||'dash');try{renderColManager();}catch(e){}try{dzRestoreCollapsed();}catch(e){}}
   if(p==='sum')buildSummary();
   setTimeout(()=>{applyChartHeights();addResizers();},30);
@@ -4132,8 +4254,10 @@ function buildSummary(){
       tooltip:{rtl:rtl,callbacks:{label:ctx=>'  '+fmt(ctx.raw)+' ('+(ctx.raw/grand*100).toFixed(1)+'%)'}}}},plugins:[pieOut()]});
 
   const mt={};D.forEach(d=>{mt[d.month]=(mt[d.month]||0)+d.qty;});
-  const ml=months.slice().reverse();
-  mk('s_month',{type:'bar',data:{labels:ml.map(m=>mn(m)+' ('+yearOf(m)+')'),datasets:[{data:ml.map(m=>mt[m]||0),borderRadius:5,maxBarThickness:22,
+  /* تجميع الأعمدة حسب العام (تصاعدياً)، مع إظهار العام مرّة كرأس مجموعة واسم الشهر أمام كل عمود */
+  const ml=months.slice().sort((a,b)=>yearOf(a)-yearOf(b));
+  const mlabels=ml.map(function(m,i){var y=yearOf(m);var py=i>0?yearOf(ml[i-1]):null;return (y!==py)?['── '+y+' ──',mn(m)]:mn(m);});
+  mk('s_month',{type:'bar',data:{labels:mlabels,datasets:[{data:ml.map(m=>mt[m]||0),borderRadius:5,maxBarThickness:22,
     backgroundColor:cx=>{const{chart}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.teal;return hgrad(ctx,chartArea,C.teal,shade(C.teal,55));}}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},dl:{}},scales:{x:{display:false,grace:'26%',reverse:rtl},y:{position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'}}}}},plugins:[dlabel]});
   if(charts.s_brand)charts.s_brand.options.onClick=chartClick(el=>{const br=bl[el.index];return {rows:D.filter(d=>brandOf(d.identity)===br),title:br};});
@@ -4153,6 +4277,9 @@ function buildSkuSizeTabs(){
   box.innerHTML=html;
 }
 function clearSkuFilters(){document.getElementById('sku-search').value='';document.getElementById('sku-cat').value='';SKU_SIZE='all';buildSku();}
+window.SKU_TOP_DIM='size';
+function setSkuTopDim(v){window.SKU_TOP_DIM=v;try{buildSku();}catch(e){}}
+function buildSkuTopDimTabs(){var box=document.getElementById('sku-top-dim');if(!box)return;var a=(LANG==='ar');var cur=window.SKU_TOP_DIM||'size';var opts=[['size',a?'الحجم':'Size'],['pack',a?'العبوة':'Pack'],['cat',a?'الفئة':'Category']];box.innerHTML=opts.map(function(o){return '<button class="'+(cur===o[0]?'on':'')+'" onclick="setSkuTopDim(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');}
 function buildSku(){
   const ALL=DATA;CURAGG=AGGS.sku;
   const allBrands=BRAND_ORDER.filter(b=>ALL.some(d=>brandOf(d.identity)===b)).concat([...new Set(ALL.map(d=>brandOf(d.identity)))].filter(b=>!BRAND_ORDER.includes(b)));
@@ -4200,13 +4327,17 @@ function buildSku(){
   try{decorateTable('sku','sku-wrap');}catch(e){}
   const realGrand=aggBy(mcol('sku','sku:total'),ALL.map(d=>d.qty));const cnt=document.getElementById('sku-count');if(cnt)cnt.textContent=realGrand?fmt(Dtot)+' / '+fmt(realGrand)+'  ('+(Dtot/realGrand*100).toFixed(1)+'%)':'—';
   // top items chart
-  const it={};D.forEach(d=>{const k=(d.size!=null&&d.size!==''?String(d.size):'-');it[k]=(it[k]||0)+d.qty;});
+  buildSkuTopDimTabs();
+  var _td=window.SKU_TOP_DIM||'size';
+  function _tkey(d){return _td==='pack'?(d.pack||'-'):(_td==='cat'?(brandOf(d.identity)||'-'):(d.size!=null&&d.size!==''?String(d.size):'-'));}
+  function _tlbl(k){return _td==='size'?fmtSize(k):k;}
+  const it={};D.forEach(d=>{const k=_tkey(d);it[k]=(it[k]||0)+d.qty;});
   const top=Object.keys(it).sort((a,b)=>it[b]-it[a]).slice(0,15);
   const rtl=LANG==='ar';
-  mk('sku_top',{type:'bar',data:{labels:top.map(s=>fmtSize(s)),datasets:[{data:top.map(k=>it[k]),borderRadius:5,maxBarThickness:20,
+  mk('sku_top',{type:'bar',data:{labels:top.map(_tlbl),datasets:[{data:top.map(k=>it[k]),borderRadius:5,maxBarThickness:20,
     backgroundColor:cx=>{const{chart}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.navy;return hgrad(ctx,chartArea,C.navy,C.blue);}}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},dl:{}},scales:{x:{display:false,grace:'28%',reverse:rtl},y:{position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'}}}}},plugins:[dlabel]});
-  if(charts.sku_top)charts.sku_top.options.onClick=chartClick(el=>{const sz=top[el.index];return {rows:D.filter(d=>(d.size!=null&&d.size!==''?String(d.size):'-')===sz),title:tr('c_size')+' '+fmtSize(sz)};});
+  if(charts.sku_top)charts.sku_top.options.onClick=chartClick(el=>{const kk=top[el.index];return {rows:D.filter(d=>_tkey(d)===kk),title:_tlbl(kk)};});
 }
 /* ===== AUTH / USERS ===== */
 let CURRENT_USER=null;
@@ -5277,7 +5408,49 @@ function updateHomeDates(){
   }catch(e){}
 }
 function applyDateStr(s){const v='&nbsp;'+s;['upddate','upddate2','upddate3'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=v;});document.querySelectorAll('.pdate').forEach(e=>{e.innerHTML=v;});}
-function printScreen(){try{var pg=document.querySelector('.page.show');var lh=document.getElementById('print-letterhead');if(lh&&pg){var h1=pg.querySelector('h1');var t=h1?h1.textContent.trim():'';var plt=lh.querySelector('.pl-t');if(plt)plt.textContent=t||'Tania Report';var d=((document.getElementById('upddate')||{}).textContent||'').trim();if(!d){var de=pg.querySelector('span[id^="rep-"][id$="-date"]');if(de)d=(de.textContent||'').replace(/📅/g,'').trim();}var pld=lh.querySelector('.pl-date');if(pld)pld.innerHTML=d?(tr('lastupdate')+': <b>'+d+'</b>'):'';var plp=lh.querySelector('.pl-printed');if(plp)plp.textContent=new Date().toLocaleString(LANG==='ar'?'ar-EG':'en-GB');}}catch(e){}try{document.querySelectorAll('.page').forEach(p=>p.style.animation='none');}catch(e){}try{Object.values(window.charts||{}).forEach(c=>{try{c.resize();}catch(e){}});}catch(e){}try{var __rk=(typeof currentReportKey==='function')?currentReportKey():null;if(__rk)buildReportPrintStage(__rk);}catch(e){}setTimeout(()=>window.print(),90);try{setTimeout(_clearReportPrintStage,2500);}catch(e){}}
+function _prEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function printScreen(){
+  try{
+    var ar=(typeof LANG!=='undefined'&&LANG==='ar');
+    var pg=document.querySelector('.page.show'); if(!pg){window.print();return;}
+    var root=document.getElementById('print-report-root');
+    if(!root){root=document.createElement('div');root.id='print-report-root';document.body.appendChild(root);}
+    var h1=pg.querySelector('h1'); var title=h1?h1.textContent.trim():(ar?'تقرير':'Report');
+    var d=((document.getElementById('upddate')||{}).textContent||'').trim();
+    if(!d){var de=pg.querySelector('span[id^="rep-"][id$="-date"]');if(de)d=(de.textContent||'').replace(/[^0-9\/\-\.\u0600-\u06FF A-Za-z:]/g,'').trim();}
+    var printed=new Date().toLocaleString(ar?'ar-EG':'en-GB');
+    var logoImg=document.querySelector('.print-letterhead img')||document.querySelector('img.tania-logo');
+    var logoSrc=logoImg?logoImg.getAttribute('src'):'';
+    var head='<div class="pr-head">'+
+      (logoSrc?'<img class="pr-logo" src="'+logoSrc+'" alt="">':'')+
+      '<div class="pr-h-mid"><div class="pr-title">'+_prEsc(title)+'</div><div class="pr-org">'+(ar?'تانيا · مركز تقارير المخزون':'TANIA · Inventory Reporting Center')+'</div></div>'+
+      '<div class="pr-meta">'+(d?((ar?'تاريخ التحديث: ':'Updated: ')+'<b>'+_prEsc(d)+'</b><br>'):'')+(ar?'طُبع: ':'Printed: ')+_prEsc(printed)+'</div>'+
+    '</div>';
+    var tables=[].slice.call(pg.querySelectorAll('table')).filter(function(t){return t.getClientRects().length>0 && (t.querySelector('tbody tr')||t.querySelector('tr'));});
+    var body='';
+    if(tables.length){
+      tables.forEach(function(t){
+        var clone=t.cloneNode(true);
+        clone.querySelectorAll('input,select,textarea').forEach(function(el){var v=(el.value!=null?el.value:'');var sp=document.createElement('span');sp.textContent=v;if(el.parentNode)el.parentNode.replaceChild(sp,el);});
+        clone.querySelectorAll('button').forEach(function(el){if(el.parentNode)el.parentNode.removeChild(el);});
+        clone.querySelectorAll('[id]').forEach(function(el){el.removeAttribute('id');});
+        clone.classList.add('pr-table');
+        body+='<div class="pr-tablewrap">'+clone.outerHTML+'</div>';
+      });
+    }else{
+      var wrap=pg.querySelector('.wrap')||pg; var c=wrap.cloneNode(true);
+      try{_psClean(c);}catch(e){}
+      body+='<div class="pr-fallback">'+c.innerHTML+'</div>';
+    }
+    root.innerHTML=head+'<div class="pr-body">'+body+'</div><div class="pr-footer"><span>'+(ar?'تانيا · تقرير المخزون':'Tania · Inventory Report')+'</span><span>'+_prEsc(printed)+'</span></div>';
+    document.body.classList.add('printing-report');
+    try{var natW=0;tables.forEach(function(t){natW=Math.max(natW,t.scrollWidth||0);});var fitW=1040;root.style.zoom=(natW>fitW)?Math.max(0.4,Math.round(fitW/natW*100)/100):1;}catch(e){}
+    try{Object.values(window.charts||{}).forEach(function(c){try{c.resize();}catch(e){}});}catch(e){}
+    setTimeout(function(){try{window.print();}catch(e){}},150);
+  }catch(e){try{window.print();}catch(_){}}
+}
+function _clearPrintReport(){try{document.body.classList.remove('printing-report');var r=document.getElementById('print-report-root');if(r){r.innerHTML='';r.style.zoom='';}}catch(e){}}
+try{window.addEventListener('afterprint',_clearPrintReport);}catch(e){}
 function _psClean(node){try{['.fg-top','.fg-bar','.fg-cards','.fg-modal-ov','.modal-ov','.sp-cards','.sp-charts','.dr-empty','.fg-clear','.fg-search','.fg-zero'].forEach(function(sel){node.querySelectorAll(sel).forEach(function(e){e.remove();});});node.querySelectorAll('button,input,select,.btn-soft,.btn-print').forEach(function(e){e.remove();});node.querySelectorAll('[id]').forEach(function(e){e.removeAttribute('id');});if(node.removeAttribute)node.removeAttribute('id');}catch(e){}return node;}
 function buildReportPrintStage(key){
   try{
@@ -5345,7 +5518,14 @@ function dateHeat(rank,minR,maxR){if(maxR<=minR)return 'hsl(80,68%,86%)';var t=(
 function _dateRank(month){var MO=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];var mi=MO.indexOf(month);if(mi<0)mi=0;/* السنة: أغسطس–ديسمبر = 2025، يناير–مايو = 2026 */var y=(mi<=4)?2025:2026;return y*12+mi;}
 function closeDetail(){document.getElementById('detail-ov').classList.remove('show');try{var t=document.querySelector('#detail-wrap table.pivot');if(t){t.style.zoom='';t.style.transform='';}}catch(e){}}
 let _lastDetail=null;
-function exportDetailExcel(){try{if(!_lastDetail||!_lastDetail.aoa||!window.XLSX)return;const ws=XLSX.utils.aoa_to_sheet(_lastDetail.aoa);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Report');let nm=(_lastDetail.title||'report').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,28)||'report';XLSX.writeFile(wb,nm+'.xlsx');}catch(e){}}
+function exportDetailExcel(){try{
+  var ar=(typeof LANG!=='undefined'&&LANG==='ar');
+  var tbl=document.querySelector('#detail-wrap table');
+  var title=((document.getElementById('detail-title')||{}).textContent||'Report').trim();
+  var nm=(title||'report').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,40)||'report';
+  if(tbl&&tbl.querySelector('tr')){tableToStyledExcel(tbl,{title:title,sheet:'Report',file:nm});return;}
+  if(!_lastDetail||!_lastDetail.aoa||!window.XLSX)return;const ws=XLSX.utils.aoa_to_sheet(_lastDetail.aoa);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Report');XLSX.writeFile(wb,nm+'.xlsx');
+}catch(e){}}
 function showDetailRows(rows,title){
   const branches=orderBranches(allBranchesList(),'sum');
   const MO=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
@@ -5499,7 +5679,7 @@ function processWorkbook(wb,fname){
   let sn=wb.SheetNames.find(n=>norm(n).toLowerCase()==='data')||wb.SheetNames[0];
   const aoa=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true});
   let hr=-1;
-  for(let i=0;i<Math.min(aoa.length,15);i++){const row=(aoa[i]||[]).map(norm);if(row.some(c=>c==='Identity')&&row.some(c=>c==='Branch')){hr=i;break;}}
+  for(let i=0;i<Math.min(aoa.length,15);i++){const row=(aoa[i]||[]).map(norm);if(row.some(c=>c==='Identity'||c==='الهوية')&&row.some(c=>c==='Branch'||c==='الفرع'||c==='الجهة')){hr=i;break;}}
   if(hr<0)throw new Error(LANG==='ar'?'تعذّر إيجاد صف عناوين يحتوي "Identity" و "Branch".':'Could not find a header row with "Identity" and "Branch".');
   const H=aoa[hr];
   const ci={identity:findCol(H,['Identity','الهوية']),branch:findCol(H,['Branch','الفرع','الجهة']),size:findCol(H,['الحجم','size']),pack:findCol(H,['الشد','pack']),item_code:findCol(H,['كود الصنف','كود','code','sku','item code','itemcode']),
@@ -5520,6 +5700,18 @@ function processWorkbook(wb,fname){
   const m=fname.match(/(\d{1,2})[-_.](\d{1,2})[-_.](\d{2,4})/);
   if(m){const ds=m[1].padStart(2,'0')+'/'+m[2].padStart(2,'0')+'/'+m[3];applyDateStr(ds);try{LS.setItem('upd_date',ds);}catch(e){}}
   return {n:recs.length,sheet:sn,tot:recs.reduce((s,r)=>s+r.qty,0)};
+}
+function downloadImportTemplate(){
+  try{
+    if(typeof XLSX==='undefined'){alert('XLSX library not loaded');return;}
+    var headers=['Identity','Branch','Item Code','Size','Pack','Category 2','Month','Classification','Brand','Qty'];
+    var sample=['New Identity','Jeddah','30000156','330','40 x 330','CTN','May','A<60','Tania',1200];
+    var wb=XLSX.utils.book_new();
+    var ws=XLSX.utils.aoa_to_sheet([headers,sample]);
+    ws['!cols']=headers.map(function(h,i){return {wch:(i<2?16:(i===headers.length-1?10:14))};});
+    XLSX.utils.book_append_sheet(wb,ws,'Data');
+    XLSX.writeFile(wb,'Import_Template.xlsx');
+  }catch(e){try{console.error('downloadImportTemplate',e);}catch(_){}}
 }
 function handleFile(file){
   LAST_FILE=file.name;
@@ -5581,7 +5773,8 @@ function getDR(){try{return JSON.parse(LS.getItem('dr_data')||'null')||{};}catch
 function saveDR(o){try{LS.setItem('dr_data',JSON.stringify(o));}catch(e){}}
 function drFmt(v){if(typeof v==='number'){try{return v.toLocaleString('en-US',{maximumFractionDigits:2});}catch(e){return ''+v;}}return drEsc(v);}
 /* always return a grouped Space object (uploaded grouped data, else embedded design) */
-function getSpaceRep(){var st=getDR().space;var base=(st&&st.groups&&st.groups.length)?st:DEFAULT_DAILY_REPORTS.space;return decorateSpaceRep(base);}
+function getSpaceRep(){var st=getDR().space;var base=(st&&st.groups&&st.groups.length)?st:DEFAULT_DAILY_REPORTS.space;var r=decorateSpaceRep(base);try{var md=getDR().space_date;if(md)r.date=md;}catch(e){}return r;}
+function setSpaceManualDate(v){try{var s=getDR();s.space_date=v||'';saveDR(s);}catch(e){}try{_drCloudReady=true;}catch(e){}try{drPush();}catch(e){}try{var dEl=document.getElementById('rep-space-date');if(dEl)dEl.textContent=v?('\uD83D\uDCC5 '+v):'';}catch(e){}try{if(typeof renderSpaceReport==='function')renderSpaceReport(getSpaceRep());}catch(e){}try{updateHomeDates();}catch(e){}}
 function getBottleRep(){var st=getDR().bottle;if(st&&st.spec&&st.rows&&st.rows.length)return st;return DEFAULT_DAILY_REPORTS.bottle;}
 
 function drGuessNumFrom(hdr,rows){var nf=0;for(var c=0;c<hdr.length;c++){var num=0,tot=0;for(var r=0;r<Math.min(rows.length,25);r++){var v=rows[r][c];if(v===''||v==null)continue;tot++;if(typeof v==='number')num++;}if(tot>0&&num/tot>0.5)break;nf++;}return Math.max(1,nf);}
@@ -6129,11 +6322,73 @@ function drAutoTotal(key,p){
   });
   return p;
 }
+/* ───── تصدير Excel مُنسّق بنفس تصميم التقرير وبياناته (ExcelJS) ───── */
+function _xlNum(t){if(t==null)return null;var s=String(t).replace(/[,\s\u00a0]/g,'').replace(/%$/,'');if(s===''||s==='-'||s==='—')return null;if(!/^-?\d*\.?\d+$/.test(s))return null;var n=Number(s);return isFinite(n)?n:null;}
+function _tableToPlainExcel(tableEl,opts){
+  try{var aoa=[];[].slice.call(tableEl.querySelectorAll('tr')).forEach(function(tr){var row=[];[].slice.call(tr.cells).forEach(function(c){var t=c.textContent.trim();var n=_xlNum(t);row.push(n!=null?n:t);var sp=(parseInt(c.colSpan,10)||1);for(var i=1;i<sp;i++)row.push('');});aoa.push(row);});
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),(opts.sheet||'Report').slice(0,28));XLSX.writeFile(wb,(opts.file||'Report')+'.xlsx');}catch(e){alert('Excel error: '+e.message);}
+}
+function tableToStyledExcel(tableEl,opts){
+  opts=opts||{};
+  if(typeof ExcelJS==='undefined'){return _tableToPlainExcel(tableEl,opts);}
+  try{
+    var ar=(typeof LANG!=='undefined'&&LANG==='ar');
+    var NAVY='FF13396B',LIGHT='FFEEF3FB',BORDER='FFCBD8E8';
+    var wb=new ExcelJS.Workbook();
+    var ws=wb.addWorksheet((opts.sheet||'Report').slice(0,28),{views:[{rightToLeft:ar}],pageSetup:{orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.3,right:0.3,top:0.4,bottom:0.4,header:0.2,footer:0.2}}});
+    var headRows=tableEl.tHead?[].slice.call(tableEl.tHead.rows):[];
+    var bodyRows=[];[].slice.call(tableEl.tBodies).forEach(function(tb){bodyRows=bodyRows.concat([].slice.call(tb.rows));});
+    var footRows=tableEl.tFoot?[].slice.call(tableEl.tFoot.rows):[];
+    var ncol=0;headRows.concat(bodyRows).forEach(function(r){var c=0;[].slice.call(r.cells).forEach(function(cell){c+=(parseInt(cell.colSpan,10)||1);});if(c>ncol)ncol=c;});
+    if(!ncol)ncol=1;
+    var colMax=[];for(var i=0;i<ncol;i++)colMax[i]=8;
+    function thin(){return {top:{style:'thin',color:{argb:BORDER}},left:{style:'thin',color:{argb:BORDER}},bottom:{style:'thin',color:{argb:BORDER}},right:{style:'thin',color:{argb:BORDER}}};}
+    /* عنوان */
+    if(opts.title){ws.mergeCells(1,1,1,ncol);var tc=ws.getCell(1,1);tc.value=opts.title;tc.font={bold:true,size:15,color:{argb:NAVY}};tc.alignment={horizontal:'center',vertical:'middle'};ws.getRow(1).height=24;}
+    if(opts.subtitle){var sr=opts.title?2:1;ws.mergeCells(sr,1,sr,ncol);var sc=ws.getCell(sr,1);sc.value=opts.subtitle;sc.font={size:10,color:{argb:'FF64748B'}};sc.alignment={horizontal:'center'};ws.getRow(sr).height=16;}
+    if(opts.title||opts.subtitle)ws.addRow([]);
+    /* رؤوس */
+    headRows.forEach(function(r){
+      var vals=[];[].slice.call(r.cells).forEach(function(c){var span=parseInt(c.colSpan,10)||1;var t=c.textContent.trim();vals.push(t);for(var k=1;k<span;k++)vals.push('');});
+      var row=ws.addRow(vals);row.height=20;
+      row.eachCell({includeEmpty:true},function(cell,col){cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};cell.font={bold:true,color:{argb:'FFFFFFFF'},size:10};cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};cell.border=thin();var L=(vals[col-1]||'').length;if(col-1<ncol&&L>colMax[col-1])colMax[col-1]=L;});
+    });
+    /* صفوف */
+    function emit(r){
+      var grand=/\b(grand|fg-grand|sp-total)\b/.test(' '+r.className+' ');
+      var vals=[],meta=[];
+      [].slice.call(r.cells).forEach(function(c){var span=parseInt(c.colSpan,10)||1;var t=c.textContent.trim();var pct=/%$/.test(t);var n=_xlNum(t);vals.push(n!=null?n:t);meta.push({num:n!=null,pct:pct,len:t.length});for(var k=1;k<span;k++){vals.push('');meta.push({num:false,pct:false,len:0});}});
+      var row=ws.addRow(vals);var even=(bodyRows.indexOf(r)%2===1);
+      row.eachCell({includeEmpty:true},function(cell,col){var ci=col-1;cell.border=thin();
+        if(grand){cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};cell.font={bold:true,color:{argb:'FFFFFFFF'},size:10};}
+        else{cell.font={size:10,color:{argb:'FF1E293B'}};if(even)cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:LIGHT}};}
+        cell.alignment={horizontal:ci===0?(ar?'right':'left'):'center',vertical:'middle'};
+        if(meta[ci]&&meta[ci].num){cell.numFmt=meta[ci].pct?'0.0"%"':'#,##0';}
+        if(meta[ci]&&meta[ci].len>colMax[ci])colMax[ci]=meta[ci].len;});
+    }
+    bodyRows.forEach(emit);footRows.forEach(emit);
+    for(var c2=1;c2<=ncol;c2++){ws.getColumn(c2).width=Math.max(9,Math.min(34,(colMax[c2-1]||8)+2));}
+    wb.xlsx.writeBuffer().then(function(buf){
+      var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(opts.file||'Report')+'.xlsx';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
+    }).catch(function(e){_tableToPlainExcel(tableEl,opts);});
+  }catch(e){_tableToPlainExcel(tableEl,opts);}
+}
 function exportDR(key){
-  var rep=(key==='space')?getSpaceRep():(getDR()[key]||DEFAULT_DAILY_REPORTS[key]);if(!rep||!rep.rows)return;
+  var ar=(typeof LANG!=='undefined'&&LANG==='ar');
+  var wrap=document.getElementById('rep-'+key+'-wrap');
+  var tbl=wrap&&wrap.querySelector('table');
+  var rep=(key==='space')?getSpaceRep():(getDR()[key]||DEFAULT_DAILY_REPORTS[key]);
+  var T2=(typeof DR_TITLES!=='undefined'&&DR_TITLES[key])?DR_TITLES[key]:null;
+  var title=T2?((ar&&T2.ar)?T2.ar:T2.en):key;
+  var date=(rep&&rep.date)||drToday();
+  var file=((T2?T2.en:'Report').replace(/[^\w]+/g,'_'))+'_'+date;
+  var sheet=(DR_TEMPLATES[key]&&DR_TEMPLATES[key].sheet)||'Report';
+  if(tbl&&tbl.querySelector('tr')){tableToStyledExcel(tbl,{title:title,subtitle:(ar?'تاريخ التحديث: ':'Updated: ')+date,sheet:sheet,file:file});return;}
+  if(!rep||!rep.rows)return;
   var aoa=[rep.headers].concat(rep.rows);
-  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),(DR_TEMPLATES[key].sheet||'Report').slice(0,28));
-  XLSX.writeFile(wb,(DR_TITLES[key].en.replace(/[^\w]+/g,'_'))+'_'+(rep.date||drToday())+'.xlsx');
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),sheet.slice(0,28));
+  XLSX.writeFile(wb,file+'.xlsx');
 }
 
 
@@ -6189,19 +6444,73 @@ function dalSetRec(code,branch,rec){var s=getDR();if(!s.daily_avg)s.daily_avg={}
   s.daily_avg[code][branch]={avg:+rec.avg||0,min:+rec.min||0,safe:+rec.safe||0,max:+rec.max||0,vmax:+rec.vmax||0};
   saveDR(s);try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}}
 
-/* أيام التغطية = الرصيد ÷ المتوسط اليومي (للعرض في التفاصيل) */
+/* أيام التغطية = الرصيد ÷ المتوسط اليومي */
 function dalCoverage(code,branch,balance){var avg=dalGet(code,branch,'avg');if(!avg||avg<=0)return null;var b=parseFloat(balance)||0;return b/avg;}
+/* مجموع المتوسط اليومي عبر كل الفروع (لعمود الإجمالي الجانبي) */
+function dalTotalAvg(code){var t=0;(typeof DAL_BRANCHES!=='undefined'?DAL_BRANCHES:[]).forEach(function(b){t+=(dalGet(code,b,'avg')||0);});return t;}
+function dalCoverageTotal(code,balance){var avg=dalTotalAvg(code);if(!avg||avg<=0)return null;var b=parseFloat(balance)||0;return b/avg;}
 
-/* لون خلية الرصيد حسب الحدود الخمسة (مقارنة مباشرة بأرقام الكراتين)
-   النطاقات:
-     رصيد < min                → نقص حاد (أحمر)
-     min ≤ رصيد < safe          → منخفض (برتقالي)
-     safe ≤ رصيد ≤ max          → مثالي (أخضر)
-     max < رصيد ≤ vmax          → عالٍ (أصفر)
-     رصيد > vmax                → فائض (أحمر غامق) */
-function dalColorClass(code,branch,balance){
+/* ───── نموذج «المتوسط اليومي × عدد الأيام» ─────
+   عتبات الأيام الأربع (عامة، تفصل الفئات الخمس):
+     d1 = نهاية «نقص حاد»  · d2 = نهاية «منخفض» · d3 = نهاية «مثالي» · d4 = نهاية «عالٍ»
+   التغطية (أيام) = الرصيد ÷ المتوسط اليومي، ثم تُصنَّف:
+     تغطية < d1            → نقص حاد (c1)
+     d1 ≤ تغطية < d2       → منخفض (c2)
+     d2 ≤ تغطية ≤ d3       → مثالي (c3)
+     d3 < تغطية ≤ d4       → عالٍ (c4)
+     تغطية > d4            → فائض (c5)
+   الحد بالكراتين لكل عتبة = المتوسط اليومي × عدد الأيام. */
+var DAL_DAYS_DEFAULTS={d1:7,d2:14,d3:30,d4:45};
+/* الفئات الأربع — تُدخَل يدوياً لكل صنف (مع استنتاج تلقائي احتياطي) */
+var DAL_CATS=['carton','bottle','shrink','pack'];
+var DAL_CAT_LABELS={ar:{carton:'كرتون',bottle:'قارورة',shrink:'شرنك',pack:'باكت'},
+                    en:{carton:'Carton',bottle:'Bottle',shrink:'Shrink',pack:'Packet'}};
+/* استنتاج الفئة تلقائياً من بيانات الصنف (احتياطي عند عدم الإدخال اليدوي) */
+function _dalAutoCat(code){try{var skus=(typeof collectSpaceSkus==='function')?collectSpaceSkus():{};var sk=skus[code]||{};
+  var g=(typeof fgCatGroup==='function')?fgCatGroup((sk.brand||'')+' '+(sk.pack||'')+' '+code):'';
+  if(g==='carton'||g==='bottle'||g==='shrink'||g==='pack')return g;}catch(e){}return 'carton';}
+function dalCatOf(code){var s=getDR();var c=s.daily_avg_cat&&s.daily_avg_cat[code];if(c&&DAL_CATS.indexOf(c)>=0)return c;return _dalAutoCat(code);}
+function dalCatIsManual(code){var s=getDR();return !!(s.daily_avg_cat&&s.daily_avg_cat[code]);}
+function dalSetCat(code,cat){var s=getDR();if(!s.daily_avg_cat)s.daily_avg_cat={};if(DAL_CATS.indexOf(cat)<0){delete s.daily_avg_cat[code];}else{s.daily_avg_cat[code]=cat;}saveDR(s);try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}}
+
+/* ───── عتبات أيام التغطية — مصفوفة (فرع × فئة) × 4 عتبات ─────
+   d1=نهاية «نقص حاد» · d2=نهاية «منخفض» · d3=نهاية «مثالي» · d4=نهاية «عالٍ»
+   التغطية(أيام)=الرصيد÷المتوسط اليومي ثم تُصنَّف. */
+function _dalOrder(o){if(o.d2<o.d1)o.d2=o.d1;if(o.d3<o.d2)o.d3=o.d2;if(o.d4<o.d3)o.d4=o.d3;return o;}
+function dalDaysFor(branch,cat){var s=getDR();var m=s.daily_avg_days_matrix||{};var d=((m[branch]||{})[cat])||{};
+  return _dalOrder({d1:(+d.d1>0?+d.d1:DAL_DAYS_DEFAULTS.d1),d2:(+d.d2>0?+d.d2:DAL_DAYS_DEFAULTS.d2),d3:(+d.d3>0?+d.d3:DAL_DAYS_DEFAULTS.d3),d4:(+d.d4>0?+d.d4:DAL_DAYS_DEFAULTS.d4)});}
+function dalSetDaysCell(branch,cat,key,val){var s=getDR();if(!s.daily_avg_days_matrix)s.daily_avg_days_matrix={};if(!s.daily_avg_days_matrix[branch])s.daily_avg_days_matrix[branch]={};if(!s.daily_avg_days_matrix[branch][cat])s.daily_avg_days_matrix[branch][cat]={};
+  var n=parseFloat(val);if(!isFinite(n)||n<0)n=0;s.daily_avg_days_matrix[branch][cat][key]=n;saveDR(s);try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}}
+function dalResetDaysBranch(branch){var s=getDR();if(s.daily_avg_days_matrix)delete s.daily_avg_days_matrix[branch];saveDR(s);try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}}
+function dalCopyDaysToAll(branch){var s=getDR();var m=s.daily_avg_days_matrix||{};var src=m[branch];if(!src)return;
+  DAL_BRANCHES.forEach(function(b){m[b]=JSON.parse(JSON.stringify(src));});s.daily_avg_days_matrix=m;saveDR(s);try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}}
+/* متوسط العتبات عبر الفروع لفئة ما — يُستخدم لعمود الإجمالي الجانبي (كل الفروع) */
+function dalDaysAggregate(cat){var acc={d1:0,d2:0,d3:0,d4:0},n=0;
+  DAL_BRANCHES.forEach(function(b){var t=dalDaysFor(b,cat);acc.d1+=t.d1;acc.d2+=t.d2;acc.d3+=t.d3;acc.d4+=t.d4;n++;});
+  if(!n)return {d1:DAL_DAYS_DEFAULTS.d1,d2:DAL_DAYS_DEFAULTS.d2,d3:DAL_DAYS_DEFAULTS.d3,d4:DAL_DAYS_DEFAULTS.d4};
+  return _dalOrder({d1:Math.round(acc.d1/n),d2:Math.round(acc.d2/n),d3:Math.round(acc.d3/n),d4:Math.round(acc.d4/n)});}
+/* توافق رجعي */
+function dalDays(){return {d1:DAL_DAYS_DEFAULTS.d1,d2:DAL_DAYS_DEFAULTS.d2,d3:DAL_DAYS_DEFAULTS.d3,d4:DAL_DAYS_DEFAULTS.d4};}
+/* وضع التلوين: 'days' (افتراضي) = أيام التغطية · 'limits' = الحدود الخمسة بالكراتين */
+function dalMode(){var s=getDR();return s.daily_avg_mode==='limits'?'limits':'days';}
+function dalSetMode(m){var s=getDR();s.daily_avg_mode=(m==='limits')?'limits':'days';saveDR(s);try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}}
+/* تصنيف الفئة من أيام التغطية مقابل عتبات معطاة */
+function dalBandFromCoverage(cov,t){
+  if(cov==null||!isFinite(cov))return '';
+  t=t||DAL_DAYS_DEFAULTS;
+  if(cov<t.d1)return 'dal-c1';
+  if(cov<t.d2)return 'dal-c2';
+  if(cov<=t.d3)return 'dal-c3';
+  if(cov<=t.d4)return 'dal-c4';
+  return 'dal-c5';}
+function dalBandLabel(cls,ar){
+  var L=ar?{'dal-c1':'نقص حاد','dal-c2':'منخفض','dal-c3':'مثالي','dal-c4':'عالٍ','dal-c5':'فائض'}
+          :{'dal-c1':'Critical','dal-c2':'Low','dal-c3':'Ideal','dal-c4':'High','dal-c5':'Excess'};
+  return L[cls]||'';}
+
+/* ───── الحدود الخمسة بالكراتين (الوضع القديم) ───── */
+function _dalColorClassLimits(code,branch,balance){
   var r=dalRec(code,branch);if(!r)return '';
-  /* نحتاج حدوداً مُعرّفة على الأقل (غير صفرية كلها) */
   if(!r.min&&!r.safe&&!r.max&&!r.vmax)return '';
   var b=parseFloat(balance)||0;
   if(r.min&&b<r.min)return 'dal-c1';
@@ -6209,12 +6518,9 @@ function dalColorClass(code,branch,balance){
   if(r.max&&b<=r.max)return 'dal-c3';
   if(r.vmax&&b<=r.vmax)return 'dal-c4';
   if(r.vmax&&b>r.vmax)return 'dal-c5';
-  /* احتياط: إن كان safe فقط معرّفاً */
   if(r.safe&&b>=r.safe)return 'dal-c3';
   return '';}
-
-/* تصنيف لوني للإجمالي الجانبي: يجمع حدود كل الفروع للصنف ثم يقارن الرصيد الكلي */
-function dalColorClassTotal(code,balance){
+function _dalColorClassTotalLimits(code,balance){
   var min=0,safe=0,max=0,vmax=0,any=false;
   (typeof DAL_BRANCHES!=='undefined'?DAL_BRANCHES:[]).forEach(function(b){
     var r=dalRec(code,b);if(!r)return;
@@ -6231,6 +6537,71 @@ function dalColorClassTotal(code,balance){
   if(safe&&b2>=safe)return 'dal-c3';
   return '';}
 
+/* ───── دوال التلوين العامة — تُوزِّع حسب الوضع ───── */
+/* لون خلية الرصيد لفرع واحد */
+function dalColorClass(code,branch,balance){
+  if(dalMode()==='limits')return _dalColorClassLimits(code,branch,balance);
+  var avg=dalGet(code,branch,'avg');if(!avg||avg<=0)return '';
+  var b=parseFloat(balance)||0;return dalBandFromCoverage(b/avg,dalDaysFor(branch,dalCatOf(code)));}
+/* لون خلية الإجمالي الجانبي (كل الفروع) */
+function dalColorClassTotal(code,balance){
+  if(dalMode()==='limits')return _dalColorClassTotalLimits(code,balance);
+  var avg=dalTotalAvg(code);if(!avg||avg<=0)return '';
+  var b=parseFloat(balance)||0;return dalBandFromCoverage(b/avg,dalDaysAggregate(dalCatOf(code)));}
+
+/* ───── النافذة المنبثقة: الرصيد · أيام التغطية · المتوسط اليومي ───── */
+function dalTipHTML(code,scope,bal){
+  var ar=drIsAr&&drIsAr();
+  var avg=dalTotalAvg(code);
+  if(!avg||avg<=0)return null;
+  var cov=bal/avg;
+  var cat=dalCatOf(code);var t=dalDaysAggregate(cat);
+  var cls=dalColorClassTotal(code,bal)||dalBandFromCoverage(cov,t);
+  var skus=(typeof collectSpaceSkus==='function')?collectSpaceSkus():{};var sk=(skus&&skus[code])||{};
+  var cols=(typeof getDALColors==='function')?getDALColors():{};var ck=cls.replace('dal-','');var cc=cols[ck]||{bg:'#e2e8f0',fg:'#334155'};
+  var catLab=(DAL_CAT_LABELS[ar?'ar':'en'][cat]||cat);
+  var covTxt=(cov>=100)?Math.round(cov):(Math.round(cov*10)/10);
+  var idealLo=Math.round(avg*t.d2),idealHi=Math.round(avg*t.d3);
+  var bandName=dalBandLabel(cls,ar);
+  var h='';
+  h+='<div class="dal-tip-hd">';
+  h+='<div><div class="dal-tip-code">'+drEsc(code)+'</div><div class="dal-tip-brand">'+(sk.brand?drEsc(sk.brand)+' · ':'')+drEsc(catLab)+'</div></div>';
+  h+='<span class="dal-tip-pill" style="background:'+cc.bg+';color:'+cc.fg+'">'+drEsc(bandName)+'</span>';
+  h+='</div>';
+  h+='<div class="dal-tip-body">';
+  h+='<div class="dal-tip-cov"><b>'+drFmt(covTxt)+'</b><span>'+(ar?'يوم تغطية متوقّعة':'days of coverage')+'</span></div>';
+  h+='<div class="dal-tip-rows">';
+  h+='<div class="dal-tip-row"><span class="k">'+(ar?'الرصيد الحالي':'Current balance')+'</span><span class="v">'+drFmt(Math.round(bal))+' '+(ar?'كرتون':'ctn')+'</span></div>';
+  h+='<div class="dal-tip-row"><span class="k">'+(ar?'متوسط التحميل اليومي':'Daily average load')+'</span><span class="v">'+drFmt(Math.round(avg*10)/10)+' '+(ar?'كرتون/يوم':'ctn/day')+'</span></div>';
+  h+='<div class="dal-tip-row"><span class="k">'+(ar?'النطاق المثالي':'Ideal range')+'</span><span class="v">'+drFmt(idealLo)+'–'+drFmt(idealHi)+' '+(ar?'كرتون':'ctn')+'</span></div>';
+  h+='</div></div>';
+  h+='<div class="dal-tip-foot">'+(ar?('عتبات '+drEsc(catLab)+' (متوسط الفروع، أيام): نقص &lt;'+t.d1+' · منخفض &lt;'+t.d2+' · مثالي '+t.d2+'–'+t.d3+' · عالٍ ≤'+t.d4+' · فائض &gt;'+t.d4):(drEsc(catLab)+' days: Crit &lt;'+t.d1+' · Low &lt;'+t.d2+' · Ideal '+t.d2+'–'+t.d3+' · High ≤'+t.d4+' · Excess &gt;'+t.d4))+'</div>';
+  return h;}
+
+(function dalTipInit(){
+  if(window._dalTipReady)return;window._dalTipReady=true;
+  function el(){var t=document.getElementById('dal-tip');if(!t){t=document.createElement('div');t.id='dal-tip';t.className='dal-tip-pop';document.body.appendChild(t);}return t;}
+  function place(tip,cell){
+    var rc=cell.getBoundingClientRect();var tw=tip.offsetWidth,th=tip.offsetHeight;
+    var top=rc.top-th-10;if(top<8)top=rc.bottom+10;
+    var left=rc.left+rc.width/2-tw/2;left=Math.max(8,Math.min(left,window.innerWidth-tw-8));
+    tip.style.top=top+'px';tip.style.left=left+'px';}
+  function show(cell){
+    var code=cell.getAttribute('data-dal-code');if(!code)return;
+    var bal=parseFloat(cell.getAttribute('data-dal-bal'))||0;
+    var html;try{html=dalTipHTML(code,cell.getAttribute('data-dal-scope')||'total',bal);}catch(e){html=null;}
+    if(!html){hide();return;}
+    var tip=el();tip.innerHTML=html;tip.classList.add('show');tip._cell=cell;place(tip,cell);}
+  function hide(){var t=document.getElementById('dal-tip');if(t){t.classList.remove('show');t._cell=null;}}
+  document.addEventListener('mouseover',function(e){var c=e.target.closest&&e.target.closest('.dal-tip');if(c)show(c);});
+  document.addEventListener('mouseout',function(e){var c=e.target.closest&&e.target.closest('.dal-tip');if(!c)return;var to=e.relatedTarget;if(!to||!(to.closest&&to.closest('.dal-tip')))hide();});
+  document.addEventListener('click',function(e){var c=e.target.closest&&e.target.closest('.dal-tip');var tip=document.getElementById('dal-tip');
+    if(c){if(tip&&tip.classList.contains('show')&&tip._cell===c)hide();else show(c);}
+    else if(!(e.target.closest&&e.target.closest('.dal-tip-pop')))hide();});
+  window.addEventListener('scroll',hide,true);
+  window.addEventListener('resize',hide);
+})();
+
 /* استيراد القالب من Excel — ورقة لكل فرع أو عمود فرع، 5 حقول لكل صنف
    التنسيق المرن: عمود Code + أعمدة (Branch_avg, Branch_min, ...) أو ورقة لكل فرع */
 function importDAL(input){
@@ -6244,6 +6615,13 @@ function importDAL(input){
     var fieldSyn={avg:['avg','average','daily','متوسط','تحميل'],min:['min','minimum','ادنى','أدنى','حدادنى'],safe:['safe','safety','امان','أمان','حدامان'],max:['max','maximum','اقصى','أقصى','حداقصى'],vmax:['vmax','verymax','verymaximum','اقصىجدا','أقصىجداً','اقصىجداً']};
     function matchField(h){var nh=_norm(h);for(var fi=0;fi<DAL_FIELDS.length;fi++){var fld=DAL_FIELDS[fi];var syn=fieldSyn[fld];for(var k=0;k<syn.length;k++){if(nh.indexOf(_norm(syn[k]))>=0)return fld;}}return null;}
     function matchBranch(h){var nh=_norm(h);return DAL_BRANCHES.find(function(b){var nb=_norm(b);return nb===nh||nb.indexOf(nh)>=0||nh.indexOf(nb)>=0;});}
+    /* تحويل نص الفئة إلى رمز */
+    function _catFromText(v){var n=_norm(v);if(!n)return null;
+      if(n.indexOf('carton')>=0||n.indexOf('كرتون')>=0||n==='ctn')return 'carton';
+      if(n.indexOf('bottle')>=0||n.indexOf('قاروره')>=0||n.indexOf('قارورة')>=0)return 'bottle';
+      if(n.indexOf('shrink')>=0||n.indexOf('شرنك')>=0||n==='shr')return 'shrink';
+      if(n.indexOf('pack')>=0||n.indexOf('باكت')>=0||n.indexOf('باكيت')>=0)return 'pack';
+      return null;}
     /* لكل ورقة: إما اسمها فرع (أعمدة=الحقول) أو أعمدة مركّبة Branch_field */
     wb.SheetNames.forEach(function(sheetName){
       var aoa=sheetToAoa(wb.Sheets[sheetName]);
@@ -6252,6 +6630,8 @@ function importDAL(input){
       var hlow=hdr.map(function(h){return h.toLowerCase();});
       var ci=hlow.findIndex(function(h){return h==='code'||h==='product code'||h.indexOf('كود')>=0||h.indexOf('product')>=0;});
       if(ci<0)ci=0;
+      /* عمود الفئة (اختياري) — يُطبَّق على الصنف لكل الفروع */
+      var catCol=hdr.findIndex(function(h){var n=_norm(h);return n==='category'||n==='cat'||n==='type'||n.indexOf('فئة')>=0||n.indexOf('نوع')>=0;});
       var sheetBranch=matchBranch(sheetName);
       /* خريطة العمود → {branch,field} */
       var colMap=[];
@@ -6269,6 +6649,7 @@ function importDAL(input){
         var row=aoa[r];if(!row)continue;
         var code=String(row[ci]==null?'':row[ci]).trim();if(!code)continue;
         if(!s.daily_avg[code])s.daily_avg[code]={};
+        if(catCol>=0){var _ct=_catFromText(row[catCol]);if(_ct){if(!s.daily_avg_cat)s.daily_avg_cat={};s.daily_avg_cat[code]=_ct;}}
         colMap.forEach(function(cm){
           var cur=s.daily_avg[code][cm.branch];
           if(typeof cur==='number')cur={avg:cur,min:0,safe:0,max:0,vmax:0};
@@ -6296,17 +6677,56 @@ function exportDAL(){
     var codes=Object.keys(skus);
     Object.keys(d).forEach(function(c){if(codes.indexOf(c)<0)codes.push(c);});
     codes.sort();
-    var ar=drIsAr&&drIsAr();
+    var t=dalDays();
     var wb=XLSX.utils.book_new();
+    /* ── ورقة التعليمات (أولاً) ── */
+    var info=[
+      ['متوسط التحميل اليومي · Daily Average Load — قالب الرفع'],
+      [],
+      ['الأعمدة المطلوبة في كل ورقة فرع · Required columns per branch sheet:'],
+      ['Code','كود الصنف (مطابق لتقرير الرصيد) · Item code'],
+      ['Brand','العلامة (اختياري) · Brand (optional)'],
+      ['Pack','الشد/العبوة (اختياري) · Pack (optional)'],
+      ['Category','★ الفئة: Carton كرتون / Bottle قارورة / Shrink شرنك / Packet باكت — تحدّد عتبات أيام الصنف'],
+      ['Daily Avg','★ متوسط التحميل اليومي بالكرتون/اليوم — العمود الأساسي · cartons consumed per day'],
+      ['Min / Safe / Max / Very Max','حدود بالكراتين (تُستخدم فقط في وضع «حدود الكراتين») · optional, only for carton-limits mode'],
+      [],
+      ['طريقة الحساب · How it works:'],
+      ['أيام التغطية = الرصيد ÷ متوسط التحميل اليومي · Coverage days = Balance ÷ Daily Avg'],
+      ['الحد بالكراتين لأي عتبة = المتوسط اليومي × عدد الأيام · Carton limit = Daily Avg × days'],
+      [],
+      ['العتبات الافتراضية — تُضبط لكل فرع × فئة داخل التطبيق · Default thresholds — set per branch×category in the app:'],
+      ['نقص حاد · Critical','أقل من '+t.d1+' يوم'],
+      ['منخفض · Low','من '+t.d1+' إلى '+t.d2+' يوم'],
+      ['مثالي · Ideal','من '+t.d2+' إلى '+t.d3+' يوم'],
+      ['عالٍ · High','من '+t.d3+' إلى '+t.d4+' يوم'],
+      ['فائض · Excess','أكثر من '+t.d4+' يوم'],
+      [],
+      ['مثال · Example (Daily Avg = 12 كرتون/يوم):'],
+      ['الرصيد · Balance','أيام التغطية · Coverage','الفئة · Band'],
+      [60,'5.0 يوم','نقص حاد · Critical'],
+      [150,'12.5 يوم','منخفض · Low'],
+      [300,'25.0 يوم','مثالي · Ideal'],
+      [480,'40.0 يوم','عالٍ · High'],
+      [720,'60.0 يوم','فائض · Excess']
+    ];
+    var wsi=XLSX.utils.aoa_to_sheet(info);wsi['!cols']=[{wch:26},{wch:60}];
+    XLSX.utils.book_append_sheet(wb,wsi,'تعليمات · Instructions');
+    /* ── صفوف مثال احتياطية عند عدم وجود أصناف ── */
+    var sample=[
+      ['EX-001 (مثال — احذفه)','Brand A','12×1L','Carton',12,'','','',''],
+      ['EX-002 (مثال — احذفه)','Brand B','24×500ml','Bottle',30,'','','','']
+    ];
+    var head=['Code','Brand','Pack','Category','Daily Avg','Min','Safe','Max','Very Max'];
     DAL_BRANCHES.forEach(function(b){
-      var head=['Code','Brand','Pack'].concat(DAL_FIELDS.map(function(f){return DAL_FIELD_LABELS.en[f];}));
       var aoa=[head];
-      codes.forEach(function(code){
-        var sk=skus[code]||{};var rec=dalRec(code,b);
-        aoa.push([code,sk.brand||'',sk.pack||''].concat(DAL_FIELDS.map(function(f){return rec?(rec[f]||''):'';})));
-      });
-      var ws=XLSX.utils.aoa_to_sheet(aoa);
-      /* اسم الورقة = اسم الفرع (مختصر ≤31 حرف) */
+      if(codes.length){
+        codes.forEach(function(code){
+          var sk=skus[code]||{};var rec=dalRec(code,b);
+          aoa.push([code,sk.brand||'',sk.pack||'',DAL_CAT_LABELS.en[dalCatOf(code)]||'',rec?(rec.avg||''):'',rec?(rec.min||''):'',rec?(rec.safe||''):'',rec?(rec.max||''):'',rec?(rec.vmax||''):'']);
+        });
+      }else{aoa=aoa.concat(sample);}
+      var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:22},{wch:14},{wch:12},{wch:10},{wch:11},{wch:8},{wch:8},{wch:8},{wch:10}];
       var sn=b.replace(/[\\\/\?\*\[\]:]/g,'').slice(0,31);
       XLSX.utils.book_append_sheet(wb,ws,sn);
     });
@@ -6318,47 +6738,135 @@ function exportDAL(){
 var _dalQuery='', _dalBranch='';
 function renderDALTable(){
   var wrap=document.getElementById('dal-table');if(!wrap)return;
-  var ar=drIsAr&&drIsAr();
-  /* تهيئة الفرع المختار */
+  var ar=drIsAr&&drIsAr();var mode=dalMode();
   if(!_dalBranch)_dalBranch=DAL_BRANCHES[0];
-  /* قائمة الفروع المنسدلة */
   var selWrap=document.getElementById('dal-branch-sel');
   if(selWrap){
     var opts=DAL_BRANCHES.map(function(b){return '<option value="'+drEsc(b)+'"'+(b===_dalBranch?' selected':'')+'>'+drEsc(b)+'</option>';}).join('');
     if(selWrap.innerHTML!==opts)selWrap.innerHTML=opts;
     selWrap.value=_dalBranch;
   }
+  try{_dalSyncModeUI();}catch(e){}
   var skus=collectSpaceSkus();var d=getDAL();
   var codes=Object.keys(skus);
   Object.keys(d).forEach(function(c){if(codes.indexOf(c)<0)codes.push(c);});
   var q=_dalQuery.trim().toLowerCase();
   if(q){codes=codes.filter(function(code){var sk=skus[code]||{};return code.toLowerCase().indexOf(q)>=0||String(sk.brand||'').toLowerCase().indexOf(q)>=0||String(sk.pack||'').toLowerCase().indexOf(q)>=0;});}
   codes.sort();
-  var FL=DAL_FIELD_LABELS[ar?'ar':'en'];
-  var h='<table class="dal-tbl"><thead><tr>';
-  h+='<th class="dal-h-code">'+(ar?'الكود':'Code')+'</th><th>'+(ar?'العلامة':'Brand')+'</th><th>'+(ar?'الشد':'Pack')+'</th>';
-  DAL_FIELDS.forEach(function(f){h+='<th class="dal-h-fld dal-fld-'+f+'">'+drEsc(FL[f])+'</th>';});
-  h+='</tr></thead><tbody>';
-  if(!codes.length){h+='<tr><td colspan="'+(3+DAL_FIELDS.length)+'" class="dal-empty">'+(ar?'لا توجد أصناف. ارفع تقرير الرصيد أو استورد القالب.':'No items. Upload a balance report or import the template.')+'</td></tr>';}
   var B=_dalBranch.replace(/'/g,"\\'");
-  codes.forEach(function(code){
-    var sk=skus[code]||{};var rec=dalRec(code,_dalBranch)||{avg:0,min:0,safe:0,max:0,vmax:0};
-    var cE=code.replace(/'/g,"\\'");
-    h+='<tr><td class="dal-c-code">'+drEsc(code)+'</td>';
-    h+='<td>'+drEsc(sk.brand||'')+'</td><td>'+drEsc(sk.pack||'')+'</td>';
-    DAL_FIELDS.forEach(function(f){
-      var v=rec[f]||0;
-      h+='<td class="dal-val dal-vc-'+f+(v>0?' dal-has':'')+'"><input type="number" min="0" step="1" value="'+(v||'')+'" onchange="dalFieldChange(\''+cE+'\',\''+B+'\',\''+f+'\',this.value)" placeholder="0"></td>';
+  var h='';
+  if(mode==='days'){
+    /* ── وضع أيام التغطية: الفئة + المتوسط اليومي + حدود محسوبة بعتبات الفئة ── */
+    var bandsMeta=[{k:'d1',lab:ar?'حد النقص':'Critical',cls:'dal-fld-min'},
+                   {k:'d2',lab:ar?'حد المنخفض':'Low cap',cls:'dal-fld-safe'},
+                   {k:'d3',lab:ar?'سقف المثالي':'Ideal cap',cls:'dal-fld-max'},
+                   {k:'d4',lab:ar?'سقف العالي':'High cap',cls:'dal-fld-vmax'}];
+    var CL=DAL_CAT_LABELS[ar?'ar':'en'];
+    h+='<table class="dal-tbl"><thead><tr>';
+    h+='<th class="dal-h-code">'+(ar?'الكود':'Code')+'</th><th>'+(ar?'العلامة':'Brand')+'</th><th>'+(ar?'الشد':'Pack')+'</th>';
+    h+='<th class="dal-h-cat">'+(ar?'الفئة':'Category')+'</th>';
+    h+='<th class="dal-h-fld dal-fld-avg">'+(ar?'المتوسط اليومي':'Daily Avg')+'<br><small style="font-weight:600;font-size:9px">'+(ar?'كرتون/يوم':'ctn/day')+'</small></th>';
+    bandsMeta.forEach(function(c){h+='<th class="dal-h-comp '+c.cls+'">'+c.lab+'<br><small>'+(ar?'حسب أيام الفئة':'by cat days')+'</small></th>';});
+    h+='</tr></thead><tbody>';
+    if(!codes.length){h+='<tr><td colspan="9" class="dal-empty">'+(ar?'لا توجد أصناف. ارفع تقرير الرصيد أو استورد القالب.':'No items. Upload a balance report or import the template.')+'</td></tr>';}
+    codes.forEach(function(code){
+      var sk=skus[code]||{};var avg=dalGet(code,_dalBranch,'avg')||0;var cE=code.replace(/'/g,"\\'");
+      var cat=dalCatOf(code);var manual=dalCatIsManual(code);var tt=dalDaysFor(_dalBranch,cat);
+      h+='<tr><td class="dal-c-code">'+drEsc(code)+'</td>';
+      h+='<td>'+drEsc(sk.brand||'')+'</td><td>'+drEsc(sk.pack||'')+'</td>';
+      h+='<td class="dal-cat-cell"><select class="dal-cat-sel'+(manual?'':' auto')+'" title="'+(manual?'':(ar?'مستنتجة تلقائياً — اختر لتثبيتها':'auto — pick to set'))+'" onchange="dalCatChange(\''+cE+'\',this.value)">';
+      DAL_CATS.forEach(function(ct){h+='<option value="'+ct+'"'+(ct===cat?' selected':'')+'>'+drEsc(CL[ct])+'</option>';});
+      h+='</select></td>';
+      h+='<td class="dal-val dal-avg-cell'+(avg>0?' dal-has':'')+'"><input type="number" min="0" step="0.5" value="'+(avg||'')+'" onchange="dalFieldChange(\''+cE+'\',\''+B+'\',\'avg\',this.value)" placeholder="0"></td>';
+      bandsMeta.forEach(function(c){
+        var days=tt[c.k];var lim=avg>0?Math.round(avg*days):0;
+        h+='<td class="dal-comp">'+(lim?drFmt(lim):'—')+'<small>×'+days+(ar?'ي':'d')+'</small></td>';
+      });
+      h+='</tr>';
     });
+    h+='</tbody></table>';
+  }else{
+    /* ── وضع الحدود الخمسة بالكراتين (القديم) ── */
+    var FL=DAL_FIELD_LABELS[ar?'ar':'en'];
+    h+='<table class="dal-tbl"><thead><tr>';
+    h+='<th class="dal-h-code">'+(ar?'الكود':'Code')+'</th><th>'+(ar?'العلامة':'Brand')+'</th><th>'+(ar?'الشد':'Pack')+'</th>';
+    DAL_FIELDS.forEach(function(f){h+='<th class="dal-h-fld dal-fld-'+f+'">'+drEsc(FL[f])+'</th>';});
+    h+='</tr></thead><tbody>';
+    if(!codes.length){h+='<tr><td colspan="'+(3+DAL_FIELDS.length)+'" class="dal-empty">'+(ar?'لا توجد أصناف. ارفع تقرير الرصيد أو استورد القالب.':'No items. Upload a balance report or import the template.')+'</td></tr>';}
+    codes.forEach(function(code){
+      var sk=skus[code]||{};var rec=dalRec(code,_dalBranch)||{avg:0,min:0,safe:0,max:0,vmax:0};
+      var cE=code.replace(/'/g,"\\'");
+      h+='<tr><td class="dal-c-code">'+drEsc(code)+'</td>';
+      h+='<td>'+drEsc(sk.brand||'')+'</td><td>'+drEsc(sk.pack||'')+'</td>';
+      DAL_FIELDS.forEach(function(f){
+        var v=rec[f]||0;
+        h+='<td class="dal-val dal-vc-'+f+(v>0?' dal-has':'')+'"><input type="number" min="0" step="1" value="'+(v||'')+'" onchange="dalFieldChange(\''+cE+'\',\''+B+'\',\''+f+'\',this.value)" placeholder="0"></td>';
+      });
+      h+='</tr>';
+    });
+    h+='</tbody></table>';
+  }
+  wrap.innerHTML=h;
+  try{renderDALLegend();}catch(e){}
+  var kpi=document.getElementById('dal-kpi');
+  if(kpi){
+    if(mode==='days'){var nAvg=0;codes.forEach(function(code){if((dalGet(code,_dalBranch,'avg')||0)>0)nAvg++;});
+      kpi.textContent=(ar?'الفرع: ':'Branch: ')+_dalBranch+(ar?' · الأصناف: ':' · Items: ')+codes.length+(ar?' · لها متوسط يومي: ':' · With avg: ')+nAvg;}
+    else{var totalVals=0;codes.forEach(function(code){var rec=dalRec(code,_dalBranch);if(rec)DAL_FIELDS.forEach(function(f){if(rec[f]>0)totalVals++;});});
+      kpi.textContent=(ar?'الفرع: ':'Branch: ')+_dalBranch+(ar?' · الأصناف: ':' · Items: ')+codes.length+(ar?' · قيم مسجّلة: ':' · Values: ')+totalVals;}
+  }
+}
+/* ───── واجهة: مفتاح الوضع · عتبات الأيام · المفتاح اللوني ───── */
+function dalSetModeUI(m){dalSetMode(m);try{_dalSyncModeUI();}catch(e){}renderDALTable();try{rebuildAllTables&&rebuildAllTables();}catch(e){}}
+function _dalSyncModeUI(){
+  var m=dalMode();var sw=document.getElementById('dal-mode-sw');
+  if(sw)Array.prototype.forEach.call(sw.querySelectorAll('button'),function(b){b.classList.toggle('on',b.getAttribute('data-mode')===m);});
+  var btn=document.getElementById('dal-days-btn');if(btn)btn.style.display=(m==='days')?'':'none';
+  if(m!=='days'){var box=document.getElementById('dal-days-box');if(box)box.classList.remove('open');}
+}
+function dalToggleDays(){var box=document.getElementById('dal-days-box');if(!box)return;box.classList.toggle('open');
+  if(box.classList.contains('open')){try{renderDALDaysRow();}catch(e){}try{renderDALBandsStrip();}catch(e){}}}
+function dalCatChange(code,cat){dalSetCat(code,cat);renderDALTable();try{rebuildAllTables&&rebuildAllTables();}catch(e){}}
+function dalSetDaysCellUI(branch,cat,key,val){dalSetDaysCell(branch,cat,key,val);try{renderDALDaysRow();}catch(e){}try{renderDALLegend();}catch(e){}renderDALTable();try{rebuildAllTables&&rebuildAllTables();}catch(e){}}
+function dalResetDaysBranchUI(){var ar=drIsAr&&drIsAr();dalResetDaysBranch(_dalBranch||DAL_BRANCHES[0]);try{renderDALDaysRow();}catch(e){}try{renderDALLegend();}catch(e){}renderDALTable();try{rebuildAllTables&&rebuildAllTables();}catch(e){}var st=document.getElementById('dal-status');if(st)st.textContent=ar?'✓ أُعيدت عتبات هذا الفرع للافتراضي.':'✓ Reset to defaults.';}
+function dalCopyDaysToAllUI(){var ar=drIsAr&&drIsAr();var b=_dalBranch||DAL_BRANCHES[0];if(!confirm(ar?('نسخ عتبات الفرع «'+b+'» إلى كل الفروع؟ سيُستبدَل ما فيها.'):('Copy "'+b+'" thresholds to ALL branches?')))return;dalCopyDaysToAll(b);try{rebuildAllTables&&rebuildAllTables();}catch(e){}renderDALTable();var st=document.getElementById('dal-status');if(st)st.textContent=ar?'✓ نُسخت العتبات لكل الفروع.':'✓ Copied to all branches.';}
+function renderDALDaysRow(){
+  var grid=document.getElementById('dal-days-grid');if(!grid)return;
+  var ar=drIsAr&&drIsAr();var branch=_dalBranch||DAL_BRANCHES[0];
+  var bn=document.getElementById('dal-days-branch');if(bn)bn.textContent=branch;
+  var CL=DAL_CAT_LABELS[ar?'ar':'en'];
+  var cols=[['d1',ar?'نهاية «نقص حاد»':'Critical end','dal-c1'],['d2',ar?'نهاية «منخفض»':'Low end','dal-c2'],['d3',ar?'نهاية «مثالي»':'Ideal end','dal-c3'],['d4',ar?'نهاية «عالٍ»':'High end','dal-c4']];
+  var be=branch.replace(/'/g,"\\'");
+  var h='<table class="dal-mtx"><thead><tr><th class="dal-mtx-cat">'+(ar?'الفئة \\ العتبة (يوم تغطية)':'Category \\ Threshold (days)')+'</th>';
+  cols.forEach(function(c){h+='<th><span class="dal-mtx-dot '+c[2]+'"></span>'+c[1]+'</th>';});
+  h+='</tr></thead><tbody>';
+  DAL_CATS.forEach(function(cat){
+    var t=dalDaysFor(branch,cat);
+    h+='<tr><td class="dal-mtx-cat">'+drEsc(CL[cat])+'</td>';
+    cols.forEach(function(c){h+='<td><input type="number" min="0" step="1" value="'+t[c[0]]+'" onchange="dalSetDaysCellUI(\''+be+'\',\''+cat+'\',\''+c[0]+'\',this.value)"></td>';});
     h+='</tr>';
   });
   h+='</tbody></table>';
-  wrap.innerHTML=h;
-  var totalVals=0;codes.forEach(function(code){var rec=dalRec(code,_dalBranch);if(rec)DAL_FIELDS.forEach(function(f){if(rec[f]>0)totalVals++;});});
-  var kpi=document.getElementById('dal-kpi');
-  if(kpi)kpi.textContent=(ar?'الفرع: ':'Branch: ')+_dalBranch+(ar?' · الأصناف: ':' · Items: ')+codes.length+(ar?' · قيم مسجّلة: ':' · Values: ')+totalVals;
+  grid.innerHTML=h;
 }
-function dalSelectBranch(v){_dalBranch=v||DAL_BRANCHES[0];renderDALTable();}
+function renderDALBandsStrip(){
+  var strip=document.getElementById('dal-bands-strip');if(!strip)return;
+  var ar=drIsAr&&drIsAr();var c=getDALColors();
+  var bands=[['c1',ar?'نقص حاد':'Critical'],['c2',ar?'منخفض':'Low'],['c3',ar?'مثالي':'Ideal'],['c4',ar?'عالٍ':'High'],['c5',ar?'فائض':'Excess']];
+  strip.innerHTML=bands.map(function(b){return '<span style="background:'+c[b[0]].bg+';color:'+c[b[0]].fg+'">'+b[1]+'</span>';}).join('');
+}
+function renderDALLegend(){
+  var lg=document.getElementById('dal-legend');if(!lg)return;
+  var ar=drIsAr&&drIsAr();
+  if(dalMode()==='days'){
+    var items=[['dal-c1',ar?'نقص حاد':'Critical'],['dal-c2',ar?'منخفض':'Low'],['dal-c3',ar?'مثالي':'Ideal'],['dal-c4',ar?'عالٍ':'High'],['dal-c5',ar?'فائض':'Excess']];
+    lg.innerHTML=items.map(function(it){return '<span class="dal-lg"><i class="dal-sw '+it[0]+'"></i> '+it[1]+'</span>';}).join('')+'<span class="dal-lg" style="color:#94a3b8">'+(ar?'· نطاقات الأيام لكل فرع×فئة تُضبط من «عتبات الأيام»':'· day ranges set per branch×category')+'</span>';
+  }else{
+    var items2=[['dal-c1',ar?'نقص حاد (< الأدنى)':'Critical (< Min)'],['dal-c2',ar?'منخفض (< الأمان)':'Low (< Safe)'],['dal-c3',ar?'مثالي (الأمان–الأقصى)':'Ideal (Safe–Max)'],['dal-c4',ar?'عالٍ (< الأقصى جداً)':'High (< Very Max)'],['dal-c5',ar?'فائض (> الأقصى جداً)':'Excess (> Very Max)']];
+    lg.innerHTML=items2.map(function(it){return '<span class="dal-lg"><i class="dal-sw '+it[0]+'"></i> '+it[1]+'</span>';}).join('');
+  }
+}
+function dalSelectBranch(v){_dalBranch=v||DAL_BRANCHES[0];renderDALTable();var box=document.getElementById('dal-days-box');if(box&&box.classList.contains('open')){try{renderDALDaysRow();}catch(e){}}}
 function dalFieldChange(code,branch,field,val){dalSetField(code,branch,field,val);try{rebuildAllTables&&rebuildAllTables();}catch(e){}var t=event&&event.target;if(t){if((parseFloat(val)||0)>0)t.parentNode.classList.add('dal-has');else t.parentNode.classList.remove('dal-has');}}
 function filterDAL(v){_dalQuery=v||'';renderDALTable();}
 
@@ -6372,26 +6880,193 @@ function openDALDetail(code){
   function balFor(branch){if(!balRow)return 0;var ci=fgH.indexOf(branch);return ci>=0?(parseFloat(balRow[ci])||0):0;}
   var ttl=document.getElementById('dal-detail-title');
   if(ttl)ttl.textContent=(ar?'تفاصيل · ':'Detail · ')+code+(sk.brand?' — '+sk.brand:'');
-  var FL=DAL_FIELD_LABELS[ar?'ar':'en'];
-  var h='<table class="dal-detail-tbl"><thead><tr><th>'+(ar?'الفرع':'Branch')+'</th>';
-  DAL_FIELDS.forEach(function(f){h+='<th>'+drEsc(FL[f])+'</th>';});
-  h+='<th>'+(ar?'الرصيد':'Balance')+'</th><th>'+(ar?'الحالة':'Status')+'</th></tr></thead><tbody>';
-  DAL_BRANCHES.forEach(function(b){
-    var rec=dalRec(code,b)||{avg:0,min:0,safe:0,max:0,vmax:0};var bal=balFor(b);
-    var cls=dalColorClass(code,b,bal);
-    h+='<tr><td class="dal-d-br">'+drEsc(b)+'</td>';
-    DAL_FIELDS.forEach(function(f){
-      h+='<td><input type="number" min="0" step="1" value="'+(rec[f]||'')+'" onchange="dalDetailEdit(\''+code.replace(/'/g,"\\'")+'\',\''+b.replace(/'/g,"\\'")+'\',\''+f+'\',this.value)" placeholder="0"></td>';
+  var cEsc=code.replace(/'/g,"\\'");var h='';
+  if(dalMode()==='days'){
+    var dcat=dalCatOf(code);var dcatLab=DAL_CAT_LABELS[ar?'ar':'en'][dcat]||dcat;
+    h+='<div style="font-size:12px;color:#475569;margin-bottom:10px">'+(ar?'الفئة: ':'Category: ')+'<b style="color:#3730a3">'+drEsc(dcatLab)+'</b> '+(ar?'— عتبات الأيام تخصّ هذه الفئة في كل فرع':'— day thresholds for this category per branch')+'</div>';
+    h+='<table class="dal-detail-tbl"><thead><tr><th>'+(ar?'الفرع':'Branch')+'</th><th>'+(ar?'المتوسط اليومي':'Daily Avg')+'</th><th>'+(ar?'الرصيد':'Balance')+'</th><th>'+(ar?'أيام التغطية':'Coverage')+'</th><th>'+(ar?'الحالة':'Status')+'</th></tr></thead><tbody>';
+    DAL_BRANCHES.forEach(function(b){
+      var avg=dalGet(code,b,'avg')||0;var bal=balFor(b);
+      var cov=(avg>0)?(bal/avg):null;var cls=(avg>0)?dalBandFromCoverage(cov,dalDaysFor(b,dcat)):'';
+      var covTxt=(cov==null)?'—':((cov>=100?Math.round(cov):Math.round(cov*10)/10)+(ar?' يوم':'d'));
+      h+='<tr><td class="dal-d-br">'+drEsc(b)+'</td>';
+      h+='<td><input type="number" min="0" step="0.5" value="'+(avg||'')+'" onchange="dalDetailEdit(\''+cEsc+'\',\''+b.replace(/'/g,"\\'")+'\',\'avg\',this.value)" placeholder="0"></td>';
+      h+='<td>'+(bal?drFmt(bal):'—')+'</td>';
+      h+='<td style="font-weight:800">'+covTxt+'</td>';
+      h+='<td class="dal-cov '+cls+'">'+(cls?dalBandLabel(cls,ar):'—')+'</td></tr>';
     });
-    h+='<td>'+(bal?drFmt(bal):'—')+'</td>';
-    h+='<td class="dal-cov '+cls+'">'+(cls?'\u25cf':'—')+'</td></tr>';
-  });
-  h+='</tbody></table>';
+    h+='</tbody></table>';
+  }else{
+    var FL=DAL_FIELD_LABELS[ar?'ar':'en'];
+    h+='<table class="dal-detail-tbl"><thead><tr><th>'+(ar?'الفرع':'Branch')+'</th>';
+    DAL_FIELDS.forEach(function(f){h+='<th>'+drEsc(FL[f])+'</th>';});
+    h+='<th>'+(ar?'الرصيد':'Balance')+'</th><th>'+(ar?'الحالة':'Status')+'</th></tr></thead><tbody>';
+    DAL_BRANCHES.forEach(function(b){
+      var rec=dalRec(code,b)||{avg:0,min:0,safe:0,max:0,vmax:0};var bal=balFor(b);
+      var cls=dalColorClass(code,b,bal);
+      h+='<tr><td class="dal-d-br">'+drEsc(b)+'</td>';
+      DAL_FIELDS.forEach(function(f){
+        h+='<td><input type="number" min="0" step="1" value="'+(rec[f]||'')+'" onchange="dalDetailEdit(\''+cEsc+'\',\''+b.replace(/'/g,"\\'")+'\',\''+f+'\',this.value)" placeholder="0"></td>';
+      });
+      h+='<td>'+(bal?drFmt(bal):'—')+'</td>';
+      h+='<td class="dal-cov '+cls+'">'+(cls?'\u25cf':'—')+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  }
   var body=document.getElementById('dal-detail-body');if(body)body.innerHTML=h;
   pop.classList.add('show');
 }
 function dalDetailEdit(code,branch,field,val){dalSetField(code,branch,field,val);openDALDetail(code);try{rebuildAllTables&&rebuildAllTables();}catch(e){}}
 function closeDALDetail(){var p=document.getElementById('dal-detail-ov');if(p)p.classList.remove('show');}
+
+/* ── تثبيت رأس أعمدة جداول النوافذ على الجوال داخل العرض المُدار (sticky لا يعمل داخل rotate) ── */
+(function(){
+  if(window._headFreezeReady)return;window._headFreezeReady=true;
+  function isMobRot(){try{return window.matchMedia('(max-width:900px) and (orientation:portrait)').matches;}catch(e){return false;}}
+  function setTop(tbl,y){if(!tbl||!tbl.tHead)return;var c=tbl.tHead.querySelectorAll('th,td');for(var i=0;i<c.length;i++)c[i].style.top=y;}
+  function onScroll(e){
+    var t=e.target;if(!t||!t.closest||!t.querySelector)return;
+    if(!(t.closest('#detail-ov')||t.closest('.fg-modal-ov')))return;
+    var tbl=t.querySelector('table');if(!tbl||!tbl.tHead)return;
+    setTop(tbl,isMobRot()?(t.scrollTop+'px'):'');
+  }
+  document.addEventListener('scroll',onScroll,true);
+})();
+
+/* ═══════════════ مركز استيراد SAP (يحلّ محل Data Editor) ═══════════════
+   (ج) استيراد ملفات الآن + تجهيز طلبات OData متوافقة مع SAP S/4HANA Private Cloud 2022 */
+var SAP_REPORTS=[
+  {key:'fgbal',ic:'\uD83D\uDCE6',ar:'الأرصدة',en:'FG Balance / Stock',color:'#2f7ed8',
+   od:{service:'API_MATERIAL_STOCK_SRV',entity:'A_MatlStkInAcctMod',select:'Material,Plant,StorageLocation,MatlWrhsStkQtyInMatlBaseUnit',filter:''}},
+  {key:'transit',ic:'\uD83D\uDE9A',ar:'الترانزيت',en:'FG Transit / In-Transit',color:'#9b7bf0',
+   od:{service:'',entity:'',select:'Material,IssuingPlant,ReceivingPlant,StockInTransitBaseUnitQty',filter:''}},
+  {key:'aging',ic:'\u23F3',ar:'أعمار المخزون',en:'Inventory Aging',color:'#3f6fd1',
+   od:{service:'',entity:'',select:'Material,Plant,InventoryStockQuantity,NmbrOfDaysMaterialInStock',filter:''}}
+];
+function _sapRepDef(k){for(var i=0;i<SAP_REPORTS.length;i++)if(SAP_REPORTS[i].key===k)return SAP_REPORTS[i];return null;}
+function getSap(){var s=getDR();if(!s.sap||typeof s.sap!=='object')s.sap={};var x=s.sap;
+  if(typeof x.root!=='string')x.root='';x.version=(x.version==='v4'?'v4':'v2');if(!x.top)x.top='5000';if(typeof x.user!=='string')x.user='';
+  if(!x.sources||typeof x.sources!=='object')x.sources={};
+  if(!x.odata||typeof x.odata!=='object')x.odata={};
+  if(!x.plants||typeof x.plants!=='object')x.plants={};
+  if(!x.meta||typeof x.meta!=='object')x.meta={};
+  return x;}
+function _saveSap(x){var s=getDR();s.sap=x;saveDR(s);try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}}
+function sapSetGlobal(f,v){var x=getSap();x[f]=v;_saveSap(x);sapRefreshAllUrls();}
+function sapSetVer(v){var x=getSap();x.version=(v==='v4'?'v4':'v2');_saveSap(x);_sapSyncVerUI();sapRefreshAllUrls();}
+function _sapSyncVerUI(){var seg=document.getElementById('sap-ver');if(!seg)return;var v=getSap().version;Array.prototype.forEach.call(seg.querySelectorAll('button'),function(b){b.classList.toggle('on',b.getAttribute('data-v')===v);});}
+function sapSetSource(k,v){var x=getSap();x.sources[k]=v;_saveSap(x);}
+function sapSetOData(k,f,v){var x=getSap();if(!x.odata[k])x.odata[k]={};x.odata[k][f]=v;_saveSap(x);sapRefreshUrl(k);}
+function sapSetPlant(b,v){var x=getSap();x.plants[b]=String(v||'').trim();_saveSap(x);sapRefreshAllUrls();}
+function sapTogglePlants(){var box=document.getElementById('sap-plants-box');if(box)box.classList.toggle('open');}
+function _sapOD(k){var x=getSap();var def=_sapRepDef(k)||{od:{}};var saved=x.odata[k]||{};
+  return {service:(saved.service!=null?saved.service:(def.od.service||'')),entity:(saved.entity!=null?saved.entity:(def.od.entity||'')),select:(saved.select!=null?saved.select:(def.od.select||'')),filter:(saved.filter!=null?saved.filter:(def.od.filter||''))};}
+function sapPlantFilter(){var x=getSap();var codes=[];(typeof DAL_BRANCHES!=='undefined'?DAL_BRANCHES:[]).forEach(function(b){var c=(x.plants[b]||'').trim();if(c&&codes.indexOf(c)<0)codes.push(c);});
+  if(!codes.length)return '';return codes.map(function(c){return "Plant eq '"+c.replace(/'/g,"''")+"'";}).join(' or ');}
+function sapBuildUrl(k){var x=getSap();var od=_sapOD(k);var ver=x.version==='v4'?'v4':'v2';
+  var root=(x.root||'').replace(/\/+$/,'')||'{SERVICE_ROOT}';
+  var base=ver==='v4'?'/sap/opu/odata4/sap/':'/sap/opu/odata/sap/';
+  var svc=od.service||'{SERVICE}';var ent=od.entity||'{EntitySet}';
+  var qs=[];
+  if(od.select)qs.push('$select='+od.select.replace(/\s+/g,''));
+  var filt=(od.filter&&od.filter.trim())?od.filter.trim():sapPlantFilter();
+  if(filt)qs.push('$filter='+filt);
+  if(x.top)qs.push('$top='+x.top);
+  qs.push(ver==='v4'?'$count=true':'$inlinecount=allpages');
+  qs.push('$format=json');
+  return root+base+svc+'/'+ent+'?'+qs.join('&');}
+function sapRefreshUrl(k){var el=document.getElementById('sap-url-'+k);if(el)el.textContent=sapBuildUrl(k);}
+function sapRefreshAllUrls(){SAP_REPORTS.forEach(function(r){sapRefreshUrl(r.key);});}
+function sapStat(k,msg,cls){var el=document.getElementById('sap-st-'+k);if(el){el.textContent=msg;el.className='sap-rep-st'+(cls?' '+cls:'');}}
+function sapCopyUrl(k){var ar=drIsAr&&drIsAr();var u=sapBuildUrl(k);try{navigator.clipboard.writeText(u).then(function(){sapStat(k,ar?'\u2713 نُسخ الطلب إلى الحافظة.':'\u2713 Request copied to clipboard.','ok');},function(){sapStat(k,u,'');});}catch(e){sapStat(k,(ar?'انسخ يدوياً: ':'Copy manually: ')+u,'');}}
+function sapFetch(k){var ar=drIsAr&&drIsAr();var x=getSap();if(!(x.root||'').trim()){sapStat(k,ar?'أدخل عنوان خادم SAP (Service Root) أولاً.':'Enter the SAP Service Root URL first.','warn');return;}
+  var url=sapBuildUrl(k);sapStat(k,ar?'\u2026 جارٍ الاتصال بخادم SAP':'\u2026 Connecting to SAP','');
+  fetch(url,{headers:{Accept:'application/json'},credentials:'include'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+   .then(function(j){var n=(j&&j.d&&j.d.results&&j.d.results.length)||(j&&j.value&&j.value.length)||0;sapStat(k,(ar?'\u2713 اتصال ناجح — ':'\u2713 Connected — ')+n+(ar?' سجل من SAP. (تحويل البيانات يُفعّل بعد تثبيت مصدر التقرير)':' records from SAP. (Auto-mapping enabled once the source is fixed)'),'ok');})
+   .catch(function(e){sapStat(k,(ar?'تعذّر الاتصال المباشر (':'Direct connection failed (')+e.message+(ar?') — متوقّع داخل المتصفّح دون خادم/CORS. الطلب صحيح ومحفوظ وجاهز للربط عبر خادم وسيط.':') — expected in-browser without a server/CORS. The request is valid, saved, and ready to connect via a proxy.'),'warn');});}
+function sapTemplate(k){var ar=drIsAr&&drIsAr();try{if(k==='fgbal')drTemplateMain();else if(k==='transit')drTemplateOne('transit');else if(k==='aging')downloadImportTemplate();}catch(e){alert((ar?'تعذّر تنزيل القالب: ':'Template download failed: ')+e.message);}}
+function sapClear(k){var ar=drIsAr&&drIsAr();try{if(k==='fgbal')drClearMain();else if(k==='transit')drClearOne('transit');else if(k==='aging')clearData();sapStat(k,ar?'\u2713 تم تفريغ بيانات هذا التقرير.':'\u2713 Report data cleared.','ok');sapUpdateMeta(k);}catch(e){}}
+function sapFileImport(input,k){var ar=drIsAr&&drIsAr();var f=input&&input.files&&input.files[0];if(!f)return;
+  sapStat(k,(ar?'\u2026 جارٍ استيراد الملف: ':'\u2026 Importing file: ')+f.name,'');
+  try{
+    if(k==='transit')drUploadOne(input,'transit');
+    else if(k==='aging')handleFile(f);
+    else drUploadMain(input);
+    var x=getSap();x.meta[k]={file:f.name,date:new Date().toISOString().slice(0,10)};_saveSap(x);
+    setTimeout(function(){sapUpdateMeta(k);sapStat(k,(ar?'\u2713 تم استلام الملف ومعالجته — ':'\u2713 File received & processed — ')+f.name,'ok');},450);
+  }catch(e){sapStat(k,(ar?'تعذّر الاستيراد: ':'Import failed: ')+e.message,'warn');}}
+function sapUpdateMeta(k){var ar=drIsAr&&drIsAr();var el=document.getElementById('sap-meta-'+k);if(!el)return;var m=getSap().meta[k];el.textContent=(m&&m.date)?((ar?'آخر استيراد: ':'Last import: ')+m.date):(ar?'لم يُستورد بعد':'Not imported yet');}
+function sapRenderPlants(){var box=document.getElementById('sap-plants-grid');if(!box)return;var x=getSap();var br=(typeof DAL_BRANCHES!=='undefined')?DAL_BRANCHES:[];
+  box.innerHTML=br.map(function(b){var v=(x.plants[b]||'');return '<div class="sap-plant-row"><span class="sap-plant-br" title="'+String(b).replace(/"/g,'&quot;')+'">'+drEsc(b)+'</span><input type="text" spellcheck="false" placeholder="Plant" value="'+String(v).replace(/"/g,'&quot;')+'" oninput="sapSetPlant(\''+b.replace(/'/g,"\\'")+'\',this.value)"></div>';}).join('');}
+function renderSapHub(){
+  var x=getSap();var ar=drIsAr&&drIsAr();
+  var ttl=document.getElementById('sap-title');if(ttl)ttl.textContent=ar?'\uD83D\uDD0C مركز استيراد SAP':'\uD83D\uDD0C SAP Import Hub';
+  var sub=document.getElementById('sap-sub');if(sub)sub.textContent=ar?'استيراد تقارير SAP (أرصدة · ترانزيت · أعمار) + طلبات OData متوافقة مع SAP S/4HANA Private Cloud 2022':'Import SAP reports (Balance · Transit · Aging) + OData requests compatible with SAP S/4HANA Private Cloud 2022';
+  var sv=document.getElementById('sap-save');if(sv)sv.textContent=ar?'حفظ للسحابة':'Save to Cloud';
+  var root=document.getElementById('sap-hub-root');if(!root)return;
+  var L={
+    cfgTitle:ar?'إعداد اتصال SAP العام · S/4HANA OData':'SAP connection settings · S/4HANA OData',
+    cfgDesc:ar?'يُستخدم لبناء طلبات OData لكل التقارير. بيانات الاعتماد لا تُرسَل لأي طرف — تُحفظ محلياً فقط.':'Used to build OData requests for every report. Credentials are never sent anywhere — stored locally only.',
+    root:ar?'عنوان خادم SAP · Service Root':'SAP server · Service Root',
+    ver:ar?'إصدار OData':'OData version',
+    user:ar?'المستخدم · Basic Auth (اختياري)':'User · Basic Auth (optional)',
+    top:ar?'حد الصفوف · $top':'Row limit · $top',
+    note:ar?'\u26A0 الاتصال المباشر من المتصفّح يتطلّب خادم SAP يسمح CORS وبوابة OData مفعّلة (أو خادم وسيط). الطلبات تُبنى وتُحفظ الآن متوافقة مع S/4HANA Private Cloud 2022 وجاهزة للربط لاحقاً؛ والاستيراد بالملفات متاح الآن.':'\u26A0 Direct browser access needs a SAP server that allows CORS with an active OData gateway (or a proxy). Requests are built & saved now (S/4HANA Private Cloud 2022 compatible), ready to connect later; file import works today.',
+    plantsBtn:ar?'\uD83C\uDFED ربط المواقع (Plants) بالفروع':'\uD83C\uDFED Map Plants to branches',
+    plantsHead:ar?'رمز موقع SAP (Plant) لكل فرع — يُستخدم في $filter ولمطابقة ملفات SAP بالفروع. اتركه فارغاً إن لم يلزم.':'SAP Plant code per branch — used in $filter and to map SAP files to branches. Leave blank if not needed.',
+    src:ar?'مصدر SAP (Tcode / OData Service / CDS)':'SAP source (Tcode / OData Service / CDS)',
+    odata:ar?'طلب OData — متوافق مع S/4HANA Private Cloud 2022':'OData request — S/4HANA Private Cloud 2022 compatible',
+    filt:ar?'$filter (فارغ = مواقع الفروع تلقائياً)':'$filter (blank = branch plants auto)',
+    gen:ar?'الطلب المُولَّد · Generated request':'Generated request',
+    copy:ar?'\uD83D\uDCCB نسخ الطلب':'\uD83D\uDCCB Copy request',
+    test:ar?'\uD83D\uDD0C اختبار الاتصال':'\uD83D\uDD0C Test connection',
+    imp:ar?'استيراد ملف (Excel / CSV)':'Import file (Excel / CSV)',
+    tpl:ar?'\u2B07\uFE0F قالب':'\u2B07\uFE0F Template',
+    clr:ar?'\uD83D\uDDD1\uFE0F تفريغ':'\uD83D\uDDD1\uFE0F Clear',
+    ready:ar?'جاهز':'Ready'
+  };
+  var h='<div class="card sap-card">'+
+    '<div class="sap-h"><span class="sap-h-ic">\u2699</span><div><h3>'+L.cfgTitle+'</h3><p>'+L.cfgDesc+'</p></div></div>'+
+    '<div class="sap-gcfg">'+
+      '<div class="sap-f"><label>'+L.root+'</label><input id="sap-root" type="text" spellcheck="false" placeholder="https://s4host.corp:44300" value="'+String(x.root||'').replace(/"/g,'&quot;')+'" oninput="sapSetGlobal(\'root\',this.value)"></div>'+
+      '<div class="sap-f"><label>'+L.ver+'</label><div class="sap-seg" id="sap-ver"><button type="button" data-v="v2" onclick="sapSetVer(\'v2\')">OData V2</button><button type="button" data-v="v4" onclick="sapSetVer(\'v4\')">OData V4</button></div></div>'+
+      '<div class="sap-f"><label>'+L.user+'</label><input id="sap-user" type="text" spellcheck="false" autocomplete="off" placeholder="SAP user" value="'+String(x.user||'').replace(/"/g,'&quot;')+'" oninput="sapSetGlobal(\'user\',this.value)"></div>'+
+      '<div class="sap-f"><label>'+L.top+'</label><input id="sap-top" type="number" min="1" placeholder="5000" value="'+String(x.top||'').replace(/"/g,'&quot;')+'" oninput="sapSetGlobal(\'top\',this.value)"></div>'+
+    '</div>'+
+    '<div class="sap-note">'+L.note+'</div>'+
+    '<button class="btn-soft sm" onclick="sapTogglePlants()" id="sap-plants-btn" style="margin-top:12px">'+L.plantsBtn+'</button>'+
+    '<div class="sap-plants" id="sap-plants-box"><div class="sap-plants-head">'+L.plantsHead+'</div><div class="sap-plants-grid" id="sap-plants-grid"></div></div>'+
+  '</div>';
+  h+='<div id="sap-reports">'+SAP_REPORTS.map(function(r){var od=_sapOD(r.key);var src=(x.sources[r.key]||'');
+    var nm=ar?(r.ar+' <small>\u00b7 '+r.en+'</small>'):(r.en+' <small>\u00b7 '+r.ar+'</small>');
+    return '<div class="sap-rep" style="--rc:'+r.color+'">'+
+      '<div class="sap-rep-h"><span class="sap-rep-ic">'+r.ic+'</span>'+
+        '<div><h3>'+nm+'</h3><div class="sap-rep-st" id="sap-st-'+r.key+'">'+L.ready+'</div></div>'+
+        '<span class="sap-rep-badge" id="sap-meta-'+r.key+'"></span></div>'+
+      '<div class="sap-rep-body">'+
+        '<div class="sap-block"><div class="sap-block-h">\u2460 '+L.src+'</div>'+
+          '<input class="sap-src" id="sap-src-'+r.key+'" spellcheck="false" placeholder="MB52 \u00b7 MB5T \u00b7 API_MATERIAL_STOCK_SRV" value="'+String(src).replace(/"/g,'&quot;')+'" oninput="sapSetSource(\''+r.key+'\',this.value)"></div>'+
+        '<div class="sap-block"><div class="sap-block-h">\u2461 '+L.odata+'</div>'+
+          '<div class="sap-od-grid">'+
+            '<div class="sap-f"><label>Service</label><input id="sap-svc-'+r.key+'" spellcheck="false" placeholder="{SERVICE}" value="'+String(od.service).replace(/"/g,'&quot;')+'" oninput="sapSetOData(\''+r.key+'\',\'service\',this.value)"></div>'+
+            '<div class="sap-f"><label>Entity Set</label><input id="sap-ent-'+r.key+'" spellcheck="false" placeholder="{EntitySet}" value="'+String(od.entity).replace(/"/g,'&quot;')+'" oninput="sapSetOData(\''+r.key+'\',\'entity\',this.value)"></div>'+
+            '<div class="sap-f full"><label>$select</label><input id="sap-sel-'+r.key+'" spellcheck="false" value="'+String(od.select).replace(/"/g,'&quot;')+'" oninput="sapSetOData(\''+r.key+'\',\'select\',this.value)"></div>'+
+            '<div class="sap-f full"><label>'+L.filt+'</label><input id="sap-flt-'+r.key+'" spellcheck="false" placeholder="Plant eq &#39;1010&#39;" value="'+String(od.filter).replace(/"/g,'&quot;')+'" oninput="sapSetOData(\''+r.key+'\',\'filter\',this.value)"></div>'+
+          '</div>'+
+          '<div class="sap-url-h">'+L.gen+'</div>'+
+          '<div class="sap-url" id="sap-url-'+r.key+'"></div>'+
+          '<div class="sap-od-acts"><button class="btn-soft sm" onclick="sapCopyUrl(\''+r.key+'\')">'+L.copy+'</button><button class="btn-soft sm" onclick="sapFetch(\''+r.key+'\')">'+L.test+'</button></div>'+
+        '</div>'+
+        '<div class="sap-block"><div class="sap-block-h">\u2462 '+L.imp+'</div>'+
+          '<div class="sap-file-row"><input class="dr-file" type="file" accept=".xlsx,.xls,.csv" onchange="sapFileImport(this,\''+r.key+'\')"><button class="btn-soft sm" onclick="sapTemplate(\''+r.key+'\')">'+L.tpl+'</button><button class="btn-soft sm dr-clear-btn" onclick="sapClear(\''+r.key+'\')">'+L.clr+'</button></div>'+
+        '</div>'+
+      '</div></div>';
+  }).join('')+'</div>';
+  root.innerHTML=h;
+  _sapSyncVerUI();
+  sapRenderPlants();
+  SAP_REPORTS.forEach(function(r){sapRefreshUrl(r.key);sapUpdateMeta(r.key);});
+}
 
 /* ───── ألوان الفئات الخمس القابلة للتخصيص ───── */
 var DAL_COLOR_DEFAULTS={
@@ -7858,8 +8533,8 @@ function renderRichReport(key,rep){
 }
     html+='</div></div>';
   }
-  /* استبعاد أعمدة المستودعات المكرّرة بعد ربط البيانات (الدمام/الشمال/الخرج مصنع) — تُخفى من الرأس والصفوف والإجماليات معاً */
-  try{var _exNm=['dammam','north','kharj factory','الدمام','الشمال','الخرج مصنع','خرج مصنع'];h.forEach(function(col,i){var _n=String(col==null?'':col).trim().toLowerCase();if(_exNm.indexOf(_n)>=0)HIDDEN.add(P+':col:'+i);});}catch(e){}
+  /* (أُزيل إخفاء الأعمدة بالاسم لأنه كان يحجب فروعاً حقيقية مثل «الدمام» في تقرير الترانزيت) — تُعرض جميع الأعمدة المسجّلة */
+  try{if(window._rrEx&&window._rrEx[P]){window._rrEx[P].forEach(function(k){HIDDEN.delete(k);});window._rrEx[P]=[];}}catch(e){}
   html+='<div class="pivot-wrap fg-wrap"><table class="pivot fg-table"><thead><tr>';
   h.forEach(function(col,i){if(HIDDEN.has(P+':col:'+i))return;if(i===c.transit&&c.transit>=0)html+='<th class="fg-vsep"></th>';var thc=(i===c.total?' class="fg-toth"':(i===c.transit?' class="fg-trth"':''));html+='<th'+thc+'>'+drEsc(col)+'</th>';});
   /* رؤوس الأعمدة المخصصة */
@@ -7914,14 +8589,15 @@ function rrRefresh(){
       var cls=(k<nf)?'cat':((v===0||v==='0')?'zero':'');
       if(k===ti&&ti>=0)cls+=' tot';
       /* التلوين الشرطي (متوسط التحميل) — على عمود الإجمالي الجانبي فقط */
-      if(num&&k===ti&&ti>=0){try{var _dalC=dalColorClassTotal(String(r[0]||'').trim(),v);if(_dalC)cls+=' '+_dalC;}catch(e){}}
+      var _dalAttr='';
+      if(num&&k===ti&&ti>=0){try{var _dCode=String(r[0]||'').trim();var _dalC=dalColorClassTotal(_dCode,v);if(_dalC){cls+=' '+_dalC+' dal-tip';_dalAttr=' data-dal-code="'+drEsc(_dCode)+'" data-dal-bal="'+(typeof v==='number'?v:0)+'" data-dal-scope="total"';}}catch(e){}}
       var dispV=v;
       if(!num&&k<nf){
         /* تطبيق تحويل البراند والحجم على خلايا النص */
         if(c.brand>=0&&k===c.brand)dispV=drBrandLabel(String(v));
         else if(c.size>=0&&k===c.size)dispV=drSizeLabel(String(v));
       }
-      html+='<td class="'+cls+'">'+((num&&k>=nf)?drFmt(v):drEsc(dispV))+'</td>';
+      html+='<td class="'+cls+'"'+_dalAttr+'>'+((num&&k>=nf)?drFmt(v):drEsc(dispV))+'</td>';
     }
     /* خلايا الأعمدة المخصصة */
     (function(){var _cc=COLDEF[P]||[];if(!_cc.length)return;
@@ -9279,6 +9955,17 @@ function renderBottleReport(rep){
       {key:'bottle',label:a?'القارورة — FG Bottle':'FG Bottle Stock'}
     ];
     grid.innerHTML='';
+    (function(){
+      var sslot=document.createElement('div'); sslot.className='dr-slot';
+      var sh=document.createElement('h4'); sh.style.cssText='font-size:14px;font-weight:800;color:var(--ink,#16233b);margin-bottom:4px'; sh.textContent=a?'\u0627\u0644\u0645\u0633\u0627\u062d\u0627\u062a \u0641\u064a \u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639\u0627\u062a \u2014 \u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Space in Warehouses — Update date'; sslot.appendChild(sh);
+      var snote=document.createElement('p'); snote.style.cssText='font-size:11.5px;color:var(--muted,#7c8aa0);margin-bottom:10px'; snote.textContent=a?'\u0633\u062c\u0651\u0644 \u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u062d\u062f\u064a\u062b \u064a\u062f\u0648\u064a\u0627\u064b \u2014 \u064a\u0638\u0647\u0631 \u0641\u064a \u0627\u0644\u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0631\u0626\u064a\u0633\u064a \u0644\u0644\u0645\u0633\u0627\u062d\u0627\u062a.':'Set the update date manually — shown in the main Space report.'; sslot.appendChild(snote);
+      var srow=document.createElement('div'); srow.className='dr-row';
+      var sdate=document.createElement('input'); sdate.type='date'; sdate.style.cssText='padding:9px 11px;border:1px solid var(--line,#e2e8f0);border-radius:9px;font-family:inherit;font-size:13px';
+      try{sdate.value=((typeof getDR==='function'&&getDR().space_date)||'');}catch(e){}
+      sdate.addEventListener('change',function(){try{setSpaceManualDate(this.value);}catch(e){}});
+      srow.appendChild(sdate); sslot.appendChild(srow);
+      grid.appendChild(sslot);
+    })();
     reports.forEach(function(r){
       var slot=document.createElement('div'); slot.className='dr-slot';
       var h=document.createElement('h4'); h.style.cssText='font-size:14px;font-weight:800;color:var(--ink,#16233b);margin-bottom:4px'; h.textContent=r.label; slot.appendChild(h);
@@ -9589,7 +10276,7 @@ function renderBottleReport(rep){
     bar=document.createElement('div');bar.className='mbar';bar.id='mbar';
     mk(bar,'◀','mb-back',ar()?'رجوع':'Back',function(){wakeBar();back();});
     mk(bar,'⟳','mb-rot',ar()?'تدوير':'Rotate',function(){wakeBar();rotate();});
-    mk(bar,'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>','mb-logout',ar()?'تسجيل الخروج':'Logout',function(){wakeBar();try{if(typeof logout==='function')logout();}catch(e){}});
+    mk(bar,'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>','mb-home',ar()?'الرئيسية':'Home',function(){wakeBar();try{if(typeof go==='function')go('home');}catch(e){}});
     mk(bar,'▶','mb-fwd',ar()?'تقدّم':'Forward',function(){wakeBar();fwd();});
     document.body.appendChild(bar);
   }
@@ -9940,6 +10627,10 @@ function renderBottleReport(rep){
 #pack-size-tabs::-webkit-scrollbar-thumb, #sku-size-tabs::-webkit-scrollbar-thumb{background:#cdd8e6;border-radius:6px}
 /* إخفاء المسميات الفرعية على رؤوس الرسوم (by pack / CTN · SHR / monthly qty …) */
 .card .ch .sub{display:none!important}
+/* إخفاء زر «إضافة بطاقة» من الداش بورد — الإضافة تتم من شاشة Card Builder المستقلة */
+#page-dash .kpi-add{display:none!important}
+/* خط ثقيل يفصل بين كل مجموعة فئة في تقرير SKU */
+#page-sku .pivot tbody tr:has(td.yr) td{border-top:2px solid #cdd9e8 !important}
 .mini-legend{display:flex;gap:14px;margin:-2px 0 8px;flex-wrap:wrap}
 .mini-legend span{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;color:#475569}
 .mini-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
@@ -9991,6 +10682,51 @@ function renderBottleReport(rep){
   document.addEventListener('click',function(e){ var t=e.target&&e.target.closest?e.target.closest('[data-page="cardbuilder"]'):null; if(t){setTimeout(ensure,80);setTimeout(ensure,300);} },true);
   setInterval(ensure,1200);
   if(document.readyState!=='loading')setTimeout(ensure,600); else document.addEventListener('DOMContentLoaded',function(){setTimeout(ensure,600);});
+})();
+</script>
+
+<script id="cyl-colors-js">
+(function(){
+  'use strict';
+  var KEY='cyl_colors_v1';
+  var DEF={normal:'#2f7ed8',warn:'#d68a35',over:'#d9564a'};
+  function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function get(){try{return Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){return Object.assign({},DEF);}}
+  function save(c){try{localStorage.setItem(KEY,JSON.stringify(c));}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}}
+  function shade(hex,amt){try{var n=parseInt(String(hex).replace('#',''),16);var r=Math.max(0,Math.min(255,(n>>16)+amt)),g=Math.max(0,Math.min(255,((n>>8)&255)+amt)),b=Math.max(0,Math.min(255,(n&255)+amt));return '#'+(1<<24|r<<16|g<<8|b).toString(16).slice(1);}catch(e){return hex;}}
+  function grad(col){return 'linear-gradient(100deg,'+shade(col,-48)+' 0%,'+shade(col,16)+' 45%,'+shade(col,46)+' 50%,'+shade(col,10)+' 62%,'+shade(col,-52)+' 100%)';}
+  function apply(){
+    var c=get();var st=document.getElementById('cyl-colors-style');
+    if(!st){st=document.createElement('style');st.id='cyl-colors-style';document.head.appendChild(st);}
+    st.textContent=
+      '.cyl-fill{background:'+grad(c.normal)+' !important}'+
+      '.cyl-fill:before{background:linear-gradient(180deg,'+shade(c.normal,55)+','+shade(c.normal,20)+') !important}'+
+      '.cyl-warn .cyl-fill{background:'+grad(c.warn)+' !important}'+
+      '.cyl-warn .cyl-fill:before{background:linear-gradient(180deg,'+shade(c.warn,55)+','+shade(c.warn,20)+') !important}'+
+      '.cyl-over .cyl-fill{background:'+grad(c.over)+' !important}'+
+      '.cyl-over .cyl-fill:before{background:linear-gradient(180deg,'+shade(c.over,55)+','+shade(c.over,20)+') !important}';
+  }
+  function rowHtml(k,lbl,val){return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155"><input type="color" data-cyl="'+k+'" value="'+val+'" style="width:44px;height:32px;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer;padding:2px;background:#fff"> '+lbl+'</label>';}
+  function build(){
+    var p=document.getElementById('page-designer'); if(!p)return; var wrap=p.querySelector('.wrap'); if(!wrap)return;
+    if(document.getElementById('cyl-color-card'))return;
+    var c=get(),a=ar();
+    var card=document.createElement('div'); card.className='dz-card full'; card.id='cyl-color-card'; card.style.marginTop='16px';
+    card.innerHTML='<h4 style="font-size:15px;font-weight:800;margin-bottom:4px">\uD83E\uDDEA '+(a?'تعديل أنابيب الرسم البياني للمساحات':'Space chart cylinders — colors')+'</h4>'+
+      '<p style="font-size:12px;color:#64748b;margin-bottom:14px">'+(a?'اختر لوناً لكل حالة تعبئة في أنابيب رسم المساحات — يُطبّق فوراً ويُحفظ.':'Pick a color for each fill state of the Space cylinders — applied live & saved.')+'</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center">'+
+        rowHtml('normal',a?'عادي (ضمن الحد)':'Normal',c.normal)+
+        rowHtml('warn',a?'تحذير (منخفض)':'Warning',c.warn)+
+        rowHtml('over',a?'فائض (تجاوز)':'Over',c.over)+
+        '<button id="cyl-col-reset" class="btn-soft sm" style="margin-inline-start:auto">'+(a?'استعادة الافتراضي':'Reset')+'</button>'+
+      '</div>';
+    wrap.appendChild(card);
+    card.querySelectorAll('input[data-cyl]').forEach(function(inp){inp.addEventListener('input',function(){var cc=get();cc[inp.getAttribute('data-cyl')]=inp.value;save(cc);apply();});});
+    var rb=card.querySelector('#cyl-col-reset'); if(rb)rb.addEventListener('click',function(){save(Object.assign({},DEF));apply();card.remove();build();});
+  }
+  function tick(){ try{var p=document.getElementById('page-designer'); if(p&&p.classList.contains('show'))build();}catch(e){} }
+  function start(){ apply(); setInterval(tick,1200); setTimeout(tick,500); }
+  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
 })();
 </script>
 
