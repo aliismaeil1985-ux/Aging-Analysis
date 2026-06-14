@@ -86,6 +86,8 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .kpis{margin-bottom:8px !important;break-inside:avoid}
 /* ═══ البطاقات المخصّصة ═══ */
 .custom-kpis{margin-top:12px !important}
+}
+/* ═══ أنماط شاشة (كانت محصورة خطأً داخل @media print) — منشئ البطاقات والبطاقات المخصّصة ═══ */
 /* ═══ شاشة منشئ البطاقات ═══ */
 .cb-layout{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px}
 .cb-form-card,.cb-preview-card{margin:0}
@@ -145,6 +147,7 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .ce-row .fpc-fld{margin-bottom:12px}
 #ce-calc,#ce-cls,#ce-month{width:100%;padding:10px 11px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff;cursor:pointer}
 @media (max-width:600px){.ce-row{flex-direction:column;gap:0}}
+@media print{
   .sumbar{break-inside:avoid;margin-bottom:8px !important}
   .sumbar select{border:1px solid #cdd8e6 !important;-webkit-appearance:none;appearance:none;background-image:none;padding-inline-end:10px}
   .sp-cards,.fg-cards{display:flex !important;flex-wrap:wrap !important;gap:5px !important;margin-bottom:7px !important}
@@ -192,6 +195,19 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
   .print-head .ph-t{font-size:14px;font-weight:800;color:#13396b}
   .print-head .ph-d{font-size:10.5px;color:#5b6b82;font-weight:600}
   .foot{margin-top:6px}
+}
+@media print{
+  /* إصلاح فراغ الطباعة: فرض تدفّق بسيط وارتفاع تلقائي على الحاويات (تتجاوز تخطيط الشبكة ذا الارتفاع الثابت) */
+  html,body,.app,.content,.wrap,.page.show{display:block !important;height:auto !important;min-height:0 !important;max-height:none !important;overflow:visible !important}
+  #page-dash .wrap,#page-dash .main{display:block !important}
+  #page-dash .kpis,#page-dash .custom-kpis,#page-dash .side{height:auto !important;max-height:none !important;display:flex !important;flex-wrap:wrap !important;flex-direction:row !important;gap:8px !important;align-self:auto !important}
+  #page-dash .kpis .kpi{flex:1 1 22% !important;height:auto !important;min-height:0 !important}
+  #page-dash .custom-kpis .kpi{flex:1 1 22% !important}
+  #page-dash .side .fbox{flex:1 1 30% !important;height:auto !important}
+  #page-dash .side .fbox>div:last-child{max-height:120px !important;overflow:hidden !important}
+  #page-dash .main .grid{display:grid !important;grid-template-columns:1fr 1fr !important;grid-auto-rows:auto !important}
+  .chartbox{height:230px !important;max-height:230px !important}
+  .chartbox canvas{max-width:100% !important}
 }
 .wrap{max-width:1640px;margin:0 auto}
 .topbar{display:flex;align-items:center;gap:16px;margin-bottom:16px}
@@ -281,6 +297,11 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .pivot td.pct{font-weight:700;color:var(--teal);background:#f3f7fc}
 .pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo){background:#eef6ff}
 .pivot tr.grand td{background:linear-gradient(180deg,#1a4480,#13396b);color:#fff;font-weight:800;border-color:#2f63a0;font-size:13.5px}
+/* تثبيت رؤوس أعمدة جدول نافذة الإجمالي (#detail-ov): جعل حاوية التمرير الداخلية هي العنصر القابل للتمرير
+   حتى تبقى الرؤوس (sticky top:0) ثابتة أعلى الجدول عند التمرير لأعلى/لأسفل. contain يمنع الرعشة. */
+#detail-ov .modal-body{overflow:hidden}
+#detail-ov .pivot-wrap{max-height:74vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;contain:paint;border-radius:10px}
+#detail-ov .pivot thead th{position:sticky;top:0;z-index:5}
 
 .sumbar{display:flex;align-items:flex-end;gap:14px;margin-bottom:14px;flex-wrap:wrap}
 .sf{display:flex;flex-direction:column;gap:5px}
@@ -586,11 +607,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   .spacer{display:none}
   .gsearch{order:5;width:100%}
   .print-head{display:none}
-  /* Dashboard: عمودان — البطاقات الأربع + السلايسر بمحاذاتها، ثم البطاقات المخصّصة، ثم الرسوم بعرض كامل */
-  #page-dash .wrap{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"top top" "kpis side" "ckpis ckpis" "charts charts" "foot foot";gap:12px;align-items:start}
+  /* تخطيط لوحة المعلومات على الجوال (الشبكة + سلايدر البطاقات) مُعرّف في الكتلة الأدنى لتجنّب التعارض */
   #page-dash .topbar{grid-area:top;margin-bottom:0}
-  #page-dash .kpis{grid-area:kpis;display:flex !important;flex-direction:column;gap:10px;margin:0;overflow:visible}
-  #page-dash .custom-kpis{grid-area:ckpis}
   #page-dash .side{grid-area:side}
   #page-dash .side{display:flex;flex-direction:column;gap:10px}
   #page-dash .side .fbox{flex:0 0 auto;min-height:auto;padding:11px 12px}
@@ -630,8 +648,6 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 @media screen and (max-width:540px){
   .content{padding:62px 10px 16px}
   .htext h1{font-size:15px}
-  /* Tighter two columns on small phones */
-  #page-dash .wrap{grid-template-columns:1fr 1fr;gap:9px}
   .kpi{padding:10px 11px}
   .kpi h3{font-size:10px}
   .kpi .v{font-size:18px}
@@ -660,10 +676,11 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
     border-radius:0;animation:none;
     display:flex;flex-direction:column;
   }
-  #detail-ov .modal-body{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+  #detail-ov .modal-body{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column}
   #detail-ov .modal-head{flex:0 0 auto}
-  /* داخل النافذة المُدارة: لا حدّ ارتفاع داخلي للحاوية حتى يتحرّك التمرير عبر جسم النافذة */
-  #detail-ov .modal-body .pivot-wrap{max-height:none !important;overflow:visible !important}
+  /* داخل النافذة المُدارة: اجعل حاوية الجدول هي القابلة للتمرير حتى تبقى رؤوس الأعمدة ثابتة (sticky) أثناء التمرير لأعلى/لأسفل */
+  #detail-ov .modal-body .pivot-wrap{flex:1 1 auto;min-height:0;max-height:none !important;overflow:auto !important;-webkit-overflow-scrolling:touch}
+  #detail-ov .modal-body .pivot thead th{position:sticky !important;top:0;z-index:6}
 
   .fg-modal-ov{padding:0 !important}
   .fg-modal-ov.show .fg-modal-box{
@@ -736,6 +753,13 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   #detail-ov .pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo){background:#eaf3ff}
   #detail-ov .pivot td.tot{font-size:13px;font-weight:800}
   #detail-ov .pivot tr.grand td{font-size:12.5px;padding:6px 5px}
+  /* ===== إعادة تلوين جدول نافذة الإجمالي على الجوال — رأس كحلي معتم ثابت، تظليل متناوب أوضح، وتمييز الأعمدة ===== */
+  #detail-ov .pivot thead th{background:linear-gradient(180deg,#23578f,#1a4480) !important;color:#fff !important;border-color:#2f63a0 !important;box-shadow:0 2px 0 rgba(13,42,78,.35)}
+  #detail-ov .pivot tbody tr:nth-child(odd):not(.grand) td:not(.yr):not(.mo):not(.tot){background:#fff}
+  #detail-ov .pivot tbody tr:nth-child(even):not(.grand) td:not(.yr):not(.mo):not(.tot){background:#eef5fd}
+  #detail-ov .pivot td.yr{background:#dde9f8 !important;color:#13396b !important;font-weight:800}
+  #detail-ov .pivot td.mo{background:#eef3fb !important;color:#1e3a5f !important;font-weight:700}
+  #detail-ov .pivot td.cat{background:#fafcff}
 }
 .dr-empty{padding:40px 18px;text-align:center;color:#94a3b8;font-weight:600;line-height:1.9}
 .dr-table{min-width:760px}
@@ -975,9 +999,9 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-modal-x{margin-inline-start:auto;cursor:pointer;border:none;background:#f1f5f9;border-radius:9px;padding:7px 12px;font-weight:700;color:#64748b;font-size:14px}
 .fg-modal-x:hover{background:#e6ebf1;color:#1e293b}
 .fg-modal-body{overflow:auto;padding:12px 14px;contain:layout style;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-/* إلغاء sticky داخل كل النوافذ العائمة — sticky داخل نافذة بـ contain/overflow يسبب رعشة عند تمرير الماوس */
-.fg-modal-body th,.fg-modal-body td,.fg-modal-body thead th,.fg-modal-body .fg-dt th,
-#detail-ov .modal-body th,#detail-ov .modal-body td,#detail-ov .modal-body .pivot th:first-child,#detail-ov .modal-body .pivot td:first-child{position:static !important}
+/* إلغاء sticky داخل نافذة fg فقط — sticky داخلها بـ contain/overflow يسبب رعشة عند التمرير.
+   ملاحظة: نافذة #detail-ov مستثناة عمداً لأن رؤوس جدولها مثبّتة (sticky) داخل حاوية التمرير الخاصة بها. */
+.fg-modal-body th,.fg-modal-body td,.fg-modal-body thead th,.fg-modal-body .fg-dt th{position:static !important}
 .fg-dt{border-collapse:collapse;width:100%;font-size:12.5px}
 .fg-dt th{background:linear-gradient(180deg,#23578f,#1a4480);color:#fff;padding:8px 9px;font-weight:700;white-space:nowrap}
 .fg-dt td{padding:6px 9px;border:1px solid var(--line);white-space:nowrap}
@@ -1140,17 +1164,28 @@ h1[data-i18n="title"], .lb-title{white-space:pre-line;line-height:1.22;text-alig
    Placed last so it wins the cascade on phones.
    ============================================================ */
 @media screen and (max-width:860px){
-  /* ---- Dashboard: عمودان متحاذيان — البطاقات الأربع في عمود + السلايسر في العمود المقابل، ثم الرسوم بعرض كامل أسفلهما ---- */
-  #page-dash .wrap{display:grid !important;grid-template-columns:1fr 1fr;grid-template-areas:"top top" "kpis side" "ckpis ckpis" "charts charts" "foot foot";gap:12px;align-items:start}
+  /* ---- Dashboard (جوال): كل بطاقات المؤشرات في صف أفقي واحد قابل للتمرير (سلايدر) يعرض 4 بطاقات متوازية بمحاذاة متساوية ---- */
+  #page-dash .wrap{display:grid !important;grid-template-columns:1fr;grid-template-areas:"top" "kpis" "ckpis" "side" "charts" "foot";gap:12px;align-items:start}
   #page-dash .topbar{grid-area:top}
-  #page-dash .kpis{grid-area:kpis;display:flex !important;flex-direction:column;flex-wrap:nowrap;gap:10px;margin:0;overflow:visible}
-  #page-dash .kpi{flex:0 0 auto;width:auto;min-width:0;max-width:none}
-  #page-dash .custom-kpis{grid-area:ckpis;display:flex !important;flex-direction:column;gap:10px;margin:0}
+  /* السلايدر: صف أفقي، تمرير سلس مع التقاط (snap)، 4 بطاقات ظاهرة في الشاشة */
+  #page-dash .kpis{grid-area:kpis;display:flex !important;flex-direction:row !important;flex-wrap:nowrap !important;gap:8px;margin:0;
+    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;scroll-padding-inline:0;padding-bottom:8px;align-items:stretch}
+  /* كل بطاقة: ربع عرض الحاوية (مع مراعاة الفجوات) فتظهر 4 بطاقات متوازية، وبارتفاع موحّد للمحاذاة */
+  #page-dash .kpis .kpi{flex:0 0 calc((100% - 24px) / 4);width:calc((100% - 24px) / 4);min-width:0;max-width:none;
+    scroll-snap-align:start;display:flex;flex-direction:column;align-self:stretch}
+  /* البطاقات المخصّصة بنفس سلوك السلايدر تحت البطاقات الأساسية */
+  #page-dash .custom-kpis{grid-area:ckpis;display:flex !important;flex-direction:row !important;flex-wrap:nowrap !important;gap:8px;margin:0;
+    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;padding-bottom:8px;align-items:stretch}
+  #page-dash .custom-kpis:empty{display:none !important}
+  #page-dash .custom-kpis .kpi{flex:0 0 calc((100% - 24px) / 4);width:calc((100% - 24px) / 4);min-width:0;max-width:none;
+    scroll-snap-align:start;display:flex;flex-direction:column;align-self:stretch}
   #page-dash .side{grid-area:side;display:flex;flex-direction:column;gap:10px;max-width:100%;min-width:0}
   #page-dash .main{display:contents}
   #page-dash .main>div:last-child{grid-area:charts;min-width:0}
   #page-dash .foot{grid-area:foot}
-  /* السلايسرات: ارتفاع تلقائي محاذٍ للبطاقات */
+  /* السلايسرات: ارتفاع تلقائي */
   #page-dash .side .fbox{flex:0 0 auto;min-height:auto;padding:11px 12px}
   #page-dash .side .fbox h4{padding-bottom:7px;margin-bottom:8px}
   #page-dash .side .fbox>div:last-child{flex:0 0 auto;min-height:auto;max-height:none;overflow:visible}
@@ -1178,6 +1213,25 @@ h1[data-i18n="title"], .lb-title{white-space:pre-line;line-height:1.22;text-alig
   .fg-table thead th:first-child{z-index:5}
   .fg-table tbody tr:not(.grand) td:first-child{background:#fff;box-shadow:1px 0 0 #e2e8f2}
   .fg-table tbody tr.fg-hl td:first-child{background:#dbe8f7}
+
+  /* ---- بطاقات سلايدر المؤشرات على الجوال: مقاسات مدمجة ومتناسقة لتظهر 4 بطاقات بمحاذاة متساوية ---- */
+  #page-dash .kpis .kpi,#page-dash .custom-kpis .kpi{padding:10px 9px;border-radius:13px}
+  #page-dash .kpis .kpi .row,#page-dash .custom-kpis .kpi .row{gap:6px}
+  #page-dash .kpis .kpi h3,#page-dash .custom-kpis .kpi h3{font-size:9.5px;line-height:1.2;letter-spacing:.2px}
+  #page-dash .kpis .kpi .ic,#page-dash .custom-kpis .kpi .ic{width:24px;height:24px;font-size:12px;border-radius:9px}
+  #page-dash .kpis .kpi .v,#page-dash .custom-kpis .kpi .v{font-size:17px;margin-top:6px}
+  #page-dash .kpis .kpi .pill,#page-dash .custom-kpis .kpi .pill{font-size:8.5px;padding:1px 6px;margin-top:7px}
+  #page-dash .kpis .kpi .ktrend{font-size:8.5px}
+  #page-dash .kpis .kpi .bar,#page-dash .custom-kpis .kpi .bar{margin-top:8px;margin-top:auto}
+}
+
+/* ---- هواتف ضيقة جداً: حافظ على 4 بطاقات متوازية مع تصغير إضافي طفيف ---- */
+@media screen and (max-width:430px){
+  #page-dash .kpis .kpi h3,#page-dash .custom-kpis .kpi h3{font-size:8.5px}
+  #page-dash .kpis .kpi .v,#page-dash .custom-kpis .kpi .v{font-size:15px}
+  #page-dash .kpis .kpi .ic,#page-dash .custom-kpis .kpi .ic{width:21px;height:21px;font-size:11px}
+  #page-dash .kpis,#page-dash .custom-kpis{gap:6px}
+  #page-dash .kpis .kpi,#page-dash .custom-kpis .kpi{flex-basis:calc((100% - 18px) / 4);width:calc((100% - 18px) / 4)}
 }
 
 /* ---- MOBILE: compact home (hub) cards — icon + text + arrow on one row ---- */
@@ -1892,7 +1946,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 
 <style id="tnavdd-css">
 /* sidebar dropdown system: smooth expand/collapse */
-#nav .nav-sub{overflow:hidden;max-height:440px;opacity:1;transition:max-height .3s ease,opacity .22s ease,padding .3s ease}
+#nav .nav-sub{overflow:hidden;max-height:1500px;opacity:1;transition:max-height .3s ease,opacity .22s ease,padding .3s ease}
 #nav .nav-group.collapsed .nav-sub{display:flex !important;max-height:0;opacity:0;padding-top:0;padding-bottom:0;pointer-events:none}
 #nav .nav-head{cursor:pointer;transition:background .15s,border-color .15s}
 #nav .nav-group:not(.collapsed) .nav-head{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24);box-shadow:0 6px 16px -8px rgba(0,0,0,.5)}
@@ -2160,7 +2214,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
             <div class="card"><div class="ch"><span class="acc" style="background:var(--teal)"></span><h5 data-i18n="ch_identity">Identity Inventory Weight</h5></div><div class="chartbox"><canvas id="c_identity"></canvas></div></div>
             <div class="card"><div class="ch"><span class="acc" style="background:var(--teal)"></span><h5 data-i18n="ch_month">Inventory Aging Pattern</h5><span class="sub" data-i18n="sub_month">monthly qty</span></div><div class="chartbox"><canvas id="c_month"></canvas></div></div>
             <div class="card"><div class="ch"><span class="acc" style="background:var(--navy)"></span><h5 data-i18n="ch_sizewise">SKU Inventory — Size wise</h5></div><div class="chartbox"><canvas id="c_size"></canvas></div></div>
-            <div class="card"><div class="ch"><span class="acc" style="background:var(--teal)"></span><h5 data-i18n="ch_pack">SKU Inventory</h5><span class="sub" data-i18n="sub_pack">by pack</span></div><div class="cat2tabs" id="pack-cat2tabs"></div><div class="chartbox"><canvas id="c_pack"></canvas></div></div>
+            <div class="card"><div class="ch"><span class="acc" style="background:var(--teal)"></span><h5 data-i18n="ch_pack">SKU Inventory</h5><span class="sub" data-i18n="sub_pack">by pack</span></div><div class="cat2tabs" id="pack-cat2tabs"></div><div class="cat2tabs" id="pack-size-tabs"></div><div class="chartbox"><canvas id="c_pack"></canvas></div></div>
             <div class="card classify-card"><div class="ch"><span class="acc" style="background:var(--orange)"></span><h5 data-i18n="ch_classify">Inventory Classifying</h5></div>
               <div class="cl-top">
                 <div class="cl-pie"><canvas id="c_class"></canvas></div>
@@ -2171,7 +2225,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
                 </div>
               </div>
             </div>
-            <div class="card"><div class="ch"><span class="acc" style="background:var(--blue)"></span><h5 data-i18n="ch_sizeitem">SKU Inventory — Size Item</h5><span class="sub" data-i18n="sub_sizeitem">CTN / SHR</span></div><div class="chartbox"><canvas id="c_sizeitem"></canvas></div></div>
+            <div class="card"><div class="ch"><span class="acc" style="background:var(--blue)"></span><h5 data-i18n="ch_sizeitem">SKU Inventory — Size Item</h5><span class="sub" data-i18n="sub_sizeitem">CTN / SHR</span></div><div class="mini-legend" id="sizeitem-legend"><span><i style="background:#2f7ed8"></i>CTN</span><span><i style="background:#9ec9ee"></i>SHR</span><span><i style="background:#7fb0dd"></i>Pac</span></div><div class="chartbox"><canvas id="c_sizeitem"></canvas></div></div>
           </div>
         </div>
       </div>
@@ -2217,6 +2271,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
         <div class="colmenu admin-only"><button class="btn-cols" onclick="toggleColMenu('sku')">&#9881;&#65039; <span data-i18n="cols_btn">Columns</span></button><div class="colmenu-pop" id="colpop-sku"></div></div>
         <span class="sf-count" id="sku-count"></span>
       </div>
+      <div class="cat2tabs" id="sku-size-tabs" style="margin:2px 0 10px"></div>
       <div class="card"><div class="pivot-wrap" id="sku-wrap"></div></div>
       <div class="card" style="margin-top:16px"><div class="ch"><span class="acc" style="background:var(--navy)"></span><h5 data-i18n="ch_topitems">Top Items by Quantity</h5></div><div class="chartbox"><canvas id="sku_top"></canvas></div></div>
     </div></div>
@@ -2969,6 +3024,17 @@ function buildPackTabs(){const box=document.getElementById('pack-cat2tabs');if(!
   const opts=[['all',tr('all')],['CTN',mv('cat2','CTN')],['SHR',mv('cat2','SHR')],['Pac',mv('cat2','Pac')]];
   box.innerHTML=opts.map(o=>'<button class="'+(PACK_CAT2===o[0]?'on':'')+'" onclick="setPackCat2(\''+o[0]+'\')">'+o[1]+'</button>').join('');}
 function setPackCat2(v){PACK_CAT2=v;render();}
+let PACK_SIZE='all';
+function setPackSize(v){PACK_SIZE=v;render();}
+function buildPackSizeTabs(){
+  var box=document.getElementById('pack-size-tabs');if(!box)return;
+  var present={};DATA.forEach(function(d){if(d.size!=null&&d.size!=='')present[String(d.size)]=true;});
+  var order=(typeof SIZE_ORDER!=='undefined'?SIZE_ORDER:[]).map(String);
+  var sizes=order.filter(function(s){return present[s];}).concat(Object.keys(present).filter(function(s){return order.indexOf(s)<0;}));
+  var html='<button class="'+(PACK_SIZE==='all'?'on':'')+'" onclick="setPackSize(\'all\')">'+tr('all')+'</button>';
+  sizes.forEach(function(s){html+='<button class="'+(String(PACK_SIZE)===s?'on':'')+'" onclick="setPackSize(\''+s.replace(/'/g,"\\'")+'\')">'+fmtSize(s)+'</button>';});
+  box.innerHTML=html;
+}
 function gsearch(v){GQ=(v||'').trim().toLowerCase();const bx=document.getElementById('gsearch-box');if(bx)bx.classList.toggle('has',GQ!=='');render();}
 function matchG(d){if(!GQ)return true;const br=brandOf(d.identity);const s=[d.item_code,d.identity,d.branch,d.pack,d.size,d.month,d.store_class,d.cat2,d.logo,br,mv('identity',d.identity),mv('branch',d.branch),mn(d.month),mv('cat2',d.cat2)].join(' ').toLowerCase();return s.includes(GQ);}
 function filtered(){return DATA.filter(d=> matchG(d) &&
@@ -2976,19 +3042,19 @@ function filtered(){return DATA.filter(d=> matchG(d) &&
   (sel.branch.size===0||sel.branch.has(d.branch))&&
   (sel.store_class.size===0||sel.store_class.has(d.store_class)));}
 function agg(rows,key){const m={};rows.forEach(r=>{m[r[key]]=(m[r[key]]||0)+r.qty;});return m;}
-let charts={};
+let charts={};window.charts=charts;
 function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
 const dlabel={id:'dl',afterDatasetsDraw(c){const{ctx}=c;ctx.save();const _fs=(c.data.labels&&c.data.labels.length>9)?9.5:11;ctx.font='700 '+_fs+'px '+(LANG==='ar'?'Cairo':'Inter');ctx.fillStyle='#334155';
   c.data.datasets.forEach((ds,di)=>{const meta=c.getDatasetMeta(di);if(meta.hidden)return;meta.data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;
     if(c.config.type==='bar'&&c.options.indexAxis==='y'){ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(fmt(v),el.x+6,el.y);}
-    else if(c.config.type==='bar'){ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmt(v),el.x,el.y-4);}
+    else if(c.config.type==='bar'){if(c.canvas&&c.canvas.id==='c_sizeitem'){ctx.save();ctx.translate(el.x,el.y-6);ctx.rotate(-Math.PI/2);ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(fmt(v),0,0);ctx.restore();}else{ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmt(v),el.x,el.y-4);}}
   });});ctx.restore();}};
 const dlabelSeg={id:'dlseg',afterDatasetsDraw(c){const{ctx}=c;ctx.save();ctx.font='400 8.5px '+(LANG==='ar'?'Cairo':'Inter');ctx.textAlign='center';ctx.textBaseline='middle';
   c.data.datasets.forEach((ds,di)=>{const meta=c.getDatasetMeta(di);if(meta.hidden)return;meta.data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;const w=Math.abs(el.x-(el.base!=null?el.base:el.x));if(w<24)return;ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText(fmt(v),(el.x+(el.base!=null?el.base:el.x))/2,el.y);});});ctx.restore();}};
 const pieLabel={id:'pl',afterDatasetsDraw(c){if(c.config.type!=='doughnut'&&c.config.type!=='pie')return;const{ctx}=c;const ds=c.data.datasets[0];const meta=c.getDatasetMeta(0);const total=ds.data.reduce((s,x)=>s+(+x||0),0);if(!total)return;const fn=LANG==='ar'?'Cairo':'Inter';ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=3;meta.data.forEach((arc,i)=>{const v=ds.data[i];if(!v)return;const pct=v/total*100;if(pct<4)return;const ang=(arc.startAngle+arc.endAngle)/2;const r=(arc.innerRadius+arc.outerRadius)/2;const x=arc.x+Math.cos(ang)*r,y=arc.y+Math.sin(ang)*r;ctx.fillStyle='#fff';if(pct>=8){ctx.font='800 11px '+fn;ctx.fillText(fmt(v),x,y-6);ctx.font='700 10px '+fn;ctx.fillText(pct.toFixed(0)+'%',x,y+7);}else{ctx.font='800 10px '+fn;ctx.fillText(pct.toFixed(0)+'%',x,y);}});ctx.restore();}};
 const monthTrend={id:'mtrend',afterDatasetsDraw(c){if(!c.options._trend)return;const ds=c.data.datasets[0],meta=c.getDatasetMeta(0),ctx=c.ctx;const horiz=c.options.indexAxis==='y';ctx.save();ctx.font='800 12px '+(LANG==='ar'?'Cairo':'Inter');meta.data.forEach((el,i)=>{if(i===0||!el)return;const v=ds.data[i],pv=ds.data[i-1];if(v===pv)return;const up=v>pv;ctx.fillStyle=up?'#16a34a':'#dc2626';if(horiz){ctx.textAlign='start';ctx.textBaseline='middle';ctx.fillText(up?'\u25B2':'\u25BC',el.x+46,el.y);}else{ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(up?'\u25B2':'\u25BC',el.x,el.y-19);}});ctx.restore();}};
 const yearAxis={id:'yearaxis',afterDraw(c){const meta=c.getDatasetMeta(0);if(!meta||!meta.data.length)return;const yrs=c.data.datasets[0]._years;if(!yrs)return;const area=c.chartArea,ctx=c.ctx,fn=LANG==='ar'?'Cairo':'Inter';const n=meta.data.length;ctx.save();ctx.font='800 12px '+fn;ctx.fillStyle='#475569';ctx.textBaseline='top';ctx.textAlign='center';let i=0;while(i<n){let j=i;while(j+1<n&&yrs[j+1]===yrs[i])j++;const cx=(meta.data[i].x+meta.data[j].x)/2;ctx.fillText(String(yrs[i]),cx,area.bottom+24);if(i>0){const xb=(meta.data[i-1].x+meta.data[i].x)/2;ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xb,area.top);ctx.lineTo(xb,area.bottom+30);ctx.stroke();}i=j+1;}ctx.restore();}};
-function pieOut(){return {id:'pieout',afterDraw(c){if(c.config.type!=='doughnut'&&c.config.type!=='pie')return;if((window.innerWidth||999)<=540)return;const ds=c.data.datasets[0],meta=c.getDatasetMeta(0);const total=ds.data.reduce((s,x)=>s+(+x||0),0);if(!total||!meta.data.length)return;const ctx=c.ctx,fn=LANG==='ar'?'Cairo':'Inter';const cx=meta.data[0].x,cy=meta.data[0].y;const items=[];meta.data.forEach((arc,i)=>{const v=ds.data[i];if(!v)return;const pct=v/total*100;if(pct<3)return;const ang=(arc.startAngle+arc.endAngle)/2;const oR=arc.outerRadius;const x0=cx+Math.cos(ang)*oR,y0=cy+Math.sin(ang)*oR;const right=Math.cos(ang)>=0;items.push({v:v,pct:pct,oR:oR,x0:x0,y0:y0,right:right,col:(ds.backgroundColor[i]||'#94a3b8'),y:cy+Math.sin(ang)*(oR+8)});});const GAP=21;['r','l'].forEach(side=>{const arr=items.filter(it=>it.right===(side==='r')).sort((a,b)=>a.y-b.y);for(let k=1;k<arr.length;k++){if(arr[k].y-arr[k-1].y<GAP)arr[k].y=arr[k-1].y+GAP;}});ctx.save();items.forEach(it=>{const r=it.right;const elbowX=cx+(r?1:-1)*(it.oR+9);const labelX=cx+(r?1:-1)*(it.oR+14);ctx.strokeStyle=it.col;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(it.x0,it.y0);ctx.lineTo(elbowX,it.y);ctx.lineTo(labelX,it.y);ctx.stroke();ctx.beginPath();ctx.arc(labelX,it.y,1.8,0,7);ctx.fillStyle=it.col;ctx.fill();ctx.textAlign=r?'left':'right';ctx.textBaseline='middle';const tx=labelX+(r?4:-4);ctx.fillStyle='#1e293b';ctx.font='800 10.5px '+fn;ctx.fillText(fmt(it.v),tx,it.y-6);ctx.font='700 9.5px '+fn;ctx.fillStyle='#475569';ctx.fillText(it.pct.toFixed(0)+'%',tx,it.y+7);});ctx.restore();}};}
+function pieOut(force){return {id:'pieout',afterDraw(c){if(c.config.type!=='doughnut'&&c.config.type!=='pie')return;if(!force&&(window.innerWidth||999)<=540)return;const ds=c.data.datasets[0],meta=c.getDatasetMeta(0);const total=ds.data.reduce((s,x)=>s+(+x||0),0);if(!total||!meta.data.length)return;const ctx=c.ctx,fn=LANG==='ar'?'Cairo':'Inter';const cx=meta.data[0].x,cy=meta.data[0].y;const items=[];meta.data.forEach((arc,i)=>{const v=ds.data[i];if(!v)return;const pct=v/total*100;if(pct<3)return;const ang=(arc.startAngle+arc.endAngle)/2;const oR=arc.outerRadius;const x0=cx+Math.cos(ang)*oR,y0=cy+Math.sin(ang)*oR;const right=Math.cos(ang)>=0;items.push({v:v,pct:pct,oR:oR,x0:x0,y0:y0,right:right,col:(ds.backgroundColor[i]||'#94a3b8'),y:cy+Math.sin(ang)*(oR+8)});});const GAP=21;['r','l'].forEach(side=>{const arr=items.filter(it=>it.right===(side==='r')).sort((a,b)=>a.y-b.y);for(let k=1;k<arr.length;k++){if(arr[k].y-arr[k-1].y<GAP)arr[k].y=arr[k-1].y+GAP;}});ctx.save();items.forEach(it=>{const r=it.right;const elbowX=cx+(r?1:-1)*(it.oR+9);const labelX=cx+(r?1:-1)*(it.oR+14);ctx.strokeStyle=it.col;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(it.x0,it.y0);ctx.lineTo(elbowX,it.y);ctx.lineTo(labelX,it.y);ctx.stroke();ctx.beginPath();ctx.arc(labelX,it.y,1.8,0,7);ctx.fillStyle=it.col;ctx.fill();ctx.textAlign=r?'left':'right';ctx.textBaseline='middle';const tx=labelX+(r?4:-4);ctx.fillStyle='#1e293b';ctx.font='800 10.5px '+fn;ctx.fillText(fmt(it.v),tx,it.y-6);ctx.font='700 9.5px '+fn;ctx.fillStyle='#475569';ctx.fillText(it.pct.toFixed(0)+'%',tx,it.y+7);});ctx.restore();}};}
 function centerText(total){return {id:'ct',afterDraw(c){const{ctx,chartArea}=c;if(!chartArea)return;const x=(chartArea.left+chartArea.right)/2,y=(chartArea.top+chartArea.bottom)/2;
   const meta=c.getDatasetMeta(0).data[0];const inner=meta?meta.innerRadius:60;const fn=LANG==='ar'?'Cairo':'Inter';
   const txt=fmt(total);ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
@@ -3014,9 +3080,10 @@ function render(){
       tooltip:{rtl:rtl,callbacks:{label:ctx=>'  '+fmt(ctx.raw)+' ('+pc(ctx.raw)+')'}}}},plugins:[centerText(tot),pieOut()]});
 
   const MO=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];const mm=agg(rows,'month');
-  const moL=MO.filter(x=>mm[x]!==undefined).concat(Object.keys(mm).filter(x=>!MO.includes(x)));
+  let moL=MO.filter(x=>mm[x]!==undefined).concat(Object.keys(mm).filter(x=>!MO.includes(x)));
+  if(window.AGING_RANGE==='2025')moL=moL.filter(function(x){return yearOf(x)===2025;});
   mk('c_month',{type:'bar',data:{labels:moL.map(mn),datasets:[{data:moL.map(x=>mm[x]||0),_years:moL.map(x=>yearOf(x)),borderRadius:6,maxBarThickness:34,
-    backgroundColor:cx=>{const{chart,dataIndex}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.teal;const c1=(yearOf(moL[dataIndex])===2025)?C.blue:C.teal;return grad(ctx,chartArea,c1,shade(c1,60));}}]},
+    backgroundColor:cx=>{const{chart,dataIndex}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.teal;const _ys=chart.data.datasets[0]._years;const c1=((_ys?_ys[dataIndex]:yearOf(moL[dataIndex]))===2025)?C.blue:C.teal;return grad(ctx,chartArea,c1,shade(c1,60));}}]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16,bottom:30}},plugins:{legend:{display:false},dl:{}},scales:{y:{display:false,grace:'22%'},x:{grid:{display:false},border:{display:false}}}},plugins:[dlabel,yearAxis]});
 
   const SZ=SIZE_ORDER;const szm=agg(rows,'size');
@@ -3025,9 +3092,10 @@ function render(){
     backgroundColor:cx=>{const{chart}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.navy;return hgrad(ctx,chartArea,C.navy,C.blue);}}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},dl:{}},scales:{x:{display:false,grace:'26%',reverse:rtl},y:{position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{weight:'600'}}}}},plugins:[dlabel]});
 
-  buildPackTabs();
+  buildPackTabs();buildPackSizeTabs();
   const pcats=['CTN','SHR','Pac'];const pcatcol={CTN:C.blue,SHR:'#9ec9ee',Pac:'#7fb0dd'};
-  const prows=PACK_CAT2==='all'?rows:rows.filter(r=>r.cat2===PACK_CAT2);
+  let prows=PACK_CAT2==='all'?rows:rows.filter(r=>r.cat2===PACK_CAT2);
+  if(PACK_SIZE!=='all')prows=prows.filter(r=>String(r.size)===String(PACK_SIZE));
   const pmm={};prows.forEach(r=>{pmm[r.pack]=pmm[r.pack]||{};pmm[r.pack][r.cat2]=(pmm[r.pack][r.cat2]||0)+r.qty;});
   const ptot={};Object.keys(pmm).forEach(p=>{ptot[p]=Object.values(pmm[p]).reduce((s,x)=>s+x,0);});
   const pl=Object.keys(pmm).sort((x,y)=>ptot[y]-ptot[x]);
@@ -3036,14 +3104,14 @@ function render(){
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:PACK_CAT2==='all'?{rtl:rtl,position:'top',align:'end',labels:{font:{size:10},boxWidth:9,boxHeight:9,usePointStyle:true,pointStyle:'rectRounded',padding:8}}:{display:false},dl:{}},scales:{x:{display:false,grace:'28%',reverse:rtl,stacked:true},y:{stacked:true,position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'}}}}},plugins:PACK_CAT2==='all'?[dlabelSeg]:[dlabel]});
 
   mk('c_class',{type:'doughnut',data:{labels:['A<60','B<90','C>90'],datasets:[{data:[a,b,c],backgroundColor:[C.teal,C.navy,C.orange],borderColor:'#fff',borderWidth:3,hoverOffset:8}]},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,bottom:10,left:8,right:8}},cutout:'52%',plugins:{legend:{display:false},tooltip:{rtl:rtl,callbacks:{label:ctx=>'  '+fmt(ctx.raw)+' ('+pc(ctx.raw)+')'}}}},plugins:[pieLabel]});
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16,bottom:16,left:54,right:54}},cutout:'56%',plugins:{legend:{display:false},tooltip:{rtl:rtl,callbacks:{label:ctx=>'  '+fmt(ctx.raw)+' ('+pc(ctx.raw)+')'}}}},plugins:[pieOut(true)]});
 
   const cats=['CTN','SHR','Pac'];const catcol={CTN:C.blue,SHR:'#9ec9ee',Pac:'#7fb0dd'};
   const sim={};rows.forEach(r=>{sim[r.size]=sim[r.size]||{};sim[r.size][r.cat2]=(sim[r.size][r.cat2]||0)+r.qty;});
   const siL=['C100','600','330','250','200','1500'].filter(x=>sim[x]).concat(Object.keys(sim).filter(x=>!['C100','600','330','250','200','1500'].includes(x)));
   const catsAll=[...new Set([...cats,...rows.map(r=>r.cat2)])];
   mk('c_sizeitem',{type:'bar',data:{labels:siL,datasets:catsAll.map(ct=>({label:mv('cat2',ct),data:siL.map(s=>(sim[s]||{})[ct]||0),borderRadius:5,maxBarThickness:30,backgroundColor:catcol[ct]||'#8fb8d4'}))},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{bottom:26}},plugins:{legend:{rtl:rtl,position:'top',align:'end',labels:{font:{size:10.5},boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rectRounded',padding:10}},dl:{}},scales:{y:{display:false,grace:'22%'},x:{grid:{display:false},border:{display:false},ticks:{font:{weight:'600'}}}}},plugins:[dlabel]});
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:48,bottom:26}},plugins:{legend:{display:false},dl:{}},scales:{y:{display:false,grace:'22%'},x:{grid:{display:false},border:{display:false},ticks:{font:{weight:'600'}}}}},plugins:[dlabel]});
 
   [['c_identity',el=>({rows:filtered().filter(d=>d.identity===idk[el.index]),title:mv('identity',idk[el.index])})],
    ['c_month',el=>({rows:filtered().filter(d=>d.month===moL[el.index]),title:mn(moL[el.index])})],
@@ -4073,14 +4141,26 @@ function buildSummary(){
 }
 
 let SKU_DIM='size';
-function clearSkuFilters(){document.getElementById('sku-search').value='';document.getElementById('sku-cat').value='';buildSku();}
+let SKU_SIZE='all';
+function setSkuSize(v){SKU_SIZE=v;try{buildSku();}catch(e){}}
+function buildSkuSizeTabs(){
+  var box=document.getElementById('sku-size-tabs');if(!box)return;
+  var present={};DATA.forEach(function(d){if(d.size!=null&&d.size!=='')present[String(d.size)]=true;});
+  var order=(typeof SIZE_ORDER!=='undefined'?SIZE_ORDER:[]).map(String);
+  var sizes=order.filter(function(s){return present[s];}).concat(Object.keys(present).filter(function(s){return order.indexOf(s)<0;}));
+  var html='<button class="'+(SKU_SIZE==='all'?'on':'')+'" onclick="setSkuSize(\'all\')">'+tr('all')+'</button>';
+  sizes.forEach(function(s){html+='<button class="'+(String(SKU_SIZE)===s?'on':'')+'" onclick="setSkuSize(\''+s.replace(/'/g,"\\'")+'\')">'+fmtSize(s)+'</button>';});
+  box.innerHTML=html;
+}
+function clearSkuFilters(){document.getElementById('sku-search').value='';document.getElementById('sku-cat').value='';SKU_SIZE='all';buildSku();}
 function buildSku(){
   const ALL=DATA;CURAGG=AGGS.sku;
   const allBrands=BRAND_ORDER.filter(b=>ALL.some(d=>brandOf(d.identity)===b)).concat([...new Set(ALL.map(d=>brandOf(d.identity)))].filter(b=>!BRAND_ORDER.includes(b)));
   fillSel('sku-cat',allBrands.map(b=>[b,b]));
   const q=(document.getElementById('sku-search').value||'').trim().toLowerCase();
   const fc=document.getElementById('sku-cat').value;
-  const D=ALL.filter(d=>(fc===''||brandOf(d.identity)===fc)&&(q===''||String(d.item_code||'').toLowerCase().includes(q)));
+  buildSkuSizeTabs();
+  const D=ALL.filter(d=>(fc===''||brandOf(d.identity)===fc)&&(q===''||String(d.item_code||'').toLowerCase().includes(q))&&(SKU_SIZE==='all'||String(d.size)===String(SKU_SIZE)));
   let branches=BRANCH_SUM_ORDER.filter(b=>ALL.some(d=>d.branch===b)).concat([...new Set(ALL.map(d=>d.branch))].filter(b=>!BRANCH_SUM_ORDER.includes(b)));branches=orderBranches(branches,'sku');const VB=branches.filter(b=>!HIDDEN.has('sku:br:'+b));
   const grand=aggBy(mcol('sku','sku:total'),ALL.map(d=>d.qty))||1;
   // structure: brand -> item -> {desc, branchSums}
@@ -4120,13 +4200,13 @@ function buildSku(){
   try{decorateTable('sku','sku-wrap');}catch(e){}
   const realGrand=aggBy(mcol('sku','sku:total'),ALL.map(d=>d.qty));const cnt=document.getElementById('sku-count');if(cnt)cnt.textContent=realGrand?fmt(Dtot)+' / '+fmt(realGrand)+'  ('+(Dtot/realGrand*100).toFixed(1)+'%)':'—';
   // top items chart
-  const it={};D.forEach(d=>{const k=(d.item_code||'-');it[k]=(it[k]||0)+d.qty;});
+  const it={};D.forEach(d=>{const k=(d.size!=null&&d.size!==''?String(d.size):'-');it[k]=(it[k]||0)+d.qty;});
   const top=Object.keys(it).sort((a,b)=>it[b]-it[a]).slice(0,15);
   const rtl=LANG==='ar';
-  mk('sku_top',{type:'bar',data:{labels:top,datasets:[{data:top.map(k=>it[k]),borderRadius:5,maxBarThickness:20,
+  mk('sku_top',{type:'bar',data:{labels:top.map(s=>fmtSize(s)),datasets:[{data:top.map(k=>it[k]),borderRadius:5,maxBarThickness:20,
     backgroundColor:cx=>{const{chart}=cx,{ctx,chartArea}=chart;if(!chartArea)return C.navy;return hgrad(ctx,chartArea,C.navy,C.blue);}}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},dl:{}},scales:{x:{display:false,grace:'28%',reverse:rtl},y:{position:rtl?'right':'left',grid:{display:false},border:{display:false},ticks:{font:{size:10.5,weight:'600'}}}}},plugins:[dlabel]});
-  if(charts.sku_top)charts.sku_top.options.onClick=chartClick(el=>{const code=top[el.index];return {rows:D.filter(d=>(d.item_code||'-')===code),title:tr('c_code')+' '+code};});
+  if(charts.sku_top)charts.sku_top.options.onClick=chartClick(el=>{const sz=top[el.index];return {rows:D.filter(d=>(d.size!=null&&d.size!==''?String(d.size):'-')===sz),title:tr('c_size')+' '+fmtSize(sz)};});
 }
 /* ===== AUTH / USERS ===== */
 let CURRENT_USER=null;
@@ -6133,6 +6213,24 @@ function dalColorClass(code,branch,balance){
   if(r.safe&&b>=r.safe)return 'dal-c3';
   return '';}
 
+/* تصنيف لوني للإجمالي الجانبي: يجمع حدود كل الفروع للصنف ثم يقارن الرصيد الكلي */
+function dalColorClassTotal(code,balance){
+  var min=0,safe=0,max=0,vmax=0,any=false;
+  (typeof DAL_BRANCHES!=='undefined'?DAL_BRANCHES:[]).forEach(function(b){
+    var r=dalRec(code,b);if(!r)return;
+    min+=(+r.min||0);safe+=(+r.safe||0);max+=(+r.max||0);vmax+=(+r.vmax||0);
+    if(r.min||r.safe||r.max||r.vmax)any=true;
+  });
+  if(!any)return '';
+  var b2=parseFloat(balance)||0;
+  if(min&&b2<min)return 'dal-c1';
+  if(safe&&b2<safe)return 'dal-c2';
+  if(max&&b2<=max)return 'dal-c3';
+  if(vmax&&b2<=vmax)return 'dal-c4';
+  if(vmax&&b2>vmax)return 'dal-c5';
+  if(safe&&b2>=safe)return 'dal-c3';
+  return '';}
+
 /* استيراد القالب من Excel — ورقة لكل فرع أو عمود فرع، 5 حقول لكل صنف
    التنسيق المرن: عمود Code + أعمدة (Branch_avg, Branch_min, ...) أو ورقة لكل فرع */
 function importDAL(input){
@@ -7760,6 +7858,8 @@ function renderRichReport(key,rep){
 }
     html+='</div></div>';
   }
+  /* استبعاد أعمدة المستودعات المكرّرة بعد ربط البيانات (الدمام/الشمال/الخرج مصنع) — تُخفى من الرأس والصفوف والإجماليات معاً */
+  try{var _exNm=['dammam','north','kharj factory','الدمام','الشمال','الخرج مصنع','خرج مصنع'];h.forEach(function(col,i){var _n=String(col==null?'':col).trim().toLowerCase();if(_exNm.indexOf(_n)>=0)HIDDEN.add(P+':col:'+i);});}catch(e){}
   html+='<div class="pivot-wrap fg-wrap"><table class="pivot fg-table"><thead><tr>';
   h.forEach(function(col,i){if(HIDDEN.has(P+':col:'+i))return;if(i===c.transit&&c.transit>=0)html+='<th class="fg-vsep"></th>';var thc=(i===c.total?' class="fg-toth"':(i===c.transit?' class="fg-trth"':''));html+='<th'+thc+'>'+drEsc(col)+'</th>';});
   /* رؤوس الأعمدة المخصصة */
@@ -7801,7 +7901,7 @@ function rrRefresh(){
   var html='',sumA=[],sumB=[],hasNum=[];var card={carton:0,shrink:0,pack:0,bottle:0,transit:0,other:0};
   for(var z=0;z<h.length;z++){sumA[z]=0;sumB[z]=0;hasNum[z]=false;}
   rows.forEach(function(r){
-    var grp=(cati>=0)?fgCatGroup(r[cati]):'other'; var isBottle=(grp==='bottle');
+    var grp=(cati>=0)?fgCatGroup(r[cati]):fgCatGroup(r.slice(0,nf).join(' ')); var isBottle=(grp==='bottle');
     var tv=(ti>=0&&typeof r[ti]==='number')?r[ti]:0; if(card[grp]!=null)card[grp]+=tv; else card.other+=tv;
     if(tri>=0&&typeof r[tri]==='number')card.transit+=r[tri];
     var hl=(RR_HL_CODES.indexOf(String(r[0]==null?'':r[0]).trim())>=0);
@@ -7812,8 +7912,9 @@ function rrRefresh(){
       var v=(k<r.length?r[k]:''); if(v==null)v='';
       var num=(typeof v==='number'); if(num){(isBottle?sumB:sumA)[k]+=v;hasNum[k]=true;}
       var cls=(k<nf)?'cat':((v===0||v==='0')?'zero':'');
-      /* تلوين حسب متوسط التحميل اليومي — خلايا الفروع الرقمية فقط */
-      if(num&&k>=nf&&k!==ti&&k!==tri){try{var _dalC=dalColorClass(String(r[0]||'').trim(),h[k],v);if(_dalC)cls+=' '+_dalC;}catch(e){}}
+      if(k===ti&&ti>=0)cls+=' tot';
+      /* التلوين الشرطي (متوسط التحميل) — على عمود الإجمالي الجانبي فقط */
+      if(num&&k===ti&&ti>=0){try{var _dalC=dalColorClassTotal(String(r[0]||'').trim(),v);if(_dalC)cls+=' '+_dalC;}catch(e){}}
       var dispV=v;
       if(!num&&k<nf){
         /* تطبيق تحويل البراند والحجم على خلايا النص */
@@ -7851,7 +7952,9 @@ function rrRefresh(){
     return s+'</tr>';
   }
   if(cati>=0){html+=grand(sumA,'Carton + Shrink + Pack','fg-gA');html+=grand(sumB,'Bottle','fg-gB');}
-  else{var sAll=[];for(var z2=0;z2<h.length;z2++)sAll[z2]=sumA[z2]+sumB[z2];html+=grand(sAll,drIsAr()?'الإجمالي':'Total','fg-gA');}
+  else{var _bHas=false;for(var _zb=0;_zb<sumB.length;_zb++){if(sumB[_zb]){_bHas=true;break;}}
+    if(_bHas){html+=grand(sumA,drIsAr()?'كرتون + شرنك':'Carton + Shrink','fg-gA');html+=grand(sumB,drIsAr()?'القارورة':'Bottle','fg-gB');}
+    else{var sAll=[];for(var z2=0;z2<h.length;z2++)sAll[z2]=sumA[z2]+sumB[z2];html+=grand(sAll,drIsAr()?'الإجمالي':'Total','fg-gA');}}
   tb.innerHTML=html;
   /* تأجيل decorateRich بعد إتمام الرسم لمنع layout thrash */
   if(typeof requestAnimationFrame!=='undefined'){
@@ -8872,8 +8975,12 @@ function renderBottleReport(rep){
      =================================================================== -->
 <style id="uix-css">
 #edit-fab{display:none !important}   /* hidden — moved into the side menu */
-.nav-version{margin-top:auto;padding:11px 8px 6px;text-align:center;font-size:10.5px;font-weight:700;
+.nav-version{margin-top:0;padding:11px 8px 6px;text-align:center;font-size:10.5px;font-weight:700;
   color:rgba(255,255,255,.42);letter-spacing:.3px;border-top:1px solid rgba(255,255,255,.08)}
+/* تثبيت مجموعة المستخدم/اللغة/الإصدار أسفل القائمة + منع انكماش الأزرار (جوال وسطح مكتب) */
+.nav .userbox{margin-top:auto}
+.nav>.navbtn,.nav .nav-group,.nav .nav-head,.nav .nav-sub,.nav .brand,.nav .userbox,.nav .langsw,.nav-version{flex:0 0 auto}
+.nav .navbtn,.nav .nav-head{flex-shrink:0}
 .nav-version b{color:rgba(255,255,255,.72)}
 .navbtn.em-on{background:linear-gradient(95deg,#16a34a,#0f7a37) !important;color:#fff !important;box-shadow:0 6px 16px rgba(16,120,60,.4) !important}
 </style>
@@ -8907,6 +9014,8 @@ function renderBottleReport(rep){
       var v=document.createElement('div'); v.id='nav-version'; v.className='nav-version';
       nav.appendChild(v); renderVersion();
     }
+    /* إخفاء عنصر الإصدار الثابت القديم لتفادي التكرار */
+    try{var _ov=document.getElementById('app-ver-side'); if(_ov&&_ov.parentNode)_ov.parentNode.style.display='none';}catch(e){}
   }
 
   /* reflect edit-mode state on the new sidebar button */
@@ -9480,7 +9589,7 @@ function renderBottleReport(rep){
     bar=document.createElement('div');bar.className='mbar';bar.id='mbar';
     mk(bar,'◀','mb-back',ar()?'رجوع':'Back',function(){wakeBar();back();});
     mk(bar,'⟳','mb-rot',ar()?'تدوير':'Rotate',function(){wakeBar();rotate();});
-    mk(bar,'🔍','mb-sync',ar()?'المزامنة':'Sync',function(){wakeBar();sync();});
+    mk(bar,'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>','mb-logout',ar()?'تسجيل الخروج':'Logout',function(){wakeBar();try{if(typeof logout==='function')logout();}catch(e){}});
     mk(bar,'▶','mb-fwd',ar()?'تقدّم':'Forward',function(){wakeBar();fwd();});
     document.body.appendChild(bar);
   }
@@ -9530,6 +9639,358 @@ function renderBottleReport(rep){
     setInterval(function(){if(ovOpen())injectOvBar();refresh();},1500);
   }
   if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+<style id="elegant-tables-v2">
+@media screen{
+  /* ============ جداول التقارير — تنسيق أنيق واحترافي ============ */
+  .pivot{font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+  .pivot-wrap,.fg-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* رؤوس راقية بتدرّج كحلي هادئ بلا حدود ثقيلة */
+  .pivot th{background:linear-gradient(180deg,#214e7d,#173f63)!important;border:none!important;box-shadow:inset 0 -1px 0 rgba(255,255,255,.10);letter-spacing:.2px}
+  .pivot th.fg-toth{background:linear-gradient(180deg,#163a5e,#0f2c49)!important}
+  /* خلايا: حدود أفقية خفيفة بدل الشبكة الكاملة */
+  .pivot td{border:none!important;border-bottom:1px solid #eef2f7!important}
+  /* تظليل متناوب (Zebra) مع استثناء الخلايا الخاصة */
+  .pivot tbody tr:nth-child(even) td:not(.yr):not(.mo):not(.tot){background:#f8fafe}
+  /* العمود الأول المثبّت */
+  .pivot td.cat,.pivot td.idc{box-shadow:1px 0 0 #eef2f7}
+  /* عمود الإجمالي الجانبي — قاعدة محايدة يطغى عليها التلوين الشرطي */
+  .pivot td.tot{background:#eef4fb!important;color:#16448a!important;font-weight:800;box-shadow:inset 1px 0 0 #dbe7f6}
+  /* صف الإجمالي العام — كحلي عميق كامل وأرقام بيضاء (أولوية أعلى من Zebra) */
+  .pivot tbody tr.grand td{background:linear-gradient(180deg,#163a5e,#0f2c49)!important;color:#fff!important;font-weight:800;border-bottom:none!important;box-shadow:none}
+  .pivot tbody tr.grand td.tot{box-shadow:inset 1px 0 0 rgba(255,255,255,.14)!important}
+  .pivot tbody tr.grand.fg-gB td{background:linear-gradient(180deg,#15506e,#0e3a52)!important}
+  /* الفاصل بين الإجمالي والترانزيت: بلا أي لون (أبيض) في الرأس والصفوف وصف الإجمالي */
+  .pivot td.fg-vsep,.fg-table td.fg-vsep,.pivot th.fg-vsep,.fg-table th.fg-vsep,.pivot tbody tr.grand td.fg-vsep,.fg-table tbody tr.grand td.fg-vsep,.fg-table tr.grand td.fg-vsep{background:#fff!important;background-image:none!important;border:none!important;box-shadow:none!important}
+  /* عمود الترانزيت — برتقالي مهذّب أنعم */
+  .pivot th.fg-trth,.fg-table th.fg-trth{background:linear-gradient(180deg,#d9822f,#bd6a22)!important;color:#fff!important}
+  .pivot td.fg-trcol,.fg-table td.fg-trcol{background:#fcf1ea!important;color:#9a5a1e!important;font-weight:700}
+  /* التطبيق الشرطي (خريطة حرارية ناعمة) — يظهر على عمود الإجمالي فقط */
+  .pivot td.dal-c1,.fg-table td.dal-c1{background:#fbe4e4!important;color:#9c2a2a!important;font-weight:800}
+  .pivot td.dal-c2,.fg-table td.dal-c2{background:#fcebd8!important;color:#9a5a1e!important;font-weight:800}
+  .pivot td.dal-c3,.fg-table td.dal-c3{background:#e4f4e9!important;color:#1f7a45!important;font-weight:800}
+  .pivot td.dal-c4,.fg-table td.dal-c4{background:#faf1d2!important;color:#8a6d12!important;font-weight:800}
+  .pivot td.dal-c5,.fg-table td.dal-c5{background:#f7dede!important;color:#9c2a2a!important;font-weight:800}
+  /* hover ناعم دون طمس عمود الإجمالي */
+  .pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo):not(.tot):not(.cat){background:#eef6ff}
+}
+</style>
+
+<style id="dash-customkpis-gap-fix">
+@media screen and (max-width:860px){
+  /* إزالة الفراغ الكبير بين البطاقات/السلايسر والرسم: حاوية البطاقات المخصّصة
+     كانت ترث ارتفاع البطاقات الثابت (558px) رغم أنها شبه فارغة على الجوال —
+     نجعلها بارتفاع محتواها فقط دون المساس بأي شيء آخر */
+  #page-dash .custom-kpis{height:auto !important;max-height:none !important}
+}
+</style>
+
+<style id="elegant-tables-overlays">
+@media screen{
+  /* ===== تطبيق النظام الأنيق داخل النوافذ العائمة (#detail-ov / FG modal) وجدول الملخص ===== */
+  /* الرؤوس — تدرّج كحلي راقٍ بلا حدود ثقيلة */
+  #detail-ov .pivot thead th,
+  #detail-ov .modal-box .pivot th,
+  .fg-modal-ov .fg-dt th, .fg-modal-ov.show .fg-dt th, .fg-dt th,
+  #page-sum .sum-table-card .pivot thead th{
+    background:linear-gradient(180deg,#214e7d,#173f63)!important;color:#fff!important;
+    border:none!important;box-shadow:none!important;letter-spacing:.2px!important
+  }
+  /* إزالة أي ظل أزرق من رأس الجدول والعمود الأول المثبّت داخل النوافذ — شكل طبيعي مسطّح */
+  #detail-ov .pivot thead th, #detail-ov .pivot th, #detail-ov .pivot td,
+  #detail-ov .pivot th:first-child, #detail-ov .pivot td:first-child,
+  #page-sum .sum-table-card .pivot th:first-child, #page-sum .sum-table-card .pivot td.yr,
+  .fg-modal-ov .fg-dt th, .fg-dt th{box-shadow:none!important}
+  /* الخلايا — حدود أفقية خفيفة بدل الشبكة */
+  #detail-ov .pivot td, .fg-modal-ov .fg-dt td, .fg-dt td,
+  #page-sum .sum-table-card .pivot td{
+    border:none!important;border-bottom:1px solid #eef2f7!important
+  }
+  /* تظليل متناوب أنعم لجدول FG العائم */
+  .fg-modal-ov .fg-dt tbody tr:nth-child(even) td, .fg-dt tbody tr:nth-child(even) td{background:#f8fafe!important}
+  /* عمود الإجمالي الجانبي */
+  #detail-ov .pivot td.tot, #page-sum .sum-table-card .pivot td.tot{
+    background:#eef4fb!important;color:#16448a!important;font-weight:800!important
+  }
+  /* التلوين الشرطي الناعم على عمود الإجمالي فقط */
+  #detail-ov .pivot td.tot.dal-c1,#page-sum .sum-table-card .pivot td.tot.dal-c1{background:#fbe4e4!important;color:#9c2a2a!important}
+  #detail-ov .pivot td.tot.dal-c2,#page-sum .sum-table-card .pivot td.tot.dal-c2{background:#fcebd8!important;color:#9a5a1e!important}
+  #detail-ov .pivot td.tot.dal-c3,#page-sum .sum-table-card .pivot td.tot.dal-c3{background:#e4f4e9!important;color:#1f7a45!important}
+  #detail-ov .pivot td.tot.dal-c4,#page-sum .sum-table-card .pivot td.tot.dal-c4{background:#faf1d2!important;color:#8a6d12!important}
+  #detail-ov .pivot td.tot.dal-c5,#page-sum .sum-table-card .pivot td.tot.dal-c5{background:#f7dede!important;color:#9c2a2a!important}
+  /* صف الإجمالي العام — كحلي عميق متطابق مع الرأس */
+  #detail-ov .pivot tbody tr.grand td, #detail-ov .pivot tr.grand td,
+  .fg-modal-ov .fg-dt tr.grand td, .fg-modal-ov.show .fg-dt tr.grand td, .fg-modal-ov.show .fg-dt tr.fg-grand td, .fg-dt tfoot .grand td,
+  #page-sum .sum-table-card .pivot tbody tr.grand td, #page-sum .sum-table-card .pivot tr.grand td{
+    background:linear-gradient(180deg,#163a5e,#0f2c49)!important;color:#fff!important;font-weight:800!important;border-bottom:none!important
+  }
+  /* تثبيت رأس جدول التفاصيل بالكحلي الأنيق فوق كل القواعد القديمة (يتجاوز :first-child) */
+  #detail-ov .modal-box .pivot thead th, #detail-ov .modal-box .pivot thead th:first-child{
+    background:linear-gradient(180deg,#214e7d,#173f63)!important;border:none!important;box-shadow:none!important;color:#fff!important
+  }
+  /* إزالة الظل/الخلفية الزرقاء حول النوافذ المنبثقة — ظل رمادي محايد وخلفية تعتيم محايدة */
+  .modal-box, .fg-modal-box, #detail-ov .modal-box, .fg-modal-ov .fg-modal-box{box-shadow:0 20px 56px rgba(0,0,0,.30)!important}
+  .modal-ov, .fg-modal-ov{background:rgba(17,20,28,.5)!important}
+  /* تهدئة تدرّج ترويسة النافذة إلى الكحلي الأنيق (إزالة الأزرق الفاقع) */
+  #detail-ov .modal-head, .fg-modal-ov .fg-modal-head, .fg-modal-ov.show .fg-modal-head{background:linear-gradient(180deg,#214e7d,#173f63)!important}
+}
+@media screen and (max-width:900px){
+  /* تجاوز كتلة الجوال القديمة لنافذة الإجمالي العائمة */
+  #detail-ov .pivot thead th{background:linear-gradient(180deg,#214e7d,#173f63)!important;border:none!important;box-shadow:none!important}
+  #detail-ov .pivot tbody tr:nth-child(even):not(.grand) td:not(.yr):not(.mo):not(.tot){background:#f8fafe!important}
+  #detail-ov .pivot tbody tr:nth-child(odd):not(.grand) td:not(.yr):not(.mo):not(.tot){background:#fff!important}
+  #detail-ov .pivot tr.grand td{background:linear-gradient(180deg,#163a5e,#0f2c49)!important}
+  /* ===== جدول التفاصيل على الجوال: محاذاة المسميات مع السماح بالالتفاف ليبقى داخل حدود الشاشة ===== */
+  #detail-ov .pivot td.cat{text-align:start!important}
+}
+</style>
+
+<script id="pivot-cardify-js">
+(function(){
+  'use strict';
+  var MOBQ=window.matchMedia('(max-width:640px)');
+  function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function txt(el){return (el&&el.textContent||'').replace(/\s+/g,' ').trim();}
+  function isZero(t){return t===''||t==='-'||/^-?0(\.0+)?$/.test(t)||/^-?0%$/.test(t);}
+  var LBL=['idc','mo','cat','yr'];
+  function hasCls(el,c){return el&&el.classList&&el.classList.contains(c);}
+  function isLabel(el){for(var i=0;i<LBL.length;i++){if(hasCls(el,LBL[i]))return true;}return false;}
+  function isBranch(el){
+    if(!el||!el.classList)return false;
+    if(isLabel(el)||hasCls(el,'tot')||hasCls(el,'pct'))return false;
+    if(el.getAttribute&&el.getAttribute('colspan'))return false;
+    if(el.querySelector&&el.querySelector('input'))return false;
+    return true;
+  }
+  function buildGrid(tbl){
+    var rows=[].slice.call(tbl.querySelectorAll('tbody tr')); var grid=[];
+    rows.forEach(function(tr,r){
+      grid[r]=grid[r]||[]; var c=0;
+      [].slice.call(tr.children).forEach(function(cell){
+        while(grid[r][c]!==undefined)c++;
+        var rs=parseInt(cell.getAttribute('rowspan')||1,10)||1, cs=parseInt(cell.getAttribute('colspan')||1,10)||1;
+        for(var i=0;i<rs;i++){for(var j=0;j<cs;j++){grid[r+i]=grid[r+i]||[];grid[r+i][c+j]=cell;}}
+        c+=cs;
+      });
+    });
+    return {grid:grid,rows:rows};
+  }
+  function build(wrapId,force){
+    var wrap=document.getElementById(wrapId); if(!wrap)return;
+    var host=wrap.parentNode; if(!host)return;
+    var old=host.querySelector('.mb-cards[data-pc="'+wrapId+'"]'); if(old)old.remove();
+    wrap.classList.remove('mb-cardified');
+    var tbl=wrap.querySelector('table.pivot'); if(!tbl)return;
+    if(!force && !MOBQ.matches)return;
+    var headLabels=[].slice.call(tbl.querySelectorAll('thead th')).map(txt);
+    var gd=buildGrid(tbl); if(!gd.rows.length)return;
+    var cards=document.createElement('div'); cards.className='mb-cards'; cards.setAttribute('data-pc',wrapId);
+    var any=false;
+    gd.rows.forEach(function(tr,r){
+      if(tr.classList.contains('grand'))return;
+      var line=gd.grid[r]||[]; var seen=[];
+      var labels=[], branches=[], tot='', pct='';
+      line.forEach(function(cell,c){
+        if(!cell||seen.indexOf(cell)>=0)return; seen.push(cell);
+        if(hasCls(cell,'tot')){tot=txt(cell);return;}
+        if(hasCls(cell,'pct')){pct=txt(cell);return;}
+        if(isLabel(cell)){labels.push({c:c,t:txt(cell),cls:' '+cell.className+' '});return;}
+        if(isBranch(cell)){branches.push({label:headLabels[c]||('#'+(c+1)),val:txt(cell)});return;}
+      });
+      if(!branches.length&&!tot)return;
+      function lbl(cls){for(var i=0;i<labels.length;i++){if(labels[i].cls.indexOf(' '+cls+' ')>=0)return labels[i].t;}return '';}
+      var title=lbl('idc')||lbl('mo')||lbl('cat')||lbl('yr')||'';
+      var sub=labels.filter(function(x){return x.t&&x.t!==title;}).sort(function(a,b){return a.c-b.c;}).map(function(x){return x.t;}).join(' \u00b7 ');
+      var card=document.createElement('div'); card.className='mb-card';
+      var head=document.createElement('div'); head.className='mb-card-head';
+      var main=document.createElement('div'); main.className='mb-card-main';
+      var t=document.createElement('div'); t.className='mb-card-title'; t.textContent=title||sub||'-';
+      var sb=document.createElement('div'); sb.className='mb-card-sub';
+      sb.textContent=sub||(ar()?'\u0627\u0636\u063a\u0637 \u0644\u0644\u062a\u0641\u0627\u0635\u064a\u0644':'tap for details');
+      main.appendChild(t); main.appendChild(sb);
+      var val=document.createElement('div'); val.className='mb-card-val'; val.textContent=tot;
+      var chev=document.createElement('div'); chev.className='mb-chev'; chev.innerHTML='&#9662;';
+      head.appendChild(main); head.appendChild(val); head.appendChild(chev);
+      var body=document.createElement('div'); body.className='mb-card-body';
+      var inner=document.createElement('div'); inner.className='mb-bd-inner';
+      branches.forEach(function(it){
+        var row=document.createElement('div'); row.className='mb-row'+(isZero(it.val)?' zero':'');
+        var l=document.createElement('div'); l.className='l'; l.textContent=it.label;
+        var v=document.createElement('div'); v.className='v'; v.textContent=it.val;
+        row.appendChild(l); row.appendChild(v); inner.appendChild(row);
+      });
+      if(tot){
+        var trow=document.createElement('div'); trow.className='mb-row tot';
+        var tl=document.createElement('div'); tl.className='l'; tl.textContent=(ar()?'\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a':'Total');
+        var tv=document.createElement('div'); tv.className='v'; tv.textContent=tot+(pct?('  ('+pct+')'):'');
+        trow.appendChild(tl); trow.appendChild(tv); inner.appendChild(trow);
+      }
+      body.appendChild(inner);
+      head.addEventListener('click',function(){card.classList.toggle('open');});
+      card.appendChild(head); card.appendChild(body); cards.appendChild(card); any=true;
+    });
+    if(!any)return;
+    wrap.classList.add('mb-cardified');
+    host.insertBefore(cards, wrap.nextSibling);
+  }
+  window.__pivotCard=build;
+  function hook(fnName,wrapId,pageId){
+    var o=window[fnName];
+    if(typeof o!=='function'){setTimeout(function(){hook(fnName,wrapId,pageId);},300);return;}
+    if(o.__pcWrapped)return;
+    window[fnName]=function(){var r=o.apply(this,arguments);try{build(wrapId);}catch(e){}return r;};
+    window[fnName].__pcWrapped=true;
+    setTimeout(function(){try{var p=document.getElementById(pageId);if(p&&p.classList.contains('show'))build(wrapId);}catch(e){}},400);
+  }
+  function start(){
+    hook('buildSku','sku-wrap','page-sku');
+    hook('buildSummary','pivot-wrap','page-sum');
+    function rescan(){try{build('sku-wrap');}catch(e){}try{build('pivot-wrap');}catch(e){}}
+    if(MOBQ.addEventListener)MOBQ.addEventListener('change',rescan);else if(MOBQ.addListener)MOBQ.addListener(rescan);
+  }
+  if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+
+<script id="aging-controls-js">
+(function(){
+  'use strict';
+  if(typeof window.AGING_RANGE==='undefined')window.AGING_RANGE='all';
+  function isAr(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function reRender(){try{if(typeof render==='function')render();}catch(e){} setTimeout(syncBtns,120);}
+  var _chSize=window.chSize;
+  window.chSize=function(id,dir){
+    if(id==='c_month'){ window.AGING_RANGE=(dir>0)?'all':'2025'; reRender(); return; }
+    return (typeof _chSize==='function')?_chSize.apply(this,arguments):undefined;
+  };
+  function syncBtns(){
+    var cv=document.getElementById('c_month'); if(!cv)return; var box=cv.parentElement; if(!box)return;
+    var cs=box.querySelector('.csize'); if(!cs)return; var bs=cs.querySelectorAll('button');
+    if(bs[1])bs[1].title=isAr()?'\u0639\u0631\u0636 2025 \u0641\u0642\u0637':'Show 2025 only';
+    if(bs[2])bs[2].title=isAr()?'\u0639\u0631\u0636 \u0627\u0644\u0631\u0633\u0645 \u0627\u0644\u0643\u0627\u0645\u0644':'Show full chart';
+  }
+  if(document.readyState!=='loading')setTimeout(syncBtns,900); else document.addEventListener('DOMContentLoaded',function(){setTimeout(syncBtns,900);});
+})();
+</script>
+
+<script id="chart-sort-js">
+(function(){
+  'use strict';
+  var KEY='chart_sort_v1'; var CS={};
+  try{CS=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){CS={};}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(CS));}catch(e){}}
+  function isAr(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function getCharts(){try{return window.charts||{};}catch(e){return {};}}
+  function capture(ch){
+    if(ch.__orig)return;
+    ch.__orig={labels:(ch.data.labels||[]).slice(), ds:(ch.data.datasets||[]).map(function(d){
+      return {data:(d.data||[]).slice(), bg:(Array.isArray(d.backgroundColor)?d.backgroundColor.slice():null), yrs:(d._years?d._years.slice():null)};
+    })};
+  }
+  function applySort(id){
+    var ch=getCharts()[id]; if(!ch||!ch.data||!ch.data.labels)return;
+    capture(ch);
+    var O=ch.__orig, n=O.labels.length, st=CS[id]||'time';
+    var order=[]; for(var i=0;i<n;i++)order.push(i);
+    if(st==='desc'||st==='asc'){
+      var tot=order.map(function(i){var s=0;O.ds.forEach(function(d){var v=d.data[i];if(typeof v==='number')s+=v;});return s;});
+      order.sort(function(a,b){return st==='desc'?(tot[b]-tot[a]):(tot[a]-tot[b]);});
+    }
+    ch.__sortOrder=order;
+    ch.data.labels=order.map(function(i){return O.labels[i];});
+    ch.data.datasets.forEach(function(d,di){ var od=O.ds[di]; if(!od)return;
+      d.data=order.map(function(i){return od.data[i];});
+      if(od.bg)d.backgroundColor=order.map(function(i){return od.bg[i];});
+      if(od.yrs)d._years=order.map(function(i){return od.yrs[i];});
+    });
+    if(ch.options&&typeof ch.options.onClick==='function'&&!ch.options.onClick.__sw){
+      var orig=ch.options.onClick;
+      var w=function(e,els,c){ if(els&&els.length&&c.__sortOrder){els=els.map(function(el){return {index:c.__sortOrder[el.index],datasetIndex:el.datasetIndex,element:el.element};});} return orig.call(this,e,els,c); };
+      w.__sw=true; ch.options.onClick=w;
+    }
+    try{ch.update('none');}catch(e){}
+  }
+  function iconFor(id){var m={time:'\u21C5',desc:'\u2193',asc:'\u2191'};return m[CS[id]||'time']||'\u21C5';}
+  function syncBtn(id){
+    var cv=document.getElementById(id); if(!cv)return; var box=cv.parentElement; if(!box)return;
+    var cs=box.querySelector('.csize'); if(!cs)return; var a=cs.querySelector('.cdl'); if(!a)return;
+    a.innerHTML=iconFor(id);
+    a.title=isAr()?'\u062a\u0631\u062a\u064a\u0628: \u0632\u0645\u0646\u064a / \u062a\u0646\u0627\u0632\u0644\u064a / \u062a\u0635\u0627\u0639\u062f\u064a':'Sort: time / desc / asc';
+  }
+  function applyAll(){ var C=getCharts(); Object.keys(C).forEach(function(id){ if(C[id])delete C[id].__orig; }); Object.keys(C).forEach(function(id){ try{applySort(id);}catch(e){} }); Object.keys(C).forEach(syncBtn); }
+  function cycle(id){ var seq=['time','desc','asc']; var i=seq.indexOf(CS[id]||'time'); CS[id]=seq[(i+1)%3]; save(); try{applySort(id);}catch(e){} syncBtn(id); }
+  var _dl=window.downloadChart;
+  window.downloadChart=function(id){ if(getCharts()[id]){ cycle(id); return; } return (typeof _dl==='function')?_dl.apply(this,arguments):undefined; };
+  ['render','buildSummary','buildSku'].forEach(function(fn){
+    var o=window[fn]; if(typeof o!=='function'||o.__sortHook)return;
+    window[fn]=function(){ var r=o.apply(this,arguments); setTimeout(applyAll,40); return r; };
+    window[fn].__sortHook=true;
+  });
+  window.__applyChartSorts=applyAll;
+  if(document.readyState!=='loading')setTimeout(applyAll,950); else document.addEventListener('DOMContentLoaded',function(){setTimeout(applyAll,950);});
+})();
+</script>
+
+<style id="size-tabs-compact">
+/* أزرار فلتر الحجم: أصغر وعلى صف واحد مع تمرير أفقي عند الحاجة */
+#pack-size-tabs, #sku-size-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:4px;scrollbar-width:thin;padding-bottom:2px}
+#pack-size-tabs button, #sku-size-tabs button{padding:3px 9px;font-size:10px;white-space:nowrap;flex:0 0 auto}
+#pack-size-tabs::-webkit-scrollbar, #sku-size-tabs::-webkit-scrollbar{height:5px}
+#pack-size-tabs::-webkit-scrollbar-thumb, #sku-size-tabs::-webkit-scrollbar-thumb{background:#cdd8e6;border-radius:6px}
+/* إخفاء المسميات الفرعية على رؤوس الرسوم (by pack / CTN · SHR / monthly qty …) */
+.card .ch .sub{display:none!important}
+.mini-legend{display:flex;gap:14px;margin:-2px 0 8px;flex-wrap:wrap}
+.mini-legend span{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;color:#475569}
+.mini-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+@media (max-width:860px){
+  /* تكبير دونات تصنيف المخزون + بطاقات ديناميكية تكبر/تصغر حسب الشاشة */
+  #page-dash .classify-card .cl-top{flex-direction:column !important;align-items:stretch !important}
+  #page-dash .classify-card .cl-pie{width:100% !important;height:clamp(240px,62vw,360px) !important;min-height:240px !important}
+  #page-dash .classify-card .cl-kpis{flex-direction:row !important;flex-wrap:wrap !important;gap:10px !important;justify-content:center !important}
+  #page-dash .classify-card .cl-item{flex:1 1 28% !important;min-width:88px !important}
+  #page-dash .classify-card .cl-item .b{font-size:clamp(15px,4.6vw,25px) !important}
+  #page-dash .classify-card .cl-item .l{font-size:clamp(9.5px,2.5vw,12.5px) !important;line-height:1.25 !important}
+}
+.nav-tap-zone{display:none}
+/* أزرار التحكم بالرسوم: مخفية على اللمس وتظهر عند لمس/اقتراب الإصبع من الرسم */
+@media (hover:none),(pointer:coarse),(max-width:860px){
+  .chartbox .csize,.cl-pie .csize{opacity:0!important;transition:opacity .22s}
+  .chartbox.csize-show .csize,.cl-pie.csize-show .csize{opacity:1!important}
+  /* إخفاء زرّ القائمة وفتحها عند لمس الزاوية العليا/السفلى اليسرى */
+  #menu-btn{display:none!important}
+  .nav-tap-zone{display:block;position:fixed;left:0;width:42px;height:76px;z-index:44;background:transparent}
+  .nav-tap-zone.top{top:0}
+  .nav-tap-zone.bot{bottom:0}
+}
+</style>
+
+<script id="csize-touch-js">
+(function(){
+  function reveal(box){ if(!box)return; box.classList.add('csize-show'); clearTimeout(box.__ct); box.__ct=setTimeout(function(){box.classList.remove('csize-show');},3000); }
+  function fromEvt(e){ var t=e.target; return (t&&t.closest)?t.closest('.chartbox,.cl-pie'):null; }
+  document.addEventListener('touchstart',function(e){ var b=fromEvt(e); if(b)reveal(b); },{passive:true});
+  document.addEventListener('pointerdown',function(e){ if(e.pointerType&&e.pointerType!=='touch')return; var b=fromEvt(e); if(b)reveal(b); },{passive:true});
+  document.addEventListener('pointermove',function(e){ if(e.pointerType!=='touch')return; var b=fromEvt(e); if(b)reveal(b); },{passive:true});
+})();
+(function(){
+  function open(){try{if(typeof openNav==='function')openNav();else if(typeof toggleNav==='function')toggleNav();}catch(e){}}
+  function mkZone(cls){var d=document.createElement('div');d.className='nav-tap-zone '+cls;d.setAttribute('aria-label','Open menu');d.addEventListener('click',open);d.addEventListener('touchstart',function(e){open();},{passive:true});return d;}
+  function init(){if(document.querySelector('.nav-tap-zone')||!document.body)return;document.body.appendChild(mkZone('top'));document.body.appendChild(mkZone('bot'));}
+  if(document.readyState!=='loading')init();else document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
+
+<script id="cardbuilder-ensure-js">
+(function(){
+  'use strict';
+  function ensure(){
+    var p=document.getElementById('page-cardbuilder'); var r=document.getElementById('cb-root');
+    if(p&&p.classList.contains('show')&&r&&!r.children.length){ try{ if(typeof initCardBuilder==='function')initCardBuilder(); }catch(e){} }
+  }
+  document.addEventListener('click',function(e){ var t=e.target&&e.target.closest?e.target.closest('[data-page="cardbuilder"]'):null; if(t){setTimeout(ensure,80);setTimeout(ensure,300);} },true);
+  setInterval(ensure,1200);
+  if(document.readyState!=='loading')setTimeout(ensure,600); else document.addEventListener('DOMContentLoaded',function(){setTimeout(ensure,600);});
 })();
 </script>
 
