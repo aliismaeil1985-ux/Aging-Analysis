@@ -4788,8 +4788,7 @@ function _loginProceed(u,p){
   try{logLogin(fnd.u,'login');}catch(e){}
   document.getElementById('login-err').textContent='';document.getElementById('login-pass').value='';
   document.getElementById('login-ov').style.display='none';applyRole();
-  /* تغيير إجباري لكلمة المرور عند أول دخول */
-  if(fnd.mustChange||fnd.temp){openForcePwd(fnd.u);return;}
+  /* (مُلغى) نظام تغيير الرقم الإجباري عند أول دخول — يدخل المستخدم مباشرة */
   go('home');
 }
 
@@ -9230,7 +9229,7 @@ function renderBottleReport(rep){
       if(p.disabled){ CURRENT_USER=null; if(ov)ov.style.display='flex'; loginErr(T('This account is disabled.','هذا الحساب موقوف.')); try{_auth.signOut();}catch(e){} return; }
       CURRENT_USER={u:email,email:email,r:(p.role==='admin'?'admin':'user'),perms:p.perms||['dash','sum','sku'],name:p.name||email};
       try{applyRole();}catch(e){}
-      try{ var _force=(p.mustChange===true)||(!p.pwdChangedAt && p.role!=='admin'); if(_force){ window._fbForce=true; if(typeof openForcePwd==='function'){openForcePwd(email);} } else { window._fbForce=false; } }catch(e){}
+      try{ window._fbForce=false; /* (مُلغى) نظام تغيير الرقم الإجباري */ }catch(e){}
       try{if(typeof logLogin==='function')logLogin(email,'login');}catch(e){}
     }).catch(function(){ /* keep provisional access; sync already running */ });
   }
