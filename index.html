@@ -2092,7 +2092,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
     <h2 class="fpc-title" data-i18n="fpc_title">تغيير كلمة المرور مطلوب</h2>
     <p class="fpc-sub" data-i18n="fpc_sub">لحماية حسابك، يجب تعيين كلمة مرور جديدة قبل المتابعة.</p>
     <div class="fpc-fld"><label data-i18n="fpc_new">كلمة المرور الجديدة</label>
-      <input id="fpc-new" type="password" autocomplete="new-password" oninput="_fpUpdateMeter()" onkeydown="if(event.key==='Enter')document.getElementById('fpc-confirm').focus()"></div>
+      <div style="position:relative"><input id="fpc-new" type="password" autocomplete="new-password" style="padding-inline-end:42px" oninput="_fpUpdateMeter();_fpcMatch()" onkeydown="if(event.key==='Enter')document.getElementById('fpc-confirm').focus()"><button type="button" id="fpc-eye-new" onclick="_fpcToggle('fpc-new','fpc-eye-new')" aria-label="show/hide" style="position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;line-height:1;padding:4px;color:#64748b">👁</button></div></div>
     <div class="fpc-meter"><div class="fpc-meter-bar"><div id="fpc-bar" class="fpc-bar-fill"></div></div><span id="fpc-strength-lbl" class="fpc-strength"></span></div>
     <div class="fpc-reqs">
       <div class="fpc-req" id="fpc-r-len"><span class="fp-ic">&#9675;</span> <span data-i18n="fpc_r_len">8 أحرف على الأقل</span></div>
@@ -2102,9 +2102,11 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <div class="fpc-req" id="fpc-r-symbol"><span class="fp-ic">&#9675;</span> <span data-i18n="fpc_r_symbol">رمز خاص (!@#$...)</span></div>
     </div>
     <div class="fpc-fld"><label data-i18n="fpc_confirm">تأكيد كلمة المرور</label>
-      <input id="fpc-confirm" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitForcePwd()"></div>
+      <div style="position:relative"><input id="fpc-confirm" type="password" autocomplete="new-password" style="padding-inline-end:42px" oninput="_fpcMatch()" onkeydown="if(event.key==='Enter')submitForcePwd()"><button type="button" id="fpc-eye-confirm" onclick="_fpcToggle('fpc-confirm','fpc-eye-confirm')" aria-label="show/hide" style="position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;line-height:1;padding:4px;color:#64748b">👁</button></div>
+      <div id="fpc-match" style="font-size:11.5px;font-weight:700;margin-top:5px;min-height:15px"></div></div>
     <div class="fpc-err" id="fpc-err"></div>
     <button class="fpc-btn" onclick="submitForcePwd()" data-i18n="fpc_save">حفظ ومتابعة</button>
+    <button type="button" id="fpc-skip" onclick="skipForcePwd()" style="width:100%;margin-top:10px;background:none;border:none;color:#64748b;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline;font-family:inherit">الدخول الآن وتغيير الرقم لاحقاً</button>
   </div>
 </div>
 <div class="fp-ov" id="fp-ov">
@@ -4813,6 +4815,12 @@ function openForcePwd(username){
   var inp=document.getElementById('fpc-new');if(inp)inp.value='';
   var inp2=document.getElementById('fpc-confirm');if(inp2)inp2.value='';
   var err=document.getElementById('fpc-err');if(err)err.textContent='';
+  var ar=drIsAr&&drIsAr();
+  ['fpc-new','fpc-confirm'].forEach(function(id){var e=document.getElementById(id);if(e)e.type='password';});
+  var en=document.getElementById('fpc-eye-new');if(en)en.textContent='👁';
+  var ec=document.getElementById('fpc-eye-confirm');if(ec)ec.textContent='👁';
+  var mt=document.getElementById('fpc-match');if(mt)mt.textContent='';
+  var sk=document.getElementById('fpc-skip');if(sk)sk.textContent=ar?'الدخول الآن وتغيير الرقم لاحقاً':'Enter now, change password later';
   _fpUpdateMeter();
   ov.style.display='flex';
   setTimeout(function(){if(inp)inp.focus();},100);
@@ -4832,6 +4840,41 @@ function _fpUpdateMeter(){
   var reqMap={len:'fpc-r-len',upper:'fpc-r-upper',lower:'fpc-r-lower',digit:'fpc-r-digit',symbol:'fpc-r-symbol'};
   Object.keys(reqMap).forEach(function(k){var el=document.getElementById(reqMap[k]);if(el){el.classList.toggle('met',st.checks[k]);var ic=el.querySelector('.fp-ic');if(ic)ic.innerHTML=st.checks[k]?'&#10003;':'&#9675;';}});
 }
+/* إظهار/إخفاء الرقم السري للمطابقة */
+function _fpcToggle(id,btnId){
+  var inp=document.getElementById(id),b=document.getElementById(btnId);if(!inp)return;
+  if(inp.type==='password'){inp.type='text';if(b)b.textContent='🙈';}
+  else{inp.type='password';if(b)b.textContent='👁';}
+}
+/* مؤشّر تطابق فوري بين الحقلين */
+function _fpcMatch(){
+  var pw=val('fpc-new')||'',cf=val('fpc-confirm')||'';
+  var el=document.getElementById('fpc-match');if(!el)return;
+  var ar=drIsAr&&drIsAr();
+  if(!cf){el.textContent='';return;}
+  if(pw===cf){el.textContent=ar?'✓ الرقمان متطابقان':'✓ Passwords match';el.style.color='#15803d';}
+  else{el.textContent=ar?'✗ الرقمان غير متطابقين':'✗ Passwords do not match';el.style.color='#dc2626';}
+}
+/* السماح بالدخول الآن وتأجيل تغيير الرقم للمرة القادمة (حتى لا يُحبس المستخدم) */
+function skipForcePwd(){
+  var ar=drIsAr&&drIsAr();
+  var ov=document.getElementById('force-pwd-ov');
+  /* مسار Firebase: ادخل لهذه الجلسة مع إبقاء علم التغيير في السحابة */
+  if(window._fbForce){
+    window._fbForce=false;
+    if(ov)ov.style.display='none';
+    try{applyRole();}catch(e){}try{go('home');}catch(e){}
+    return;
+  }
+  var us=getUsers()||[];var u=us.find(function(x){return x.u===_forcePwdUser;});
+  if(!u){if(ov)ov.style.display='none';return;}
+  /* يبقى u.mustChange=true ليُطلب التغيير في الدخول التالي */
+  CURRENT_USER={u:u.u,r:u.r,perms:u.perms||[]};
+  try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
+  if(ov)ov.style.display='none';
+  try{applyRole();}catch(e){}try{go('home');}catch(e){}
+}
+
 function submitForcePwd(){
   var ar=drIsAr&&drIsAr();
   var pw=val('fpc-new')||'';var cf=val('fpc-confirm')||'';
