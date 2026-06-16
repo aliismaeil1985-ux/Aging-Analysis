@@ -2363,7 +2363,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <button class="logoutbtn" onclick="logout()"><span data-i18n="logout">Logout</span></button>
     </div>
     <div class="langsw"><button id="lang-en" class="on" onclick="setLang('en')">EN</button><button id="lang-ar" onclick="setLang('ar')">ع</button></div>
-    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.4.4</span></div>
+    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.4.5</span></div>
   </div>
 
   <div class="content">
@@ -2409,7 +2409,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="d-tile" data-page="dailyup" style="--c:var(--pink)" onclick="go('dailyup')"><div class="ti" data-icon="upload"></div><div><div class="tt" data-i18n="nav_dailyup">Daily Reports Upload</div><div class="td" data-i18n="desc_dailyup">Upload the daily coverage files.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         </div>
       </div>
-      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.4.4</span></div>
+      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.4.5</span></div>
       </div>
     </div></div>
     <div class="page" id="page-dash"><div class="wrap">
@@ -3045,7 +3045,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
 
 /* ===== Version-based settings reset ===== */
 (function(){
-  var VER = 'v6.4.4';
+  var VER = 'v6.4.5';
   try{
     if(LS.getItem('dr_app_ver')!==VER){
       // مسح الإعدادات التي قد تحتوي أسماء قديمة للبراندات
@@ -3061,7 +3061,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
   }catch(e){}
 })();
 /* عرض الإصدار في الواجهة ديناميكياً من VER */
-try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.4.4';}catch(e){}}); }catch(e){}
+try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.4.5';}catch(e){}}); }catch(e){}
 const IDENT_ORDER=['1- New Identity','2- OLD Identity','3- Mai','4- Mokabat','5- SAR','6- TG Sparkling'];
 const BRANCH_ORDER=['1. Riyadh','2. Kharj','3. Heet','4. Jeddah (W)','5. Jeddah (F)','6. Dammam','7. Qassim','8. Ahsa'];
 const CLASS_ORDER=['c1','c2','c3','c4','c5','c6'];
@@ -10672,10 +10672,14 @@ function renderBottleReport(rep){
   function getDRsafe(){try{return (typeof getDR==='function'?getDR():{})||{};}catch(e){return {};}}
   function fb(){try{return (typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined')?{db:fbDB,col:FB_COL,cid:(typeof FB_CLIENT_ID!=='undefined'?FB_CLIENT_ID:'')}:null;}catch(e){return null;}}
 
+  function _isAdminNow(){try{return !!(typeof isAdmin==='function'?isAdmin():(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.r==='admin'));}catch(e){return false;}}
   function build(){
-    if(document.getElementById('syncdbg-btn'))return;
+    var existing=document.getElementById('syncdbg-btn');
+    /* أداة تشخيص تقنية — للأدمن فقط؛ تُزال إن دخل مستخدم عادي */
+    if(!_isAdminNow()){if(existing)existing.remove();return;}
+    if(existing)return;
     var b=E('button','position:fixed;left:10px;bottom:10px;z-index:99990;width:42px;height:42px;border-radius:50%;border:none;background:#1e4e8c;color:#fff;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer;opacity:.9','🔍');
-    b.id='syncdbg-btn'; b.addEventListener('click',openPanel); document.body.appendChild(b);
+    b.id='syncdbg-btn'; b.title=(ar()?'تشخيص المزامنة (للمشرف)':'Sync diagnostics (admin)'); b.addEventListener('click',openPanel); document.body.appendChild(b);
   }
   function setMsg(t,color){var m=document.getElementById('syncdbg-msg');if(m){m.textContent=t;m.style.color=color||'#475569';}}
   function refreshCloud(){
