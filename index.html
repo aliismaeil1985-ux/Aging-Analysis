@@ -164,7 +164,7 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .htext .dot{width:7px;height:7px;border-radius:50%;background:#19b36b;box-shadow:0 0 0 3px rgba(25,179,107,.18)}
 .spacer{flex:1}
 /* تاريخ التحديث على الجهة المقابلة للعنوان (يسار/يمين حسب الاتجاه) */
-.topbar .htext{display:flex;flex:1 1 auto;align-items:center;flex-wrap:wrap;gap:4px 14px}
+.topbar .htext{display:flex;flex:1 1 auto;align-items:center;flex-wrap:wrap;gap:4px 14px;min-width:0}
 .topbar .htext .upd{margin-inline-start:auto;margin-top:0}
 .topbar>.spacer{flex:0 1 auto}
 .whicon{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#2f7ed8,#1e4e8c);display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;box-shadow:var(--shadow)}
@@ -275,10 +275,12 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .pivot tr.yr-start td{border-top:3px solid #1e5398 !important}
 /* === التصميم الجديد على الجوال: شبكة عمودية (بطل بعرض كامل + شبكة 2×2) بدل السلايدر الأفقي === */
 @media screen and (max-width:900px){
-  #page-dash .kpis{display:grid !important;grid-template-columns:1fr 1fr !important;flex-wrap:wrap !important;gap:10px !important;overflow:visible !important;margin:0 0 14px !important;scroll-snap-type:none !important;padding-bottom:0 !important}
-  #page-dash .kpis .kpi{flex:none !important;width:auto !important;max-width:none !important;min-width:0 !important;padding:14px 15px !important;border-radius:16px !important;align-self:auto !important}
+  #page-dash .kpis{display:grid !important;grid-template-columns:1fr 1fr !important;flex-wrap:wrap !important;gap:10px !important;overflow:visible !important;margin:0 0 14px !important;scroll-snap-type:none !important;padding-bottom:0 !important;max-width:100% !important;min-width:0 !important}
+  #page-dash .kpis .kpi{flex:none !important;width:auto !important;max-width:100% !important;min-width:0 !important;padding:14px 15px !important;border-radius:16px !important;align-self:auto !important;overflow:hidden !important}
   #page-dash .kpis .kpi.t-total{grid-column:1 / -1 !important}
-  #page-dash .kpis .kpi h3{font-size:11px !important;line-height:1.3 !important;letter-spacing:.2px !important}
+  #page-dash .kpis .kpi h3{font-size:11px !important;line-height:1.3 !important;letter-spacing:.2px !important;overflow-wrap:break-word !important;word-break:break-word !important;min-width:0 !important}
+  #page-dash .kpi-seglg{display:flex !important;flex-wrap:wrap !important;min-width:0 !important;max-width:100% !important}
+  #page-dash .kpi-seglg span{font-size:9px !important;overflow-wrap:break-word !important;min-width:0 !important}
   #page-dash .kpis .kpi .v{font-size:23px !important;white-space:nowrap !important;letter-spacing:-.5px !important;margin-top:8px !important}
   #page-dash .kpis .kpi.t-total .v{font-size:34px !important}
   #page-dash .kpis .kpi .ic{width:34px !important;height:34px !important;font-size:16px !important;border-radius:11px !important}
@@ -409,12 +411,21 @@ html[dir=rtl] .login-shell{font-family:'Cairo','Inter',sans-serif}
 .bio-divider{display:flex;align-items:center;gap:12px;margin:14px 0 2px;color:#94a3b8;font-size:12px;font-weight:600}
 .bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:#e7edf5}
 @media (max-width:760px){
-  .login-shell{flex-direction:column;min-height:0;max-height:none;width:100%}
+  .login-ov{padding:14px;align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .login-shell{flex-direction:column;min-height:0;max-height:none;width:100%;margin:auto}
   .login-brand{display:none}
   .login-form-side{padding:38px 26px;justify-content:flex-start}
   .lf-mini{display:flex !important;justify-content:center;align-items:center;width:128px;height:128px;margin:6px auto 26px;padding:0;gap:0;position:relative;border-radius:31px;background:linear-gradient(155deg,#fff,#eef4fb);box-shadow:0 18px 40px -12px rgba(6,20,44,.32),inset 0 1px 0 rgba(255,255,255,.92),0 0 42px -8px rgba(47,126,216,.4),0 0 30px -8px rgba(232,62,140,.32)}
   .lf-mini::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:2.5px;background:linear-gradient(140deg,#ff4d97,#2f7ed8 52%,#12b5a3);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
   .lf-mini .tania-logo{height:110px;width:auto}
+}
+@media (max-width:430px){
+  .login-ov{padding:10px}
+  .login-form-side{padding:26px 18px}
+  .lf-mini{width:104px;height:104px;margin:2px auto 20px;border-radius:26px}
+  .lf-mini .tania-logo{height:88px}
+  .lf-welcome{font-size:21px}
+  .lf-sub{font-size:13px;margin-bottom:22px}
 }
 .userbox{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:auto;width:100%;padding-top:14px;border-top:1px solid rgba(255,255,255,.10)}
 .ubadge{font-size:11px;color:#bcd2ec;text-align:center;font-weight:600;line-height:1.3}
@@ -648,10 +659,11 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   .nav-backdrop.show{display:block}
   .nav-close{display:none}
   .content{padding:64px 12px 18px;overflow-x:hidden}
-  .wrap{max-width:100%}
-  .topbar{flex-wrap:wrap;gap:8px 10px;margin-bottom:14px}
+  .wrap{max-width:100%;min-width:0}
+  .topbar{flex-wrap:wrap;gap:8px 10px;margin-bottom:14px;min-width:0;max-width:100%}
   .topbar .home-logo{height:34px}
-  .htext h1{font-size:16px;line-height:1.25}
+  .htext{min-width:0;max-width:100%}
+  .htext h1{font-size:16px;line-height:1.25;min-width:0;max-width:100%;overflow-wrap:break-word;word-break:break-word;white-space:normal}
   .htext .upd{font-size:11px;padding:3px 10px}
   .spacer{display:none}
   .gsearch{order:5;width:100%}
@@ -1847,6 +1859,23 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 .temp-code-display span{font-size:30px;font-weight:800;letter-spacing:4px;color:#0c4a6e;font-family:ui-monospace,'Courier New',monospace}
 .temp-show-note{font-size:11.5px;color:#64748b;line-height:1.6;margin:8px 0 16px}
 .temp-show-note b{color:#0369a1}
+/* نافذة إدارة كلمة المرور (للمشرف) */
+.pwmgr-seg{display:flex;gap:8px;margin:14px 0}
+.pwmgr-seg-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:11px 8px;border:1.5px solid #e2e8f0;background:#f8fafc;border-radius:12px;cursor:pointer;font-family:inherit;transition:all .18s}
+.pwmgr-seg-btn .pm-ic{font-size:20px;line-height:1}
+.pwmgr-seg-btn .pm-t{font-size:13.5px;font-weight:800;color:#334155}
+.pwmgr-seg-btn .pm-d{font-size:10px;font-weight:600;color:#94a3b8}
+.pwmgr-seg-btn.on{border-color:#2f7ed8;background:#eef6ff;box-shadow:0 2px 8px rgba(47,126,216,.15)}
+.pwmgr-seg-btn.on .pm-t{color:#1e4e8c}
+.pwmgr-seg-btn.on .pm-d{color:#2f7ed8}
+.pwmgr-fld{margin:6px 0 4px}
+.pwmgr-fld label{display:block;font-size:12.5px;font-weight:700;color:#334155;margin-bottom:6px}
+.pwmgr-row{display:flex;gap:8px;align-items:stretch}
+.pwmgr-gen{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;padding:0 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#1e4e8c,#2f7ed8);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.pwmgr-gen:active{transform:scale(.97)}
+.pwmgr-meter{display:flex;align-items:center;gap:10px;margin-top:10px}
+.pwmgr-hint{font-size:11px;color:#64748b;margin-top:7px;line-height:1.5;min-height:14px}
+#pwmgr-err{color:#e0654a;font-weight:700;font-size:12px;text-align:center;margin:8px 0;min-height:14px}
 /* خطوة النجاح في نافذة نسيت كلمة المرور */
 .fp-done-ic{font-size:42px;text-align:center;margin-bottom:6px}
 .fp-done-hint{opacity:.85;font-size:12.5px}
@@ -2262,6 +2291,38 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
     <button class="fpc-btn" onclick="closeTempShow()" data-i18n="fp_done_ok">تم</button>
   </div>
 </div>
+<!-- نافذة موحّدة: إدارة كلمة مرور المستخدم (للمشرف) -->
+<div class="fpc-ov" id="pwmgr-ov">
+  <div class="fpc-box" style="max-width:430px;text-align:start">
+    <button type="button" onclick="closePwMgr()" aria-label="close" style="position:absolute;inset-inline-end:12px;top:12px;background:none;border:none;cursor:pointer;font-size:20px;line-height:1;color:#94a3b8;padding:4px">✕</button>
+    <div class="fpc-icon" style="text-align:center">&#128273;</div>
+    <h2 class="fpc-title" id="pwmgr-title" style="text-align:center">إدارة كلمة المرور</h2>
+    <p class="fpc-sub" style="text-align:center"><span id="pwmgr-for-lbl">للمستخدم</span> <b id="pwmgr-user"></b></p>
+
+    <!-- نوع كلمة المرور: مؤقت / دائم -->
+    <div class="pwmgr-seg" id="pwmgr-type">
+      <button type="button" class="pwmgr-seg-btn on" data-type="temp" onclick="_pwmgrSetType('temp')"><span class="pm-ic">&#9203;</span><span class="pm-t" id="pwmgr-type-temp">مؤقتة</span><span class="pm-d" id="pwmgr-type-temp-d">يُجبر على التغيير</span></button>
+      <button type="button" class="pwmgr-seg-btn" data-type="perm" onclick="_pwmgrSetType('perm')"><span class="pm-ic">&#128274;</span><span class="pm-t" id="pwmgr-type-perm">دائمة</span><span class="pm-d" id="pwmgr-type-perm-d">ثابتة لا تتغيّر</span></button>
+    </div>
+
+    <!-- مصدر كلمة المرور: توليد / يدوي -->
+    <div class="pwmgr-fld">
+      <label id="pwmgr-src-lbl">كلمة المرور</label>
+      <div class="pwmgr-row">
+        <div style="position:relative;flex:1">
+          <input id="pwmgr-pass" type="text" autocomplete="off" dir="ltr" placeholder="••••••••" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px;font-family:monospace;letter-spacing:.5px" oninput="_pwmgrMeter()">
+        </div>
+        <button type="button" class="pwmgr-gen" id="pwmgr-gen" onclick="_pwmgrGenerate()" title="توليد تلقائي">&#127922; <span id="pwmgr-gen-lbl">توليد</span></button>
+      </div>
+      <div class="pwmgr-meter" id="pwmgr-meter-wrap" style="display:none"><div class="fpc-meter-bar"><div id="pwmgr-bar" class="fpc-bar-fill"></div></div><span id="pwmgr-strength" class="fpc-strength"></span></div>
+      <div id="pwmgr-hint" class="pwmgr-hint"></div>
+    </div>
+
+    <div class="fpc-err" id="pwmgr-err"></div>
+    <button class="fpc-btn" id="pwmgr-save" onclick="applyPwMgr()">حفظ</button>
+    <button type="button" onclick="closePwMgr()" id="pwmgr-cancel" style="width:100%;margin-top:8px;background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;font-size:13px;font-weight:700;cursor:pointer;border-radius:12px;padding:11px;font-family:inherit">إلغاء</button>
+  </div>
+</div>
 <!-- نافذة التغيير الإجباري لكلمة المرور عند أول دخول -->
 <div class="fpc-ov" id="force-pwd-ov">
   <div class="fpc-box">
@@ -2363,7 +2424,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <button class="logoutbtn" onclick="logout()"><span data-i18n="logout">Logout</span></button>
     </div>
     <div class="langsw"><button id="lang-en" class="on" onclick="setLang('en')">EN</button><button id="lang-ar" onclick="setLang('ar')">ع</button></div>
-    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.4.7</span></div>
+    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.4.9</span></div>
   </div>
 
   <div class="content">
@@ -2409,7 +2470,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="d-tile" data-page="dailyup" style="--c:var(--pink)" onclick="go('dailyup')"><div class="ti" data-icon="upload"></div><div><div class="tt" data-i18n="nav_dailyup">Daily Reports Upload</div><div class="td" data-i18n="desc_dailyup">Upload the daily coverage files.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         </div>
       </div>
-      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.4.7</span></div>
+      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.4.9</span></div>
       </div>
     </div></div>
     <div class="page" id="page-dash"><div class="wrap">
@@ -3045,7 +3106,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
 
 /* ===== Version-based settings reset ===== */
 (function(){
-  var VER = 'v6.4.7';
+  var VER = 'v6.4.9';
   try{
     if(LS.getItem('dr_app_ver')!==VER){
       // مسح الإعدادات التي قد تحتوي أسماء قديمة للبراندات
@@ -3061,7 +3122,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
   }catch(e){}
 })();
 /* عرض الإصدار في الواجهة ديناميكياً من VER */
-try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.4.7';}catch(e){}}); }catch(e){}
+try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.4.9';}catch(e){}}); }catch(e){}
 const IDENT_ORDER=['1- New Identity','2- OLD Identity','3- Mai','4- Mokabat','5- SAR','6- TG Sparkling'];
 const BRANCH_ORDER=['1. Riyadh','2. Kharj','3. Heet','4. Jeddah (W)','5. Jeddah (F)','6. Dammam','7. Qassim','8. Ahsa'];
 const CLASS_ORDER=['c1','c2','c3','c4','c5','c6'];
@@ -5455,8 +5516,7 @@ function renderUsers(){
     /* كلمة المرور — أزرار مرتّبة عمودياً + حالة */
     html+='<td><div class="u-pwd-cell">'
       +'<div class="u-pwd-btns">'
-      +'<button class="u-act-btn u-btn-reset" onclick="resetUserPwd('+i+')" title="'+tr('u_resetpwd')+'">&#128273; <span>'+tr('u_resetpwd')+'</span></button>'
-      +'<button class="u-act-btn u-btn-temp" onclick="adminIssueTemp('+i+')" title="'+(ar?'توليد رقم مؤقت صالح 24 ساعة':'generate 24h temp code')+'">&#9203; <span>'+(ar?'رقم مؤقت':'Temp code')+'</span></button>'
+      +'<button class="u-act-btn u-btn-reset" onclick="openPwMgr('+i+')" title="'+(ar?'إدارة كلمة المرور (مؤقتة/دائمة)':'Manage password (temp/permanent)')+'">&#128273; <span>'+(ar?'إدارة كلمة المرور':'Manage password')+'</span></button>'
       +'</div>';
     var statusTags='';
     if(tempActive){var _rem=tempPwdRemaining(x.tempExpires);statusTags+='<span class="temp-code-tag" title="'+(ar?'رقم مؤقت نشط':'active temp code')+'">&#9203; '+escHtml(x.tempCode)+' &middot; '+_rem+'</span>';}
@@ -5542,7 +5602,119 @@ function renderUserStats(){
     card('&#9888;',pending,ar?'تغيير معلّق':'Pending change','s-pending')+
     card('&#9203;',activeTemp,ar?'أرقام مؤقتة نشطة':'Active temp codes','s-temp');
 }
-function resetUserPwd(i){const us=getUsers()||[];if(!us[i])return;const np=prompt(tr('set_new_pwd')+' ('+us[i].u+')');if(np&&np.trim()){us[i].p=_pwHash(np.trim());us[i].mustChange=true;us[i].temp=false;saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}renderUsers();try{alert(tr('pwd_reset_forced'));}catch(e){}}}
+/* ═══════ إدارة كلمة مرور المستخدم (للمشرف): مؤقتة/دائمة + توليد/يدوي ═══════ */
+var _pwmgrIdx=-1, _pwmgrType='temp';
+/* نقطة الدخول من زر "إدارة كلمة المرور" في صف المستخدم */
+function resetUserPwd(i){ openPwMgr(i); }
+function openPwMgr(i){
+  var us=getUsers()||[];if(!us[i])return;
+  if(typeof isAdmin==='function' && !isAdmin())return;/* للمشرف فقط */
+  _pwmgrIdx=i; _pwmgrType='temp';
+  var ar=drIsAr&&drIsAr();var x=us[i];
+  var ov=document.getElementById('pwmgr-ov');if(!ov)return;
+  /* تعريب النصوص */
+  var t=document.getElementById('pwmgr-title');if(t)t.textContent=ar?'إدارة كلمة المرور':'Manage password';
+  var fl=document.getElementById('pwmgr-for-lbl');if(fl)fl.textContent=ar?'للمستخدم':'For user';
+  var uu=document.getElementById('pwmgr-user');if(uu)uu.textContent=x.u;
+  var sl=document.getElementById('pwmgr-src-lbl');if(sl)sl.textContent=ar?'كلمة المرور':'Password';
+  var gl=document.getElementById('pwmgr-gen-lbl');if(gl)gl.textContent=ar?'توليد':'Generate';
+  document.getElementById('pwmgr-type-temp').textContent=ar?'مؤقتة':'Temporary';
+  document.getElementById('pwmgr-type-temp-d').textContent=ar?('يُجبر على التغيير'):'Forces change';
+  document.getElementById('pwmgr-type-perm').textContent=ar?'دائمة':'Permanent';
+  document.getElementById('pwmgr-type-perm-d').textContent=ar?'ثابتة لا تتغيّر':'Stays fixed';
+  document.getElementById('pwmgr-save').textContent=ar?'حفظ':'Save';
+  document.getElementById('pwmgr-cancel').textContent=ar?'إلغاء':'Cancel';
+  /* تهيئة الحقول */
+  var pin=document.getElementById('pwmgr-pass');if(pin)pin.value='';
+  var er=document.getElementById('pwmgr-err');if(er)er.textContent='';
+  _pwmgrSetType('temp');
+  ov.classList.add('show');
+  setTimeout(function(){if(pin)pin.focus();},60);
+}
+function closePwMgr(){var o=document.getElementById('pwmgr-ov');if(o)o.classList.remove('show');_pwmgrIdx=-1;}
+function _pwmgrSetType(type){
+  _pwmgrType=(type==='perm')?'perm':'temp';var ar=drIsAr&&drIsAr();
+  document.querySelectorAll('#pwmgr-type .pwmgr-seg-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-type')===_pwmgrType);});
+  var hint=document.getElementById('pwmgr-hint');
+  if(hint)hint.textContent=(_pwmgrType==='temp')
+    ?(ar?'سيُسجّل المستخدم الدخول بهذه الكلمة ثم يُطلب منه تعيين كلمة مرور جديدة فوراً.':'User signs in with this, then must set a new password immediately.')
+    :(ar?'ستصبح كلمة مرور المستخدم الثابتة. لن يُطلب منه تغييرها.':"This becomes the user's fixed password. No change will be required.");
+  _pwmgrMeter();
+}
+function _pwmgrGenerate(){
+  var pin=document.getElementById('pwmgr-pass');if(!pin)return;
+  /* توليد كلمة قوية للوضع الدائم، أو رمز XXXX-XXXX للمؤقت */
+  if(_pwmgrType==='temp'){pin.value=genTempPassword();}
+  else{pin.value=_genStrongPwd();}
+  _pwmgrMeter();
+}
+/* مولّد كلمة مرور قوية (تحقق كل الشروط) */
+function _genStrongPwd(){
+  var U='ABCDEFGHJKLMNPQRSTUVWXYZ',L='abcdefghijkmnpqrstuvwxyz',D='23456789',S='!@#$%&*';
+  function pick(s){return s.charAt(Math.floor(Math.random()*s.length));}
+  var base=pick(U)+pick(L)+pick(D)+pick(S);
+  var all=U+L+D;for(var i=0;i<6;i++)base+=pick(all);
+  /* خلط */
+  return base.split('').sort(function(){return Math.random()-0.5;}).join('');
+}
+function _pwmgrMeter(){
+  var v=val('pwmgr-pass')||'';var ar=drIsAr&&drIsAr();
+  var wrap=document.getElementById('pwmgr-meter-wrap');
+  /* مقياس القوة يظهر للوضع الدائم فقط (المؤقت رمز عشوائي) */
+  if(_pwmgrType==='perm'&&v){if(wrap)wrap.style.display='';
+    try{var st=pwdStrength(v);var bar=document.getElementById('pwmgr-bar');var lbl=document.getElementById('pwmgr-strength');
+    var colors=['#ef4444','#f97316','#eab308','#84cc16','#22c55e'];var idx=Math.max(0,st.passed-1);
+    if(bar){bar.style.width=(st.passed*20)+'%';bar.style.background=st.passed?colors[idx]:'#e2e8f0';}
+    if(lbl){lbl.textContent=(ar?['ضعيفة جداً','ضعيفة','متوسطة','جيدة','قوية جداً']:['Very weak','Weak','Fair','Good','Very strong'])[idx];lbl.style.color=st.passed?colors[idx]:'#94a3b8';}}catch(e){}
+  }else{if(wrap)wrap.style.display='none';}
+}
+function applyPwMgr(){
+  var i=_pwmgrIdx;var us=getUsers()||[];if(i<0||!us[i]){closePwMgr();return;}
+  var ar=drIsAr&&drIsAr();var pw=(val('pwmgr-pass')||'').trim();
+  var err=document.getElementById('pwmgr-err');
+  if(!pw){if(err)err.textContent=ar?'أدخل كلمة المرور أو اضغط «توليد».':'Enter a password or press “Generate”.';return;}
+  if(_pwmgrType==='perm'){
+    /* الدائمة يجب أن تحقق شروط القوة */
+    var stp=pwdStrength(pw);
+    if(!stp.valid){if(err)err.textContent=ar?'كلمة المرور الدائمة لا تحقق كل الشروط (8 أحرف، حرف كبير وصغير ورقم ورمز).':'Permanent password must meet all rules (8+, upper, lower, digit, symbol).';return;}
+    us[i].p=_pwHash(pw);us[i].temp=false;us[i].mustChange=false;
+    delete us[i].tempCode;delete us[i].tempExpires;
+    us[i].pwdChangedAt=(drToday&&drToday())||'';
+    saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}
+    closePwMgr();renderUsers();
+    _pwmgrShowResult(us[i].u,pw,'perm',null);
+  }else{
+    /* المؤقتة: تُخزَّن كرمز مؤقت يُجبر التغيير، مع صلاحية زمنية */
+    var expires=Date.now()+TEMP_PWD_HOURS*3600*1000;
+    us[i].tempCode=pw;us[i].tempExpires=expires;us[i].mustChange=true;
+    saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}
+    closePwMgr();renderUsers();
+    _pwmgrShowResult(us[i].u,pw,'temp',expires);
+  }
+}
+/* عرض النتيجة في نافذة العرض الأنيقة مع زر النسخ */
+function _pwmgrShowResult(user,code,type,expires){
+  var ar=drIsAr&&drIsAr();
+  var ov=document.getElementById('temp-show-ov');
+  if(!ov){try{alert((ar?'كلمة المرور: ':'Password: ')+code);}catch(e){}return;}
+  var c=document.getElementById('temp-show-code');if(c)c.textContent=code;
+  var u=document.getElementById('temp-show-user');if(u)u.textContent=user;
+  var ttl=ov.querySelector('.fpc-title');
+  var note=ov.querySelector('.temp-show-note');
+  var ic=ov.querySelector('.fpc-icon');
+  if(type==='perm'){
+    if(ic)ic.innerHTML='&#128274;';
+    if(ttl)ttl.textContent=ar?'كلمة مرور دائمة':'Permanent password';
+    if(note)note.innerHTML=ar?'هذه كلمة المرور الثابتة للمستخدم. شاركها معه بأمان — لن يُطلب منه تغييرها.':"This is the user's fixed password. Share it securely — no change is required.";
+  }else{
+    if(ic)ic.innerHTML='&#9203;';
+    if(ttl)ttl.textContent=ar?'رقم مؤقت تم توليده':'Temporary code generated';
+    var exTxt='';try{var d=new Date(expires);exTxt=d.toLocaleString(ar?'ar':'en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){}
+    if(note)note.innerHTML=(ar?'صالح حتى ':'Valid until ')+'<b>'+exTxt+'</b> &mdash; '+(ar?'سيُطلب تغيير كلمة المرور بعد الدخول به.':'A password change will be required after signing in with it.');
+  }
+  ov.classList.add('show');
+}
+try{if(typeof window!=='undefined'){window.openPwMgr=openPwMgr;window.closePwMgr=closePwMgr;window._pwmgrSetType=_pwmgrSetType;window._pwmgrGenerate=_pwmgrGenerate;window._pwmgrMeter=_pwmgrMeter;window.applyPwMgr=applyPwMgr;}}catch(e){}
 /* المدير: توليد رقم مؤقت يدوياً (24 ساعة) وعرضه ليسلّمه للمستخدم */
 function adminIssueTemp(i){
   var us=getUsers()||[];if(!us[i])return;
