@@ -86,11 +86,11 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .nav-backdrop{display:none;position:fixed;inset:0;background:rgba(8,22,44,.5);z-index:45;opacity:0;transition:opacity .25s}
 .nav-backdrop.show{opacity:1}
 /* مؤشّر عائم لفتح/إغلاق القائمة الجانبية — أسفل يسار، يظهر بلمس الجهة اليمنى */
-.nav-fab{position:fixed;left:16px;bottom:18px;z-index:62;width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#163f73,#0d2a4e);color:#fff;font-size:22px;line-height:1;display:none;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(10,30,64,.35);opacity:.28;transform:translateY(4px) scale(.96);transition:opacity .45s,transform .25s;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.nav-fab{position:fixed;left:14px;bottom:16px;z-index:62;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#163f73,#0d2a4e);color:#fff;font-size:18px;line-height:1;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(10,30,64,.25);opacity:.18;transform:translateY(4px) scale(.92);transition:opacity .45s,transform .25s;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .nav-fab.show{display:flex}
-.nav-fab.awake{opacity:.97;transform:translateY(0) scale(1)}
+.nav-fab.awake{opacity:.62;transform:translateY(0) scale(1)}
 .nav-fab .nf-dot{position:absolute;top:7px;inset-inline-end:7px;width:8px;height:8px;border-radius:50%;background:#37d67a;box-shadow:0 0 0 2px rgba(255,255,255,.35);opacity:0;transition:opacity .3s}
-.nav-fab.is-open{background:linear-gradient(135deg,#2f7ed8,#1e5fb0)}
+.nav-fab.is-open{background:linear-gradient(135deg,#2f7ed8,#1e5fb0);opacity:.97;transform:translateY(0) scale(1)}
 .nav-fab.is-open .nf-dot{opacity:1}
 @media (min-width:861px){.nav-fab{display:none !important}}
 .nav-close{display:none;position:absolute;top:10px;inset-inline-end:10px;z-index:3;width:36px;height:36px;border:none;border-radius:10px;background:rgba(255,255,255,.1);color:#cfe0f3;font-size:17px;cursor:pointer;align-items:center;justify-content:center}
@@ -973,6 +973,9 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .sp-wl-d-empty{background:rgba(58,167,87,.12)}
 .sp-wl-d-empty b{color:#2f7a45}
 .sp-wl-d-empty small{color:#5aa873}
+.sp-wl-pc{font-style:normal;font-size:9px;font-weight:800;margin-top:2px;padding:1px 6px;border-radius:8px;line-height:1.3}
+.sp-wl-d-used .sp-wl-pc{color:var(--st);background:color-mix(in srgb,var(--st) 18%,#fff)}
+.sp-wl-d-empty .sp-wl-pc{color:#2f7a45;background:rgba(58,167,87,.18)}
 @media (max-width:360px){.sp-wl-d{min-width:46px;padding:3px 5px}.sp-wl-d b{font-size:12.5px}}
 .sp-wl-chip{font-size:11px;font-weight:800;color:#fff;padding:3px 9px;border-radius:20px;background:var(--st);box-shadow:inset 0 1px 0 rgba(255,255,255,.4);flex:0 0 auto}
 .sp-wl-ar{font-size:12px;color:#90a4bd;transition:transform .2s;flex:0 0 auto}
@@ -2357,7 +2360,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <button class="logoutbtn" onclick="logout()"><span data-i18n="logout">Logout</span></button>
     </div>
     <div class="langsw"><button id="lang-en" class="on" onclick="setLang('en')">EN</button><button id="lang-ar" onclick="setLang('ar')">ع</button></div>
-    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.4.1</span></div>
+    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.4.3</span></div>
   </div>
 
   <div class="content">
@@ -2403,7 +2406,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="d-tile" data-page="dailyup" style="--c:var(--pink)" onclick="go('dailyup')"><div class="ti" data-icon="upload"></div><div><div class="tt" data-i18n="nav_dailyup">Daily Reports Upload</div><div class="td" data-i18n="desc_dailyup">Upload the daily coverage files.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         </div>
       </div>
-      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.4.1</span></div>
+      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.4.3</span></div>
       </div>
     </div></div>
     <div class="page" id="page-dash"><div class="wrap">
@@ -3039,7 +3042,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
 
 /* ===== Version-based settings reset ===== */
 (function(){
-  var VER = 'v6.4.1';
+  var VER = 'v6.4.3';
   try{
     if(LS.getItem('dr_app_ver')!==VER){
       // مسح الإعدادات التي قد تحتوي أسماء قديمة للبراندات
@@ -3055,7 +3058,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
   }catch(e){}
 })();
 /* عرض الإصدار في الواجهة ديناميكياً من VER */
-try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.4.1';}catch(e){}}); }catch(e){}
+try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.4.3';}catch(e){}}); }catch(e){}
 const IDENT_ORDER=['1- New Identity','2- OLD Identity','3- Mai','4- Mokabat','5- SAR','6- TG Sparkling'];
 const BRANCH_ORDER=['1. Riyadh','2. Kharj','3. Heet','4. Jeddah (W)','5. Jeddah (F)','6. Dammam','7. Qassim','8. Ahsa'];
 const CLASS_ORDER=['c1','c2','c3','c4','c5','c6'];
@@ -3190,15 +3193,23 @@ function _navFabSync(){var f=document.getElementById('nav-fab');if(!f)return;var
   var wakeT=null;
   function fab(){return document.getElementById('nav-fab');}
   function isMobile(){return window.innerWidth<=860;}
-  window._navFabWake=function(){var f=fab();if(!f)return;f.classList.add('show','awake');clearTimeout(wakeT);wakeT=setTimeout(function(){f.classList.remove('awake');},2600);};
-  /* يظهر المؤشّر عند لمس الجهة اليمنى من أي منطقة (ثم يخفت تلقائياً) */
+  window._navFabWake=function(){var f=fab();if(!f)return;if(!isMobile())return;f.classList.add('show','awake');clearTimeout(wakeT);wakeT=setTimeout(function(){
+    /* إخفاء كامل بعد المدة — إلا إذا كانت القائمة مفتوحة */
+    var n=document.getElementById('nav');var open=n&&n.classList.contains('mobile-open');
+    f.classList.remove('awake');if(!open)f.classList.remove('show');
+  },2600);};
+  /* يظهر المؤشّر عند لمس الجهة اليمنى من أي منطقة (ثم يختفي تماماً تلقائياً) */
   document.addEventListener('touchstart',function(e){
     if(!isMobile())return;if(!e.touches||!e.touches.length)return;
     var x=e.touches[0].clientX;
     if(x>=window.innerWidth*0.62){window._navFabWake();}
   },{passive:true});
-  /* إظهار دائم خافت على الجوال بمجرد توفّر مستخدم مُسجّل */
-  function tick(){var f=fab();if(!f)return;if(isMobile()){f.classList.add('show');}else{f.classList.remove('show','awake');}}
+  /* على الجوال: يبقى ظاهراً فقط أثناء فتح القائمة، ويختفي تماماً خلاف ذلك */
+  function tick(){var f=fab();if(!f)return;
+    if(!isMobile()){f.classList.remove('show','awake');return;}
+    var n=document.getElementById('nav');var open=n&&n.classList.contains('mobile-open');
+    if(open){f.classList.add('show');}
+  }
   if(document.readyState!=='loading'){setTimeout(tick,300);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(tick,300);});}
   window.addEventListener('resize',tick);
   setInterval(tick,1500);
@@ -5270,16 +5281,20 @@ function submitForcePwd(){
   var st=pwdStrength(pw);
   if(!st.valid){if(err)err.textContent=ar?'كلمة المرور لا تحقق كل الشروط':'Password does not meet all requirements';return;}
   if(pw!==cf){if(err)err.textContent=ar?'كلمتا المرور غير متطابقتين':'Passwords do not match';return;}
-  /* مسار Firebase: تغيير كلمة المرور السحابية */
+  /* تحديد مستخدم Firebase: إمّا عبر علم الجلسة أو لأن الحساب سحابي (بريد إلكتروني) */
   var _isChangeMode2=(window._pwdMode==='change');
-  if((window._fbForce||_isChangeMode2) && typeof _auth!=='undefined' && _auth && _auth.currentUser){
+  var _fbAuth=(typeof window!=='undefined'&&window._auth)?window._auth:((typeof _auth!=='undefined')?_auth:null);
+  var _isFbUser=!!(CURRENT_USER&&(CURRENT_USER.email||CURRENT_USER._prov))||window._fbForce;
+  var _hasFbAuth=!!(_fbAuth && _fbAuth.currentUser);
+  /* مسار Firebase: تغيير كلمة المرور السحابية */
+  if((window._fbForce||_isChangeMode2||_isFbUser) && _hasFbAuth){
     var _fbBtn=document.querySelector('#force-pwd-ov .fpc-btn');if(_fbBtn)_fbBtn.disabled=true;
-    _auth.currentUser.updatePassword(pw).then(function(){
+    _fbAuth.currentUser.updatePassword(pw).then(function(){
       try{if(typeof profileRef==='function'&&CURRENT_USER&&CURRENT_USER.email)profileRef(CURRENT_USER.email).set({mustChange:false,pwdChangedAt:Date.now()},{merge:true});}catch(e){}
       window._fbForce=false;
       var ovx=document.getElementById('force-pwd-ov');if(ovx)ovx.style.display='none';
       if(_fbBtn)_fbBtn.disabled=false;
-      if(_isChangeMode2){window._pwdMode=null;try{alert(ar?'تم تغيير كلمة المرور بنجاح':'Password changed successfully');}catch(e){}return;}
+      if(_isChangeMode2){window._pwdMode=null;try{closeChangePwd();}catch(e){}try{alert(ar?'تم تغيير كلمة المرور بنجاح':'Password changed successfully');}catch(e){}return;}
       try{applyRole();}catch(e){}try{go('home');}catch(e){}
       try{alert(ar?'تم تغيير كلمة المرور بنجاح':'Password changed successfully');}catch(e){}
     }).catch(function(e2){
@@ -5289,7 +5304,12 @@ function submitForcePwd(){
     });
     return;
   }
-  /* منع إعادة نفس كلمة المرور المؤقتة */
+  /* حساب سحابي لكن جلسة Firebase غير جاهزة → اطلب إعادة الدخول بدل خطأ مبهم */
+  if(_isFbUser && !_hasFbAuth){
+    if(err)err.textContent=ar?'انتهت جلسة الحساب. سجّل الخروج ثم ادخل من جديد وأعد المحاولة.':'Session expired. Please log out, sign in again, then retry.';
+    return;
+  }
+  /* منع إعادة نفس كلمة المرور المؤقتة (المسار المحلي) */
   var _isChangeMode=(window._pwdMode==='change');
   var us=getUsers()||[];var u=us.find(function(x){return x.u===(_isChangeMode&&CURRENT_USER?CURRENT_USER.u:_forcePwdUser);});
   if(!u){if(err)err.textContent=ar?'خطأ في الحساب':'Account error';return;}
@@ -6389,11 +6409,15 @@ function renderSpaceReport(rep){
       /* الرأس يعرض قيمتين: المستخدمة + الفارغة (تتبدّلان بين المساحة والكمية) */
       var _usedV=(_VU==='qty')?_spV(1,1,w.col):_spV(1,0,w.col);
       var _emptyV=(_VU==='qty')?_spV(3,2,w.col):_spV(3,0,w.col);
+      /* المقام الكلي لحساب النسب (يختلف حسب الوضع) */
+      var _totV=_num((_VU==='qty')?_spV(0,2,w.col):_spV(0,0,w.col));
+      var _usedPct=_totV?Math.round(_num(_usedV)/_totV*100):0;
+      var _emptyPct=_totV?Math.round(_num(_emptyV)/_totV*100):0;
       var _usedLbl=_ar?'المستخدمة':'Used', _emptyLbl=_ar?'الفارغة':'Empty';
       combo+='<details class="sp-wl '+st+'"><summary class="sp-wl-h"><span class="sp-wl-ic">'+(w.fac?'🏭':'🏬')+'</span><span class="sp-wl-name">'+drEsc(disp)+'</span>'
         +'<span class="sp-wl-duo">'
-          +'<span class="sp-wl-d sp-wl-d-used"><b>'+_spFq(_usedV)+'</b><small>'+_usedLbl+'</small></span>'
-          +'<span class="sp-wl-d sp-wl-d-empty"><b>'+_spFq(_emptyV)+'</b><small>'+_emptyLbl+'</small></span>'
+          +'<span class="sp-wl-d sp-wl-d-used"><b>'+_spFq(_usedV)+'</b><small>'+_usedLbl+'</small><em class="sp-wl-pc">'+_usedPct+'%</em></span>'
+          +'<span class="sp-wl-d sp-wl-d-empty"><b>'+_spFq(_emptyV)+'</b><small>'+_emptyLbl+'</small><em class="sp-wl-pc">'+_emptyPct+'%</em></span>'
         +'</span>'
         +'<span class="sp-wl-chip">'+fill+'%</span><span class="sp-wl-ar">▾</span></summary><div class="sp-wl-body">';
       _MX.forEach(function(m){combo+='<div class="sp-wl-s" style="--ac:'+m.ac+'"><span class="sp-wl-dot"></span><span class="sp-wl-sl">'+m.lbl+'</span><span class="sp-wl-sv">'+_spFq(_spV(m.gi,m.ri,w.col))+' <i class="sp-wl-u">'+m.u+'</i></span></div>';});
@@ -9803,6 +9827,8 @@ function renderBottleReport(rep){
       if(typeof firebase==='undefined'||!firebase.auth)return false;
       if(typeof fbApp==='undefined'||!fbApp)return false;
       _auth=firebase.auth(fbApp);
+      /* جسر عالمي: حتى تتمكّن دوال خارج هذا النطاق (مثل تغيير كلمة المرور) من الوصول لـ Firebase Auth */
+      try{window._auth=_auth;}catch(e){}
       /* أمان: استخدام استمرارية الجلسة SESSION بدل LOCAL —
          • تبقى الجلسة بعد «تحديث الصفحة» (نفس التبويب) فلا يُعاد طلب الدخول.
          • تُمسح تلقائياً عند إغلاق المتصفح/التبويب، فيُطلب الدخول عند فتح النظام من جديد.
