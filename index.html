@@ -383,6 +383,23 @@ html[dir=rtl] .login-shell{font-family:'Cairo','Inter',sans-serif}
 .login-err-shake{animation:loginShake .4s ease}
 @keyframes loginShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
 .login-hint{font-size:11.5px;color:#94a3b8;margin-top:18px;text-align:start;border-top:1px solid #eef2f7;padding-top:16px}
+.login-remember{position:relative;display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;margin:4px 0 16px;user-select:none;padding:13px 14px;min-height:46px;box-sizing:border-box;border:1.5px solid #e4ecf6;border-radius:12px;background:#fafcfe;transition:border-color .15s,background .15s}
+.login-remember:hover{border-color:#cfe0f4;background:#f4f9ff}
+.login-remember.is-on{border-color:#2f7ed8;background:#f0f7ff}
+.login-box .login-remember input,.login-remember input{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;border:0!important;opacity:0!important;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none;background:none!important}
+.login-remember .lr-switch{flex:0 0 42px;position:relative;display:block;width:42px;height:24px;border-radius:24px;background:#cbd5e1;transition:background .2s ease}
+.login-remember .lr-switch::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.28);transition:inset-inline-start .2s ease}
+.login-remember.is-on .lr-switch{background:linear-gradient(135deg,#2f7ed8,#1a4a87)}
+.login-remember.is-on .lr-switch::after{inset-inline-start:calc(100% - 21px)}
+.login-remember .lr-txt{flex:1 1 auto;min-width:0;text-align:center;line-height:1.3}
+.login-remember .lr-bal{display:none}
+.lbtn-bio{width:100%;background:#fff;color:#1a4a87;border:1.5px solid #cfe0f4;border-radius:12px;padding:13px;font-weight:700;font-size:14.5px;cursor:pointer;margin-top:11px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s,border-color .15s,transform .12s}
+.lbtn-bio:hover{background:#f1f7fe;border-color:#2f7ed8;transform:translateY(-1px)}
+.lbtn-bio:active{transform:translateY(0)}
+.lbtn-bio .bio-ic{font-size:18px;line-height:1}
+.lbtn-bio:disabled{opacity:.55;cursor:default;transform:none}
+.bio-divider{display:flex;align-items:center;gap:12px;margin:14px 0 2px;color:#94a3b8;font-size:12px;font-weight:600}
+.bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:#e7edf5}
 @media (max-width:760px){
   .login-shell{flex-direction:column;min-height:0;max-height:none;width:100%}
   .login-brand{display:none}
@@ -880,6 +897,14 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .sp-combo.st-over .sp-combo-bar span{background:linear-gradient(90deg,#ffc9c9,#fc8181)}
 .sp-thbtn{display:flex;align-items:center;gap:7px;width:100%;justify-content:center;margin:0 0 12px;padding:11px;border:1.5px dashed #c4d3e6;border-radius:13px;background:#f3f7fc;color:#2f6fb0;font-family:inherit;font-weight:800;font-size:12.5px;cursor:pointer}
 .sp-thbtn:active{background:#e9f1fb}
+/* صف أزرار التبديل (المساحة/الكمية) + الإعدادات أسفل البطاقة المدمجة */
+.sp-actions{display:flex;align-items:stretch;gap:9px;margin:0 0 12px;flex-wrap:wrap}
+.sp-vseg{flex:1 1 auto;display:flex;background:#eef4fc;border:1.5px solid #d4e0ee;border-radius:13px;padding:3px;gap:3px;min-width:0}
+.sp-vbtn{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 8px;border:none;border-radius:10px;background:transparent;color:#51688a;font-family:inherit;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,box-shadow .15s}
+.sp-vbtn.on{background:linear-gradient(135deg,#2f7ed8,#1a4a87);color:#fff;box-shadow:0 3px 8px rgba(31,74,135,.32)}
+.sp-vbtn:not(.on):active{background:#e1ebf6}
+.sp-thbtn-inline{flex:0 0 auto;width:auto;margin:0;padding:9px 14px;border-radius:13px}
+@media (max-width:380px){.sp-actions{flex-direction:column}.sp-thbtn-inline{width:100%}}
 .spth-ov{display:none;position:fixed;inset:0;z-index:9700;background:rgba(8,22,44,.55);align-items:center;justify-content:center;padding:16px}
 .spth-box{background:#fff;border-radius:18px;max-width:480px;width:100%;max-height:86vh;overflow:auto;box-shadow:0 30px 70px rgba(8,22,44,.5);font-family:inherit}
 .spth-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:linear-gradient(180deg,#163f73,#0d2a4e);color:#fff;font-size:15px;position:sticky;top:0}
@@ -937,7 +962,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .sp-wl-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:var(--ac);box-shadow:inset 0 1px 1px rgba(255,255,255,.6)}
 .sp-wl-sl{font-size:10.5px;font-weight:700;color:#51688a}
 .sp-wl-sv{margin-inline-start:auto;font-size:13px;font-weight:800;color:#13315c;font-variant-numeric:tabular-nums}
-@media (max-width:860px){#rep-space-wrap .sp-cards{display:none !important}#rep-space-wrap .sp-mob{display:block !important}}
+.sp-export-bottom{display:none}
+@media (max-width:860px){#rep-space-wrap .sp-cards{display:none !important}#rep-space-wrap .sp-mob{display:block !important}#rep-space-wrap .sp-scroll{display:none !important}#page-rspace .sp-export-top{display:none !important}#page-rspace .sp-export-bottom{display:flex !important;width:100%;justify-content:center;gap:9px;margin-top:16px;padding:14px;font-weight:800}}
 .g-actual-card:before{background:#2f6fb0}.g-actual-card .sp-card-ic{background:linear-gradient(135deg,#3f86c6,#2f6fb0);color:#fff}.g-actual-card .sp-bar span{background:linear-gradient(90deg,#2f6fb0,#5aa0db)}.g-actual-card .sp-chip{background:#eaf2fb;color:#2f6fb0}
 .g-used-card:before{background:#1296a6}.g-used-card .sp-card-ic{background:linear-gradient(135deg,#18aebf,#1296a6);color:#fff}.g-used-card .sp-bar span{background:linear-gradient(90deg,#1296a6,#3fc6d4)}.g-used-card .sp-chip{background:#e1f4f3;color:#0e7c8a}
 .g-transit-card:before{background:#1f7a86}.g-transit-card .sp-card-ic{background:linear-gradient(135deg,#2a8d9a,#1f7a86);color:#fff}.g-transit-card .sp-bar span{background:linear-gradient(90deg,#1f7a86,#46aab6)}.g-transit-card .sp-chip{background:#e0f0f1;color:#1f7a86}
@@ -2136,8 +2162,10 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <div class="lf-welcome" data-i18n="login_welcome">Welcome back</div>
         <div class="lf-sub" data-i18n="login_form_sub">Sign in to access your reporting workspace</div>
         <div class="fld"><label data-i18n="login_user">Username</label><input id="login-user" type="text" autocomplete="username" oninput="this.classList.remove('login-input-err')" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()"></div>
-        <div class="fld"><label data-i18n="login_pass">Password</label><input id="login-pass" type="password" autocomplete="current-password" oninput="this.classList.remove('login-input-err')" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="fld"><label data-i18n="login_pass">Password</label><div style="position:relative"><input id="login-pass" type="password" autocomplete="current-password" style="padding-inline-end:42px" oninput="this.classList.remove('login-input-err')" onkeydown="if(event.key==='Enter')doLogin()"><button type="button" id="login-eye" onclick="_loginToggleEye()" aria-label="show/hide" style="position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;line-height:1;padding:4px;color:#64748b">👁</button></div></div>
+        <label class="login-remember" id="login-remember-wrap"><input type="checkbox" id="login-remember"><span class="lr-switch"></span><span class="lr-txt" data-i18n="login_remember">Stay signed in on this device</span><span class="lr-bal" aria-hidden="true"></span></label>
         <button class="lbtn" onclick="doLogin()" data-i18n="login_btn">Login</button>
+        <button class="lbtn-bio" id="login-bio-btn" type="button" onclick="bioLogin()" style="display:none"><span class="bio-ic">&#128273;</span> <span data-i18n="login_bio">Sign in with fingerprint / Face ID</span></button>
         <div class="login-err" id="login-err"></div>
         <div class="login-forgot"><a href="javascript:void(0)" onclick="openForgot()" data-i18n="forgot_pwd">Forgot password?</a></div>
       </div>
@@ -2298,7 +2326,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <button class="logoutbtn" onclick="logout()"><span data-i18n="logout">Logout</span></button>
     </div>
     <div class="langsw"><button id="lang-en" class="on" onclick="setLang('en')">EN</button><button id="lang-ar" onclick="setLang('ar')">ع</button></div>
-    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.1.2</span></div>
+    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.3.4</span></div>
   </div>
 
   <div class="content">
@@ -2314,6 +2342,14 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       </div>
       <div class="d-body">
       <div class="d-sec">
+        <div class="d-sec-h"><h2 data-i18n="grp_aging">Inventory Aging</h2><span class="cnt">03 reports</span><span class="upd" id="home-upd-aging">Updated 30 May 2026</span></div>
+        <div class="d-grid">
+        <button class="d-tile" data-page="dash" style="--c:var(--navy)" onclick="go('dash')"><div class="ti" data-icon="chart"></div><div><div class="tt" data-i18n="nav_dash">Dashboard</div><div class="td" data-i18n="desc_dash">KPIs, charts and full aging breakdown.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
+        <button class="d-tile" data-page="sum" style="--c:var(--teal)" onclick="go('sum')"><div class="ti" data-icon="list"></div><div><div class="tt" data-i18n="nav_sum">Summary</div><div class="td" data-i18n="desc_sum">Totals by brand, month and branch.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
+        <button class="d-tile" data-page="sku" style="--c:var(--blue)" onclick="go('sku')"><div class="ti" data-icon="tag"></div><div><div class="tt" data-i18n="nav_sku">SKU Summary</div><div class="td" data-i18n="desc_sku">Item-level totals and top SKUs.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
+        </div>
+      </div>
+      <div class="d-sec">
         <div class="d-sec-h"><h2 data-i18n="grp_daily">Daily Coverage Report</h2><span class="cnt">05 reports</span><span class="upd" id="home-upd-daily">Updated 30 May 2026</span></div>
         <div class="d-grid">
         <button class="d-tile" data-page="rspace" style="--c:var(--teal)" onclick="go('rspace')"><div class="ti" data-icon="building"></div><div><div class="tt" data-i18n="nav_rspace">Space in Warehouses</div><div class="td" data-i18n="desc_rspace">Warehouse space utilisation.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
@@ -2321,14 +2357,6 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="d-tile" data-page="roldid" style="--c:var(--orange)" onclick="go('roldid')"><div class="ti" data-icon="clock"></div><div><div class="tt" data-i18n="nav_roldid">OLD Identity</div><div class="td" data-i18n="desc_roldid">Slow-moving / old identity stock.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="rtransit" style="--c:var(--purple)" onclick="go('rtransit')"><div class="ti" data-icon="truck"></div><div><div class="tt" data-i18n="nav_rtransit">FG Transit</div><div class="td" data-i18n="desc_rtransit">Goods in transit between sites.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="rbottle" style="--c:var(--pink)" onclick="go('rbottle')"><div class="ti" data-icon="bottle"></div><div><div class="tt" data-i18n="nav_rbottle">FG Bottle Stock</div><div class="td" data-i18n="desc_rbottle">Bottle stock coverage.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
-        </div>
-      </div>
-      <div class="d-sec">
-        <div class="d-sec-h"><h2 data-i18n="grp_aging">Inventory Aging</h2><span class="cnt">03 reports</span><span class="upd" id="home-upd-aging">Updated 30 May 2026</span></div>
-        <div class="d-grid">
-        <button class="d-tile" data-page="dash" style="--c:var(--navy)" onclick="go('dash')"><div class="ti" data-icon="chart"></div><div><div class="tt" data-i18n="nav_dash">Dashboard</div><div class="td" data-i18n="desc_dash">KPIs, charts and full aging breakdown.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
-        <button class="d-tile" data-page="sum" style="--c:var(--teal)" onclick="go('sum')"><div class="ti" data-icon="list"></div><div><div class="tt" data-i18n="nav_sum">Summary</div><div class="td" data-i18n="desc_sum">Totals by brand, month and branch.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
-        <button class="d-tile" data-page="sku" style="--c:var(--blue)" onclick="go('sku')"><div class="ti" data-icon="tag"></div><div><div class="tt" data-i18n="nav_sku">SKU Summary</div><div class="td" data-i18n="desc_sku">Item-level totals and top SKUs.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         </div>
       </div>
       <div class="d-sec">
@@ -2344,7 +2372,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="d-tile" data-page="dailyup" style="--c:var(--pink)" onclick="go('dailyup')"><div class="ti" data-icon="upload"></div><div><div class="tt" data-i18n="nav_dailyup">Daily Reports Upload</div><div class="td" data-i18n="desc_dailyup">Upload the daily coverage files.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         </div>
       </div>
-      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.1.2</span></div>
+      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.3.4</span></div>
       </div>
     </div></div>
     <div class="page" id="page-dash"><div class="wrap">
@@ -2688,8 +2716,9 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
     </div></div>
     <div class="page" id="page-rspace"><div class="wrap">
       <div class="topbar"><div class="htext"><h1 data-i18n="nav_rspace">Space Report In Warehouses</h1><span class="upd"><span class="dot"></span> <span id="rep-space-date"></span></span></div><div class="spacer"></div>
-        <button class="btn-soft sm" onclick="exportDR('space')"><span>&#128202;</span> <span data-i18n="export_excel">Export to Excel</span></button></div>
+        <button class="btn-soft sm sp-export-top" onclick="exportDR('space')"><span>&#128202;</span> <span data-i18n="export_excel">Export to Excel</span></button></div>
       <div class="card" style="padding:14px"><div class="pivot-wrap" id="rep-space-wrap"></div></div>
+      <button class="btn-soft sp-export-bottom" onclick="exportDR('space')"><span>&#128202;</span> <span data-i18n="export_excel">Export to Excel</span></button>
     </div></div>
     <div class="page" id="page-rfgbal"><div class="wrap">
       <div class="topbar"><div class="htext"><h1 data-i18n="nav_rfgbal">FG Balance Report</h1><span class="upd"><span class="dot"></span> <span id="rep-fgbal-date"></span></span></div><div class="spacer"></div>
@@ -2979,7 +3008,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
 
 /* ===== Version-based settings reset ===== */
 (function(){
-  var VER = 'v6.1.2';
+  var VER = 'v6.3.4';
   try{
     if(LS.getItem('dr_app_ver')!==VER){
       // مسح الإعدادات التي قد تحتوي أسماء قديمة للبراندات
@@ -2995,7 +3024,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
   }catch(e){}
 })();
 /* عرض الإصدار في الواجهة ديناميكياً من VER */
-try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.1.2';}catch(e){}}); }catch(e){}
+try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.3.4';}catch(e){}}); }catch(e){}
 const IDENT_ORDER=['1- New Identity','2- OLD Identity','3- Mai','4- Mokabat','5- SAR','6- TG Sparkling'];
 const BRANCH_ORDER=['1. Riyadh','2. Kharj','3. Heet','4. Jeddah (W)','5. Jeddah (F)','6. Dammam','7. Qassim','8. Ahsa'];
 const CLASS_ORDER=['c1','c2','c3','c4','c5','c6'];
@@ -3034,7 +3063,7 @@ const T={
   ch_identity:'Identity Inventory Weight',ch_month:'Inventory Aging Pattern',sub_month:'monthly qty',
   ch_sizewise:'SKU Inventory — Size wise',ch_pack:'SKU Inventory',sub_pack:'by pack',
   ch_classify:'Inventory Classifying',ch_sizeitem:'SKU Inventory — Size Item',sub_sizeitem:'CTN / SHR',
-  center_total:'TOTAL QTY',gsearch_ph:'Search anything…',login_sub:'Inventory Dashboard',nav_home:'Home',login_welcome:'Welcome back',login_form_sub:'Sign in to access your reporting workspace',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'Warehouse aging, coverage and analytics — unified in one workspace.',login_stat_wh:'Warehouses',login_stat_br:'Brands',login_stat_rp:'Reports',home_hero_title:'Reporting Center',home_hero_sub:'Select a report to open — everything in one place.',home_open:'Open',back_btn:'Back',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'Tania • Warehouse',desc_dash:'KPIs, charts and aging breakdown',desc_sum:'Totals by brand, month and branch',desc_sku:'Item-level totals and top SKUs',desc_rspace:'Warehouse space utilisation',desc_rfgbal:'Finished-goods balance by branch',desc_roldid:'Slow-moving / old identity stock',desc_rtransit:'Goods in transit between sites',desc_rbottle:'Bottle stock coverage',desc_imp:'Upload an Excel file to refresh data',desc_cloud:'Sync and back up to Firebase',desc_records:'Edit any cell, add, duplicate or delete records',desc_designer:'Customise table columns and methods',desc_users:'Manage accounts and permissions',desc_dailyup:'Upload the daily coverage files',login_user:'Username',login_pass:'Password',login_btn:'Login',col_new_manual:'New manual column',col_new_calc:'New calculated column',colm_title:'Column Manager',colm_sub:'Add custom columns (manual or calculated) to any table.',colm_screen:'Table',colm_add_calc:'+ Calculated column',colm_add_manual:'+ Manual column',colm_name:'Column name',colm_formula:'Formula e.g. {total} * 0.15',colm_type:'Type',colm_t_calc:'Calculated',colm_t_manual:'Manual',colm_avail:'Available variables',colm_hbg:'Header color',colm_cbg:'Cell color',colm_del:'Delete',colm_none:'No custom columns yet.',colm_help_calc:'Use variables in braces. Supports + - * / ( ) and Math.round/abs/min/max.',colm_help_manual:'Manual columns let you type a value into each row directly.',colm_existing:'Existing columns (click to show/hide)',colm_custom:'Custom columns',colm_hide:'Hide column',colm_show:'Show column',forgot_pwd:'Forgot password?',fpc_title:'Password change required',fpc_sub:'To protect your account, set a new password before continuing.',fpc_new:'New password',fpc_confirm:'Confirm password',fpc_save:'Save & continue',fpc_r_len:'At least 8 characters',fpc_r_upper:'Uppercase (A-Z)',fpc_r_lower:'Lowercase (a-z)',fpc_r_digit:'Number (0-9)',fpc_r_symbol:'Symbol (!@#$...)',pwd_reset_forced:'Password reset. User must set a new one at next login.',fp_title:'Reset Password',fp_desc1:'Enter your username. A verification code will be sent to your registered email.',fp_desc2:'Enter the code sent to',fp_send:'Send code',fp_reset:'Reset password',fp_resend:'Resend code',fp_need_user:'Please enter your username.',fp_checking:'Checking…',fp_no_user:'No account found with this username.',fp_no_email:'No email is registered for this account. Contact your admin.',fp_email_unavail:'Email service is not configured. Contact your admin.',fp_sent_ok:'Code sent. Check your inbox.',fp_send_fail:'Could not send the code. Try again later.',fp_restart:'Please restart the reset process.',fp_expired:'The code has expired. Request a new one.',fp_bad_code:'Incorrect code.',fp_pwd_short:'Password must be at least 4 characters.',fp_pwd_mismatch:'Passwords do not match.',fp_reset_ok:'Password reset successfully.',sec_title:'Security & Email Settings',sec_sub:'Configure the email service used to send password-reset codes to users.',sec_pub:'EmailJS Public Key',sec_svc:'Service ID',sec_tpl:'Template ID',sec_save:'Save settings',sec_test:'Send test email',sec_note:'Tip: create a free account at emailjs.com, add an email service and a template containing the variable {{passcode}}, then paste the keys above.',sec_saved:'Settings saved.',sec_need_all:'Please fill all three fields.',sec_admin_only:'Admins only.',sec_bad_cfg:'Invalid or missing settings.',sec_no_admin_email:'Your account has no email set.',sec_sending:'Sending…',sec_test_ok:'Test email sent to',sec_test_fail:'Test failed. Check your settings.',log_title:'Login Activity Log',log_refresh:'Refresh',log_clear:'Clear log',log_user:'User',log_event:'Event',log_time:'Time',log_empty:'No activity yet.',log_k_login:'Signed in',log_k_reset:'Password reset',log_k_failed:'Failed attempt',login_bad:'Invalid username or password',login_empty_user:'Please enter your username',login_empty_pass:'Please enter your password',login_empty_both:'Please enter your username and password',login_nouser:'No account found with this username',login_wrongpass:'Incorrect password — please try again',login_temp_expired:'Temporary password expired. Please request a new one.',fp_temp_sent:'Temporary password sent to your email.',fp_temp_done1:'A temporary password (valid 24 hours) has been sent to',fp_temp_done2:"Sign in with it — you'll be asked to set a new password.",fp_done_ok:'Got it',temp_show_title:'Temporary password generated',temp_show_for:'For user',temp_show_valid:'Valid until',temp_show_hint:'Password change will be required after signing in with it.',temp_copy:'Copy code',login_locked:'Account temporarily locked. Try again in {n}s',nav_users:'Users',nav_records:'Data Editor',rec_title:'Data Editor — Edit & Add Records',rec_add:'Add Record',rec_search:'Search records',rec_del:'Delete',rec_dup:'Duplicate',rec_edit_hint:'Click any cell in the table to edit it directly. Changes are saved and synced to all devices automatically.',rec_save:'Save to Cloud',rec_qty:'Quantity',rec_cat2:'Category 2',rec_logo:'Logo',rec_need:'Enter Identity and Branch at least',logout:'Logout',users_title:'User Management',users_sub:'Manage accounts, permissions and security',utab_users:'Users',utab_security:'Security & Email',utab_log:'Login Log',ce_title:'Card title',ce_calc:'Calculation',ce_cls:'Age class',ce_month:'Month',ce_color:'Color',ce_save:'Save card',ce_cancel:'Cancel',ce_sum:'Sum of quantity',ce_avg:'Average quantity',ce_count:'Item count',ce_max:'Max quantity',ce_min:'Min quantity',ce_all:'All',u_add_title:'Add new user',u_list_title:'Users list',u_perms_modal:'Permissions',u_user:'Username',u_pass:'Password',u_role:'Role',u_add:'Add User',u_admin:'Admin',u_userrole:'User',u_actions:'Actions',u_delete:'Delete',u_exists:'Username already exists',u_need:'Enter username and password',u_perms:'Screen permissions',u_temp:'Temporary',u_all:'All',u_email:'Email',u_mobile:'Mobile',u_password:'Password',u_resetpwd:'Reset Password',set_new_pwd:'Enter a new password for the user:',pwd_changed:'Password updated successfully.',u_pwd_help:'🔑 Reset Password sets a new one · ⏳ Temp code generates a 24-hour login code · ⚙️ Edit permissions for screen access.',temp_prompt:'Your password is temporary. Please enter a new password:',cols_btn:'Columns',cols_title:'Show / hide columns',cols_hint:'Check a branch to show its column, uncheck to hide it. Changes are saved automatically and apply to both tables.',nav_designer:'Designer',nav_cardbuilder:'Card Builder',cb_title:'Card Builder',cb_sub:'Create custom KPI cards that appear on the dashboard',cb_new:'New card',cb_f_title:'Card title',cb_f_calc:'Calculation',cb_f_age:'Age class',cb_f_month:'Month',cb_f_icon:'Icon',cb_f_color:'Color',cb_calc_sum:'Sum of quantity',cb_calc_avg:'Average quantity',cb_calc_count:'Item count',cb_calc_max:'Max value',cb_calc_min:'Min value',cb_age_all:'All classes',cb_month_all:'All months',cb_save:'Save card',cb_cancel:'Cancel',cb_preview:'Live preview',cb_preview_hint:'The value is computed from current data and reflects dashboard filters.',cb_list:'Created cards',cb_empty:'No cards yet. Create your first card above.',designer_title:'Table Designer',designer_sub:'Rename columns, choose the calculation method, reorder and show/hide columns.',calc_method:'Calculation method',calc_sum:'Sum',calc_avg:'Average',calc_count:'Count',calc_max:'Max',calc_min:'Min',calc_hint:'Applies to all value cells in the Summary and SKU tables.',appearance:'Appearance',colors:'Colors',c_primary:'Primary',c_teal:'Teal',c_blue:'Blue',c_orange:'Orange',st_color:'Color',st_font:'Font',st_size:'Font size (px)',st_align:'Text align',dz_al_def:'Default',dz_al_l:'Left',dz_al_c:'Center',dz_al_r:'Right',font_family:'Font',font_default:'Default',display_size:'Display size',card_titles:'Card titles & labels',dz_pick:'Choose screen to edit',dz_pick_hint:'Each screen is edited independently — changes here do not affect other screens.',dz_scr_dash:'Dashboard',dz_scr_sum:'Summary table',dz_scr_sku:'SKU table',dz_scr_fgbal:'FG Balance report',dz_scr_oldid:'OLD Identity report',dz_scr_transit:'FG Transit report',rpt_cols_title:'Report columns',rpt_cols_hint:'Rename headers, set colors and add conditional formatting. Changes apply to this report only.',rpt_no_data:'Upload this report first to load its columns.',dz_scr_appear:'General appearance',chart_order:'Chart cards order / position',dz_branch_order:'Branch column order',dz_col:'Column',dz_name:'Display name',dz_show:'Show',dz_calc:'Calc',calc_default:'Default',dz_reset:'Reset',dz_collapse_all:'Collapse all',dz_expand_all:'Expand all',dz_sum_title:'Summary columns',dz_sku_title:'SKU columns',set_date_label:'Report update date',set_btn:'Set date',saved_date:'\u2713 Update date saved.',dz_color:'Color',dz_cf:'Cond. format',cc_hbg:'Header background',cc_cbg:'Cell background',cc_cfg:'Cell text',cc_clear:'Clear colors',cf_title:'Conditional formatting',cf_sub:'Add rules: when the cell value meets a condition, apply colors. "Whole row" colors the entire row.',cf_if:'If value',cf_and:'and',cf_between:'between',cf_outside:'outside',cf_bg:'Fill',cf_fg:'Text',cf_bold:'Bold',cf_scope:'Apply to',cf_cell:'This cell',cf_row:'Whole row',cf_addrule:'Add rule',cf_done:'Done',cust_title:'Custom calculated columns',cust_help:'Create a new column from a formula. Use column tokens and arithmetic ( + - * / and % ).',cust_avail:'Available tokens',cust_name:'Column name',cust_formula_ph:'e.g.  {total} * 0.15   or   {br_RYD} + {br_HIT}',cust_add:'Add column',em_edit:'Edit titles',em_done:'Finish editing',em_banner:'Edit mode — click any title to rename it. Changes sync to everyone.',portal_titles:'Login portal & platform titles',portal_titles_hint:'Edit the external login page and platform brand wording. Changes sync to everyone and appear on the login screen.',
+  center_total:'TOTAL QTY',gsearch_ph:'Search anything…',login_sub:'Inventory Dashboard',nav_home:'Home',login_welcome:'Welcome back',login_form_sub:'Sign in to access your reporting workspace',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'Warehouse aging, coverage and analytics — unified in one workspace.',login_stat_wh:'Warehouses',login_stat_br:'Brands',login_stat_rp:'Reports',home_hero_title:'Reporting Center',home_hero_sub:'Select a report to open — everything in one place.',home_open:'Open',back_btn:'Back',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'Tania • Warehouse',desc_dash:'KPIs, charts and aging breakdown',desc_sum:'Totals by brand, month and branch',desc_sku:'Item-level totals and top SKUs',desc_rspace:'Warehouse space utilisation',desc_rfgbal:'Finished-goods balance by branch',desc_roldid:'Slow-moving / old identity stock',desc_rtransit:'Goods in transit between sites',desc_rbottle:'Bottle stock coverage',desc_imp:'Upload an Excel file to refresh data',desc_cloud:'Sync and back up to Firebase',desc_records:'Edit any cell, add, duplicate or delete records',desc_designer:'Customise table columns and methods',desc_users:'Manage accounts and permissions',desc_dailyup:'Upload the daily coverage files',login_user:'Username',login_pass:'Password',login_btn:'Login',col_new_manual:'New manual column',col_new_calc:'New calculated column',colm_title:'Column Manager',colm_sub:'Add custom columns (manual or calculated) to any table.',colm_screen:'Table',colm_add_calc:'+ Calculated column',colm_add_manual:'+ Manual column',colm_name:'Column name',colm_formula:'Formula e.g. {total} * 0.15',colm_type:'Type',colm_t_calc:'Calculated',colm_t_manual:'Manual',colm_avail:'Available variables',colm_hbg:'Header color',colm_cbg:'Cell color',colm_del:'Delete',colm_none:'No custom columns yet.',colm_help_calc:'Use variables in braces. Supports + - * / ( ) and Math.round/abs/min/max.',colm_help_manual:'Manual columns let you type a value into each row directly.',colm_existing:'Existing columns (click to show/hide)',colm_custom:'Custom columns',colm_hide:'Hide column',colm_show:'Show column',forgot_pwd:'Forgot password?',login_remember:'Stay signed in on this device',login_bio:'Sign in with fingerprint / Face ID',bio_or:'or',bio_setup_title:'Quick sign-in',bio_setup_q:'Enable fingerprint / Face ID for faster sign-in next time?',bio_enable:'Enable',bio_later:'Not now',bio_enabled:'Quick sign-in enabled on this device.',bio_failed:'Biometric sign-in failed. Use your password.',bio_unsupported:'This device does not support biometric sign-in.',bio_none:'No saved quick sign-in on this device.',bio_disable:'Disable quick sign-in',bio_disabled:'Quick sign-in disabled on this device.',fpc_title:'Password change required',fpc_sub:'To protect your account, set a new password before continuing.',fpc_new:'New password',fpc_confirm:'Confirm password',fpc_save:'Save & continue',fpc_r_len:'At least 8 characters',fpc_r_upper:'Uppercase (A-Z)',fpc_r_lower:'Lowercase (a-z)',fpc_r_digit:'Number (0-9)',fpc_r_symbol:'Symbol (!@#$...)',pwd_reset_forced:'Password reset. User must set a new one at next login.',fp_title:'Reset Password',fp_desc1:'Enter your username. A verification code will be sent to your registered email.',fp_desc2:'Enter the code sent to',fp_send:'Send code',fp_reset:'Reset password',fp_resend:'Resend code',fp_need_user:'Please enter your username.',fp_checking:'Checking…',fp_no_user:'No account found with this username.',fp_no_email:'No email is registered for this account. Contact your admin.',fp_email_unavail:'Email service is not configured. Contact your admin.',fp_sent_ok:'Code sent. Check your inbox.',fp_send_fail:'Could not send the code. Try again later.',fp_restart:'Please restart the reset process.',fp_expired:'The code has expired. Request a new one.',fp_bad_code:'Incorrect code.',fp_pwd_short:'Password must be at least 4 characters.',fp_pwd_mismatch:'Passwords do not match.',fp_reset_ok:'Password reset successfully.',sec_title:'Security & Email Settings',sec_sub:'Configure the email service used to send password-reset codes to users.',sec_pub:'EmailJS Public Key',sec_svc:'Service ID',sec_tpl:'Template ID',sec_save:'Save settings',sec_test:'Send test email',sec_note:'Tip: create a free account at emailjs.com, add an email service and a template containing the variable {{passcode}}, then paste the keys above.',sec_saved:'Settings saved.',sec_need_all:'Please fill all three fields.',sec_admin_only:'Admins only.',sec_bad_cfg:'Invalid or missing settings.',sec_no_admin_email:'Your account has no email set.',sec_sending:'Sending…',sec_test_ok:'Test email sent to',sec_test_fail:'Test failed. Check your settings.',log_title:'Login Activity Log',log_refresh:'Refresh',log_clear:'Clear log',log_user:'User',log_event:'Event',log_time:'Time',log_empty:'No activity yet.',log_k_login:'Signed in',log_k_reset:'Password reset',log_k_failed:'Failed attempt',login_bad:'Invalid username or password',login_empty_user:'Please enter your username',login_empty_pass:'Please enter your password',login_empty_both:'Please enter your username and password',login_nouser:'No account found with this username',login_wrongpass:'Incorrect password — please try again',login_temp_expired:'Temporary password expired. Please request a new one.',fp_temp_sent:'Temporary password sent to your email.',fp_temp_done1:'A temporary password (valid 24 hours) has been sent to',fp_temp_done2:"Sign in with it — you'll be asked to set a new password.",fp_done_ok:'Got it',temp_show_title:'Temporary password generated',temp_show_for:'For user',temp_show_valid:'Valid until',temp_show_hint:'Password change will be required after signing in with it.',temp_copy:'Copy code',login_locked:'Account temporarily locked. Try again in {n}s',nav_users:'Users',nav_records:'Data Editor',rec_title:'Data Editor — Edit & Add Records',rec_add:'Add Record',rec_search:'Search records',rec_del:'Delete',rec_dup:'Duplicate',rec_edit_hint:'Click any cell in the table to edit it directly. Changes are saved and synced to all devices automatically.',rec_save:'Save to Cloud',rec_qty:'Quantity',rec_cat2:'Category 2',rec_logo:'Logo',rec_need:'Enter Identity and Branch at least',logout:'Logout',users_title:'User Management',users_sub:'Manage accounts, permissions and security',utab_users:'Users',utab_security:'Security & Email',utab_log:'Login Log',ce_title:'Card title',ce_calc:'Calculation',ce_cls:'Age class',ce_month:'Month',ce_color:'Color',ce_save:'Save card',ce_cancel:'Cancel',ce_sum:'Sum of quantity',ce_avg:'Average quantity',ce_count:'Item count',ce_max:'Max quantity',ce_min:'Min quantity',ce_all:'All',u_add_title:'Add new user',u_list_title:'Users list',u_perms_modal:'Permissions',u_user:'Username',u_pass:'Password',u_role:'Role',u_add:'Add User',u_admin:'Admin',u_userrole:'User',u_actions:'Actions',u_delete:'Delete',u_exists:'Username already exists',u_need:'Enter username and password',u_perms:'Screen permissions',u_temp:'Temporary',u_all:'All',u_email:'Email',u_mobile:'Mobile',u_password:'Password',u_resetpwd:'Reset Password',set_new_pwd:'Enter a new password for the user:',pwd_changed:'Password updated successfully.',u_pwd_help:'🔑 Reset Password sets a new one · ⏳ Temp code generates a 24-hour login code · ⚙️ Edit permissions for screen access.',temp_prompt:'Your password is temporary. Please enter a new password:',cols_btn:'Columns',cols_title:'Show / hide columns',cols_hint:'Check a branch to show its column, uncheck to hide it. Changes are saved automatically and apply to both tables.',nav_designer:'Designer',nav_cardbuilder:'Card Builder',cb_title:'Card Builder',cb_sub:'Create custom KPI cards that appear on the dashboard',cb_new:'New card',cb_f_title:'Card title',cb_f_calc:'Calculation',cb_f_age:'Age class',cb_f_month:'Month',cb_f_icon:'Icon',cb_f_color:'Color',cb_calc_sum:'Sum of quantity',cb_calc_avg:'Average quantity',cb_calc_count:'Item count',cb_calc_max:'Max value',cb_calc_min:'Min value',cb_age_all:'All classes',cb_month_all:'All months',cb_save:'Save card',cb_cancel:'Cancel',cb_preview:'Live preview',cb_preview_hint:'The value is computed from current data and reflects dashboard filters.',cb_list:'Created cards',cb_empty:'No cards yet. Create your first card above.',designer_title:'Table Designer',designer_sub:'Rename columns, choose the calculation method, reorder and show/hide columns.',calc_method:'Calculation method',calc_sum:'Sum',calc_avg:'Average',calc_count:'Count',calc_max:'Max',calc_min:'Min',calc_hint:'Applies to all value cells in the Summary and SKU tables.',appearance:'Appearance',colors:'Colors',c_primary:'Primary',c_teal:'Teal',c_blue:'Blue',c_orange:'Orange',st_color:'Color',st_font:'Font',st_size:'Font size (px)',st_align:'Text align',dz_al_def:'Default',dz_al_l:'Left',dz_al_c:'Center',dz_al_r:'Right',font_family:'Font',font_default:'Default',display_size:'Display size',card_titles:'Card titles & labels',dz_pick:'Choose screen to edit',dz_pick_hint:'Each screen is edited independently — changes here do not affect other screens.',dz_scr_dash:'Dashboard',dz_scr_sum:'Summary table',dz_scr_sku:'SKU table',dz_scr_fgbal:'FG Balance report',dz_scr_oldid:'OLD Identity report',dz_scr_transit:'FG Transit report',rpt_cols_title:'Report columns',rpt_cols_hint:'Rename headers, set colors and add conditional formatting. Changes apply to this report only.',rpt_no_data:'Upload this report first to load its columns.',dz_scr_appear:'General appearance',chart_order:'Chart cards order / position',dz_branch_order:'Branch column order',dz_col:'Column',dz_name:'Display name',dz_show:'Show',dz_calc:'Calc',calc_default:'Default',dz_reset:'Reset',dz_collapse_all:'Collapse all',dz_expand_all:'Expand all',dz_sum_title:'Summary columns',dz_sku_title:'SKU columns',set_date_label:'Report update date',set_btn:'Set date',saved_date:'\u2713 Update date saved.',dz_color:'Color',dz_cf:'Cond. format',cc_hbg:'Header background',cc_cbg:'Cell background',cc_cfg:'Cell text',cc_clear:'Clear colors',cf_title:'Conditional formatting',cf_sub:'Add rules: when the cell value meets a condition, apply colors. "Whole row" colors the entire row.',cf_if:'If value',cf_and:'and',cf_between:'between',cf_outside:'outside',cf_bg:'Fill',cf_fg:'Text',cf_bold:'Bold',cf_scope:'Apply to',cf_cell:'This cell',cf_row:'Whole row',cf_addrule:'Add rule',cf_done:'Done',cust_title:'Custom calculated columns',cust_help:'Create a new column from a formula. Use column tokens and arithmetic ( + - * / and % ).',cust_avail:'Available tokens',cust_name:'Column name',cust_formula_ph:'e.g.  {total} * 0.15   or   {br_RYD} + {br_HIT}',cust_add:'Add column',em_edit:'Edit titles',em_done:'Finish editing',em_banner:'Edit mode — click any title to rename it. Changes sync to everyone.',portal_titles:'Login portal & platform titles',portal_titles_hint:'Edit the external login page and platform brand wording. Changes sync to everyone and appear on the login screen.',
   sum_title:'Finished Product — Totals Summary',c_year:'Year',c_month:'Month',c_cat:'Category',c_total:'Total',c_pct:'%',sum_grand:'Grand Total',
   ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',map:{identity:{'1- New Identity':'New Identity','2- OLD Identity':'Old Identity','3- Mai':'Mai','4- Mokabat':'Mokabat','5- SAR':'SAR','6- TG Sparkling':'TG Sparkling'}},grp_daily:'Daily Coverage Report',grp_data:'Data & Tools',grp_admintools:'Admin Tools',u_selall:'Select all',u_selnone:'Clear',nav_masterdata:'Master Data',nav_spaceact:'Space Actuals',nav_rspace:'Space in Warehouses',nav_rfgbal:'FG Balance',nav_roldid:'OLD Identity',nav_rtransit:'FG Transit',nav_rbottle:'FG Bottle Stock',nav_dailyup:'Daily Reports Upload',cloud_title:'\u2601\ufe0f Firebase Cloud Sync',cloud_sub:'Store and sync the report data in Firebase (Firestore).',cloud_cfg_label:'Firebase configuration',fb_apikey:'API Key',fb_project:'Project ID',fb_authdomain:'Auth Domain',fb_bucket:'Storage Bucket',fb_sender:'Messaging Sender ID',fb_appid:'App ID',fb_paste_toggle:'Or paste the full firebaseConfig',fb_fill:'Fill fields from config',popout_btn:'Window',full_btn:'Fullscreen',export_excel:'Export to Excel',cloud_connect:'Connect',cloud_save:'Save to Cloud',cloud_test:'Test Connection',cloud_load:'Load from Cloud',cloud_auto:'Auto-load on open & auto-save on every change',cloud_live:'Live two-way sync (recommended)',cloud_note_title:'Setup notes',cloud_st_idle:'Not connected',cloud_n1:'Create a Firebase project, enable <b>Firestore Database</b>, then copy the <span class=\"tag\">firebaseConfig</span> from Project settings.',cloud_n2:'For testing, set Firestore rules to test mode. For production, secure your rules.',cloud_n3:'Data is stored in collection <span class=\"tag\">inventory_dashboard</span>, document <span class=\"tag\">latest</span>.',cloud_n4:'All data &amp; settings are stored in the cloud only (no browser storage).',cyl_storage:'Storage area',cyl_used:'Used balance',cyl_transit:'Transit',cyl_empty:'Empty (available)',cyl_branch_title:'Branches',cyl_fact_title:'Factories',
   foot:(s,t,q)=>'Showing '+s+' of '+t+' records  •  Total qty '+q+'  •  Click filters to slice',
@@ -3056,7 +3085,7 @@ const T={
   ch_identity:'وزن المخزون حسب الهوية',ch_month:'نمط أعمار المخزون',sub_month:'الكمية الشهرية',
   ch_sizewise:'المخزون حسب الحجم',ch_pack:'المخزون حسب العبوة',sub_pack:'حسب العبوة',
   ch_classify:'تصنيف المخزون',ch_sizeitem:'المخزون حسب الحجم والصنف',sub_sizeitem:'كرتون / شرنك',
-  center_total:'إجمالي الكمية',gsearch_ph:'بحث شامل…',login_sub:'لوحة تحليل المخزون',nav_home:'الرئيسية',login_welcome:'مرحباً بعودتك',login_form_sub:'سجّل الدخول للوصول إلى مساحة التقارير',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'أعمار المخزون والتغطية والتحليلات في مساحة عمل واحدة.',login_stat_wh:'مستودعات',login_stat_br:'علامات',login_stat_rp:'تقارير',home_hero_title:'مركز التقارير',home_hero_sub:'اختر تقريراً لفتحه — كل شيء في مكان واحد.',home_open:'فتح',back_btn:'رجوع',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'تانيا • المستودعات',desc_dash:'المؤشرات والرسوم وتحليل الأعمار',desc_sum:'الإجماليات حسب العلامة والشهر والفرع',desc_sku:'إجماليات الأصناف وأعلى المنتجات',desc_rspace:'استغلال مساحة المستودعات',desc_rfgbal:'رصيد المنتج التام حسب الفرع',desc_roldid:'المخزون الراكد / الهوية القديمة',desc_rtransit:'البضائع في الطريق بين المواقع',desc_rbottle:'تغطية مخزون العبوات',desc_imp:'ارفع ملف Excel لتحديث البيانات',desc_cloud:'المزامنة والنسخ الاحتياطي عبر Firebase',desc_records:'عدّل أي خلية، أضف، كرّر أو احذف السجلات',desc_designer:'تخصيص أعمدة الجداول وطرق الحساب',desc_users:'إدارة الحسابات والصلاحيات',desc_dailyup:'رفع ملفات التغطية اليومية',login_user:'اسم المستخدم',login_pass:'كلمة المرور',login_btn:'دخول',col_new_manual:'عمود يدوي جديد',col_new_calc:'عمود محسوب جديد',colm_title:'إدارة الأعمدة',colm_sub:'أضف أعمدة مخصصة (يدوية أو محسوبة) لأي جدول.',colm_screen:'الجدول',colm_add_calc:'+ عمود محسوب',colm_add_manual:'+ عمود يدوي',colm_name:'اسم العمود',colm_formula:'صيغة مثل {total} * 0.15',colm_type:'النوع',colm_t_calc:'محسوب',colm_t_manual:'يدوي',colm_avail:'المتغيرات المتاحة',colm_hbg:'لون الرأس',colm_cbg:'لون الخلية',colm_del:'حذف',colm_none:'لا توجد أعمدة مخصصة بعد.',colm_help_calc:'استخدم المتغيرات بين أقواس معقوفة. يدعم + - * / ( ) ودوال Math.round/abs/min/max.',colm_help_manual:'الأعمدة اليدوية تتيح إدخال قيمة لكل صف مباشرة.',colm_existing:'الأعمدة الموجودة (اضغط للإظهار/الإخفاء)',colm_custom:'الأعمدة المخصصة',colm_hide:'إخفاء العمود',colm_show:'إظهار العمود',forgot_pwd:'نسيت كلمة المرور؟',fpc_title:'تغيير كلمة المرور مطلوب',fpc_sub:'لحماية حسابك، يجب تعيين كلمة مرور جديدة قبل المتابعة.',fpc_new:'كلمة المرور الجديدة',fpc_confirm:'تأكيد كلمة المرور',fpc_save:'حفظ ومتابعة',fpc_r_len:'8 أحرف على الأقل',fpc_r_upper:'حرف كبير (A-Z)',fpc_r_lower:'حرف صغير (a-z)',fpc_r_digit:'رقم (0-9)',fpc_r_symbol:'رمز خاص (!@#$...)',pwd_reset_forced:'تمت إعادة التعيين. سيُطلب من المستخدم تعيين كلمة مرور جديدة عند الدخول.',fp_title:'إعادة تعيين كلمة المرور',fp_desc1:'أدخل اسم المستخدم وسيُرسل رمز تأكيد إلى بريدك المسجّل.',fp_desc2:'أدخل الرمز المُرسل إلى',fp_send:'إرسال الرمز',fp_reset:'إعادة التعيين',fp_resend:'إعادة إرسال الرمز',fp_need_user:'الرجاء إدخال اسم المستخدم.',fp_checking:'جارٍ التحقق…',fp_no_user:'لا يوجد حساب بهذا الاسم.',fp_no_email:'لا يوجد بريد مسجّل لهذا الحساب. تواصل مع المسؤول.',fp_email_unavail:'خدمة البريد غير مُعدّة. تواصل مع المسؤول.',fp_sent_ok:'تم إرسال الرمز. تحقق من بريدك.',fp_send_fail:'تعذّر إرسال الرمز. حاول لاحقاً.',fp_restart:'الرجاء إعادة بدء عملية الاستعادة.',fp_expired:'انتهت صلاحية الرمز. اطلب رمزاً جديداً.',fp_bad_code:'الرمز غير صحيح.',fp_pwd_short:'كلمة المرور يجب أن تكون 4 أحرف على الأقل.',fp_pwd_mismatch:'كلمتا المرور غير متطابقتين.',fp_reset_ok:'تم تغيير كلمة المرور بنجاح.',sec_title:'إعدادات الأمان والبريد',sec_sub:'إعداد خدمة البريد المُستخدمة لإرسال رموز إعادة تعيين كلمة المرور للمستخدمين.',sec_pub:'المفتاح العام EmailJS',sec_svc:'معرّف الخدمة',sec_tpl:'معرّف القالب',sec_save:'حفظ الإعدادات',sec_test:'إرسال بريد تجريبي',sec_note:'تلميح: أنشئ حساباً مجانياً على emailjs.com، أضف خدمة بريد وقالباً يحتوي المتغيّر {{passcode}}، ثم الصق المفاتيح أعلاه.',sec_saved:'تم حفظ الإعدادات.',sec_need_all:'الرجاء تعبئة الحقول الثلاثة.',sec_admin_only:'للمسؤولين فقط.',sec_bad_cfg:'الإعدادات غير صحيحة أو ناقصة.',sec_no_admin_email:'لا يوجد بريد مسجّل لحسابك.',sec_sending:'جارٍ الإرسال…',sec_test_ok:'تم إرسال بريد تجريبي إلى',sec_test_fail:'فشل الإرسال. تحقق من الإعدادات.',log_title:'سجل عمليات الدخول',log_refresh:'تحديث',log_clear:'مسح السجل',log_user:'المستخدم',log_event:'الحدث',log_time:'الوقت',log_empty:'لا يوجد نشاط بعد.',log_k_login:'تسجيل دخول',log_k_reset:'إعادة تعيين كلمة المرور',log_k_failed:'محاولة فاشلة',login_bad:'اسم المستخدم أو كلمة المرور غير صحيحة',login_empty_user:'الرجاء إدخال اسم المستخدم',login_empty_pass:'الرجاء إدخال كلمة المرور',login_empty_both:'الرجاء إدخال اسم المستخدم وكلمة المرور',login_nouser:'لا يوجد حساب بهذا الاسم',login_wrongpass:'كلمة المرور غير صحيحة — حاول مرة أخرى',login_temp_expired:'انتهت صلاحية الرقم المؤقت. الرجاء طلب رقم جديد.',fp_temp_sent:'تم إرسال رقم مؤقت إلى بريدك.',fp_temp_done1:'تم إرسال رقم مؤقت (صالح 24 ساعة) إلى',fp_temp_done2:'سجّل الدخول به — سيُطلب منك تعيين كلمة مرور جديدة.',fp_done_ok:'تم',temp_show_title:'تم توليد رقم مؤقت',temp_show_for:'للمستخدم',temp_show_valid:'صالح حتى',temp_show_hint:'سيُطلب تغيير كلمة المرور بعد الدخول به.',temp_copy:'نسخ الرقم',login_locked:'الحساب مقفل مؤقتاً. حاول بعد {n} ثانية',nav_users:'المستخدمون',nav_records:'محرّر البيانات',rec_title:'محرّر البيانات — تعديل وإضافة السجلات',rec_add:'إضافة سجل',rec_search:'بحث في السجلات',rec_del:'حذف',rec_dup:'تكرار',rec_edit_hint:'انقر أي خلية في الجدول لتعديلها مباشرةً. تُحفظ التغييرات وتُزامَن لكل الأجهزة تلقائياً.',rec_save:'حفظ في السحابة',rec_qty:'الكمية',rec_cat2:'الفئة 2',rec_logo:'الشعار',rec_need:'أدخل الهوية والفرع على الأقل',logout:'خروج',users_title:'إدارة المستخدمين',users_sub:'إدارة الحسابات والصلاحيات والأمان',utab_users:'المستخدمون',utab_security:'الأمان والبريد',utab_log:'سجل الدخول',ce_title:'عنوان البطاقة',ce_calc:'نوع الحساب',ce_cls:'فئة العمر',ce_month:'الشهر',ce_color:'اللون',ce_save:'حفظ البطاقة',ce_cancel:'إلغاء',ce_sum:'مجموع الكمية',ce_avg:'متوسط الكمية',ce_count:'عدد الأصناف',ce_max:'أعلى كمية',ce_min:'أدنى كمية',ce_all:'الكل',u_add_title:'إضافة مستخدم جديد',u_list_title:'قائمة المستخدمين',u_perms_modal:'الصلاحيات',u_user:'اسم المستخدم',u_pass:'كلمة المرور',u_role:'الصلاحية',u_add:'إضافة مستخدم',u_admin:'مسؤول',u_userrole:'مستخدم',u_actions:'إجراءات',u_delete:'حذف',u_exists:'اسم المستخدم موجود مسبقاً',u_need:'أدخل اسم المستخدم وكلمة المرور',u_perms:'صلاحيات الشاشات',u_temp:'مؤقتة',u_all:'الكل',u_email:'البريد الإلكتروني',u_mobile:'الجوال',u_password:'كلمة المرور',u_resetpwd:'إعادة تعيين كلمة المرور',set_new_pwd:'أدخل كلمة مرور جديدة للمستخدم:',pwd_changed:'تم تحديث كلمة المرور بنجاح.',u_pwd_help:'🔑 إعادة التعيين تضبط كلمة مرور جديدة · ⏳ رقم مؤقت يولّد رقم دخول صالح 24 ساعة · ⚙️ تعديل الصلاحيات للتحكم بالوصول للشاشات.',temp_prompt:'كلمة مرورك مؤقتة. الرجاء إدخال كلمة مرور جديدة:',cols_btn:'الأعمدة',cols_title:'إظهار / إخفاء الأعمدة',cols_hint:'فعّل الفرع لإظهار عموده، وألغِ التفعيل لإخفائه. تُحفظ التغييرات تلقائياً وتُطبّق على الجدولين.',nav_designer:'تصميم الجداول',nav_cardbuilder:'منشئ البطاقات',cb_title:'منشئ البطاقات',cb_sub:'أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات',cb_new:'بطاقة جديدة',cb_f_title:'عنوان البطاقة',cb_f_calc:'نوع الحساب',cb_f_age:'فئة العمر',cb_f_month:'الشهر',cb_f_icon:'الأيقونة',cb_f_color:'اللون',cb_calc_sum:'مجموع الكمية',cb_calc_avg:'متوسط الكمية',cb_calc_count:'عدد الأصناف',cb_calc_max:'أعلى قيمة',cb_calc_min:'أدنى قيمة',cb_age_all:'كل الفئات',cb_month_all:'كل الشهور',cb_save:'حفظ البطاقة',cb_cancel:'إلغاء',cb_preview:'معاينة حية',cb_preview_hint:'القيمة محسوبة من البيانات الحالية وتتأثر بفلاتر لوحة المعلومات.',cb_list:'البطاقات المنشأة',cb_empty:'لا توجد بطاقات بعد. أنشئ بطاقتك الأولى أعلاه.',designer_title:'تصميم الجداول',designer_sub:'عدّل مسميات الأعمدة، اختر طريقة الحساب، ورتّب وأظهر/أخفِ الأعمدة.',calc_method:'طريقة الحساب',calc_sum:'المجموع',calc_avg:'المتوسط',calc_count:'العدد',calc_max:'الأعلى',calc_min:'الأدنى',calc_hint:'تُطبّق على كل خلايا القيم في جدولي الملخص والأصناف.',appearance:'المظهر',colors:'الألوان',c_primary:'الأساسي',c_teal:'التركواز',c_blue:'الأزرق',c_orange:'البرتقالي',st_color:'اللون',st_font:'الخط',st_size:'حجم الخط (px)',st_align:'محاذاة النص',dz_al_def:'افتراضي',dz_al_l:'يسار',dz_al_c:'وسط',dz_al_r:'يمين',font_family:'الخط',font_default:'افتراضي',display_size:'حجم العرض',card_titles:'عناوين ومسميات البطاقات',dz_pick:'اختر الشاشة للتعديل',dz_pick_hint:'كل شاشة تُعدّل بشكل مستقل — التعديلات هنا لا تؤثر على باقي الشاشات.',dz_scr_dash:'لوحة المعلومات',dz_scr_sum:'جدول الملخص',dz_scr_sku:'جدول الأصناف',dz_scr_fgbal:'تقرير رصيد المنتج التام',dz_scr_oldid:'تقرير الهوية القديمة',dz_scr_transit:'تقرير الترانزيت',rpt_cols_title:'أعمدة التقرير',rpt_cols_hint:'أعد تسمية الرؤوس، وحدّد الألوان، وأضف تنسيقاً شرطياً. تُطبَّق التغييرات على هذا التقرير فقط.',rpt_no_data:'ارفع هذا التقرير أولاً لتحميل أعمدته.',dz_scr_appear:'المظهر العام',chart_order:'ترتيب/مكان بطاقات الرسوم',dz_branch_order:'ترتيب أعمدة الفروع',dz_col:'العمود',dz_name:'الاسم المعروض',dz_show:'إظهار',dz_calc:'الحساب',calc_default:'افتراضي',dz_reset:'استعادة الافتراضي',dz_collapse_all:'طي الكل',dz_expand_all:'فتح الكل',dz_sum_title:'أعمدة الملخص',dz_sku_title:'أعمدة الأصناف',set_date_label:'تاريخ تحديث التقرير',set_btn:'تعيين التاريخ',saved_date:'\u2713 تم حفظ تاريخ التحديث.',dz_color:'اللون',dz_cf:'تنسيق شرطي',cc_hbg:'خلفية العنوان',cc_cbg:'خلفية الخلية',cc_cfg:'لون النص',cc_clear:'مسح الألوان',cf_title:'التنسيق الشرطي',cf_sub:'أضف قواعد: عندما تحقق قيمة الخلية شرطاً، طبّق الألوان. "الصف بالكامل" يلوّن الصف كله.',cf_if:'إذا كانت القيمة',cf_and:'و',cf_between:'بين',cf_outside:'خارج',cf_bg:'التعبئة',cf_fg:'النص',cf_bold:'عريض',cf_scope:'التطبيق على',cf_cell:'هذه الخلية',cf_row:'الصف بالكامل',cf_addrule:'إضافة قاعدة',cf_done:'تم',cust_title:'أعمدة محسوبة مخصصة',cust_help:'أنشئ عموداً جديداً من معادلة. استخدم رموز الأعمدة والعمليات الحسابية ( + - * / و % ).',cust_avail:'الرموز المتاحة',cust_name:'اسم العمود',cust_formula_ph:'مثال:  {total} * 0.15   أو   {br_RYD} + {br_HIT}',cust_add:'إضافة عمود',em_edit:'تعديل العناوين',em_done:'إنهاء التعديل',em_banner:'وضع التعديل — انقر أي عنوان لإعادة تسميته. التغييرات تُزامَن للجميع.',portal_titles:'عناوين بوابة الدخول والمنصة',portal_titles_hint:'عدّل نصوص صفحة الدخول الخارجية واسم المنصة. التغييرات تُزامَن للجميع وتظهر في شاشة الدخول.',
+  center_total:'إجمالي الكمية',gsearch_ph:'بحث شامل…',login_sub:'لوحة تحليل المخزون',nav_home:'الرئيسية',login_welcome:'مرحباً بعودتك',login_form_sub:'سجّل الدخول للوصول إلى مساحة التقارير',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'أعمار المخزون والتغطية والتحليلات في مساحة عمل واحدة.',login_stat_wh:'مستودعات',login_stat_br:'علامات',login_stat_rp:'تقارير',home_hero_title:'مركز التقارير',home_hero_sub:'اختر تقريراً لفتحه — كل شيء في مكان واحد.',home_open:'فتح',back_btn:'رجوع',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'تانيا • المستودعات',desc_dash:'المؤشرات والرسوم وتحليل الأعمار',desc_sum:'الإجماليات حسب العلامة والشهر والفرع',desc_sku:'إجماليات الأصناف وأعلى المنتجات',desc_rspace:'استغلال مساحة المستودعات',desc_rfgbal:'رصيد المنتج التام حسب الفرع',desc_roldid:'المخزون الراكد / الهوية القديمة',desc_rtransit:'البضائع في الطريق بين المواقع',desc_rbottle:'تغطية مخزون العبوات',desc_imp:'ارفع ملف Excel لتحديث البيانات',desc_cloud:'المزامنة والنسخ الاحتياطي عبر Firebase',desc_records:'عدّل أي خلية، أضف، كرّر أو احذف السجلات',desc_designer:'تخصيص أعمدة الجداول وطرق الحساب',desc_users:'إدارة الحسابات والصلاحيات',desc_dailyup:'رفع ملفات التغطية اليومية',login_user:'اسم المستخدم',login_pass:'كلمة المرور',login_btn:'دخول',col_new_manual:'عمود يدوي جديد',col_new_calc:'عمود محسوب جديد',colm_title:'إدارة الأعمدة',colm_sub:'أضف أعمدة مخصصة (يدوية أو محسوبة) لأي جدول.',colm_screen:'الجدول',colm_add_calc:'+ عمود محسوب',colm_add_manual:'+ عمود يدوي',colm_name:'اسم العمود',colm_formula:'صيغة مثل {total} * 0.15',colm_type:'النوع',colm_t_calc:'محسوب',colm_t_manual:'يدوي',colm_avail:'المتغيرات المتاحة',colm_hbg:'لون الرأس',colm_cbg:'لون الخلية',colm_del:'حذف',colm_none:'لا توجد أعمدة مخصصة بعد.',colm_help_calc:'استخدم المتغيرات بين أقواس معقوفة. يدعم + - * / ( ) ودوال Math.round/abs/min/max.',colm_help_manual:'الأعمدة اليدوية تتيح إدخال قيمة لكل صف مباشرة.',colm_existing:'الأعمدة الموجودة (اضغط للإظهار/الإخفاء)',colm_custom:'الأعمدة المخصصة',colm_hide:'إخفاء العمود',colm_show:'إظهار العمود',forgot_pwd:'نسيت كلمة المرور؟',login_remember:'تذكّرني على هذا الجهاز',login_bio:'الدخول ببصمة الإصبع / Face ID',bio_or:'أو',bio_setup_title:'دخول سريع',bio_setup_q:'تفعيل بصمة الإصبع / Face ID لتسجيل دخول أسرع في المرة القادمة؟',bio_enable:'تفعيل',bio_later:'ليس الآن',bio_enabled:'تم تفعيل الدخول السريع على هذا الجهاز.',bio_failed:'فشل الدخول البيومتري. استخدم كلمة المرور.',bio_unsupported:'هذا الجهاز لا يدعم الدخول البيومتري.',bio_none:'لا يوجد دخول سريع محفوظ على هذا الجهاز.',bio_disable:'إيقاف الدخول السريع',bio_disabled:'تم إيقاف الدخول السريع على هذا الجهاز.',fpc_title:'تغيير كلمة المرور مطلوب',fpc_sub:'لحماية حسابك، يجب تعيين كلمة مرور جديدة قبل المتابعة.',fpc_new:'كلمة المرور الجديدة',fpc_confirm:'تأكيد كلمة المرور',fpc_save:'حفظ ومتابعة',fpc_r_len:'8 أحرف على الأقل',fpc_r_upper:'حرف كبير (A-Z)',fpc_r_lower:'حرف صغير (a-z)',fpc_r_digit:'رقم (0-9)',fpc_r_symbol:'رمز خاص (!@#$...)',pwd_reset_forced:'تمت إعادة التعيين. سيُطلب من المستخدم تعيين كلمة مرور جديدة عند الدخول.',fp_title:'إعادة تعيين كلمة المرور',fp_desc1:'أدخل اسم المستخدم وسيُرسل رمز تأكيد إلى بريدك المسجّل.',fp_desc2:'أدخل الرمز المُرسل إلى',fp_send:'إرسال الرمز',fp_reset:'إعادة التعيين',fp_resend:'إعادة إرسال الرمز',fp_need_user:'الرجاء إدخال اسم المستخدم.',fp_checking:'جارٍ التحقق…',fp_no_user:'لا يوجد حساب بهذا الاسم.',fp_no_email:'لا يوجد بريد مسجّل لهذا الحساب. تواصل مع المسؤول.',fp_email_unavail:'خدمة البريد غير مُعدّة. تواصل مع المسؤول.',fp_sent_ok:'تم إرسال الرمز. تحقق من بريدك.',fp_send_fail:'تعذّر إرسال الرمز. حاول لاحقاً.',fp_restart:'الرجاء إعادة بدء عملية الاستعادة.',fp_expired:'انتهت صلاحية الرمز. اطلب رمزاً جديداً.',fp_bad_code:'الرمز غير صحيح.',fp_pwd_short:'كلمة المرور يجب أن تكون 4 أحرف على الأقل.',fp_pwd_mismatch:'كلمتا المرور غير متطابقتين.',fp_reset_ok:'تم تغيير كلمة المرور بنجاح.',sec_title:'إعدادات الأمان والبريد',sec_sub:'إعداد خدمة البريد المُستخدمة لإرسال رموز إعادة تعيين كلمة المرور للمستخدمين.',sec_pub:'المفتاح العام EmailJS',sec_svc:'معرّف الخدمة',sec_tpl:'معرّف القالب',sec_save:'حفظ الإعدادات',sec_test:'إرسال بريد تجريبي',sec_note:'تلميح: أنشئ حساباً مجانياً على emailjs.com، أضف خدمة بريد وقالباً يحتوي المتغيّر {{passcode}}، ثم الصق المفاتيح أعلاه.',sec_saved:'تم حفظ الإعدادات.',sec_need_all:'الرجاء تعبئة الحقول الثلاثة.',sec_admin_only:'للمسؤولين فقط.',sec_bad_cfg:'الإعدادات غير صحيحة أو ناقصة.',sec_no_admin_email:'لا يوجد بريد مسجّل لحسابك.',sec_sending:'جارٍ الإرسال…',sec_test_ok:'تم إرسال بريد تجريبي إلى',sec_test_fail:'فشل الإرسال. تحقق من الإعدادات.',log_title:'سجل عمليات الدخول',log_refresh:'تحديث',log_clear:'مسح السجل',log_user:'المستخدم',log_event:'الحدث',log_time:'الوقت',log_empty:'لا يوجد نشاط بعد.',log_k_login:'تسجيل دخول',log_k_reset:'إعادة تعيين كلمة المرور',log_k_failed:'محاولة فاشلة',login_bad:'اسم المستخدم أو كلمة المرور غير صحيحة',login_empty_user:'الرجاء إدخال اسم المستخدم',login_empty_pass:'الرجاء إدخال كلمة المرور',login_empty_both:'الرجاء إدخال اسم المستخدم وكلمة المرور',login_nouser:'لا يوجد حساب بهذا الاسم',login_wrongpass:'كلمة المرور غير صحيحة — حاول مرة أخرى',login_temp_expired:'انتهت صلاحية الرقم المؤقت. الرجاء طلب رقم جديد.',fp_temp_sent:'تم إرسال رقم مؤقت إلى بريدك.',fp_temp_done1:'تم إرسال رقم مؤقت (صالح 24 ساعة) إلى',fp_temp_done2:'سجّل الدخول به — سيُطلب منك تعيين كلمة مرور جديدة.',fp_done_ok:'تم',temp_show_title:'تم توليد رقم مؤقت',temp_show_for:'للمستخدم',temp_show_valid:'صالح حتى',temp_show_hint:'سيُطلب تغيير كلمة المرور بعد الدخول به.',temp_copy:'نسخ الرقم',login_locked:'الحساب مقفل مؤقتاً. حاول بعد {n} ثانية',nav_users:'المستخدمون',nav_records:'محرّر البيانات',rec_title:'محرّر البيانات — تعديل وإضافة السجلات',rec_add:'إضافة سجل',rec_search:'بحث في السجلات',rec_del:'حذف',rec_dup:'تكرار',rec_edit_hint:'انقر أي خلية في الجدول لتعديلها مباشرةً. تُحفظ التغييرات وتُزامَن لكل الأجهزة تلقائياً.',rec_save:'حفظ في السحابة',rec_qty:'الكمية',rec_cat2:'الفئة 2',rec_logo:'الشعار',rec_need:'أدخل الهوية والفرع على الأقل',logout:'خروج',users_title:'إدارة المستخدمين',users_sub:'إدارة الحسابات والصلاحيات والأمان',utab_users:'المستخدمون',utab_security:'الأمان والبريد',utab_log:'سجل الدخول',ce_title:'عنوان البطاقة',ce_calc:'نوع الحساب',ce_cls:'فئة العمر',ce_month:'الشهر',ce_color:'اللون',ce_save:'حفظ البطاقة',ce_cancel:'إلغاء',ce_sum:'مجموع الكمية',ce_avg:'متوسط الكمية',ce_count:'عدد الأصناف',ce_max:'أعلى كمية',ce_min:'أدنى كمية',ce_all:'الكل',u_add_title:'إضافة مستخدم جديد',u_list_title:'قائمة المستخدمين',u_perms_modal:'الصلاحيات',u_user:'اسم المستخدم',u_pass:'كلمة المرور',u_role:'الصلاحية',u_add:'إضافة مستخدم',u_admin:'مسؤول',u_userrole:'مستخدم',u_actions:'إجراءات',u_delete:'حذف',u_exists:'اسم المستخدم موجود مسبقاً',u_need:'أدخل اسم المستخدم وكلمة المرور',u_perms:'صلاحيات الشاشات',u_temp:'مؤقتة',u_all:'الكل',u_email:'البريد الإلكتروني',u_mobile:'الجوال',u_password:'كلمة المرور',u_resetpwd:'إعادة تعيين كلمة المرور',set_new_pwd:'أدخل كلمة مرور جديدة للمستخدم:',pwd_changed:'تم تحديث كلمة المرور بنجاح.',u_pwd_help:'🔑 إعادة التعيين تضبط كلمة مرور جديدة · ⏳ رقم مؤقت يولّد رقم دخول صالح 24 ساعة · ⚙️ تعديل الصلاحيات للتحكم بالوصول للشاشات.',temp_prompt:'كلمة مرورك مؤقتة. الرجاء إدخال كلمة مرور جديدة:',cols_btn:'الأعمدة',cols_title:'إظهار / إخفاء الأعمدة',cols_hint:'فعّل الفرع لإظهار عموده، وألغِ التفعيل لإخفائه. تُحفظ التغييرات تلقائياً وتُطبّق على الجدولين.',nav_designer:'تصميم الجداول',nav_cardbuilder:'منشئ البطاقات',cb_title:'منشئ البطاقات',cb_sub:'أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات',cb_new:'بطاقة جديدة',cb_f_title:'عنوان البطاقة',cb_f_calc:'نوع الحساب',cb_f_age:'فئة العمر',cb_f_month:'الشهر',cb_f_icon:'الأيقونة',cb_f_color:'اللون',cb_calc_sum:'مجموع الكمية',cb_calc_avg:'متوسط الكمية',cb_calc_count:'عدد الأصناف',cb_calc_max:'أعلى قيمة',cb_calc_min:'أدنى قيمة',cb_age_all:'كل الفئات',cb_month_all:'كل الشهور',cb_save:'حفظ البطاقة',cb_cancel:'إلغاء',cb_preview:'معاينة حية',cb_preview_hint:'القيمة محسوبة من البيانات الحالية وتتأثر بفلاتر لوحة المعلومات.',cb_list:'البطاقات المنشأة',cb_empty:'لا توجد بطاقات بعد. أنشئ بطاقتك الأولى أعلاه.',designer_title:'تصميم الجداول',designer_sub:'عدّل مسميات الأعمدة، اختر طريقة الحساب، ورتّب وأظهر/أخفِ الأعمدة.',calc_method:'طريقة الحساب',calc_sum:'المجموع',calc_avg:'المتوسط',calc_count:'العدد',calc_max:'الأعلى',calc_min:'الأدنى',calc_hint:'تُطبّق على كل خلايا القيم في جدولي الملخص والأصناف.',appearance:'المظهر',colors:'الألوان',c_primary:'الأساسي',c_teal:'التركواز',c_blue:'الأزرق',c_orange:'البرتقالي',st_color:'اللون',st_font:'الخط',st_size:'حجم الخط (px)',st_align:'محاذاة النص',dz_al_def:'افتراضي',dz_al_l:'يسار',dz_al_c:'وسط',dz_al_r:'يمين',font_family:'الخط',font_default:'افتراضي',display_size:'حجم العرض',card_titles:'عناوين ومسميات البطاقات',dz_pick:'اختر الشاشة للتعديل',dz_pick_hint:'كل شاشة تُعدّل بشكل مستقل — التعديلات هنا لا تؤثر على باقي الشاشات.',dz_scr_dash:'لوحة المعلومات',dz_scr_sum:'جدول الملخص',dz_scr_sku:'جدول الأصناف',dz_scr_fgbal:'تقرير رصيد المنتج التام',dz_scr_oldid:'تقرير الهوية القديمة',dz_scr_transit:'تقرير الترانزيت',rpt_cols_title:'أعمدة التقرير',rpt_cols_hint:'أعد تسمية الرؤوس، وحدّد الألوان، وأضف تنسيقاً شرطياً. تُطبَّق التغييرات على هذا التقرير فقط.',rpt_no_data:'ارفع هذا التقرير أولاً لتحميل أعمدته.',dz_scr_appear:'المظهر العام',chart_order:'ترتيب/مكان بطاقات الرسوم',dz_branch_order:'ترتيب أعمدة الفروع',dz_col:'العمود',dz_name:'الاسم المعروض',dz_show:'إظهار',dz_calc:'الحساب',calc_default:'افتراضي',dz_reset:'استعادة الافتراضي',dz_collapse_all:'طي الكل',dz_expand_all:'فتح الكل',dz_sum_title:'أعمدة الملخص',dz_sku_title:'أعمدة الأصناف',set_date_label:'تاريخ تحديث التقرير',set_btn:'تعيين التاريخ',saved_date:'\u2713 تم حفظ تاريخ التحديث.',dz_color:'اللون',dz_cf:'تنسيق شرطي',cc_hbg:'خلفية العنوان',cc_cbg:'خلفية الخلية',cc_cfg:'لون النص',cc_clear:'مسح الألوان',cf_title:'التنسيق الشرطي',cf_sub:'أضف قواعد: عندما تحقق قيمة الخلية شرطاً، طبّق الألوان. "الصف بالكامل" يلوّن الصف كله.',cf_if:'إذا كانت القيمة',cf_and:'و',cf_between:'بين',cf_outside:'خارج',cf_bg:'التعبئة',cf_fg:'النص',cf_bold:'عريض',cf_scope:'التطبيق على',cf_cell:'هذه الخلية',cf_row:'الصف بالكامل',cf_addrule:'إضافة قاعدة',cf_done:'تم',cust_title:'أعمدة محسوبة مخصصة',cust_help:'أنشئ عموداً جديداً من معادلة. استخدم رموز الأعمدة والعمليات الحسابية ( + - * / و % ).',cust_avail:'الرموز المتاحة',cust_name:'اسم العمود',cust_formula_ph:'مثال:  {total} * 0.15   أو   {br_RYD} + {br_HIT}',cust_add:'إضافة عمود',em_edit:'تعديل العناوين',em_done:'إنهاء التعديل',em_banner:'وضع التعديل — انقر أي عنوان لإعادة تسميته. التغييرات تُزامَن للجميع.',portal_titles:'عناوين بوابة الدخول والمنصة',portal_titles_hint:'عدّل نصوص صفحة الدخول الخارجية واسم المنصة. التغييرات تُزامَن للجميع وتظهر في شاشة الدخول.',
   sum_title:'المنتج التام — ملخص الإجماليات',c_year:'العام',c_month:'الشهر',c_cat:'الفئة',c_total:'الإجمالي',c_pct:'النسبة %',sum_grand:'الإجمالي',
   ch_brand:'المخزون حسب الفئة (العلامة)',ch_monthly:'الإجماليات الشهرية',nav_sku:'ملخص الأصناف',sku_title:'ملخص إجماليات الأصناف (SKU)',c_code:'كود الصنف',c_size:'الحجم',c_pack2:'الشد',c_dim:'الحجم / الشد',search_item:'بحث بكود الصنف',dimension:'البُعد',ch_topitems:'أعلى الأصناف كميةً',nav_cloud:'السحابة',grp_daily:'التقارير اليومية',grp_data:'البيانات والأدوات',grp_admintools:'أدوات الإدارة',u_selall:'تحديد الكل',u_selnone:'مسح',nav_masterdata:'البيانات الرئيسية',nav_spaceact:'المساحات الفعلية',nav_rspace:'مساحات المستودعات',nav_rfgbal:'أرصدة المنتجات',nav_roldid:'الهوية القديمة',nav_rtransit:'الترانزيت',nav_rbottle:'أرصدة القارورة',nav_dailyup:'رفع التقارير اليومية',cloud_title:'\u2601\ufe0f مزامنة سحابية - Firebase',cloud_sub:'تخزين ومزامنة بيانات التقرير في Firebase (Firestore).',cloud_cfg_label:'إعدادات Firebase',fb_apikey:'مفتاح API',fb_project:'معرّف المشروع',fb_authdomain:'نطاق المصادقة',fb_bucket:'مساحة التخزين',fb_sender:'معرّف المرسل',fb_appid:'معرّف التطبيق',fb_paste_toggle:'أو الصق إعدادات firebaseConfig كاملة',fb_fill:'تعبئة الحقول من الإعدادات',popout_btn:'نافذة',full_btn:'ملء الشاشة',export_excel:'تصدير إلى Excel',cloud_connect:'اتصال',cloud_save:'حفظ إلى السحابة',cloud_test:'اختبار الاتصال',cloud_load:'تحميل من السحابة',cloud_auto:'تحميل تلقائي عند الفتح وحفظ تلقائي بعد كل تعديل',cloud_live:'مزامنة لحظية ثنائية (موصى بها)',cloud_note_title:'ملاحظات الإعداد',cloud_st_idle:'غير متصل',cloud_n1:'أنشئ مشروع Firebase، فعّل <b>Firestore Database</b>، ثم انسخ <span class=\"tag\">firebaseConfig</span> من إعدادات المشروع.',cloud_n2:'للاختبار اضبط قواعد Firestore على وضع الاختبار. للإنتاج أمّن القواعد.',cloud_n3:'تُخزّن البيانات في المجموعة <span class=\"tag\">inventory_dashboard</span>، المستند <span class=\"tag\">latest</span>.',cloud_n4:'تُحفظ كل البيانات والإعدادات في السحابة فقط (بدون تخزين محلي في المتصفح).',cyl_storage:'المساحة التخزينية',cyl_used:'رصيد مُستخدم',cyl_transit:'ترانزيت',cyl_empty:'فارغة (متاحة)',cyl_branch_title:'الفروع',cyl_fact_title:'المصانع',
   foot:(s,t,q)=>'عرض '+s+' من '+t+' سجل  •  إجمالي الكمية '+q+'  •  اضغط الفلاتر للتصفية',
@@ -3079,17 +3108,23 @@ function mv(type,v){const m=(T[LANG].map||{})[type];if(m&&m[v])return m[v];if(ty
 
 /* حماية إعدادات Chart: إن لم تكن مكتبة Chart جاهزة عند هذه النقطة، لا توقف تنفيذ
    باقي السكربت (تعريفات CB_ICONS ودوال منشئ البطاقات وغيرها تأتي بعد هذا السطر). */
-try{
+function _applyChartDefaults(){
+ try{
   if(typeof Chart!=='undefined'&&Chart.defaults){
-    if(Chart.defaults.font){Chart.defaults.font.family="'Inter',sans-serif";Chart.defaults.font.size=11;}
+    var _ar=(typeof LANG!=='undefined'&&LANG==='ar');
+    if(Chart.defaults.font){Chart.defaults.font.family=_ar?"'Cairo',sans-serif":"'Inter',sans-serif";Chart.defaults.font.size=11;}
     Chart.defaults.color='#64748b';
     if(Chart.defaults.animation)Chart.defaults.animation.duration=700;
     if(Chart.defaults.plugins&&Chart.defaults.plugins.tooltip){
       var _tt=Chart.defaults.plugins.tooltip;
       _tt.backgroundColor='#0c2547';_tt.padding=10;_tt.cornerRadius=8;_tt.titleFont={weight:'700'};_tt.boxPadding=5;
     }
+    return true;
   }
-}catch(e){console.warn('Chart defaults init skipped',e);}
+ }catch(e){console.warn('Chart defaults init skipped',e);}
+ return false;
+}
+_applyChartDefaults();
 
 function setLang(l){LANG=l;applyLang();}
 function applyLang(){
@@ -3237,7 +3272,8 @@ function filtered(){return DATA.filter(d=> matchG(d) &&
   (sel.store_class.size===0||sel.store_class.has(d.store_class)));}
 function agg(rows,key){const m={};rows.forEach(r=>{m[r[key]]=(m[r[key]]||0)+r.qty;});return m;}
 let charts={};window.charts=charts;
-function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
+var _chartsPending=false;
+function mk(id,cfg){if(typeof Chart==='undefined'){_chartsPending=true;return;}if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
 const dlabel={id:'dl',afterDatasetsDraw(c){const{ctx}=c;ctx.save();const _fs=(c.data.labels&&c.data.labels.length>9)?9.5:11;ctx.font='700 '+_fs+'px '+(LANG==='ar'?'Cairo':'Inter');ctx.fillStyle='#334155';
   c.data.datasets.forEach((ds,di)=>{const meta=c.getDatasetMeta(di);if(meta.hidden)return;meta.data.forEach((el,i)=>{const v=ds.data[i];if(!v)return;
     if(c.config.type==='bar'&&c.options.indexAxis==='y'){ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(fmt(v),el.x+6,el.y);}
@@ -4001,11 +4037,12 @@ function _editKeydown(e){if(e.key==='Enter'){e.preventDefault();e.target.blur();
 function _editBlur(e){const el=e.target,k=el.dataset.i18n;const nv=(el.textContent||'').trim();const orig=tr(k);setTitle(k,(nv===orig||nv==='')?'':nv);el.textContent=ttl(k);}
 function bindEditables(){document.querySelectorAll('[data-i18n]').forEach(el=>{const tag=el.tagName;if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA'||tag==='OPTION')return;el.setAttribute('contenteditable','true');el.addEventListener('keydown',_editKeydown);el.addEventListener('blur',_editBlur);});}
 function unbindEditables(){document.querySelectorAll('[data-i18n][contenteditable]').forEach(el=>{el.removeAttribute('contenteditable');el.removeEventListener('keydown',_editKeydown);el.removeEventListener('blur',_editBlur);});}
-function applyFont(){const ff=FONT?("'"+FONT+"', sans-serif"):'';document.body.style.fontFamily=ff;Chart.defaults.font.family=FONT?("'"+FONT+"'"):(LANG==='ar'?"'Cairo',sans-serif":"'Inter',sans-serif");refreshCharts();}
+function applyFont(){const ff=FONT?("'"+FONT+"', sans-serif"):'';document.body.style.fontFamily=ff;try{if(typeof Chart!=='undefined'&&Chart.defaults&&Chart.defaults.font)Chart.defaults.font.family=FONT?("'"+FONT+"'"):(LANG==='ar'?"'Cairo',sans-serif":"'Inter',sans-serif");}catch(e){}refreshCharts();}
 function setFont(v){FONT=v;try{LS.setItem('ui_font',v);}catch(e){}applyFont();pushSettingsToCloud();}
 function applyScale(){const c=document.querySelector('.content');if(c)c.style.zoom=(parseInt(UISCALE,10)||100)/100;}
 function setScale(v){UISCALE=v;try{LS.setItem('ui_scale',v);}catch(e){}applyScale();pushSettingsToCloud();}
-function refreshCharts(){try{render();}catch(e){}rebuildTables();}
+var _booting=true;
+function refreshCharts(){if(_booting)return;try{render();}catch(e){}rebuildTables();}
 function tagCards(){const g=document.getElementById('chart-grid');if(!g)return[];const cards=[...g.children];cards.forEach((c,i)=>{if(!c.dataset.chart)c.dataset.chart=CHART_DEF[i]||('x'+i);});return cards;}
 function applyChartOrder(){const cards=tagCards();const order=CHARTORDER||CHART_DEF;cards.forEach(c=>{const idx=order.indexOf(c.dataset.chart);c.style.order=idx<0?99:idx;});}
 function moveChart(id,dir){let order=(CHARTORDER||CHART_DEF).slice();const i=order.indexOf(id);const j=i+dir;if(i<0||j<0||j>=order.length)return;const t=order[i];order[i]=order[j];order[j]=t;CHARTORDER=order;try{LS.setItem('chart_order',JSON.stringify(order));}catch(e){}applyChartOrder();renderDesigner();pushSettingsToCloud();}
@@ -4513,6 +4550,179 @@ function doLogin(){
   _loginProceed(u,p);
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   ميزة (1) «إبقائي مسجّلاً» + ميزة (2) الدخول البيومتري (WebAuthn)
+   ──────────────────────────────────────────────────────────────────
+   • تذكّرني: يحفظ علامة + اسم المستخدم محلياً، ويبقي الجلسة عبر إعادة
+     فتح المتصفح عبر localStorage بدل sessionStorage فقط.
+   • الدخول البيومتري: يستخدم WebAuthn (بصمة الإصبع / Face ID / Windows
+     Hello). يربط بصمة الجهاز ببيانات دخول محفوظة محلياً ومشفّرة، وعند
+     نجاح التحقق البيومتري يُكمل تسجيل الدخول تلقائياً.
+   ═══════════════════════════════════════════════════════════════════ */
+var BIO_STORE_KEY='dash_bio_cred';      /* بيانات اعتماد WebAuthn لكل مستخدم على هذا الجهاز */
+var REMEMBER_KEY='dash_remember';        /* علامة «تذكّرني» + آخر اسم مستخدم */
+var REMEMBER_SESSION_KEY='dash_session_persist'; /* جلسة دائمة عند تفعيل تذكّرني */
+
+/* ───── أدوات تخزين ───── */
+function _bioGetAll(){try{return JSON.parse(LS.getItem(BIO_STORE_KEY)||'{}')||{};}catch(e){return {};}}
+function _bioSaveAll(o){try{LS.setItem(BIO_STORE_KEY,JSON.stringify(o||{}));}catch(e){}}
+function _b64uFromBuf(buf){var b=new Uint8Array(buf),s='';for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function _bufFromB64u(str){str=String(str||'').replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';var bin=atob(str),b=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);return b.buffer;}
+function _bioSupported(){return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create);}
+
+/* ───── إبقائي مسجّلاً ───── */
+function _rememberRead(){try{return JSON.parse(LS.getItem(REMEMBER_KEY)||'null');}catch(e){return null;}}
+function _rememberWrite(on,user){try{if(on)LS.setItem(REMEMBER_KEY,JSON.stringify({on:true,u:user||''}));else LS.removeItem(REMEMBER_KEY);}catch(e){}}
+/* تُستدعى بعد نجاح أي تسجيل دخول محلي */
+function _onLoginSuccess(user){
+  var rememberEl=document.getElementById('login-remember');
+  var remember=rememberEl?rememberEl.checked:false;
+  _rememberWrite(remember,user);
+  try{
+    if(remember){LS.setItem(REMEMBER_SESSION_KEY,JSON.stringify(CURRENT_USER));}
+    else{LS.removeItem(REMEMBER_SESSION_KEY);}
+  }catch(e){}
+  /* عرض زر الدخول البيومتري وتقديم عرض التفعيل إن لم يكن مُفعّلاً بعد */
+  _maybeOfferBio(user);
+}
+
+/* ───── إظهار/إخفاء كلمة المرور في شاشة الدخول ───── */
+function _loginToggleEye(){
+  var inp=document.getElementById('login-pass'),b=document.getElementById('login-eye');if(!inp)return;
+  if(inp.type==='password'){inp.type='text';if(b)b.textContent='🙈';}
+  else{inp.type='password';if(b)b.textContent='👁';}
+}
+
+/* ───── مزامنة مظهر مفتاح «تذكّرني» مع حالة الـ checkbox ───── */
+function _syncRememberSwitch(){
+  var rEl=document.getElementById('login-remember');
+  var wrap=document.getElementById('login-remember-wrap');
+  if(rEl&&wrap)wrap.classList.toggle('is-on',!!rEl.checked);
+}
+
+/* ───── تهيئة شاشة الدخول: ملء اسم المستخدم وإظهار زر البصمة ───── */
+function initLoginExtras(){
+  try{
+    var rem=_rememberRead();
+    var rEl=document.getElementById('login-remember');
+    var uEl=document.getElementById('login-user');
+    if(rem&&rem.on){
+      if(rEl)rEl.checked=true;
+      if(uEl&&!uEl.value&&rem.u)uEl.value=rem.u;
+    }
+    /* اربط معالج التغيير مرة واحدة + زامن المظهر الآن */
+    if(rEl&&!rEl._lrBound){rEl.addEventListener('change',_syncRememberSwitch);rEl._lrBound=true;}
+    _syncRememberSwitch();
+  }catch(e){}
+  /* زر الدخول البيومتري: يظهر متى كان الجهاز يدعم البصمة (حتى قبل تسجيلها).
+     عند الضغط بلا بصمة محفوظة، يُرشد المستخدم لتسجيل الدخول أولاً لتفعيلها. */
+  var btn=document.getElementById('login-bio-btn');
+  if(btn)btn.style.display=_bioSupported()?'flex':'none';
+}
+
+/* ═══════════ WebAuthn: تسجيل بصمة جديدة ═══════════ */
+function _bioRandomChallenge(){var a=new Uint8Array(32);(window.crypto||window.msCrypto).getRandomValues(a);return a.buffer;}
+
+function bioRegister(user,pwd){
+  var ar=drIsAr&&drIsAr();
+  if(!_bioSupported()){try{if(typeof syncToast==='function')syncToast(tr('bio_unsupported'),'err');}catch(e){}return Promise.reject('unsupported');}
+  var userIdBuf=(function(){var s=String(user||'user');var b=new Uint8Array(s.length);for(var i=0;i<s.length;i++)b[i]=s.charCodeAt(i)&255;return b.buffer;})();
+  var opts={
+    publicKey:{
+      challenge:_bioRandomChallenge(),
+      rp:{name:'Tania Inventory',id:location.hostname},
+      user:{id:userIdBuf,name:user,displayName:user},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{userVerification:'required',residentKey:'preferred'},
+      timeout:60000,
+      attestation:'none'
+    }
+  };
+  return navigator.credentials.create(opts).then(function(cred){
+    if(!cred)throw 'no-cred';
+    /* نخزّن معرّف البصمة + بيانات الدخول محلياً (مشفّرة بشكل بسيط) لإعادة الدخول */
+    var all=_bioGetAll();
+    all[user.toLowerCase()]={
+      id:_b64uFromBuf(cred.rawId),
+      u:user,
+      p:_bioWrap(pwd),               /* كلمة المرور ملفوفة — تُفك فقط بعد نجاح التحقق البيومتري */
+      ts:Date.now()
+    };
+    _bioSaveAll(all);
+    var btn=document.getElementById('login-bio-btn');if(btn)btn.style.display='flex';
+    try{if(typeof syncToast==='function')syncToast(tr('bio_enabled'),'ok');}catch(e){}
+    return true;
+  });
+}
+
+/* لفّ/فكّ بسيط لكلمة المرور المخزّنة محلياً (تشويش، ليس تعمية قوية — الحماية الفعلية من التحقق البيومتري) */
+function _bioWrap(s){try{return btoa(unescape(encodeURIComponent('Δ'+String(s==null?'':s))));}catch(e){return '';}}
+function _bioUnwrap(s){try{var d=decodeURIComponent(escape(atob(String(s||''))));return d.charAt(0)==='Δ'?d.slice(1):d;}catch(e){return '';}}
+
+/* ═══════════ WebAuthn: تسجيل الدخول بالبصمة ═══════════ */
+function bioLogin(){
+  var ar=drIsAr&&drIsAr();
+  var btn=document.getElementById('login-bio-btn');
+  if(!_bioSupported()){_loginShowErr(tr('bio_unsupported'));return;}
+  var all=_bioGetAll();var keys=Object.keys(all);
+  if(!keys.length){_loginShowErr(tr('bio_none'));return;}
+  /* إن كان اسم المستخدم مكتوباً نستهدف بصمته، وإلا نسمح بأي بصمة محفوظة */
+  var typed=(val('login-user')||'').trim().toLowerCase();
+  var targets=(typed&&all[typed])?[all[typed]]:keys.map(function(k){return all[k];});
+  var allow=targets.map(function(t){return {type:'public-key',id:_bufFromB64u(t.id)};});
+  if(btn)btn.disabled=true;
+  var opts={publicKey:{challenge:_bioRandomChallenge(),timeout:60000,userVerification:'required',rpId:location.hostname,allowCredentials:allow}};
+  navigator.credentials.get(opts).then(function(assertion){
+    if(btn)btn.disabled=false;
+    if(!assertion)throw 'no-assertion';
+    var rid=_b64uFromBuf(assertion.rawId);
+    var match=targets.find(function(t){return t.id===rid;})||targets[0];
+    if(!match)throw 'no-match';
+    /* بعد نجاح التحقق البيومتري: أكمل تسجيل الدخول بالبيانات المحفوظة */
+    var pwd=_bioUnwrap(match.p);
+    /* فعّل «تذكّرني» تلقائياً مع البصمة لإبقاء الجلسة */
+    var rEl=document.getElementById('login-remember');if(rEl)rEl.checked=true;try{_syncRememberSwitch();}catch(e){}
+    var uEl=document.getElementById('login-user');if(uEl)uEl.value=match.u;
+    _loginProceed(match.u,pwd);
+  }).catch(function(err){
+    if(btn)btn.disabled=false;
+    _loginShowErr(tr('bio_failed'));
+  });
+}
+
+/* ═══════════ عرض تفعيل البصمة بعد أول دخول ناجح ═══════════ */
+function _maybeOfferBio(user){
+  try{
+    if(!_bioSupported())return;
+    var all=_bioGetAll();
+    if(all[String(user||'').toLowerCase()])return;   /* مُفعّل مسبقاً لهذا المستخدم */
+    /* احفظ كلمة المرور المُدخلة مؤقتاً للتسجيل */
+    var pwd=val('login-pass')||window._lastLoginPwd||'';
+    if(!pwd)return;
+    var ar=drIsAr&&drIsAr();
+    setTimeout(function(){
+      if(confirm(tr('bio_setup_q'))){
+        bioRegister(user,pwd).catch(function(){});
+      }
+    },400);
+  }catch(e){}
+}
+
+/* إيقاف الدخول السريع للمستخدم الحالي (يمكن ربطه بزر في الإعدادات) */
+function bioDisable(user){
+  var all=_bioGetAll();var k=String(user||(CURRENT_USER&&CURRENT_USER.u)||'').toLowerCase();
+  if(all[k]){delete all[k];_bioSaveAll(all);}
+  var btn=document.getElementById('login-bio-btn');
+  if(btn)btn.style.display=Object.keys(all).length?'flex':'none';
+  try{if(typeof syncToast==='function')syncToast(tr('bio_disabled'),'ok');}catch(e){}
+}
+
+/* تهيئة عند جاهزية DOM */
+try{
+  if(document.readyState!=='loading')setTimeout(initLoginExtras,60);
+  else document.addEventListener('DOMContentLoaded',function(){setTimeout(initLoginExtras,60);});
+}catch(e){}
+
 /* ═══════════════════════════════════════════════════════════
    نظام إعادة تعيين كلمة المرور عبر رمز تأكيد بالبريد (EmailJS)
    ═══════════════════════════════════════════════════════════ */
@@ -4903,6 +5113,8 @@ function _loginProceed(u,p){
   if(usedTemp)fnd.mustChange=true;
   CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};
   try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
+  try{window._lastLoginPwd=p;}catch(e){}
+  try{_onLoginSuccess(fnd.u);}catch(e){}
   try{logLogin(fnd.u,'login');}catch(e){}
   document.getElementById('login-err').textContent='';document.getElementById('login-pass').value='';
   document.getElementById('login-ov').style.display='none';applyRole();
@@ -5030,7 +5242,7 @@ function submitForcePwd(){
   applyRole();go('home');
   try{alert(ar?'تم تغيير كلمة المرور بنجاح':'Password changed successfully');}catch(e){}
 }
-function logout(){CURRENT_USER=null;try{sessionStorage.removeItem('dash_session');LS.removeItem('dash_session');}catch(e){}if(EDITMODE){EDITMODE=false;document.body.classList.remove('editmode');unbindEditables();const _f=document.getElementById('edit-fab');if(_f)_f.classList.remove('on');}document.body.classList.remove('is-admin');go('dash');document.getElementById('login-ov').style.display='flex';}
+function logout(){CURRENT_USER=null;try{sessionStorage.removeItem('dash_session');LS.removeItem('dash_session');LS.removeItem(REMEMBER_SESSION_KEY);_rememberWrite(false);}catch(e){}if(EDITMODE){EDITMODE=false;document.body.classList.remove('editmode');unbindEditables();const _f=document.getElementById('edit-fab');if(_f)_f.classList.remove('on');}document.body.classList.remove('is-admin');go('dash');document.getElementById('login-ov').style.display='flex';try{setTimeout(initLoginExtras,40);}catch(e){}}
 function renderUsers(){
   const us=getUsers()||[];const ar=drIsAr&&drIsAr();
   let html='<thead><tr>'
@@ -5198,13 +5410,34 @@ function addUser(){
 function delUser(i){let us=getUsers()||[];if(!us[i])return;if(CURRENT_USER&&us[i].u===CURRENT_USER.u)return;us.splice(i,1);saveUsers(us);renderUsers();}
 function initAuth(){
   seedUsers();
-  /* أمان: لا يوجد دخول تلقائي محلي إطلاقاً.
-     المصادقة الوحيدة المعتمدة هي Firebase (onAuthChanged). نمسح أي جلسة محلية قديمة
-     ونُظهر شاشة الدخول دائماً، ثم يقرر Firebase ما إذا كانت هناك جلسة صالحة (بعد تحديث الصفحة فقط). */
+  /* أمان: لا يوجد دخول تلقائي محلي إطلاقاً ما لم يُفعّل المستخدم «إبقائي مسجّلاً».
+     المصادقة المعتمدة هي Firebase (onAuthChanged). إن وُجدت جلسة دائمة مع علامة
+     «تذكّرني» نستعيدها مباشرة؛ وإلا نمسح الجلسة المحلية ونُظهر شاشة الدخول. */
+  var restored=false;
+  try{
+    var rem=_rememberRead();
+    if(rem&&rem.on){
+      var sess=JSON.parse(LS.getItem(REMEMBER_SESSION_KEY)||'null');
+      /* تأكّد أن الحساب لا يزال موجوداً وصالحاً */
+      var us=getUsers()||[];
+      var still=sess&&us.find(function(x){return x.u===sess.u;});
+      if(sess&&still&&!still.disabled){
+        CURRENT_USER={u:still.u,r:still.r,perms:still.perms||sess.perms||['dash','sum','sku']};
+        try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
+        var ovR=document.getElementById('login-ov');if(ovR)ovR.style.display='none';
+        try{applyRole();}catch(e){}
+        var lastP=LS.getItem('dr_last_page')||'home';
+        try{go(lastP);}catch(e){try{go('home');}catch(_){}}
+        restored=true;
+      }
+    }
+  }catch(e){}
+  if(restored){try{setTimeout(initLoginExtras,60);}catch(e){}return;}
   try{sessionStorage.removeItem('dash_session');LS.removeItem('dash_session');}catch(e){}
   CURRENT_USER=null;
   var ov2=document.getElementById('login-ov');if(ov2)ov2.style.display='flex';
   var lu=document.getElementById('login-user');if(lu)setTimeout(function(){try{lu.focus();}catch(e){}},60);
+  try{setTimeout(initLoginExtras,60);}catch(e){}
 }
 /* ===== FIREBASE CLOUD SYNC ===== */
 /* ==================================================================================
@@ -5786,7 +6019,36 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail();});
   }catch(e){}
 })();
 /* initAuth أولاً — يجب التحقق من الجلسة قبل الاتصال بالسحابة */
-applyLang();buildFilters(true);render();loadEmailCfg();initAuth();cloudInit();applySavedDate();applyFont();applyScale();applyChartOrder();applyColors();applyStyles();applyChartHeights();addResizers();try{applyDALColors();}catch(e){}try{updateHomeDates();}catch(e){}
+/* الإقلاع: نطبّق الإعدادات الخفيفة فوراً (دون رندرة المخططات المتكررة) لتظهر الواجهة بسرعة،
+   ثم نرسم المخططات الثقيلة مرة واحدة فقط بعد أول إطار — هذا يسرّع ظهور الصفحة الرئيسية. */
+applyLang();buildFilters(true);loadEmailCfg();initAuth();cloudInit();applySavedDate();applyFont();applyScale();applyChartOrder();applyColors();applyStyles();applyChartHeights();try{applyDALColors();}catch(e){}try{updateHomeDates();}catch(e){}
+/* إنهاء وضع الإقلاع ثم رندرة واحدة مؤجّلة للمخططات + الجداول */
+(function(){
+  function _firstPaint(){
+    _booting=false;
+    try{render();}catch(e){console.warn('initial render deferred',e);}
+    try{rebuildTables();}catch(e){}
+    setTimeout(function(){try{applyChartHeights();}catch(e){}try{addResizers();}catch(e){}},30);
+  }
+  if(typeof requestAnimationFrame!=='undefined'){requestAnimationFrame(function(){requestAnimationFrame(_firstPaint);});}
+  else setTimeout(_firstPaint,0);
+})();
+/* إن لم تكن مكتبة Chart قد حُمّلت وقت أول رسم (تأخّر/فشل مؤقت في CDN)، نراقب
+   توفّرها ثم نعيد رسم المخططات تلقائياً دون أي خطأ يوقف التطبيق. */
+(function(){
+  var _tries=0;
+  function _whenChartReady(){
+    if(typeof Chart==='undefined'){ if(_tries++>150)return; return setTimeout(_whenChartReady,100); }
+    try{if(typeof _applyChartDefaults==='function')_applyChartDefaults();}catch(e){}
+    if(_chartsPending){_chartsPending=false;
+      try{render();}catch(e){}
+      try{var _sp=document.querySelector('.page.show');if(_sp){var _id=_sp.id.replace('page-','');if(_id==='sum'&&typeof buildSummary==='function')buildSummary();if(_id==='sku'&&typeof buildSku==='function')buildSku();}}catch(e){}
+    }
+  }
+  if(document.readyState!=='loading')_whenChartReady();
+  else document.addEventListener('DOMContentLoaded',_whenChartReady);
+  if(typeof window!=='undefined')window.addEventListener('load',_whenChartReady);
+})();
 
 /* ==== Daily Coverage Reports ==== */
 /* ===================== DAILY COVERAGE REPORTS MODULE ===================== */
@@ -5951,6 +6213,10 @@ function closeSpThreshEditor(){var ov=document.getElementById('spth-ov');if(ov)o
 function resetSpThreshEditor(){saveSpThresholds({_default:{warn:85,over:100},_total:{warn:85,over:100}});closeSpThreshEditor();try{renderDailyReport('space');}catch(e){}}
 function saveSpThreshEditor(){var ov=document.getElementById('spth-ov');if(!ov)return;var o=getSpThresholds();ov.querySelectorAll('input[data-k]').forEach(function(inp){var k=inp.getAttribute('data-k'),f=inp.getAttribute('data-f');var v=parseFloat(inp.value);if(isNaN(v))return;if(!o[k])o[k]={warn:85,over:100};o[k][f]=v;});saveSpThresholds(o);closeSpThreshEditor();try{renderDailyReport('space');}catch(e){}}
 try{if(typeof window!=='undefined'){window.openSpThreshEditor=openSpThreshEditor;window.closeSpThreshEditor=closeSpThreshEditor;window.saveSpThreshEditor=saveSpThreshEditor;window.resetSpThreshEditor=resetSpThreshEditor;}}catch(e){}
+/* وحدة عرض قيم بطاقة المساحات على الجوال: 'm2' (متر مربع) أو 'qty' (كراتين) */
+try{if(typeof window._spVU==='undefined')window._spVU='m2';}catch(e){}
+function setSpVU(u){try{window._spVU=(u==='qty')?'qty':'m2';}catch(e){}try{renderSpaceReport(window._spaceRep);}catch(e){}}
+try{if(typeof window!=='undefined')window.setSpVU=setSpVU;}catch(e){}
 function renderSpaceReport(rep){
   try{recomputeSpacePercentages(rep);}catch(e){}
   try{window._spaceRep=rep;}catch(e){}
@@ -5976,26 +6242,40 @@ function renderSpaceReport(rep){
   /* الجوال: البطاقة المدمجة السابقة + بطاقات مستودعات بعرض الجوال تُفتح بالنقر */
   function _spV(gi,ri,col){var g=_grps[gi];if(!g||!g.rows)return 0;var r=g.rows[ri]||g.rows[0]||[];return r[col];}
   function _spFq(v){return (typeof v==='number')?drFmt(Math.ceil(v)):drEsc(v);}
-  function _spCG(gi){var g=_grps[gi];if(!g||!g.rows)return null;var mr=g.rows[0]||[],sr=g.rows[g.rows.length-1]||[];var mg=mr[mr.length-1],sg=sr[sr.length-1];return{label:g.label,cls:g.cls,ic:_IC[g.cls]||'',mg:mg,pct:(gi===0)?100:(_actM2?Math.round(_num(mg)/_actM2*100):0),subLabel:(sr[0]||''),sg:sg};}
+  var _ar=(drIsAr&&drIsAr());
+  var _VU=(window._spVU==='qty')?'qty':'m2';
+  /* صف الكمية (كراتين) لكل مجموعة: Actual→2 ، used→1 ، Transit→1 ، Empty→2 */
+  var _QTYROW={0:2,1:1,2:1,3:2};
+  function _spCG(gi){var g=_grps[gi];if(!g||!g.rows)return null;var mr=g.rows[0]||[],sr=g.rows[g.rows.length-1]||[];var mg=mr[mr.length-1],sg=sr[sr.length-1];
+    var qRow=g.rows[_QTYROW[gi]]||[];var qv=qRow[qRow.length-1];
+    var showQ=(_VU==='qty'&&typeof qv!=='undefined');
+    var val=showQ?qv:mg; var unit=showQ?(_ar?'كرتون':'ctn'):'m²';
+    return{label:g.label,cls:g.cls,ic:_IC[g.cls]||'',mg:val,unit:unit,pct:(gi===0)?100:(_actM2?Math.round(_num(mg)/_actM2*100):0),subLabel:(sr[0]||''),sg:sg};}
   var combo='';var _g0=_spCG(0);
   if(_g0){
-    var _ar=(drIsAr&&drIsAr());
     var _u1=_spCG(1);var _lastCol=(_grps[0]&&_grps[0].rows&&_grps[0].rows[0])?_grps[0].rows[0].length-1:0;var _tCovQ=_num(_spV(0,2,_lastCol)),_tUsedQ=_num(_spV(1,1,_lastCol));var _topFill=_tCovQ?Math.round(_tUsedQ/_tCovQ*100):0;var _topSt=spStatusClass(_topFill,'_total');
     combo='<div class="sp-mob"><div class="sp-combo '+_topSt+'">'
       +'<div class="sp-combo-top" onclick="openSpaceCardDetail(0)"><div class="sp-combo-toprow"><span class="sp-combo-ic">'+_g0.ic+'</span>'
-      +'<span class="sp-combo-htext"><span class="sp-combo-lbl">'+drEsc(_g0.label)+'</span><span class="sp-combo-cap">'+(_ar?'المساحة الإجمالية':'Total space')+'</span></span>'
-      +'<span class="sp-combo-val">'+_spFq(_g0.mg)+' <small>m²</small></span></div>'
-      +'<div class="sp-view-toggle" style="display:flex;gap:8px;padding:12px;background:#f1f5fa;border-top:1px solid #d4e0ee"><button class="sp-toggle-btn sp-toggle-space" onclick="toggleSpaceView(\'space\')" style="flex:1;padding:10px 12px;border:1px solid #d4e0ee;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:#1e4e8c;transition:all .2s">📏 '+(_ar?'المساحة':'Space')+'</button><button class="sp-toggle-btn sp-toggle-quantity" onclick="toggleSpaceView(\'quantity\')" style="flex:1;padding:10px 12px;border:1px solid #d4e0ee;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:#1e4e8c;transition:all .2s">📊 '+(_ar?'الكمية':'Quantity')+'</button></div>'
+      +'<span class="sp-combo-htext"><span class="sp-combo-lbl">'+drEsc(_g0.label)+'</span><span class="sp-combo-cap">'+(_VU==='qty'?(_ar?'الكمية الإجمالية':'Total quantity'):(_ar?'المساحة الإجمالية':'Total space'))+'</span></span>'
+      +'<span class="sp-combo-val">'+_spFq(_g0.mg)+' <small>'+_g0.unit+'</small></span></div>'
       +'<div class="sp-combo-bar"><span style="width:100%"></span></div>'
       +'<div class="sp-combo-sub">'+drEsc(_g0.subLabel)+': <b>'+_spFq(_g0.sg)+'</b></div></div><div class="sp-combo-bot">';
-    [1,2,3].forEach(function(gi){var d=_spCG(gi);if(!d)return;combo+='<div class="sp-combo-cell '+d.cls+'-card" onclick="openSpaceCardDetail('+gi+')"><span class="sp-combo-cic">'+d.ic+'</span><div class="sp-combo-cval">'+_spFq(d.mg)+'</div><div class="sp-combo-cunit">m²</div><div class="sp-combo-clbl">'+drEsc(d.label)+'</div><span class="sp-combo-cpct">'+d.pct+'%</span></div>';});
+    [1,2,3].forEach(function(gi){var d=_spCG(gi);if(!d)return;combo+='<div class="sp-combo-cell '+d.cls+'-card" onclick="openSpaceCardDetail('+gi+')"><span class="sp-combo-cic">'+d.ic+'</span><div class="sp-combo-cval">'+_spFq(d.mg)+'</div><div class="sp-combo-cunit">'+d.unit+'</div><div class="sp-combo-clbl">'+drEsc(d.label)+'</div><span class="sp-combo-cpct">'+d.pct+'%</span></div>';});
     combo+='</div></div>';
     var _MX=[{gi:0,ri:2,lbl:(_ar?'التغطية':'Coverage'),ac:'#2f6fb0'},{gi:1,ri:1,lbl:(_ar?'الحالية':'Current'),ac:'#10b981'},{gi:2,ri:1,lbl:(_ar?'الترانزيت':'Transit'),ac:'#1f7a86'},{gi:3,ri:2,lbl:(_ar?'الفارغة':'Empty'),ac:'#3aa757'}];
     var _whAr={'kharj store':'الخرج','riyadh':'الرياض','heat':'هيت','dammam':'الدمام','al ahsa':'الأحساء','ahsa':'الأحساء','jeddah':'جدة','qassim':'القصيم','jeddah factory':'مصنع جدة','kharj factory':'مصنع الخرج'};
     function _rank(name,fac){var n=String(name||'').toLowerCase();if(fac){if(n.indexOf('jeddah')>=0)return 70;if(n.indexOf('kharj')>=0)return 71;return 79;}if(n.indexOf('riyadh')>=0)return 0;if(n.indexOf('heat')>=0||n.indexOf('hit')>=0)return 1;if(n.indexOf('kharj')>=0)return 2;if(n.indexOf('dammam')>=0)return 3;if(n.indexOf('ahsa')>=0)return 4;if(n.indexOf('jeddah')>=0)return 5;if(n.indexOf('qassim')>=0)return 6;return 50;}
     var _wh=[];B.forEach(function(nm,i){_wh.push({name:nm,col:i+1,fac:false});});F.forEach(function(nm,j){_wh.push({name:nm,col:B.length+2+j,fac:true});});
     _wh.sort(function(a,b){return _rank(a.name,a.fac)-_rank(b.name,b.fac);});
-    if(typeof isAdmin==='function'&&isAdmin()){combo+='<button class="sp-thbtn" onclick="openSpThreshEditor()">⚙️ '+(_ar?'تعديل ألوان النِسب حسب المستودع':'Edit status thresholds')+'</button>';}
+    /* أزرار تبديل وحدة العرض (المساحة/الكمية) بجوار زر الإعدادات — بعد البطاقة المدمجة */
+    var _isAdm=(typeof isAdmin==='function'&&isAdmin());
+    combo+='<div class="sp-actions">'
+      +'<div class="sp-vseg" role="group">'
+        +'<button class="sp-vbtn'+(_VU==='m2'?' on':'')+'" onclick="setSpVU(\'m2\')">📐 '+(_ar?'المساحة':'Space')+'</button>'
+        +'<button class="sp-vbtn'+(_VU==='qty'?' on':'')+'" onclick="setSpVU(\'qty\')">📦 '+(_ar?'الكمية':'Quantity')+'</button>'
+      +'</div>'
+      +(_isAdm?('<button class="sp-thbtn sp-thbtn-inline" onclick="openSpThreshEditor()">⚙️ '+(_ar?'الإعدادات':'Settings')+'</button>'):'')
+      +'</div>';
     combo+='<div class="sp-whlist">';
     _wh.forEach(function(w){var covN=_num(_spV(0,2,w.col)),usedN=_num(_spV(1,1,w.col));var fill=covN?Math.round(usedN/covN*100):0;var st=spStatusClass(fill,w.name);var disp=_ar?(_whAr[String(w.name).toLowerCase()]||w.name):w.name;
       combo+='<details class="sp-wl '+st+'"><summary class="sp-wl-h"><span class="sp-wl-ic">'+(w.fac?'🏭':'🏬')+'</span><span class="sp-wl-name">'+drEsc(disp)+'</span><span class="sp-wl-cov"><b>'+_spFq(_spV(0,0,w.col))+'</b><small>'+(_ar?'m² تغطية':'m² coverage')+'</small></span><span class="sp-wl-chip">'+fill+'%</span><span class="sp-wl-ar">▾</span></summary><div class="sp-wl-body">';
@@ -9326,7 +9606,9 @@ function renderBottleReport(rep){
     [].slice.call(root.querySelectorAll('.mb-cardified')).forEach(function(n){n.classList.remove('mb-cardified');});
     [].slice.call(root.querySelectorAll('table[data-mb]')).forEach(function(t){t.removeAttribute('data-mb');});
     if(!MOBQ.matches)return;
-    [].slice.call(root.querySelectorAll('table.sp-table,table.dr-table,table.fg-table')).forEach(cardify);
+    /* صفحة المساحات: لا نحوّل جدولها إلى بطاقات تفصيلية على الجوال —
+       يُكتفى بالبطاقة العلوية + بطاقات المستودعات + الأنابيب. */
+    [].slice.call(root.querySelectorAll('table.dr-table,table.fg-table')).forEach(cardify);
   }
   var REP_KEYS=['space','fgbal','oldid','transit','bottle'];
   function repWrap(k){return document.getElementById('rep-'+k+'-wrap');}
@@ -11799,28 +12081,6 @@ var EPM=(function(){
     try{var h=$('epm-hint');if(h){h.textContent=t('pdfhint');}}catch(e){}
     doPrint();
   }
-
-  /* Toggle between Space and Quantity views */
-  window.toggleSpaceView = function(view) {
-    var btns = document.querySelectorAll('.sp-toggle-btn');
-    btns.forEach(function(btn) {
-      btn.style.background = '#fff';
-      btn.style.color = '#1e4e8c';
-      btn.style.boxShadow = 'none';
-    });
-    
-    if (view === 'space') {
-      document.querySelector('.sp-toggle-space').style.background = '#2f7ed8';
-      document.querySelector('.sp-toggle-space').style.color = '#fff';
-      document.querySelector('.sp-toggle-space').style.boxShadow = '0 4px 12px rgba(47,126,216,0.3)';
-    } else if (view === 'quantity') {
-      document.querySelector('.sp-toggle-quantity').style.background = '#2f7ed8';
-      document.querySelector('.sp-toggle-quantity').style.color = '#fff';
-      document.querySelector('.sp-toggle-quantity').style.boxShadow = '0 4px 12px rgba(47,126,216,0.3)';
-    }
-    
-    localStorage.setItem('spaceViewMode', view);
-  };
 
   /* keep button label + open preview in sync with language switches */
   function applyLangHook(){
