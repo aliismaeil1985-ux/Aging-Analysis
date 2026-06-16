@@ -1789,6 +1789,7 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 .fp-ov{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(10,30,60,.6);backdrop-filter:blur(3px)}
 /* نافذة التغيير الإجباري لكلمة المرور */
 .fpc-ov{position:fixed;inset:0;z-index:1300;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(900px 600px at 20% 10%,rgba(28,79,144,.55),transparent 60%),rgba(8,24,48,.72);backdrop-filter:blur(5px)}
+.fpc-ov.show{display:flex}
 .fpc-box{background:#fff;border-radius:20px;padding:32px 30px;max-width:420px;width:100%;box-shadow:0 30px 80px -20px rgba(8,24,48,.5);text-align:center;animation:fpcIn .3s ease}
 @keyframes fpcIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
 .fpc-icon{font-size:38px;margin-bottom:8px}
@@ -2424,7 +2425,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <button class="logoutbtn" onclick="logout()"><span data-i18n="logout">Logout</span></button>
     </div>
     <div class="langsw"><button id="lang-en" class="on" onclick="setLang('en')">EN</button><button id="lang-ar" onclick="setLang('ar')">ع</button></div>
-    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.4.9</span></div>
+    <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.5.1</span></div>
   </div>
 
   <div class="content">
@@ -2470,7 +2471,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="d-tile" data-page="dailyup" style="--c:var(--pink)" onclick="go('dailyup')"><div class="ti" data-icon="upload"></div><div><div class="tt" data-i18n="nav_dailyup">Daily Reports Upload</div><div class="td" data-i18n="desc_dailyup">Upload the daily coverage files.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         </div>
       </div>
-      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.4.9</span></div>
+      <div class="d-foot">© Tania Reporting Center · <span id="app-ver-foot">v6.5.1</span></div>
       </div>
     </div></div>
     <div class="page" id="page-dash"><div class="wrap">
@@ -3106,7 +3107,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
 
 /* ===== Version-based settings reset ===== */
 (function(){
-  var VER = 'v6.4.9';
+  var VER = 'v6.5.1';
   try{
     if(LS.getItem('dr_app_ver')!==VER){
       // مسح الإعدادات التي قد تحتوي أسماء قديمة للبراندات
@@ -3122,7 +3123,7 @@ let C={navy:'#1e4e8c',teal:'#0f9b8e',blue:'#2f7ed8',orange:'#e0792f',purple:'#7b
   }catch(e){}
 })();
 /* عرض الإصدار في الواجهة ديناميكياً من VER */
-try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.4.9';}catch(e){}}); }catch(e){}
+try{ document.addEventListener('DOMContentLoaded',function(){try{var _vf=document.getElementById('app-ver-foot');if(_vf)_vf.textContent='v6.5.1';}catch(e){}}); }catch(e){}
 const IDENT_ORDER=['1- New Identity','2- OLD Identity','3- Mai','4- Mokabat','5- SAR','6- TG Sparkling'];
 const BRANCH_ORDER=['1. Riyadh','2. Kharj','3. Heet','4. Jeddah (W)','5. Jeddah (F)','6. Dammam','7. Qassim','8. Ahsa'];
 const CLASS_ORDER=['c1','c2','c3','c4','c5','c6'];
@@ -5180,10 +5181,22 @@ function testEmailCfg(){
 }
 
 /* ===== سجل الدخول ===== */
+/* كشف نوع الجهاز: جوال/لوحي أو كمبيوتر */
+function _detectDeviceType(){
+  try{
+    var ua=navigator.userAgent||'';
+    var isTablet=/iPad|Tablet|PlayBook|Silk/i.test(ua)||(/Android/i.test(ua)&&!/Mobile/i.test(ua));
+    var isMobileUA=/Mobi|Android|iPhone|iPod|Windows Phone|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    var touch=(navigator.maxTouchPoints||0)>1;
+    if(isTablet)return 'tablet';
+    if(isMobileUA||(touch&&window.innerWidth<=860))return 'mobile';
+    return 'desktop';
+  }catch(e){return 'desktop';}
+}
 function logLogin(uname,kind){
   try{
     var log=JSON.parse(LS.getItem('login_log')||'[]');
-    log.unshift({u:uname,k:kind||'login',t:Date.now()});
+    log.unshift({u:uname,k:kind||'login',t:Date.now(),dev:_detectDeviceType()});
     if(log.length>200)log=log.slice(0,200);
     LS.setItem('login_log',JSON.stringify(log));
   }catch(e){}
@@ -5201,15 +5214,22 @@ function renderLoginLog(){
   var log=[];
   try{log=JSON.parse(LS.getItem('login_log')||'[]');}catch(e){}
   var kindLbl={'login':tr('log_k_login'),'password-reset':tr('log_k_reset'),'failed':tr('log_k_failed')};
-  var h='<thead><tr><th>'+tr('log_user')+'</th><th>'+tr('log_event')+'</th><th>'+tr('log_time')+'</th></tr></thead><tbody>';
+  var ar=(LANG==='ar');
+  var devMap={
+    'desktop':{ic:'💻',lbl:ar?'كمبيوتر':'Desktop'},
+    'mobile':{ic:'📱',lbl:ar?'جوال':'Mobile'},
+    'tablet':{ic:'📲',lbl:ar?'لوحي':'Tablet'}
+  };
+  function devCell(dv){var d=devMap[dv]||{ic:'❔',lbl:ar?'غير معروف':'Unknown'};return '<span style="display:inline-flex;align-items:center;gap:5px;font-weight:600;color:#475569"><span style="font-size:14px">'+d.ic+'</span>'+d.lbl+'</span>';}
+  var h='<thead><tr><th>'+tr('log_user')+'</th><th>'+tr('log_event')+'</th><th>'+(ar?'الجهاز':'Device')+'</th><th>'+tr('log_time')+'</th></tr></thead><tbody>';
   if(!log.length){
-    h+='<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:18px">'+tr('log_empty')+'</td></tr>';
+    h+='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:18px">'+tr('log_empty')+'</td></tr>';
   }else{
     log.forEach(function(e){
       var d=new Date(e.t);
       var ds=d.toLocaleString(LANG==='ar'?'ar-EG':'en-GB');
       var badge=e.k==='failed'?'#c4452a':(e.k==='password-reset'?'#b45309':'#15803d');
-      h+='<tr><td><b>'+escHtml(e.u||'')+'</b></td><td><span style="color:'+badge+';font-weight:600">'+escHtml(kindLbl[e.k]||e.k)+'</span></td><td style="color:#64748b">'+escHtml(ds)+'</td></tr>';
+      h+='<tr><td><b>'+escHtml(e.u||'')+'</b></td><td><span style="color:'+badge+';font-weight:600">'+escHtml(kindLbl[e.k]||e.k)+'</span></td><td>'+devCell(e.dev)+'</td><td style="color:#64748b">'+escHtml(ds)+'</td></tr>';
     });
   }
   h+='</tbody>';
