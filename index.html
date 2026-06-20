@@ -4808,7 +4808,7 @@ function applyRole(){
   try{renderCustomCards();}catch(e){}
 }
 function doLogin(){
-  var u=(val('login-user')||'').trim(),p=val('login-pass')||'';
+  var u=(val('login-user')||'').trim(),p=(val('login-pass')||'').trim();
   /* تحقق من الحقول الفارغة برسائل واضحة وتمييز الحقل */
   var uEl=document.getElementById('login-user'),pEl=document.getElementById('login-pass');
   if(uEl)uEl.classList.remove('login-input-err');if(pEl)pEl.classList.remove('login-input-err');
@@ -4820,7 +4820,18 @@ function doLogin(){
       var done=false;var to=setTimeout(function(){if(done)return;done=true;_loginProceed(u,p);},2500);
       fbDB.collection(FB_COL).doc(FB_USERS_DOC).get().then(function(doc){
         if(done)return;done=true;clearTimeout(to);
-        try{if(doc.exists){var dd=doc.data();if(dd&&Array.isArray(dd.users))LS.setItem('dash_users',JSON.stringify(dd.users));}}catch(e){}
+        try{
+          if(doc.exists){
+            var dd=doc.data();
+            var cloudTs=(dd&&dd.updatedAt)||0;
+            /* لا نعتمد نسخة السحابة إلا إن كانت أحدث من آخر ما طبّقناه، ولا يوجد تغيير محلي معلّق */
+            if(dd&&Array.isArray(dd.users)&&!_pendingUsersJson&&!(cloudTs&&_usersLastTs&&cloudTs<_usersLastTs)){
+              LS.setItem('dash_users',JSON.stringify(dd.users));
+              if(cloudTs)_usersLastTs=Math.max(_usersLastTs,cloudTs);
+              _usersCloudReady=true;
+            }
+          }
+        }catch(e){}
         _loginProceed(u,p);
       }).catch(function(){if(done)return;done=true;clearTimeout(to);_loginProceed(u,p);});
       return;
@@ -5612,7 +5623,7 @@ function skipForcePwd(){
 
 function submitForcePwd(){
   var ar=drIsAr&&drIsAr();
-  var pw=val('fpc-new')||'';var cf=val('fpc-confirm')||'';
+  var pw=(val('fpc-new')||'').trim();var cf=(val('fpc-confirm')||'').trim();
   var err=document.getElementById('fpc-err');
   var st=pwdStrength(pw);
   if(!st.valid){if(err)err.textContent=ar?'كلمة المرور لا تحقق كل الشروط':'Password does not meet all requirements';return;}
@@ -5686,7 +5697,7 @@ function submitForcePwd(){
   if(_pwMatch(u.p,pw)){if(err)err.textContent=ar?(_isChangeMode?'اختر كلمة مرور مختلفة عن الحالية':'اختر كلمة مرور مختلفة عن المؤقتة'):(_isChangeMode?'Choose a password different from the current one':'Choose a password different from the temporary one');return;}
   u.p=_pwHash(pw);u.temp=false;u.mustChange=false;u.pwdChangedAt=drToday&&drToday();delete u.tempCode;delete u.tempExpires;
   saveUsers(us);
-  try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}
+  try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}try{flushUsersToCloud&&flushUsersToCloud();}catch(e){}
   document.getElementById('force-pwd-ov').style.display='none';
   if(_isChangeMode){
     window._pwdMode=null;
@@ -6013,14 +6024,14 @@ function applyPwMgr(){
     us[i].p=_pwHash(pw);us[i].temp=false;us[i].mustChange=false;
     delete us[i].tempCode;delete us[i].tempExpires;
     us[i].pwdChangedAt=(drToday&&drToday())||'';
-    saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}
+    saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}try{flushUsersToCloud&&flushUsersToCloud();}catch(e){}
     closePwMgr();renderUsers();
     _pwmgrShowResult(us[i].u,pw,'perm',null);
   }else{
     /* المؤقتة: تُخزَّن كرمز مؤقت يُجبر التغيير، مع صلاحية زمنية */
     var expires=Date.now()+TEMP_PWD_HOURS*3600*1000;
     us[i].tempCode=pw;us[i].tempExpires=expires;us[i].mustChange=true;
-    saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}
+    saveUsers(us);try{pushUsersToCloud&&pushUsersToCloud();}catch(e){}try{flushUsersToCloud&&flushUsersToCloud();}catch(e){}
     closePwMgr();renderUsers();
     _pwmgrShowResult(us[i].u,pw,'temp',expires);
   }
@@ -6227,16 +6238,36 @@ function fbSettingsSync(){try{
   }catch(e){}}
 
 let fbUsersUnsub=null,_pushUsersT=null,_lastUsersJson='',_usersCloudReady=false;
+/* أعلى updatedAt طُبِّق أو أُرسل لوثيقة المستخدمين — يمنع وثيقة سحابية قديمة من إرجاع كلمة مرور أحدث */
+let _usersLastTs=0,_pendingUsersJson='';
+function _usersDoPush(json){
+  try{
+    var ts=Date.now();if(ts<=_usersLastTs)ts=_usersLastTs+1; /* تصاعدي بصرامة كي يفوز التغيير الأحدث دائماً */
+    _usersLastTs=ts;
+    fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:JSON.parse(json),updatedAt:ts,clientId:FB_CLIENT_ID});
+  }catch(e){}
+}
 function pushUsersToCloud(u){
   try{
     if(!fbReady||!fbDB||!_usersCloudReady)return; // never clobber cloud before first pull
     const json=JSON.stringify(u||getUsers()||[]);
     if(json===_lastUsersJson)return; // unchanged / echo of what we already have
-    _lastUsersJson=json;
+    _lastUsersJson=json;_pendingUsersJson=json;
     if(_pushUsersT)clearTimeout(_pushUsersT);
-    _pushUsersT=setTimeout(function(){try{fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:JSON.parse(json),updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}},400);
+    _pushUsersT=setTimeout(function(){_pendingUsersJson='';_usersDoPush(json);},400);
   }catch(e){}
 }
+/* إرسال فوري بدون تأخير — يُستخدم بعد تغيير/تعيين كلمة المرور حتى لا يسبق الخروج/الدخول الإرسال */
+function flushUsersToCloud(){
+  try{
+    if(!fbReady||!fbDB||!_usersCloudReady)return;
+    var json=_pendingUsersJson||JSON.stringify(getUsers()||[]);
+    if(_pushUsersT){clearTimeout(_pushUsersT);_pushUsersT=null;}
+    _pendingUsersJson='';_lastUsersJson=json;
+    _usersDoPush(json);
+  }catch(e){}
+}
+try{window.flushUsersToCloud=flushUsersToCloud;}catch(e){}
 function fbUsersSync(){
   try{
     if(!fbReady||!fbDB)return;
@@ -6245,13 +6276,20 @@ function fbUsersSync(){
       if(!doc.exists){ // no accounts doc in cloud yet -> seed it from this device
         _usersCloudReady=true;
         var local=getUsers();
-        if(local&&local.length){_lastUsersJson=JSON.stringify(local);try{fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:local,updatedAt:Date.now(),clientId:FB_CLIENT_ID});}catch(e){}}
+        if(local&&local.length){_lastUsersJson=JSON.stringify(local);var ts0=Date.now();if(ts0<=_usersLastTs)ts0=_usersLastTs+1;_usersLastTs=ts0;try{fbDB.collection(FB_COL).doc(FB_USERS_DOC).set({users:local,updatedAt:ts0,clientId:FB_CLIENT_ID});}catch(e){}}
         return;
       }
       if(doc.metadata&&doc.metadata.hasPendingWrites)return; // our own un-acked write
       var dd=doc.data();if(!dd||!Array.isArray(dd.users))return;
+      _usersCloudReady=true;
+      var incomingTs=dd.updatedAt||0;
+      /* تجاهل أي وثيقة أقدم بصرامة من آخر ما طبّقناه/أرسلناه — يمنع إرجاع كلمة المرور الأحدث */
+      if(incomingTs && _usersLastTs && incomingTs<_usersLastTs)return;
+      /* إن كان لدينا تغيير محلي معلّق لم يُرسَل بعد، لا نسمح للسحابة بالكتابة فوقه */
+      if(_pendingUsersJson)return;
+      if(incomingTs)_usersLastTs=Math.max(_usersLastTs,incomingTs);
       var json=JSON.stringify(dd.users);
-      _lastUsersJson=json;_usersCloudReady=true;
+      _lastUsersJson=json;
       try{LS.setItem('dash_users',json);}catch(e){}
       try{
         if(CURRENT_USER){var fnd=dd.users.find(function(x){return x.u===CURRENT_USER.u;});if(fnd){CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku']};applyRole();}}
@@ -6612,23 +6650,56 @@ function _toISO(s){
   if(m)return m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2);
   return null;
 }
+/* استخراج جزء الوقت HH:MM من نص (يدعم "DD-MM-YYYY HH:MM" أو "HH:MM:SS" أو "HH:MM") */
+function _extractTime(s){
+  if(!s)return '';
+  var str=String(s).trim();
+  var m=str.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if(!m)return '';
+  var hh=('0'+m[1]).slice(-2),mm=m[2];
+  return hh+':'+mm;
+}
+/* وقت تحديث التقرير: الأولوية للوقت اليدوي (space_time) ثم حقل time ثم وقت رفع الملف fileTime */
+function drTimeFor(key){
+  try{
+    var st=getDR()||{};
+    if(key==='space'){var mt=_extractTime(st.space_time);if(mt)return mt;}
+    var rep=(key==='space')?(st.space||{}):(st[key]||{});
+    var t=_extractTime(rep&&rep.time);
+    if(t)return t;
+    t=_extractTime(rep&&rep.fileTime);
+    return t||'';
+  }catch(e){return '';}
+}
+try{window.drTimeFor=drTimeFor;}catch(e){}
+/* الوقت اليدوي المُسجَّل في شاشة الرفع (يظهر في الهوم بجوار التاريخ) */
+function drManualTime(){try{return _extractTime(getDR().space_time)||'';}catch(e){return '';}}
+try{window.drManualTime=drManualTime;}catch(e){}
+/* نص التاريخ + الوقت لرأس التقرير: 📅 التاريخ 🕐 الوقت */
+function drDateTimeLabel(key,dateStr){
+  var out=dateStr?('📅 '+dateStr):'';
+  var t=drTimeFor(key);
+  if(t)out+=(out?'  ':'')+'🕐 '+t;
+  return out;
+}
+try{window.drDateTimeLabel=drDateTimeLabel;}catch(e){}
 function updateHomeDates(){
   try{
     var st=getDR()||{};var ar=false;try{ar=(typeof LANG!=='undefined'&&LANG==='ar');}catch(e){}
     var lbl=ar?'تحديث ':'Updated ';
-    /* ── قسم التقارير اليومية: أحدث تاريخ بين التقارير الخمسة ── */
+    /* ── قسم التقارير اليومية: أحدث تاريخ بين التقارير الخمسة + وقته ── */
     var dailyKeys=['space','fgbal','oldid','transit','bottle'];
-    var dailyDates=[];
+    var dailyDates=[];var dateOwner={};
     dailyKeys.forEach(function(k){
       var r=st[k];
-      if(r){ var d=_toISO(r.date); if(d)dailyDates.push(d);
+      if(r){ var d=_toISO(r.date); if(d){dailyDates.push(d);if(!dateOwner[d])dateOwner[d]=k;}
         /* بعض التقارير قد تخزّن التاريخ داخل time أو meta */
-        if(!d&&r.time){var d2=_toISO(r.time);if(d2)dailyDates.push(d2);}
+        if(!d&&r.time){var d2=_toISO(r.time);if(d2){dailyDates.push(d2);if(!dateOwner[d2])dateOwner[d2]=k;}}
       }
     });
     var dailyLatest=_latestISO(dailyDates);
     var elD=document.getElementById('home-upd-daily');
-    if(elD){ if(dailyLatest)elD.textContent=lbl+_fmtHomeDate(dailyLatest);
+    if(elD){ if(dailyLatest){var ht='';try{ht=drManualTime()||drTimeFor(dateOwner[dailyLatest]||'fgbal');}catch(e){}elD.textContent=lbl+_fmtHomeDate(dailyLatest)+(ht?(' 🕐 '+ht):'');}
       else elD.textContent=ar?'لا توجد بيانات بعد':'No data yet'; }
     /* ── قسم تحليل الأعمار: تاريخ تحديث البيانات الرئيسية ── */
     var agingDate=null;
@@ -6950,16 +7021,18 @@ function saveDR(o){try{LS.setItem('dr_data',JSON.stringify(o));}catch(e){}}
 function drFmt(v){if(typeof v==='number'){try{return v.toLocaleString('en-US',{maximumFractionDigits:2});}catch(e){return ''+v;}}return drEsc(v);}
 /* always return a grouped Space object (uploaded grouped data, else embedded design) */
 function getSpaceRep(){var st=getDR().space;var base=(st&&st.groups&&st.groups.length)?st:DEFAULT_DAILY_REPORTS.space;var r=decorateSpaceRep(base);try{var md=getDR().space_date;if(md)r.date=md;}catch(e){}return r;}
-function setSpaceManualDate(v){try{var s=getDR();s.space_date=v||'';saveDR(s);}catch(e){}try{_drCloudReady=true;}catch(e){}try{drPush();}catch(e){}try{var dEl=document.getElementById('rep-space-date');if(dEl)dEl.textContent=v?('\uD83D\uDCC5 '+v):'';}catch(e){}try{if(typeof renderSpaceReport==='function')renderSpaceReport(getSpaceRep());}catch(e){}try{updateHomeDates();}catch(e){}}
+function setSpaceManualDate(v){try{var s=getDR();s.space_date=v||'';saveDR(s);}catch(e){}try{_drCloudReady=true;}catch(e){}try{drPush();}catch(e){}try{var dEl=document.getElementById('rep-space-date');if(dEl)dEl.textContent=drDateTimeLabel('space',v);}catch(e){}try{if(typeof renderSpaceReport==='function')renderSpaceReport(getSpaceRep());}catch(e){}try{updateHomeDates();}catch(e){}}
+function setSpaceManualTime(v){try{var s=getDR();s.space_time=v||'';saveDR(s);}catch(e){}try{_drCloudReady=true;}catch(e){}try{drPush();}catch(e){}try{var dEl=document.getElementById('rep-space-date');if(dEl){var dd=(getDR().space_date)||(getSpaceRep&&getSpaceRep().date)||'';dEl.textContent=drDateTimeLabel('space',dd);}}catch(e){}try{updateHomeDates();}catch(e){}}
+try{window.setSpaceManualTime=setSpaceManualTime;}catch(e){}
 function getBottleRep(){var st=getDR().bottle;if(st&&st.spec&&st.rows&&st.rows.length)return st;return DEFAULT_DAILY_REPORTS.bottle;}
 
 function drGuessNumFrom(hdr,rows){var nf=0;for(var c=0;c<hdr.length;c++){var num=0,tot=0;for(var r=0;r<Math.min(rows.length,25);r++){var v=rows[r][c];if(v===''||v==null)continue;tot++;if(typeof v==='number')num++;}if(tot>0&&num/tot>0.5)break;nf++;}return Math.max(1,nf);}
 function renderDailyReport(key){
   var wrap=document.getElementById('rep-'+key+'-wrap'); if(!wrap)return;
   var dEl=document.getElementById('rep-'+key+'-date');
-  if(key==='space'){var sp=getSpaceRep();if(sp&&sp.groups&&sp.groups.length){renderSpaceReport(sp);if(dEl)dEl.textContent=sp.date?('📅 '+sp.date):'';return;}}
-  if(key==='fgbal'||key==='oldid'||key==='transit'){var rr=(getDR()[key])||DEFAULT_DAILY_REPORTS[key];if(rr&&rr.rows&&rr.rows.length){renderRichReport(key,rr);if(dEl)dEl.textContent=rr.date?('📅 '+rr.date):'';try{wmInjectBanner(key);}catch(e){}return;}}
-  if(key==='bottle'){var bt=getBottleRep();if(bt&&bt.spec&&bt.rows&&bt.rows.length){renderBottleReport(bt);if(dEl)dEl.textContent=bt.date?('📅 '+bt.date):'';return;}}
+  if(key==='space'){var sp=getSpaceRep();if(sp&&sp.groups&&sp.groups.length){renderSpaceReport(sp);if(dEl)dEl.textContent=drDateTimeLabel('space',sp.date);return;}}
+  if(key==='fgbal'||key==='oldid'||key==='transit'){var rr=(getDR()[key])||DEFAULT_DAILY_REPORTS[key];if(rr&&rr.rows&&rr.rows.length){renderRichReport(key,rr);if(dEl)dEl.textContent=drDateTimeLabel(key,rr.date);try{wmInjectBanner(key);}catch(e){}return;}}
+  if(key==='bottle'){var bt=getBottleRep();if(bt&&bt.spec&&bt.rows&&bt.rows.length){renderBottleReport(bt);if(dEl)dEl.textContent=drDateTimeLabel('bottle',bt.date);return;}}
   var rep=(getDR()[key])||DEFAULT_DAILY_REPORTS[key];
   if(!rep||!rep.rows||!rep.rows.length){wrap.innerHTML='<div class="dr-empty">لا توجد بيانات بعد — ارفعها من «رفع التقارير اليومية» في الإعدادات.<br>No data yet — upload it from “Daily Reports Upload” in Settings.</div>';if(dEl)dEl.textContent='';return;}
   var h=rep.headers||[]; var nf=(rep.numFrom!=null?rep.numFrom:drGuessNumFrom(h,rep.rows));
@@ -6979,7 +7052,7 @@ function renderDailyReport(key){
   }
   html+='</tbody></table>';
   wrap.innerHTML=html;
-  if(dEl)dEl.textContent=rep.date?('📅 '+rep.date):'';
+  if(dEl)dEl.textContent=drDateTimeLabel(key,rep.date);
 }
 function currentReportKey(){for(var p in DR_PAGE2KEY){var el=document.getElementById('page-'+p);if(el&&el.classList.contains('show'))return DR_PAGE2KEY[p];}return null;}
 
@@ -11842,12 +11915,18 @@ function renderBottleReport(rep){
     (function(){
       var sslot=document.createElement('div'); sslot.className='dr-slot';
       var sh=document.createElement('h4'); sh.style.cssText='font-size:14px;font-weight:800;color:var(--ink,#16233b);margin-bottom:4px'; sh.textContent=a?'\u0627\u0644\u0645\u0633\u0627\u062d\u0627\u062a \u0641\u064a \u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639\u0627\u062a \u2014 \u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Space in Warehouses — Update date'; sslot.appendChild(sh);
-      var snote=document.createElement('p'); snote.style.cssText='font-size:11.5px;color:var(--muted,#7c8aa0);margin-bottom:10px'; snote.textContent=a?'\u0633\u062c\u0651\u0644 \u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u062d\u062f\u064a\u062b \u064a\u062f\u0648\u064a\u0627\u064b \u2014 \u064a\u0638\u0647\u0631 \u0641\u064a \u0627\u0644\u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0631\u0626\u064a\u0633\u064a \u0644\u0644\u0645\u0633\u0627\u062d\u0627\u062a.':'Set the update date manually — shown in the main Space report.'; sslot.appendChild(snote);
+      var snote=document.createElement('p'); snote.style.cssText='font-size:11.5px;color:var(--muted,#7c8aa0);margin-bottom:10px'; snote.textContent=a?'\u0633\u062c\u0651\u0644 \u062a\u0627\u0631\u064a\u062e \u0648\u0648\u0642\u062a \u0627\u0644\u062a\u062d\u062f\u064a\u062b \u064a\u062f\u0648\u064a\u0627\u064b \u2014 \u064a\u0638\u0647\u0631\u0627\u0646 \u0641\u064a \u0627\u0644\u062a\u0642\u0631\u064a\u0631 \u0627\u0644\u0631\u0626\u064a\u0633\u064a \u0648\u0641\u064a \u0627\u0644\u0635\u0641\u062d\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629.':'Set the update date & time manually — shown in the main report and on Home.'; sslot.appendChild(snote);
       var srow=document.createElement('div'); srow.className='dr-row';
       var sdate=document.createElement('input'); sdate.type='date'; sdate.style.cssText='padding:9px 11px;border:1px solid var(--line,#e2e8f0);border-radius:9px;font-family:inherit;font-size:13px';
       try{sdate.value=((typeof getDR==='function'&&getDR().space_date)||'');}catch(e){}
       sdate.addEventListener('change',function(){try{setSpaceManualDate(this.value);}catch(e){}});
-      srow.appendChild(sdate); sslot.appendChild(srow);
+      srow.appendChild(sdate);
+      /* حقل الوقت اليدوي بجوار التاريخ — يظهر في شاشة الهوم */
+      var stime=document.createElement('input'); stime.type='time'; stime.title=a?'وقت التحديث (يدوي)':'Update time (manual)'; stime.style.cssText='padding:9px 11px;border:1px solid var(--line,#e2e8f0);border-radius:9px;font-family:inherit;font-size:13px';
+      try{stime.value=((typeof getDR==='function'&&getDR().space_time)||'');}catch(e){}
+      stime.addEventListener('change',function(){try{setSpaceManualTime(this.value);}catch(e){}});
+      srow.appendChild(stime);
+      sslot.appendChild(srow);
       grid.appendChild(sslot);
     })();
     reports.forEach(function(r){
