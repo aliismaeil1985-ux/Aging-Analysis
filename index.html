@@ -2036,6 +2036,11 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 /* طي بطاقة DAL */
 #dal-card.dal-collapsed .dal-body,.dal-card.dal-collapsed .dal-body{display:none}
 #md-card.md-collapsed .md-body,.md-card.md-collapsed .md-body{display:none}
+/* طي بطاقتي «تعديل مسميات الأعمدة» و«بيانات الأصناف» — تُخفى كل العناصر ما عدا العنوان */
+#colalias-card.sec-collapsed > *:not(.sec-h),#mditems-card.sec-collapsed > *:not(.sec-h){display:none !important}
+.sec-collapse-btn{margin-inline-start:auto;border:1px solid var(--line,#e2e8f0);background:#fff;color:#1e4e8c;font-family:inherit;font-weight:700;font-size:12px;padding:5px 12px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:background .15s,box-shadow .15s}
+.sec-collapse-btn:hover{background:#eef5fc}
+#colalias-card .sec-h,#mditems-card .sec-h{align-items:center}
 .card-toggle-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;cursor:pointer;user-select:none;padding:4px;border-radius:10px;transition:background .15s}
 .card-toggle-head:hover{background:#f4f8fd}
 .card-toggle-arrow{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:#eef4fb;color:#2f7ed8;font-size:11px;flex-shrink:0;transition:transform .2s}
@@ -2188,6 +2193,44 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
 
 /* ===== Space auto-compute UI =====*/
 .sp-conv-card{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+/* ===== Per-Branch Space Calculator ===== */
+.sp-calc-card .sp-calc-head{margin-bottom:12px}
+.sp-calc-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px}
+.sp-calc-fl{display:flex;flex-direction:column;gap:4px;font-size:11.5px;font-weight:700;color:var(--navy)}
+.sp-calc-fl select{padding:8px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:700;color:var(--navy);background:#fff;font-family:inherit;min-width:200px;cursor:pointer}
+.sp-calc-search{flex:1 1 220px;min-width:160px;padding:9px 14px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit;background:#f8fafc;color:var(--ink)}
+.sp-calc-spacer{flex:1 1 auto}
+.sp-calc-summary{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.sp-calc-kpi{flex:1 1 140px;min-width:120px;background:linear-gradient(135deg,#f1f7fd,#eef5fc);border:1px solid #dce8f6;border-radius:13px;padding:11px 14px}
+.sp-calc-kpi .k-l{font-size:11px;font-weight:700;color:#5a7290;margin-bottom:3px}
+.sp-calc-kpi .k-v{font-size:18px;font-weight:800;color:var(--navy);line-height:1.1}
+.sp-calc-kpi .k-u{font-size:11px;font-weight:600;color:#8aa0bb;margin-inline-start:3px}
+.sp-calc-kpi.k-used{background:linear-gradient(135deg,#eafaf3,#e6f7ee);border-color:#bfe9d3}.sp-calc-kpi.k-used .k-v{color:#0f8a5f}
+.sp-calc-kpi.k-transit{background:linear-gradient(135deg,#e9f6f8,#e3f3f5);border-color:#bce4ea}.sp-calc-kpi.k-transit .k-v{color:#1f7a86}
+.sp-calc-kpi.k-empty{background:linear-gradient(135deg,#eef9f0,#e8f6ec);border-color:#c3e8cd}.sp-calc-kpi.k-empty .k-v{color:#2f9e54}
+.sp-calc-wrap{max-height:62vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+.sp-calc-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.sp-calc-tbl thead th{position:sticky;top:0;z-index:2;background:#f1f5f9;color:var(--navy);font-weight:800;padding:8px 10px;text-align:center;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap}
+.sp-calc-tbl thead th.grp-used{background:#e8f5ef}.sp-calc-tbl thead th.grp-transit{background:#e4f3f5}
+.sp-calc-tbl tbody td{padding:6px 9px;border-bottom:1px solid #f1f5f9;text-align:center;vertical-align:middle;white-space:nowrap}
+.sp-calc-tbl tbody td.c-code{font-family:Menlo,Consolas,monospace;font-weight:700;color:var(--blue);text-align:start}
+.sp-calc-tbl tbody td.c-name{text-align:start;color:#475569;max-width:170px;overflow:hidden;text-overflow:ellipsis}
+.sp-calc-tbl tbody td.c-qty{font-weight:800;color:var(--navy)}
+.sp-calc-tbl tbody td.c-cpp{font-weight:800;color:#7c5cbf;background:#f7f4fd}
+.sp-calc-tbl tbody td.c-qty.zero{color:#cbd5e1;font-weight:600}
+.sp-calc-tbl tbody td.c-m2{font-weight:700;color:#0f8a5f}
+.sp-calc-tbl tbody td.c-m2.transit{color:#1f7a86}
+.sp-calc-tbl tbody td.c-m2.na{color:#e0792f;font-weight:600}
+.sp-calc-tbl tbody tr:hover{background:#fafcff}
+.sp-calc-tbl tbody tr.no-conv{background:#fffbeb}
+.sp-calc-tbl tbody tr.tot-row td{background:#eef5fc;font-weight:800;color:var(--navy);border-top:2px solid #cfe0f4;position:sticky;bottom:0;z-index:1}
+.sp-calc-tbl input.cn{width:62px;padding:4px 6px;border:1px solid var(--line);border-radius:7px;font-size:12px;font-weight:700;color:var(--navy);text-align:center;background:#fff;font-family:inherit}
+.sp-calc-tbl input.cn:focus{outline:2px solid var(--blue);outline-offset:-1px}
+.sp-calc-formula{font-size:10.5px;color:#94a3b8;display:block;margin-top:2px;direction:ltr}
+.sp-calc-note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:10px}
+.sp-calc-empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+.sp-calc-sep{border:none;border-inline-start:2px solid #e2e8f0}
+@media (max-width:760px){.sp-calc-fl select{min-width:150px}.sp-calc-tbl tbody td.c-name{display:none}.sp-calc-tbl thead th.h-name{display:none}}
 .sp-conv-card .ch{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .sp-conv-card .ch .acc{width:4px;height:18px;border-radius:3px;background:var(--teal)}
 .sp-conv-card .ch h5{font-size:15px;font-weight:800;letter-spacing:-.2px}
@@ -3156,6 +3199,31 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <div id="sp-set-tbody" style="display:none"></div>
         <div id="sp-set-msg" style="display:none"></div>
       </div>
+
+      <!-- ════════ جدول حسابات المساحات لكل فرع (المصدر للتقرير الرئيسي) ════════ -->
+      <div class="card sp-calc-card" style="padding:16px;margin-top:16px">
+        <div class="sp-calc-head">
+          <div>
+            <h4 style="font-size:15px;font-weight:800;margin-bottom:4px;color:var(--navy)">&#129518; حاسبة المساحات لكل فرع · Per-Branch Space Calculator</h4>
+            <p style="font-size:12.5px;color:var(--muted);margin:0;line-height:1.7">الجدول الذي تُبنى منه أرقام تقرير «Space in Warehouses». اختر الفرع/المصنع لعرض أصنافه: <b>الكمية الحالية</b> (من FG Balance) وبجوارها <b>طريقة حساب المساحة</b>، ثم <b>كمية الترانزيت</b> (من FG Transit) و<b>طريقة حسابها</b>. التعديل على (كرتون/بلت · رصّات · حجم البلت) ينعكس مباشرة على التقرير الرئيسي.</p>
+          </div>
+        </div>
+        <div class="sp-calc-toolbar">
+          <label class="sp-calc-fl">
+            <span>الفرع / المصنع · Branch</span>
+            <select id="sp-calc-branch" onchange="renderSpaceCalc()"></select>
+          </label>
+          <input id="sp-calc-search" class="sp-calc-search" type="text" placeholder="&#128269; بحث بالكود أو العلامة…" oninput="filterSpaceCalc(this.value)">
+          <div class="sp-calc-spacer"></div>
+          <button class="btn-soft sm" onclick="renderSpaceCalc()" title="إعادة الحساب من البيانات الحالية">&#x21BB; تحديث</button>
+          <button class="btn-soft sm" onclick="spCalcRestoreDefaults()" title="استعادة قيم التحويل الافتراضية (كرتون/بلت · رصّات · حجم) لكل الأصناف من جدول SKU Management">&#x21BA; استعادة الافتراضي</button>
+          <button class="btn-soft sm" onclick="exportSpaceCalc()" title="تصدير حسابات الفرع المحدد إلى Excel">&#x1F4E5; تصدير</button>
+        </div>
+        <div id="sp-calc-summary" class="sp-calc-summary"></div>
+        <div id="sp-calc-msg"></div>
+        <div class="sp-calc-wrap" id="sp-calc-wrap"></div>
+        <p class="sp-calc-note">&#8505; معادلة المساحة لكل صنف: <b>المساحة (m²) = (الكمية ÷ كرتون/بلت) ÷ عدد الرصّات × حجم البلت (m²)</b>. قيمة <b>كرتون/بلت (cpp)</b> تُقرأ مباشرةً من جدول <b>SKU Management</b> (مصدر موحّد — للتعديل افتحه من «البيانات الرئيسية»)، بينما يمكن تعديل الرصّات وحجم البلت هنا. القيم الثلاثة مشتركة لكل كود عبر كل الفروع، وتختلف الكمية حسب الفرع: الكمية الحالية تؤخذ كأعلى قيمة بين أعمدة الفرع في FG Balance، وكمية الترانزيت كمجموع أعمدته في FG Transit — مطابقةً لمحرّك التقرير.</p>
+      </div>
     </div></div>
     <div class="page" id="page-dailyup"><div class="wrap">
       <div class="topbar"><div class="htext"><h1 data-i18n="nav_dailyup">Daily Reports Upload</h1><span class="upd"><span class="dot"></span> رفع ومزامنة بيانات التقارير اليومية</span></div></div>
@@ -3489,7 +3557,7 @@ function go(p){
   if(p==='dash'){setTimeout(function(){try{renderCustomCards();}catch(e){}},30);}
   if(p==='cardbuilder'){setTimeout(function(){try{initCardBuilder();}catch(e){console.warn('initCardBuilder',e);}},40);setTimeout(function(){try{initCardBuilder();}catch(e){}},120);}
   if(p==='masterdata'){setTimeout(function(){try{applyNumAlign();}catch(e){}try{renderMasterTable();}catch(e){}try{renderDALTable();}catch(e){}try{applyDALColors();}catch(e){}try{renderSpaceConvStatus();}catch(e){}try{renderCppAvgTable();}catch(e){}try{var _dc=LS.getItem('dal_collapsed')==='1';var _card=document.getElementById('dal-card');if(_card){_card.classList.toggle('dal-collapsed',_dc);_dalSyncToggleUI(_dc);}}catch(e){}try{var _mdc=LS.getItem('md_collapsed')==='1';var _mcard=document.getElementById('md-card');if(_mcard){_mcard.classList.toggle('md-collapsed',_mdc);_mdSyncToggleUI(_mdc);}}catch(e){}},50);}
-  if(p==='spaceact'){setTimeout(function(){try{_spActLoad();}catch(e){}try{renderSpaceActuals();}catch(e){}},50);}
+  if(p==='spaceact'){setTimeout(function(){try{_spActLoad();}catch(e){}try{renderSpaceActuals();}catch(e){}try{renderSpaceCalc();}catch(e){}},50);}
   if(p==='home'){try{updateHomeDates();}catch(e){}}
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
   /* تبديل إظهار الصفحات بأمان: حارس على كل عنصر حتى لا يمنع غياب عنصرٍ إظهارَ بقية الصفحات */
@@ -7969,7 +8037,12 @@ var SPACE_NB = 7; /* يُحدَّث عند تغيير المستودعات */
 var SPACE_CONV_DEFAULTS = {"30000000":{"cpp":40.0,"layers":3.0,"size":1.25},"30000001":{"cpp":40.0,"layers":3.0,"size":1.25},"30000011":{"cpp":48.0,"layers":1.0,"size":1.25},"30000012":{"cpp":36.0,"layers":1.0,"size":1.25},"30000173":{"cpp":187.0,"layers":2.0,"size":1.25},"30000110":{"cpp":156.0,"layers":1.0,"size":1.25},"30000155":{"cpp":156.0,"layers":2.0,"size":1.25},"30000005":{"cpp":156.0,"layers":1.5,"size":1.25},"30000154":{"cpp":108.0,"layers":2.0,"size":1.25},"30000004":{"cpp":108.0,"layers":1.5,"size":1.25},"30000153":{"cpp":84.0,"layers":2.0,"size":1.25},"30000003":{"cpp":84.0,"layers":1.5,"size":1.25},"30000174":{"cpp":136.0,"layers":2.0,"size":1.25},"30000014":{"cpp":144.0,"layers":1.5,"size":1.25},"30000108":{"cpp":144.0,"layers":1.5,"size":1.25},"30000157":{"cpp":104.0,"layers":2.0,"size":1.25},"30000007":{"cpp":104.0,"layers":2.0,"size":1.25},"30000156":{"cpp":72.0,"layers":2.0,"size":1.25},"30000006":{"cpp":72.0,"layers":2.0,"size":1.25},"30000175":{"cpp":252.0,"layers":2.0,"size":1.25},"30000158":{"cpp":70.0,"layers":2.0,"size":1.25},"30000008":{"cpp":60.0,"layers":1.5,"size":1.25},"30000159":{"cpp":48.0,"layers":2.0,"size":1.25},"30000009":{"cpp":48.0,"layers":1.0,"size":1.25},"30000176":{"cpp":92.0,"layers":2.0,"size":1.25},"30000016":{"cpp":104.0,"layers":1.5,"size":1.25},"30000107":{"cpp":104.0,"layers":1.0,"size":1.25},"30000165":{"cpp":40.0,"layers":2.0,"size":1.25},"30000164":{"cpp":40.0,"layers":2.0,"size":1.25},"30000166":{"cpp":187.0,"layers":0.0,"size":1.25},"30000167":{"cpp":84.0,"layers":2.0,"size":1.25},"30000168":{"cpp":136.0,"layers":2.0,"size":1.25},"30000169":{"cpp":64.0,"layers":2.0,"size":1.25},"30000170":{"cpp":48.0,"layers":2.0,"size":1.25},"30000233":{"cpp":180.0,"layers":2.0,"size":1.25},"30000214":{"cpp":200.0,"layers":2.0,"size":1.25}};
 
 function _spClone(o){var r={};for(var k in o)if(o[k])r[k]={cpp:+o[k].cpp||0,layers:+o[k].layers||0,size:+o[k].size||0};return r;}
-function getSpaceConv(){var s=getDR();if(!s.space_conv||!Object.keys(s.space_conv).length){s.space_conv=_spClone(SPACE_CONV_DEFAULTS);saveDR(s);}return s.space_conv;}
+function getSpaceConv(){var s=getDR();if(!s.space_conv||!Object.keys(s.space_conv).length){s.space_conv=_spClone(SPACE_CONV_DEFAULTS);saveDR(s);}
+  /* إصلاح ذاتي: لو خُزّنت قيمٌ كنصوص (من السحابة/الاستيراد) حوّلها لأرقام حتى يقرأها التقرير */
+  try{var cv=s.space_conv,changed=false;for(var k in cv){var r=cv[k];if(!r)continue;
+    ['cpp','layers','size'].forEach(function(f){if(typeof r[f]==='string'){var n=parseFloat(String(r[f]).replace(/[, ]/g,''));if(isFinite(n)){r[f]=n;changed=true;}else if(r[f]===''){r[f]=0;changed=true;}}});}
+    if(changed)saveDR(s);}catch(e){}
+  return s.space_conv;}
 
 /* ═══════════════════════════════════════════════════════════
    متوسط التحميل اليومي (Daily Average Load) — مصفوفة فرع×صنف
@@ -8721,11 +8794,15 @@ function dalToggleColors(){
 function saveSpaceConv(c){var s=getDR();s.space_conv=c||{};saveDR(s);_drCloudReady=true;try{drPush();}catch(e){}}
 function getSpaceAutoMode(){var v=LS.getItem('space_auto');return v===null?true:v==='1';}
 function setSpaceAutoMode(on){try{LS.setItem('space_auto',on?'1':'0');}catch(e){}var cb=document.getElementById('sp-auto-cb');if(cb)cb.checked=!!on;renderDailyReport('space');renderSpaceConvStatus();}
-function _spIsValid(r){return r&&typeof r.cpp==='number'&&r.cpp>0&&typeof r.layers==='number'&&r.layers>0&&typeof r.size==='number'&&r.size>0;}
+/* تحقّق متسامح: يقبل القيم الرقمية حتى لو خُزّنت كنصوص (مثلاً عند التحميل من السحابة)
+   — الإصلاح: صنف بقيم صحيحة لكنها نصّية كان يُتجاهل في التقرير رغم ظهوره في جدول الأصناف. */
+function _spNumOK(v){if(typeof v==='number')return isFinite(v)&&v>0;if(typeof v==='string'){var n=parseFloat(v.replace(/[, ]/g,''));return isFinite(n)&&n>0;}return false;}
+function _spIsValid(r){return !!(r&&_spNumOK(r.cpp)&&_spNumOK(r.layers)&&_spNumOK(r.size));}
 /* توحيد أكواد SAP: إزالة الأصفار البادئة */
 function _spNormCode(c){c=String(c==null?'':c).trim();if(/^\d+$/.test(c))c=c.replace(/^0+/,'')||'0';return c;}
 function _spBuildConvNorm(conv){var m={};Object.keys(conv).forEach(function(k){var nk=_spNormCode(k);if(!m[nk]&&_spIsValid(conv[k]))m[nk]=conv[k];});return m;}
-function _spConvLookup(code,conv,normIdx){var r=conv[code];if(_spIsValid(r))return r;var nk=_spNormCode(code);if(nk!==code){r=conv[nk];if(_spIsValid(r))return r;}if(normIdx){r=normIdx[nk];if(_spIsValid(r))return r;}return null;}
+function _spCoerceConv(r){if(!r)return r;var cpp=typeof r.cpp==='number'?r.cpp:parseFloat(String(r.cpp).replace(/[, ]/g,''));var layers=typeof r.layers==='number'?r.layers:parseFloat(String(r.layers).replace(/[, ]/g,''));var size=typeof r.size==='number'?r.size:parseFloat(String(r.size).replace(/[, ]/g,''));return {cpp:cpp,layers:layers,size:size};}
+function _spConvLookup(code,conv,normIdx){var r=conv[code];if(_spIsValid(r))return _spCoerceConv(r);var nk=_spNormCode(code);if(nk!==code){r=conv[nk];if(_spIsValid(r))return _spCoerceConv(r);}if(normIdx){r=normIdx[nk];if(_spIsValid(r))return _spCoerceConv(r);}return null;}
 var _spDiag={transit:{unmatchedCols:[],missingConv:[]},used:{missingConv:[]}};
 function spM2PerCarton(r){return _spIsValid(r)?(r.size/(r.cpp*r.layers)):0;}
 function hasAnyConv(){var c=getSpaceConv();for(var k in c)if(_spIsValid(c[k]))return true;return false;}
@@ -9112,6 +9189,244 @@ function renderSpaceAvgTable(){
   });
   html+='</tbody></table>';
   wrap.innerHTML=html;
+}
+
+/* ═══════════ حاسبة المساحات لكل فرع — الجدول المصدر للتقرير الرئيسي ═══════════
+   يعرض لكل فرع/مصنع أصنافه مع: الكمية الحالية (FG Balance: أعلى قيمة بين أعمدة الفرع)،
+   طريقة حساب المساحة (m² = qty/cpp/layers×size)، كمية الترانزيت (FG Transit: مجموع أعمدة الفرع)
+   وطريقة حسابها. التعديل على cpp/layers/size يُحدّث جدول التحويل ذاته الذي يستخدمه التقرير. */
+function _spCalcWarehouses(){
+  /* قائمة الفروع ثم المصانع بنفس ترتيب محرّك التقرير */
+  var L=_spWarehouseLists();var out=[];
+  L.B.forEach(function(n,i){out.push({name:n,code:L.BC[i]||'',fac:false});});
+  L.F.forEach(function(n,i){out.push({name:n,code:L.FC[i]||'',fac:true});});
+  return out;
+}
+function _spCalcFillBranchSelect(){
+  var sel=document.getElementById('sp-calc-branch');if(!sel)return;
+  var prev=sel.value;
+  var whs=_spCalcWarehouses();
+  var ar=drIsAr&&drIsAr();
+  var html='';
+  whs.forEach(function(w,i){
+    var ic=w.fac?'🏭':'🏬';
+    html+='<option value="'+i+'">'+ic+' '+drEsc(w.name)+(w.code?' ('+drEsc(w.code)+')':'')+'</option>';
+  });
+  sel.innerHTML=html||'<option value="">—</option>';
+  if(prev!==''&&sel.querySelector('option[value="'+prev+'"]'))sel.value=prev;
+}
+/* يجمع، لفرعٍ محدّد، صفوف الأصناف مع الكمية الحالية وكمية الترانزيت ومساحتيهما */
+function _spCalcRowsFor(whIndex){
+  var whs=_spCalcWarehouses();var w=whs[whIndex];if(!w)return null;
+  var st=getDR();
+  var fg=(st.fgbal&&st.fgbal.rows)?st.fgbal.rows:[];
+  var fgH=(st.fgbal&&st.fgbal.headers)?st.fgbal.headers:[];
+  var fgNf=(st.fgbal&&st.fgbal.numFrom!=null)?st.fgbal.numFrom:5;
+  var tr=(st.transit&&st.transit.rows)?st.transit.rows:[];
+  var trH=(st.transit&&st.transit.headers)?st.transit.headers:[];
+  var trNf=(st.transit&&st.transit.numFrom!=null)?st.transit.numFrom:2;
+  var conv=getSpaceConv();var normIdx=_spBuildConvNorm(conv);
+  var _cDisabled=getSpaceConvDisabled();var _cExcl=getSpaceExcluded();
+  function _isExcl(c){return _cDisabled[c]||_cExcl[c]||_cDisabled[_spNormCode(c)]||_cExcl[_spNormCode(c)];}
+  /* أعمدة هذا الفرع في كل تقرير (نفس مطابقة المحرّك بالكود ثم الاسم) */
+  var fgCols=_spMatchCols(fgH,fgNf,w.name,w.code);
+  var trCols=_spMatchCols(trH,trNf,w.name,w.code);
+  function qtyMax(row,cols){var mx=0,any=false;for(var i=0;i<cols.length;i++){var v=row[cols[i]];if(typeof v==='number'){any=true;if(v>mx)mx=v;}}return any?mx:0;}
+  function qtySum(row,cols){var s=0;for(var i=0;i<cols.length;i++){var v=row[cols[i]];if(typeof v==='number')s+=v;}return s;}
+  /* فئة الصنف من FG Balance لاستبعاد القارورة */
+  function _isBottelRow(row){var cat=String(row[3]||'').trim().toLowerCase();return cat==='bottel'||cat==='bottle';}
+  var _fgCats={};fg.forEach(function(r){var c=String(r[0]==null?'':r[0]).trim();if(c){var cat=String(r[3]||'').trim().toLowerCase();_fgCats[c]=cat;_fgCats[_spNormCode(c)]=cat;}});
+  function _isBottelCode(code){var cat=_fgCats[code]||_fgCats[_spNormCode(code)]||'';return cat==='bottel'||cat==='bottle';}
+  var map={};/* code -> {code,brand,size,pack,usedQty,trQty} */
+  function ensure(code){if(!map[code])map[code]={code:code,brand:'',size:'',pack:'',usedQty:0,trQty:0,hasFG:false,hasTR:false};return map[code];}
+  fg.forEach(function(row){
+    var code=String(row[0]==null?'':row[0]).trim();if(!code||code==='0'||_isExcl(code))return;
+    if(_isBottelRow(row))return;
+    if(!fgCols.length)return;
+    var q=qtyMax(row,fgCols);
+    var m=ensure(code);m.hasFG=true;
+    m.brand=String(row[1]||'').trim()||m.brand;m.size=String(row[2]||'').trim()||m.size;m.pack=String(row[4]||'').trim()||m.pack;
+    if(q)m.usedQty+=q;
+  });
+  tr.forEach(function(row){
+    var code=String(row[0]==null?'':row[0]).trim();if(!code||code==='0'||_isExcl(code))return;
+    if(_isBottelCode(code))return;
+    if(!trCols.length)return;
+    var q=qtySum(row,trCols);
+    var m=ensure(code);m.hasTR=true;
+    if(!m.pack)m.pack=String(row[1]||'').trim();
+    if(q)m.trQty+=q;
+  });
+  /* احذف الأصناف الصفرية تماماً (لا كمية ولا ترانزيت) لتقليل الضجيج */
+  var rows=[];
+  Object.keys(map).forEach(function(code){
+    var m=map[code];if(!m.usedQty&&!m.trQty)return;
+    var c=_spConvLookup(code,conv,normIdx);
+    var cpp=c?(+c.cpp||0):0,layers=c?(+c.layers||0):0,size=c?(+c.size||0):0;
+    var pmc=(cpp>0&&layers>0&&size>0)?(size/(cpp*layers)):0;
+    m.cpp=cpp;m.layers=layers;m.size=size;m.pmc=pmc;
+    m.usedM2=pmc>0?m.usedQty*pmc:0;
+    m.trM2=pmc>0?m.trQty*pmc:0;
+    m.hasConv=pmc>0;
+    rows.push(m);
+  });
+  rows.sort(function(a,b){return (b.usedQty+b.trQty)-(a.usedQty+a.trQty);});
+  return {wh:w,rows:rows,fgMatched:fgCols.length,trMatched:trCols.length,
+          hasFG:!!fg.length,hasTR:!!tr.length};
+}
+function renderSpaceCalc(){
+  _spCalcFillBranchSelect();
+  var wrap=document.getElementById('sp-calc-wrap');if(!wrap)return;
+  var sel=document.getElementById('sp-calc-branch');
+  var idx=sel?parseInt(sel.value,10):0;if(isNaN(idx))idx=0;
+  var msg=document.getElementById('sp-calc-msg');
+  var sum=document.getElementById('sp-calc-summary');
+  var data=_spCalcRowsFor(idx);
+  if(!data){wrap.innerHTML='<div class="sp-calc-empty">لا توجد فروع معرّفة بعد.</div>';if(sum)sum.innerHTML='';if(msg)msg.innerHTML='';return;}
+  if(!data.hasFG&&!data.hasTR){
+    wrap.innerHTML='<div class="sp-calc-empty">لا توجد بيانات بعد — ارفع تقريري <b>FG Balance</b> و<b>FG Transit</b> من شاشة «رفع التقارير اليومية» أولاً.<br>No data yet — upload FG Balance &amp; FG Transit first.</div>';
+    if(sum)sum.innerHTML='';if(msg)msg.innerHTML='';return;
+  }
+  if(msg){
+    var warns=[];
+    if(data.hasFG&&!data.fgMatched)warns.push('لم تُطابَق أعمدة هذا الفرع في FG Balance (تحقّق من اسم/كود الفرع في البيانات الرئيسية).');
+    if(data.hasTR&&!data.trMatched)warns.push('لم تُطابَق أعمدة هذا الفرع في FG Transit.');
+    var noConv=data.rows.filter(function(r){return !r.hasConv;}).length;
+    if(noConv>0)warns.push('يوجد <b>'+noConv+'</b> صنف بدون قيم تحويل كاملة — مساحته ستُحسب 0 حتى تُدخل (كرتون/بلت · رصّات · حجم).');
+    msg.innerHTML=warns.length?('<div class="sp-conv-warn">⚠ '+warns.join('<br>⚠ ')+'</div>'):'';
+  }
+  /* ملخّص الفرع: إجمالي الكمية والمساحة المستخدمة + الترانزيت */
+  var tUsedQ=0,tUsedM2=0,tTrQ=0,tTrM2=0;
+  data.rows.forEach(function(r){tUsedQ+=r.usedQty;tUsedM2+=r.usedM2;tTrQ+=r.trQty;tTrM2+=r.trM2;});
+  /* المساحة الفعلية والطاقة من Space Actuals لهذا الفرع (إن وُجدت) */
+  var actM2=0,capQty=0;
+  try{
+    var act=getSpaceActuals();var pool=(data.wh.fac?act.factories:act.branches)||[];
+    var hit=null;pool.forEach(function(r){
+      var rc=String(r.code||'').trim(),wc=String(data.wh.code||'').trim();
+      if((wc&&rc===wc)||String(r.name||'').trim().toLowerCase()===String(data.wh.name||'').trim().toLowerCase())hit=r;
+    });
+    if(hit){actM2=+hit.m2||0;var po=+hit.palOne||act.palOne||SP_PALONE_DEFAULT,ly=+hit.layers||act.layers||SP_LAYERS_DEFAULT,un=+hit.units||act.units||SP_UNITS_DEFAULT;capQty=po>0?Math.round(actM2/po*ly*un):0;}
+  }catch(e){}
+  var emptyM2=actM2>0?Math.round((actM2-tUsedM2-tTrM2)*10)/10:0;
+  if(sum){
+    function kpi(cls,lbl,val,unit){return '<div class="sp-calc-kpi '+cls+'"><div class="k-l">'+lbl+'</div><div class="k-v">'+drFmt(val)+'<span class="k-u">'+unit+'</span></div></div>';}
+    var h='';
+    if(actM2>0)h+=kpi('','المساحة الفعلية',Math.round(actM2),'m²');
+    h+=kpi('k-used','المستخدمة (m²)',Math.round(tUsedM2),'m²');
+    h+=kpi('k-used','الكمية المستخدمة',Math.round(tUsedQ),'كرتون');
+    h+=kpi('k-transit','الترانزيت (m²)',Math.round(tTrM2),'m²');
+    h+=kpi('k-transit','كمية الترانزيت',Math.round(tTrQ),'كرتون');
+    if(actM2>0)h+=kpi('k-empty','الفارغة (m²)',emptyM2,'m²');
+    sum.innerHTML=h;
+  }
+  /* الجدول */
+  var ar=drIsAr&&drIsAr();
+  var html='<table class="sp-calc-tbl"><thead>'
+    +'<tr>'
+      +'<th rowspan="2">#</th><th rowspan="2">Code</th><th rowspan="2" class="h-name">العلامة / العبوة</th>'
+      +'<th rowspan="2" class="h-cpp" title="قيمة موحّدة من جدول SKU Management">كرتون/بلت<br><small>cpp · من SKU Mgmt</small></th><th rowspan="2">رصّات<br><small>layers</small></th><th rowspan="2">حجم البلت<br><small>m²</small></th><th rowspan="2">m²/كرتون</th>'
+      +'<th colspan="2" class="grp-used">الكمية الحالية · Used</th>'
+      +'<th class="sp-calc-sep"></th>'
+      +'<th colspan="2" class="grp-transit">الترانزيت · Transit</th>'
+    +'</tr>'
+    +'<tr>'
+      +'<th class="grp-used">الكمية<br><small>كرتون</small></th><th class="grp-used">المساحة<br><small>m²</small></th>'
+      +'<th class="sp-calc-sep"></th>'
+      +'<th class="grp-transit">الكمية<br><small>كرتون</small></th><th class="grp-transit">المساحة<br><small>m²</small></th>'
+    +'</tr></thead><tbody>';
+  if(!data.rows.length){
+    html+='<tr><td colspan="13" class="sp-calc-empty">لا أصناف بكميات لهذا الفرع.</td></tr>';
+  }else{
+    data.rows.forEach(function(r,i){
+      var nm=(r.brand||'')+(r.pack?' · '+r.pack:'');
+      var fU=r.hasConv?(drFmt(r.usedQty)+' ÷ '+r.cpp+' ÷ '+r.layers+' × '+r.size):'';
+      var fT=r.hasConv?(drFmt(r.trQty)+' ÷ '+r.cpp+' ÷ '+r.layers+' × '+r.size):'';
+      html+='<tr'+(r.hasConv?'':' class="no-conv"')+' data-q="'+drEsc((r.code+' '+(r.brand||'')+' '+(r.pack||'')).toLowerCase())+'">'
+        +'<td>'+(i+1)+'</td>'
+        +'<td class="c-code">'+drEsc(r.code)+'</td>'
+        +'<td class="c-name">'+drEsc(nm)+'</td>'
+        +'<td class="c-cpp" title="يُقرأ من جدول SKU Management — للتعديل افتح إدارة الأصناف">'+(r.cpp>0?drFmt(r.cpp):'<span style="color:#e0792f">—</span>')+'</td>'
+        +'<td><input class="cn" type="number" min="0" step="0.5" value="'+(r.layers||'')+'" data-code="'+drEsc(r.code)+'" data-fld="layers" onchange="spCalcEdit(this)"></td>'
+        +'<td><input class="cn" type="number" min="0" step="0.01" value="'+(r.size||'')+'" data-code="'+drEsc(r.code)+'" data-fld="size" onchange="spCalcEdit(this)"></td>'
+        +'<td>'+(r.pmc>0?r.pmc.toFixed(5):'<span style="color:#cbd5e1">—</span>')+'</td>'
+        +'<td class="c-qty'+(r.usedQty?'':' zero')+'">'+drFmt(r.usedQty)+'</td>'
+        +'<td class="c-m2'+(r.hasConv?'':' na')+'">'+(r.hasConv?drFmt(Math.round(r.usedM2*10)/10):'—')+(fU?'<span class="sp-calc-formula">'+fU+'</span>':'')+'</td>'
+        +'<td class="sp-calc-sep"></td>'
+        +'<td class="c-qty'+(r.trQty?'':' zero')+'">'+drFmt(r.trQty)+'</td>'
+        +'<td class="c-m2 transit'+(r.hasConv?'':' na')+'">'+(r.hasConv?drFmt(Math.round(r.trM2*10)/10):'—')+(fT?'<span class="sp-calc-formula">'+fT+'</span>':'')+'</td>'
+        +'</tr>';
+    });
+    html+='<tr class="tot-row"><td></td><td colspan="2" style="text-align:start">الإجمالي · Total ('+data.rows.length+' صنف)</td>'
+      +'<td colspan="4"></td>'
+      +'<td>'+drFmt(Math.round(tUsedQ))+'</td><td>'+drFmt(Math.round(tUsedM2*10)/10)+'</td>'
+      +'<td class="sp-calc-sep"></td>'
+      +'<td>'+drFmt(Math.round(tTrQ))+'</td><td>'+drFmt(Math.round(tTrM2*10)/10)+'</td></tr>';
+  }
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+  var srch=document.getElementById('sp-calc-search');if(srch&&srch.value)filterSpaceCalc(srch.value);
+}
+function spCalcEdit(input){
+  var code=String(input.dataset.code||'').trim();if(!code)return;
+  var fld=String(input.dataset.fld||'');var v=parseFloat(input.value);
+  if(isNaN(v)||v<0)v=0;
+  var conv=getSpaceConv();
+  if(!conv[code])conv[code]={cpp:0,layers:0,size:0};
+  conv[code][fld]=v;
+  if(!conv[code].cpp&&!conv[code].layers&&!conv[code].size)delete conv[code];
+  saveSpaceConv(conv);
+  /* أعِد حساب التقرير الرئيسي وأي جداول تحويل مفتوحة */
+  if(getSpaceAutoMode()){try{renderDailyReport('space');}catch(e){}}
+  try{_cppRefresh();}catch(e){}
+  try{if(document.getElementById('sp-conv-table'))renderSpaceConvTable();}catch(e){}
+  renderSpaceCalc();
+  setTimeout(function(){var el=document.querySelector('#sp-calc-wrap input[data-code="'+code+'"][data-fld="'+fld+'"]');if(el){el.focus();el.select&&el.select();}},0);
+}
+function filterSpaceCalc(q){
+  q=String(q||'').trim().toLowerCase();
+  var rows=document.querySelectorAll('#sp-calc-wrap tbody tr');
+  rows.forEach(function(tr){
+    if(tr.classList.contains('tot-row'))return;
+    var t=tr.getAttribute('data-q')||'';
+    tr.style.display=(!q||t.indexOf(q)>=0)?'':'none';
+  });
+}
+function exportSpaceCalc(){
+  var sel=document.getElementById('sp-calc-branch');
+  var idx=sel?parseInt(sel.value,10):0;if(isNaN(idx))idx=0;
+  var data=_spCalcRowsFor(idx);
+  if(!data||!data.rows.length){alert('لا بيانات للتصدير لهذا الفرع.');return;}
+  var aoa=[['Code','Brand','Pack','Cartons_per_Pallet','Stack_Layers','Pallet_Size_m2','m2_per_Carton',
+            'Used_Qty_Carton','Used_Space_m2','Transit_Qty_Carton','Transit_Space_m2']];
+  var tUsedQ=0,tUsedM2=0,tTrQ=0,tTrM2=0;
+  data.rows.forEach(function(r){
+    aoa.push([r.code,r.brand,r.pack,r.cpp||'',r.layers||'',r.size||'',r.pmc>0?+r.pmc.toFixed(5):'',
+              r.usedQty,r.hasConv?Math.round(r.usedM2*10)/10:0,r.trQty,r.hasConv?Math.round(r.trM2*10)/10:0]);
+    tUsedQ+=r.usedQty;tUsedM2+=r.usedM2;tTrQ+=r.trQty;tTrM2+=r.trM2;
+  });
+  aoa.push(['TOTAL','','','','','','',tUsedQ,Math.round(tUsedM2*10)/10,tTrQ,Math.round(tTrM2*10)/10]);
+  var wb=XLSX.utils.book_new();var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=[{wch:13},{wch:16},{wch:14},{wch:16},{wch:12},{wch:14},{wch:13},{wch:14},{wch:14},{wch:16},{wch:16}];
+  var nm=String(data.wh.name||'Branch').replace(/[^\w\u0600-\u06FF\- ]/g,'').trim()||'Branch';
+  XLSX.utils.book_append_sheet(wb,ws,'Calc');
+  XLSX.writeFile(wb,'Space_Calc_'+nm+'.xlsx');
+}
+/* استعادة القيم الافتراضية لجدول التحويل (cpp/layers/size) — نفس مصدر SKU Management
+   لتوحيد المصدر؛ ثم تحديث كل الجداول والتقرير الرئيسي. */
+function spCalcRestoreDefaults(){
+  if(typeof confirm==='function'&&!confirm('سيتم استبدال قيم التحويل (كرتون/بلت · رصّات · حجم) لكل الأصناف بالقيم الافتراضية المرفقة — وهي نفس مصدر جدول SKU Management. متابعة؟\nRestore default conversion values for all SKUs (shared with SKU Management). Continue?'))return;
+  try{
+    saveSpaceConv(_spClone(SPACE_CONV_DEFAULTS));
+  }catch(e){}
+  /* حدّث كل الواجهات المعتمدة على نفس المصدر */
+  try{if(getSpaceAutoMode())renderDailyReport('space');}catch(e){}
+  try{_cppRefresh();}catch(e){}
+  try{if(document.getElementById('md-master-table'))renderMasterTable();}catch(e){}
+  try{if(document.getElementById('sp-conv-table'))renderSpaceConvTable();}catch(e){}
+  renderSpaceCalc();
+  var msg=document.getElementById('sp-calc-msg');
+  if(msg){var old=msg.innerHTML;msg.innerHTML='<div class="sp-conv-ok">✓ تمت استعادة القيم الافتراضية لجدول التحويل (موحّدة مع SKU Management).</div>';setTimeout(function(){var m=document.getElementById('sp-calc-msg');if(m&&/sp-conv-ok/.test(m.innerHTML))renderSpaceCalc();},2600);}
 }
 
 /* ===== ⑥ Space Actuals Editor ===== */
@@ -12233,7 +12548,7 @@ function renderBottleReport(rep){
     if(document.getElementById('colalias-card'))return;
     var a=ar();
     var card=document.createElement('div'); card.className='card'; card.id='colalias-card';
-    var html='<h2 class="sec-h"><span>✏️</span> <span>'+(a?'تعديل مسميات الأعمدة':'Edit column labels')+'</span></h2>'
+    var html='<h2 class="sec-h"><span>✏️</span> <span>'+(a?'تعديل مسميات الأعمدة':'Edit column labels')+'</span><button type="button" class="sec-collapse-btn" id="ca-collapse-btn" onclick="event.stopPropagation();window.toggleColAliasCard&&window.toggleColAliasCard()">&#9662; '+(a?'طي':'Collapse')+'</button></h2>'
       +'<p style="font-size:12px;color:var(--muted,#7c8aa0);margin:2px 0 6px">'+(a?'غيّر الاسم الظاهر لهذه الأعمدة في كل التقارير والجداول. اتركه فارغاً للاسم الافتراضي.':'Rename these columns across all reports & tables. Leave blank for default.')+'</p>'
       +'<table class="ca-table"><thead><tr><th>'+(a?'العمود':'Column')+'</th><th>'+(a?'الاسم المخصّص':'Custom label')+'</th></tr></thead><tbody>';
     CANON.forEach(function(c){
@@ -12247,6 +12562,19 @@ function renderBottleReport(rep){
     });
     var sv=document.getElementById('ca-save'); if(sv)sv.addEventListener('click',function(){save();apply();try{if(typeof syncToast==='function')syncToast(ar()?'تم حفظ مسميات الأعمدة':'Column labels saved','ok');}catch(e){}});
     var rs=document.getElementById('ca-reset'); if(rs)rs.addEventListener('click',function(){ALIAS={};save();card.querySelectorAll('input[data-ca]').forEach(function(i){i.value='';});apply();});
+    /* استعادة حالة الطي المحفوظة + تعريف دالة الطي (مرة واحدة) */
+    try{
+      window.toggleColAliasCard=function(){
+        var c=document.getElementById('colalias-card');if(!c)return;
+        c.classList.toggle('sec-collapsed');
+        var col=c.classList.contains('sec-collapsed');
+        try{(window.LS||localStorage).setItem('colalias_collapsed',col?'1':'0');}catch(e){}
+        var b=document.getElementById('ca-collapse-btn');
+        if(b){var aa=ar();b.innerHTML=col?('&#9656; '+(aa?'فتح':'Expand')):('&#9662; '+(aa?'طي':'Collapse'));}
+      };
+      var _cc='0';try{_cc=(window.LS||localStorage).getItem('colalias_collapsed')||'0';}catch(e){}
+      if(_cc==='1'){card.classList.add('sec-collapsed');var b0=document.getElementById('ca-collapse-btn');if(b0)b0.innerHTML='&#9656; '+(a?'فتح':'Expand');}
+    }catch(e){}
   }
 
   function start(){ load(); apply(); setInterval(injectEditor,1200); setInterval(apply,900); setTimeout(injectEditor,500); }
@@ -12319,13 +12647,26 @@ function renderBottleReport(rep){
     var wrap=page.querySelector('.wrap'); if(!wrap||document.getElementById('mditems-card'))return;
     var a=ar();
     var card=document.createElement('div'); card.className='card'; card.id='mditems-card'; card.style.marginBottom='16px';
-    card.innerHTML='<h2 class="sec-h"><span>🗂️</span> <span>'+(a?'بيانات الأصناف (Master Data)':'Item master data')+'</span></h2>'
+    card.innerHTML='<h2 class="sec-h"><span>🗂️</span> <span>'+(a?'بيانات الأصناف (Master Data)':'Item master data')+'</span><button type="button" class="sec-collapse-btn" id="mdi-collapse-btn" onclick="event.stopPropagation();window.toggleMdItemsCard&&window.toggleMdItemsCard()">&#9662; '+(a?'طي':'Collapse')+'</button></h2>'
       +'<p style="font-size:12px;color:var(--muted,#7c8aa0);margin:2px 0 4px">'+(a?'عدّل Brand / Size / Category / Pack لكل كود صنف — تُوحَّد تلقائياً في تقارير الأرصدة والهوية.':'Edit Brand / Size / Category / Pack per item code — unified across FG Balance & OLD Identity.')+'</p>'
       +'<div class="mdi-tools"><input class="mdi-search" id="mdi-search" placeholder="'+(a?'بحث بالكود أو الاسم…':'Search code or name…')+'"><span class="dr-meta" id="mdi-count"></span></div>'
       +'<div class="mdi-scroll"><table class="mdi-table"><thead><tr><th>'+(a?'كود الصنف':'Item Code')+'</th><th>Brand</th><th>Size</th><th>Category</th><th>Pack</th></tr></thead><tbody id="mdi-body"></tbody></table></div>';
     wrap.insertBefore(card, wrap.querySelector('.card')||null);
     document.getElementById('mdi-search').addEventListener('input',function(){renderBody(this.value);});
     renderBody('');
+    /* استعادة حالة الطي المحفوظة + تعريف دالة الطي (مرة واحدة) */
+    try{
+      window.toggleMdItemsCard=function(){
+        var c=document.getElementById('mditems-card');if(!c)return;
+        c.classList.toggle('sec-collapsed');
+        var col=c.classList.contains('sec-collapsed');
+        try{(window.LS||localStorage).setItem('mditems_collapsed',col?'1':'0');}catch(e){}
+        var b=document.getElementById('mdi-collapse-btn');
+        if(b){var aa=ar();b.innerHTML=col?('&#9656; '+(aa?'فتح':'Expand')):('&#9662; '+(aa?'طي':'Collapse'));}
+      };
+      var _mc='0';try{_mc=(window.LS||localStorage).getItem('mditems_collapsed')||'0';}catch(e){}
+      if(_mc==='1'){card.classList.add('sec-collapsed');var b1=document.getElementById('mdi-collapse-btn');if(b1)b1.innerHTML='&#9656; '+(a?'فتح':'Expand');}
+    }catch(e){}
   }
   function renderBody(q){
     var body=document.getElementById('mdi-body'); if(!body)return;
