@@ -261,13 +261,34 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .pivot td.idc{text-align:start;color:#334155;font-weight:600;font-size:12.5px}
 .pivot td.tot{font-weight:800;background:#f3f7fc;color:var(--navy)}
 .pivot td.pct{font-weight:700;color:var(--teal);background:#f3f7fc}
-.pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo){background:#eef6ff}
+.pivot tbody tr:not(.grand):hover td{background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
+.pivot tbody tr:not(.grand):hover td.tot{background:#aed0f7!important;color:#0d2a55!important;font-weight:800}
+.pivot tbody tr:not(.grand):hover td.yr,.pivot tbody tr:not(.grand):hover td.mo,
+.pivot tbody tr:not(.grand):hover td.cat,.pivot tbody tr:not(.grand):hover td.idc{background:#bdd8ff!important;color:#0d2a55!important}
 .pivot tr.grand td{background:linear-gradient(180deg,#1a4480,#13396b);color:#fff;font-weight:800;border-color:#2f63a0;font-size:13.5px}
 /* تثبيت رؤوس أعمدة جدول نافذة الإجمالي (#detail-ov): جعل حاوية التمرير الداخلية هي العنصر القابل للتمرير
    حتى تبقى الرؤوس (sticky top:0) ثابتة أعلى الجدول عند التمرير لأعلى/لأسفل. contain يمنع الرعشة. */
 #detail-ov .modal-body{overflow:hidden}
 #detail-ov .pivot-wrap{max-height:74vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;contain:paint;border-radius:10px}
 #detail-ov .pivot thead th{position:sticky;top:0;z-index:5}
+/* تنسيق أعمدة نافذة التفاصيل: عرض متناسب مع محتوى البيانات بدل التمدد القسري */
+@media screen and (min-width:901px){
+  /* البرواز الخارجي يلازم عرض الجدول عند التكبير والتصغير */
+  #detail-ov .modal-box{width:max-content;min-width:min(720px,94vw);max-width:96vw}
+  #detail-ov .modal-box .pivot{min-width:0;width:max-content;max-width:100%;margin-inline:auto}
+  #detail-ov .modal-box .pivot th,#detail-ov .modal-box .pivot td{padding-left:16px;padding-right:16px}
+  #detail-ov .modal-box .pivot td.cat,#detail-ov .modal-box .pivot td.idc{max-width:260px;overflow:hidden;text-overflow:ellipsis}
+  #detail-ov .modal-box .pivot td:not(.cat):not(.idc):not(.yr):not(.mo){min-width:78px}
+}
+/* خط ثقيل بعد عمود الشهور — فيصل لترتيب الفروع */
+/* خط ثقيل بعد عمود الشهور — فيصل لترتيب الفروع (بنفس نمط خط الأعوام الهادئ) */
+#detail-ov .modal-box .pivot td.mo,
+#detail-ov .pivot td.mo{border-inline-end:2px solid rgba(13,42,78,.09) !important}
+#detail-ov .modal-box .pivot th.msep,#detail-ov .modal-box .pivot tr.grand td.msep,
+#detail-ov .pivot th.msep,#detail-ov .pivot tr.grand td.msep{border-inline-end:2px solid rgba(13,42,78,.09) !important}
+/* خط فيصل أفقي بين كل عام وعام — هادئ وخفيف مثل الصورة، أزرق كحلي فاتح */
+#detail-ov .modal-box .pivot tbody tr.yr-sep td,
+#detail-ov .pivot tbody tr.yr-sep td{border-top:2px solid rgba(13,42,78,.16) !important}
 
 .sumbar{display:flex;align-items:flex-end;gap:14px;margin-bottom:14px;flex-wrap:wrap}
 .myear-btns{display:inline-flex;gap:4px;margin-inline-start:auto;background:#eef3fb;border:1px solid #dbe6f4;border-radius:9px;padding:3px}
@@ -565,7 +586,7 @@ html[dir=rtl] .login-shell{font-family:'Cairo','Inter',sans-serif}
 .kpi{cursor:pointer}
 .modal-ov{position:fixed;inset:0;background:rgba(15,30,55,.55);display:none;align-items:center;justify-content:center;z-index:900;padding:24px}
 .modal-ov.show{display:flex}
-.modal-box{background:#fff;border-radius:16px;max-width:1500px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden;animation:fade .25s ease}
+.modal-box{background:#fff;border-radius:16px;max-width:1680px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden;animation:fade .25s ease}
 .modal-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
 .modal-head h3{font-size:17px;font-weight:800}
 .modal-badge{font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;background:#eef3fb;color:var(--navy)}
@@ -822,7 +843,10 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   #detail-ov .pivot td.mo{font-size:11px}
   #detail-ov .pivot td.zero{color:#d3dbe6;font-size:11px}
   #detail-ov .pivot tbody tr:nth-child(even):not(.grand) td:not(.yr):not(.mo){background:#f6faff}
-  #detail-ov .pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo){background:#eaf3ff}
+  #detail-ov .pivot tbody tr:not(.grand):hover td{background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
+  #detail-ov .pivot tbody tr:not(.grand):hover td.tot{background:#aed0f7!important;color:#0d2a55!important;font-weight:800}
+  #detail-ov .pivot tbody tr:not(.grand):hover td.yr,#detail-ov .pivot tbody tr:not(.grand):hover td.mo,
+  #detail-ov .pivot tbody tr:not(.grand):hover td.cat,#detail-ov .pivot tbody tr:not(.grand):hover td.idc{background:#bdd8ff!important;color:#0d2a55!important}
   #detail-ov .pivot td.tot{font-size:13px;font-weight:800}
   #detail-ov .pivot tr.grand td{font-size:12.5px;padding:6px 5px}
   /* ===== إعادة تلوين جدول نافذة الإجمالي على الجوال — رأس كحلي معتم ثابت، تظليل متناوب أوضح، وتمييز الأعمدة ===== */
@@ -1663,6 +1687,27 @@ html[dir=rtl] #page-home .d-tile:hover .tgo svg{transform:scaleX(-1) translateX(
 #nav .navbtn.active{background:rgba(255,255,255,.12);color:#fff;box-shadow:none}
 #nav .navbtn.active::before{content:'';position:absolute;inset-inline-start:0;top:18%;bottom:18%;width:3px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,#ff5e99,#d6336c)}
 #nav .navbtn .cdot{margin-inline-start:auto;flex:0 0 auto}
+/* ═══ مظهر زجاجي لامع للقائمة الجانبية والأزرار (إضافة بصرية فقط) ═══ */
+#nav{background:radial-gradient(135% 55% at 50% 0%,rgba(64,144,234,.26),transparent 60%),linear-gradient(180deg,#1a4880 0%,#0d2a4e 52%,#091d3a 100%)!important;box-shadow:2px 0 24px rgba(8,26,58,.38),inset 0 1px 0 rgba(255,255,255,.10),inset -1px 0 0 rgba(255,255,255,.05)!important}
+/* رؤوس المجموعات — سطح زجاجي مصنفر مع لمعة علوية */
+#nav .nav-head{background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.05) 58%,rgba(255,255,255,.02))!important;border:1px solid rgba(255,255,255,.20)!important;border-radius:14px!important;box-shadow:0 8px 20px -12px rgba(3,12,30,.75),inset 0 1px 0 rgba(255,255,255,.38),inset 0 -10px 16px -12px rgba(0,0,0,.28)!important;-webkit-backdrop-filter:blur(8px) saturate(1.2);backdrop-filter:blur(8px) saturate(1.2);transition:background .18s,box-shadow .18s,border-color .18s,transform .18s}
+#nav .nav-head:hover{background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.08))!important;border-color:rgba(255,255,255,.34)!important;transform:translateY(-1px);box-shadow:0 12px 26px -12px rgba(3,12,30,.8),inset 0 1px 0 rgba(255,255,255,.5)!important}
+#nav .nav-head .gchev{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.08))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 2px 6px -3px rgba(0,0,0,.5)!important}
+/* زر الرئيسية — زجاجي */
+#nav .navbtn-home{background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.04))!important;border:1px solid rgba(255,255,255,.20)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 8px 18px -12px rgba(0,0,0,.6)!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+/* عناصر القائمة — لمعان زجاجي عند المرور والتفعيل */
+#nav .navbtn{transition:background .16s,color .16s,box-shadow .18s,transform .14s}
+#nav .nav-sub .navbtn:hover,#nav .navbtn:hover{background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.05))!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),inset 0 1px 0 rgba(255,255,255,.28)!important}
+#nav .nav-sub .navbtn.active,#nav .navbtn.active{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.08))!important;color:#fff!important;box-shadow:0 8px 18px -10px rgba(3,12,30,.85),inset 0 0 0 1px rgba(255,255,255,.24),inset 0 1px 0 rgba(255,255,255,.45)!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+/* شارات الأيقونات — انعكاس زجاجي لامع */
+#nav .navbtn .nico{position:relative;overflow:hidden;box-shadow:0 8px 16px -6px color-mix(in srgb,var(--c) 62%,transparent),inset 0 1px 0 rgba(255,255,255,.5),inset 0 -7px 11px -7px rgba(0,0,0,.32)!important}
+#nav .navbtn .nico::after{content:'';position:absolute;inset:0;background:linear-gradient(152deg,rgba(255,255,255,.42),rgba(255,255,255,.06) 42%,rgba(255,255,255,0) 60%);pointer-events:none}
+#nav .navbtn .nico svg{position:relative;z-index:1}
+/* مبدّل اللغة وزر الطيّ — زجاجي */
+#nav .langsw{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05))!important;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 5px 14px -9px rgba(0,0,0,.6)}
+#nav .langsw button.on{background:linear-gradient(180deg,#ffffff,#e8f0fb)!important;color:#15406f!important;box-shadow:0 3px 9px -3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.85)}
+#nav .navtoggle{background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)}
+#nav .navtoggle:hover{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.08))!important}
 </style>
 
 <style id="tdash-css">
@@ -2318,6 +2363,121 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
 }
 </style>
 
+<style id="sku-tip-css">
+/* ═══ SKU Detail Card — مطابق للصورة ═══ */
+#sku-detail-pop{
+  position:fixed;z-index:99999;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 8px 28px rgba(10,30,80,.20),0 2px 8px rgba(10,30,80,.10);
+  min-width:240px;max-width:290px;
+  padding:0;overflow:hidden;
+  pointer-events:none;
+  display:none;opacity:0;
+  transition:opacity .15s ease;
+  border:1.5px solid #c5d6f0;
+  font-family:inherit;
+  user-select:none;
+}
+#sku-detail-pop.show{opacity:1;}
+#sku-detail-pop.pinned{
+  pointer-events:all;
+  border-color:#2563b0;
+  box-shadow:0 10px 36px rgba(10,30,80,.26),0 2px 10px rgba(10,30,80,.13);
+}
+#sku-detail-pop.pinned .sdp-top-bar{cursor:grab;}
+#sku-detail-pop.pinned .sdp-top-bar:active{cursor:grabbing;}
+
+/* ── الشريط العلوي: فرع يسار، أزرار يمين ── */
+.sdp-top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:#2563b0;
+  padding:5px 8px 5px 10px;
+  gap:6px;
+}
+.sdp-branch-lbl{
+  display:flex;align-items:center;gap:5px;
+  color:#fff;font-size:12px;font-weight:700;
+  flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sdp-branch-icon{font-size:13px;flex-shrink:0;}
+.sdp-top-btns{display:flex;gap:4px;flex-shrink:0;}
+.sdp-pin-btn,.sdp-close-btn{
+  background:rgba(255,255,255,.18);
+  border:none;border-radius:6px;
+  color:#fff;cursor:pointer;
+  font-size:10.5px;padding:2px 8px;
+  line-height:1.65;font-weight:700;
+  transition:background .14s;
+  pointer-events:all;
+  white-space:nowrap;
+}
+.sdp-pin-btn:hover,.sdp-close-btn:hover{background:rgba(255,255,255,.32);}
+.sdp-pin-btn.active{background:rgba(255,210,60,.40);color:#ffe066;}
+
+/* ── الصف الثاني: اسم + شهر + pack أفقي ── */
+.sdp-info-row{
+  background:#1e4fa0;
+  display:flex;align-items:center;gap:6px;
+  padding:5px 10px 6px;
+  flex-wrap:wrap;
+}
+.sdp-name-main{
+  font-size:13px;font-weight:800;color:#fff;
+  margin-inline-end:2px;
+}
+.sdp-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  background:rgba(255,255,255,.18);
+  border-radius:20px;padding:1px 7px;
+  font-size:10px;font-weight:700;color:#e8f0ff;
+  white-space:nowrap;
+}
+.sdp-code-tag{
+  font-size:10px;font-weight:600;color:rgba(255,255,255,.70);
+  font-family:monospace;letter-spacing:.2px;
+  padding:1px 0;
+  white-space:nowrap;
+}
+
+/* ── جسم البطاقة ── */
+.sdp-body{padding:8px 11px 10px;}
+.sdp-section-label{
+  font-size:10px;font-weight:700;color:#64748b;
+  letter-spacing:.4px;
+  margin:0 0 5px;
+  display:flex;align-items:center;gap:5px;
+}
+.sdp-section-label::after{content:'';flex:1;height:1px;background:#e4eaf6;}
+.sdp-date-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:3px 5px;margin-bottom:2px;
+  background:#f4f8ff;border-radius:6px;gap:8px;
+}
+.sdp-date-row:last-child{margin-bottom:0;}
+.sdp-date-lbl{
+  font-size:11px;color:#374151;font-weight:500;
+  display:flex;align-items:center;gap:5px;flex:1;
+}
+.sdp-date-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#2563b0;flex-shrink:0;opacity:.75;
+}
+.sdp-date-qty{font-size:11.5px;color:#1e3a8a;font-weight:700;white-space:nowrap;}
+.sdp-empty-note{font-size:11px;color:#94a3b8;font-style:italic;text-align:center;padding:5px 0;}
+
+/* ── شريط الإجمالي ── */
+.sdp-total-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#eef4ff;border-radius:7px;
+  padding:5px 9px;margin-top:6px;
+  border:1px solid #c8d9f5;
+}
+.sdp-total-lbl{font-size:11px;color:#1e3a8a;font-weight:700;}
+.sdp-total-val{font-size:13px;color:#1e3a8a;font-weight:800;}
+</style>
+
 <style id="tnavdd-css">
 /* sidebar dropdown system: smooth expand/collapse */
 #nav .nav-sub{overflow:hidden;max-height:1500px;opacity:1;transition:max-height .3s ease,opacity .22s ease,padding .3s ease}
@@ -2645,17 +2805,17 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <div class="kpis">
         <div class="kpi t-total" onclick="openDetail('all')"><div class="row"><h3 data-i18n="kpi_total">Total Quantity</h3><div class="ic">&#128230;</div></div>
           <div class="v" id="k-total">0</div><span class="pill" id="kp-total">100%</span><span class="ktrend" id="kt-total"></span><div class="bar"><i id="b-total" style="width:100%"></i></div><div class="kpi-seg" id="total-seg"></div><div class="kpi-seglg" id="total-seglg"></div></div>
-        <div class="kpi t-c1" onclick="openDetail('c1')"><div class="row"><h3 id="kl-c1">Up to 30 days</h3><div class="ic" title="حتى 30 يوم">&#10003;</div></div>
+        <div class="kpi t-c1" onclick="openDetail('c1')"><div class="row"><h3 id="kl-c1" data-i18n="kpi_c1">Up to 30 days</h3><div class="ic" title="حتى 30 يوم">&#10003;</div></div>
           <div class="v" id="k-c1">0</div><span class="pill" id="kp-c1">0%</span><span class="ktrend" id="kt-c1"></span><div class="bar"><i id="b-c1"></i></div><div class="kpi-idmini" id="ids-c1"></div></div>
-        <div class="kpi t-c2" onclick="openDetail('c2')"><div class="row"><h3 id="kl-c2">31 – 60 days</h3><div class="ic" title="31–60">&#10003;</div></div>
+        <div class="kpi t-c2" onclick="openDetail('c2')"><div class="row"><h3 id="kl-c2" data-i18n="kpi_c2">31 – 60 days</h3><div class="ic" title="31–60">&#10003;</div></div>
           <div class="v" id="k-c2">0</div><span class="pill" id="kp-c2">0%</span><span class="ktrend" id="kt-c2"></span><div class="bar"><i id="b-c2"></i></div><div class="kpi-idmini" id="ids-c2"></div></div>
-        <div class="kpi t-c3" onclick="openDetail('c3')"><div class="row"><h3 id="kl-c3">61 – 90 days</h3><div class="ic" title="61–90">&#9888;</div></div>
+        <div class="kpi t-c3" onclick="openDetail('c3')"><div class="row"><h3 id="kl-c3" data-i18n="kpi_c3">61 – 90 days</h3><div class="ic" title="61–90">&#9888;</div></div>
           <div class="v" id="k-c3">0</div><span class="pill" id="kp-c3">0%</span><span class="ktrend" id="kt-c3"></span><div class="bar"><i id="b-c3"></i></div><div class="kpi-idmini" id="ids-c3"></div></div>
-        <div class="kpi t-c4" onclick="openDetail('c4')"><div class="row"><h3 id="kl-c4">91 – 180 days</h3><div class="ic" title="91–180">&#9888;</div></div>
+        <div class="kpi t-c4" onclick="openDetail('c4')"><div class="row"><h3 id="kl-c4" data-i18n="kpi_c4">91 – 180 days</h3><div class="ic" title="91–180">&#9888;</div></div>
           <div class="v" id="k-c4">0</div><span class="pill" id="kp-c4">0%</span><span class="ktrend" id="kt-c4"></span><div class="bar"><i id="b-c4"></i></div><div class="kpi-idmini" id="ids-c4"></div></div>
-        <div class="kpi t-c5" onclick="openDetail('c5')"><div class="row"><h3 id="kl-c5">181 – 240 days</h3><div class="ic" title="181–240">&#9888;</div></div>
+        <div class="kpi t-c5" onclick="openDetail('c5')"><div class="row"><h3 id="kl-c5" data-i18n="kpi_c5">181 – 240 days</h3><div class="ic" title="181–240">&#9888;</div></div>
           <div class="v" id="k-c5">0</div><span class="pill" id="kp-c5">0%</span><span class="ktrend" id="kt-c5"></span><div class="bar"><i id="b-c5"></i></div><div class="kpi-idmini" id="ids-c5"></div></div>
-        <div class="kpi t-c6" onclick="openDetail('c6')"><div class="row"><h3 id="kl-c6">Greater than 240 days</h3><div class="ic" title="+240">&#9760;</div></div>
+        <div class="kpi t-c6" onclick="openDetail('c6')"><div class="row"><h3 id="kl-c6" data-i18n="kpi_c6">Greater than 240 days</h3><div class="ic" title="+240">&#9760;</div></div>
           <div class="v" id="k-c6">0</div><span class="pill" id="kp-c6">0%</span><span class="ktrend" id="kt-c6"></span><div class="bar"><i id="b-c6"></i></div><div class="kpi-idmini" id="ids-c6"></div></div>
       </div>
       <div class="kpis custom-kpis" id="custom-kpis"></div>
@@ -2675,12 +2835,12 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
               <div class="cl-top">
                 <div class="cl-pie"><canvas id="c_class"></canvas></div>
                 <div class="cl-kpis">
-                  <div class="cl-item"><div class="sw" style="background:#10b981"></div><div><div class="b" id="cl-c1">0</div><div class="l" id="cll-c1">Up to 30 days</div></div></div>
-                  <div class="cl-item"><div class="sw" style="background:#84cc16"></div><div><div class="b" id="cl-c2">0</div><div class="l" id="cll-c2">31 – 60 days</div></div></div>
-                  <div class="cl-item"><div class="sw" style="background:#f59e0b"></div><div><div class="b" id="cl-c3">0</div><div class="l" id="cll-c3">61 – 90 days</div></div></div>
-                  <div class="cl-item"><div class="sw" style="background:#f97316"></div><div><div class="b" id="cl-c4">0</div><div class="l" id="cll-c4">91 – 180 days</div></div></div>
-                  <div class="cl-item"><div class="sw" style="background:#ef4444"></div><div><div class="b" id="cl-c5">0</div><div class="l" id="cll-c5">181 – 240 days</div></div></div>
-                  <div class="cl-item"><div class="sw" style="background:#b91c1c"></div><div><div class="b" id="cl-c6">0</div><div class="l" id="cll-c6">240+ days</div></div></div>
+                  <div class="cl-item"><div class="sw" style="background:#10b981"></div><div><div class="b" id="cl-c1">0</div><div class="l" id="cll-c1" data-i18n="kpi_c1">Up to 30 days</div></div></div>
+                  <div class="cl-item"><div class="sw" style="background:#84cc16"></div><div><div class="b" id="cl-c2">0</div><div class="l" id="cll-c2" data-i18n="kpi_c2">31 – 60 days</div></div></div>
+                  <div class="cl-item"><div class="sw" style="background:#f59e0b"></div><div><div class="b" id="cl-c3">0</div><div class="l" id="cll-c3" data-i18n="kpi_c3">61 – 90 days</div></div></div>
+                  <div class="cl-item"><div class="sw" style="background:#f97316"></div><div><div class="b" id="cl-c4">0</div><div class="l" id="cll-c4" data-i18n="kpi_c4">91 – 180 days</div></div></div>
+                  <div class="cl-item"><div class="sw" style="background:#ef4444"></div><div><div class="b" id="cl-c5">0</div><div class="l" id="cll-c5" data-i18n="kpi_c5">181 – 240 days</div></div></div>
+                  <div class="cl-item"><div class="sw" style="background:#b91c1c"></div><div><div class="b" id="cl-c6">0</div><div class="l" id="cll-c6" data-i18n="kpi_c6">240+ days</div></div></div>
                 </div>
               </div>
             </div>
@@ -2921,6 +3081,98 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
           </select>
         </div>
         <div id="colm-body"></div>
+      </div>
+
+      <!-- ===== مصمم الشعار · Logo Designer ===== -->
+      <div class="dz-card full logo-dz-card">
+        <h4 class="dz-h4-toggle" onclick="dzToggleCard(this)"><span class="dz-h4-arrow">&#9650;</span>&#127919; <span>تحريك وتكبير ومحاذاة الشعار · Move, resize &amp; align logo</span></h4>
+        <div class="dz-hint">اختر الشعار، ثم حرّكه بالسحب أو بالأسهم، كبّره أو صغّره، وحدّد محاذاته (يسار/وسط/يمين). تُحفظ التغييرات تلقائياً. · Pick a logo, then drag or nudge it, scale it, and align it. Changes are saved automatically.</div>
+        <div class="logo-dz-pick">
+          <label>الشعار · Logo</label>
+          <select id="logo-dz-target" class="dz-agg" onchange="logoDzPick(this.value)">
+            <option value="all">كل الشعارات · All logos</option>
+            <option value="topbar">شعار الشريط العلوي · Top bar</option>
+            <option value="sidebar">شعار القائمة الجانبية · Sidebar</option>
+            <option value="login">شعار صفحة الدخول · Login page</option>
+          </select>
+        </div>
+        <div class="logo-dz-grid">
+          <div class="logo-dz-fld">
+            <label>المحاذاة · Align</label>
+            <div class="logo-dz-seg" id="logo-dz-align">
+              <button type="button" data-a="left"   onclick="setLogoAlign('left')">يسار · Left</button>
+              <button type="button" data-a="center" onclick="setLogoAlign('center')">وسط · Center</button>
+              <button type="button" data-a="right"  onclick="setLogoAlign('right')">يمين · Right</button>
+            </div>
+          </div>
+          <div class="logo-dz-fld">
+            <label>الحركة · Animation</label>
+            <select id="logo-dz-anim" class="dz-agg" onchange="setLogoAnim(this.value)">
+              <option value="none">بدون · None</option>
+              <option value="float">طفو · Float</option>
+              <option value="pulse">نبض · Pulse</option>
+              <option value="bounce">قفز · Bounce</option>
+              <option value="spin">دوران · Spin</option>
+              <option value="swing">تمايل · Swing</option>
+              <option value="shake">اهتزاز · Shake</option>
+              <option value="glow">توهّج · Glow</option>
+            </select>
+          </div>
+          <div class="logo-dz-fld">
+            <label>الحجم · Size <b id="logo-dz-scaleval">100%</b></label>
+            <div class="logo-dz-row">
+              <button type="button" class="logo-dz-btn" onclick="nudgeLogoScale(-0.1)" title="تصغير · Smaller">&#8722;</button>
+              <input type="range" id="logo-dz-scale" min="0.4" max="2.5" step="0.05" value="1" oninput="setLogoScale(this.value)">
+              <button type="button" class="logo-dz-btn" onclick="nudgeLogoScale(0.1)" title="تكبير · Bigger">&#43;</button>
+            </div>
+          </div>
+          <div class="logo-dz-fld">
+            <label>أفقي · Horizontal <b id="logo-dz-xval">0</b></label>
+            <input type="range" id="logo-dz-x" min="-150" max="150" step="1" value="0" oninput="setLogoMove('x',this.value)">
+          </div>
+          <div class="logo-dz-fld">
+            <label>عمودي · Vertical <b id="logo-dz-yval">0</b></label>
+            <input type="range" id="logo-dz-y" min="-150" max="150" step="1" value="0" oninput="setLogoMove('y',this.value)">
+          </div>
+          <div class="logo-dz-fld">
+            <label>خلفية الشعار · Background</label>
+            <select id="logo-dz-bgmode" class="dz-agg" onchange="setLogoBgMode(this.value)">
+              <option value="default">افتراضي · Default</option>
+              <option value="transparent">شفاف · Transparent</option>
+              <option value="white">أبيض · White</option>
+              <option value="custom">لون مخصص · Custom color</option>
+            </select>
+            <div class="logo-dz-row">
+              <input type="color" id="logo-dz-bgcolor" value="#ffffff" oninput="setLogoBgColor(this.value)" title="اللون · Color">
+              <input type="range" id="logo-dz-bgop" min="0" max="1" step="0.05" value="1" oninput="setLogoBgOpacity(this.value)" title="الدرجة · Opacity">
+              <b id="logo-dz-bgopval">100%</b>
+            </div>
+          </div>
+          <div class="logo-dz-fld">
+            <label>شكل العرض · Shape</label>
+            <select id="logo-dz-shape" class="dz-agg" onchange="setLogoShape(this.value)">
+              <option value="default">افتراضي · Default</option>
+              <option value="circle">دائري · Circle</option>
+              <option value="oval">بيضاوي · Oval</option>
+              <option value="square">مربع · Square</option>
+              <option value="none">بدون برواز · No frame</option>
+              <option value="ovaltilt">بيضاوي مائل · Oval tilt</option>
+            </select>
+          </div>
+        </div>
+        <div class="logo-dz-actions">
+          <button type="button" class="logo-dz-drag" id="logo-dz-dragbtn" onclick="toggleLogoDrag()">&#9995; تحريك بالسحب · Drag mode: <span id="logo-dz-dragstate">إيقاف · Off</span></button>
+          <button type="button" class="logo-dz-anim-toggle" id="logo-dz-animbtn" onclick="toggleLogoAnim()">&#9889; تشغيل/إيقاف الحركة · Animation on/off</button>
+          <button type="button" class="btn-clear" onclick="resetLogoGroup()"><span>&#8635;</span> إعادة تعيين · Reset</button>
+        </div>
+        <div class="logo-dz-actions">
+          <label class="logo-dz-anim-toggle" style="display:inline-flex;align-items:center;cursor:pointer">
+            &#128247; تغيير صورة الشعار · Change logo image
+            <input type="file" accept="image/*" style="display:none" onchange="uploadLogoImage(this)">
+          </label>
+          <button type="button" class="btn-clear" onclick="restoreLogoImage()"><span>&#8635;</span> استعادة الصورة الأصلية · Restore original</button>
+        </div>
+        <div class="logo-dz-tip">&#128161; فعّل «تحريك بالسحب» ثم اسحب الشعار مباشرةً على الشاشة. شعار صفحة الدخول يظهر عند تسجيل الخروج. · Enable Drag mode, then drag the logo right on the screen. The login logo appears on the sign-in screen.</div>
       </div>
 
     </div></div>
@@ -3344,7 +3596,7 @@ const CLASS_ORDER=['c1','c2','c3','c4','c5','c6'];
 const CLASS_LABELS={en:{c1:'Up to 30 days',c2:'31 – 60 days',c3:'61 – 90 days',c4:'91 – 180 days',c5:'181 – 240 days',c6:'Greater than 240 days'},ar:{c1:'حتى 30 يوم',c2:'31 – 60 يوم',c3:'61 – 90 يوم',c4:'91 – 180 يوم',c5:'181 – 240 يوم',c6:'أكثر من 240 يوم'}};
 const CLASS_COLORS={c1:'#10b981',c2:'#84cc16',c3:'#f59e0b',c4:'#f97316',c5:'#ef4444',c6:'#b91c1c'};
 const DONUT_COLORS={c1:'#15b9a3',c2:'#7cc24f',c3:'#f4c23f',c4:'#ef8b3c',c5:'#e85f6e',c6:'#b23148'};
-function _clsLabel(k){return ((CLASS_LABELS[(typeof LANG!=='undefined'&&LANG==='ar')?'ar':'en']||{})[k])||k;}
+function _clsLabel(k){var tk='kpi_'+k;if(typeof TITLES!=='undefined'&&TITLES[tk]!=null&&TITLES[tk]!=='')return TITLES[tk];return ((CLASS_LABELS[(typeof LANG!=='undefined'&&LANG==='ar')?'ar':'en']||{})[k])||k;}
 function _ageKeyFromDays(dys){if(dys==null||isNaN(dys))return 'c1';if(dys<=30)return 'c1';if(dys<=60)return 'c2';if(dys<=90)return 'c3';if(dys<=180)return 'c4';if(dys<=240)return 'c5';return 'c6';}
 var _MOIDX={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 function _fmtY(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
@@ -3371,14 +3623,14 @@ const BRANCH_SUM_AR={'1. Riyadh':'مصنع الرياض','2. Kharj':'الخرج'
 
 const T={
  en:{grp_aging:'Inventory Aging',grp_btl:'Bottle & Brushing',nav_btl_dash:'Dashboard',nav_btl_compare:'Yearly Comparison',nav_btl_table:'Detailed Tables',nav_btl_manage:'Data Management',grp_settings:'Settings',nav_dash:'Dashboard',nav_sum:'Summary',nav_imp:'Import Data',title:'Smart Inventory Analytics\n&\nAging Dashboard',lastupdate:'Last update',
-  kpi_total:'Total Quantity',kpi_60:'Less than 60 days',kpi_90:'Less than 90 days',kpi_g90:'Greater than 90 days',
+  kpi_total:'Total Quantity',kpi_60:'Less than 60 days',kpi_90:'Less than 90 days',kpi_g90:'Greater than 90 days',kpi_c1:'Up to 30 days',kpi_c2:'31 – 60 days',kpi_c3:'61 – 90 days',kpi_c4:'91 – 180 days',kpi_c5:'181 – 240 days',kpi_c6:'Greater than 240 days',
   f_identity:'Identity',f_branch:'Branch',f_classify:'Classify',clear:'Clear',
   ch_identity:'Identity Inventory Weight',ch_month:'Inventory Aging Pattern',sub_month:'monthly qty',
   ch_sizewise:'SKU Inventory — Size wise',ch_pack:'SKU Inventory',sub_pack:'by pack',
   ch_classify:'Inventory Classifying',ch_sizeitem:'SKU Inventory — Size Item',sub_sizeitem:'CTN / SHR',
   center_total:'TOTAL QTY',gsearch_ph:'Search anything…',login_sub:'Inventory Dashboard',nav_home:'Home',login_welcome:'Welcome back',login_form_sub:'Sign in to access your reporting workspace',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'Warehouse aging, coverage and analytics — unified in one workspace.',login_stat_wh:'Warehouses',login_stat_br:'Brands',login_stat_rp:'Reports',home_hero_title:'Reporting Center',home_hero_sub:'Select a report to open — everything in one place.',home_open:'Open',back_btn:'Back',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'Tania • Warehouse',desc_dash:'KPIs, charts and aging breakdown',desc_sum:'Totals by brand, month and branch',desc_sku:'Item-level totals and top SKUs',desc_rspace:'Warehouse space utilisation',desc_rfgbal:'Finished-goods balance by branch',desc_roldid:'Slow-moving / old identity stock',desc_rtransit:'Goods in transit between sites',desc_rbottle:'Bottle stock coverage',desc_imp:'Upload an Excel file to refresh data',desc_cloud:'Sync and back up to Firebase',desc_records:'Edit any cell, add, duplicate or delete records',desc_designer:'Customise table columns and methods',desc_users:'Manage accounts and permissions',desc_dailyup:'Upload the daily coverage files',login_user:'Username',login_pass:'Password',login_btn:'Login',col_new_manual:'New manual column',col_new_calc:'New calculated column',colm_title:'Column Manager',colm_sub:'Add custom columns (manual or calculated) to any table.',colm_screen:'Table',colm_add_calc:'+ Calculated column',colm_add_manual:'+ Manual column',colm_name:'Column name',colm_formula:'Formula e.g. {total} * 0.15',colm_type:'Type',colm_t_calc:'Calculated',colm_t_manual:'Manual',colm_avail:'Available variables',colm_hbg:'Header color',colm_cbg:'Cell color',colm_del:'Delete',colm_none:'No custom columns yet.',colm_help_calc:'Use variables in braces. Supports + - * / ( ) and Math.round/abs/min/max.',colm_help_manual:'Manual columns let you type a value into each row directly.',colm_existing:'Existing columns (click to show/hide)',colm_custom:'Custom columns',colm_hide:'Hide column',colm_show:'Show column',forgot_pwd:'Forgot password?',login_remember:'Remind me',login_bio:'Sign in with fingerprint / Face ID',bio_or:'or',bio_setup_title:'Quick sign-in',bio_setup_q:'Enable fingerprint / Face ID for faster sign-in next time?',bio_enable:'Enable',bio_later:'Not now',bio_enabled:'Quick sign-in enabled on this device.',bio_failed:'Biometric sign-in failed. Use your password.',bio_unsupported:'This device does not support biometric sign-in.',bio_none:'No saved quick sign-in on this device.',bio_disable:'Disable quick sign-in',bio_disabled:'Quick sign-in disabled on this device.',fpc_title:'Password change required',fpc_sub:'To protect your account, set a new password before continuing.',fpc_new:'New password',fpc_confirm:'Confirm password',fpc_save:'Save & continue',fpc_r_len:'At least 8 characters',fpc_r_upper:'Uppercase (A-Z)',fpc_r_lower:'Lowercase (a-z)',fpc_r_digit:'Number (0-9)',fpc_r_symbol:'Symbol (!@#$...)',pwd_reset_forced:'Password reset. User must set a new one at next login.',fp_title:'Reset Password',fp_desc1:'Enter your username. A verification code will be sent to your registered email.',fp_desc2:'Enter the code sent to',fp_send:'Send code',fp_reset:'Reset password',fp_resend:'Resend code',fp_need_user:'Please enter your username.',fp_checking:'Checking…',fp_no_user:'No account found with this username.',fp_no_email:'No email is registered for this account. Contact your admin.',fp_email_unavail:'Email service is not configured. Contact your admin.',fp_sent_ok:'Code sent. Check your inbox.',fp_send_fail:'Could not send the code. Try again later.',fp_restart:'Please restart the reset process.',fp_expired:'The code has expired. Request a new one.',fp_bad_code:'Incorrect code.',fp_pwd_short:'Password must be at least 4 characters.',fp_pwd_mismatch:'Passwords do not match.',fp_reset_ok:'Password reset successfully.',sec_title:'Security & Email Settings',sec_sub:'Configure the email service used to send password-reset codes to users.',sec_pub:'EmailJS Public Key',sec_svc:'Service ID',sec_tpl:'Template ID',sec_save:'Save settings',sec_test:'Send test email',sec_note:'Tip: create a free account at emailjs.com, add an email service and a template containing the variable {{passcode}}, then paste the keys above.',sec_saved:'Settings saved.',sec_need_all:'Please fill all three fields.',sec_admin_only:'Admins only.',sec_bad_cfg:'Invalid or missing settings.',sec_no_admin_email:'Your account has no email set.',sec_sending:'Sending…',sec_test_ok:'Test email sent to',sec_test_fail:'Test failed. Check your settings.',log_title:'Login Activity Log',log_refresh:'Refresh',log_clear:'Clear log',log_user:'User',log_event:'Event',log_time:'Time',log_empty:'No activity yet.',log_k_login:'Signed in',log_k_reset:'Password reset',log_k_failed:'Failed attempt',login_bad:'Invalid username or password',login_empty_user:'Please enter your username',login_empty_pass:'Please enter your password',login_empty_both:'Please enter your username and password',login_nouser:'No account found with this username',login_wrongpass:'Incorrect password — please try again',login_temp_expired:'Temporary password expired. Please request a new one.',fp_temp_sent:'Temporary password sent to your email.',fp_temp_done1:'A temporary password (valid 24 hours) has been sent to',fp_temp_done2:"Sign in with it — you'll be asked to set a new password.",fp_done_ok:'Got it',temp_show_title:'Temporary password generated',temp_show_for:'For user',temp_show_valid:'Valid until',temp_show_hint:'Password change will be required after signing in with it.',temp_copy:'Copy code',login_locked:'Account temporarily locked. Try again in {n}s',nav_users:'Users',nav_records:'Data Editor',rec_title:'Data Editor — Edit & Add Records',rec_add:'Add Record',rec_search:'Search records',rec_del:'Delete',rec_dup:'Duplicate',rec_edit_hint:'Click any cell in the table to edit it directly. Changes are saved and synced to all devices automatically.',rec_save:'Save to Cloud',rec_qty:'Quantity',rec_cat2:'Category 2',rec_logo:'Logo',rec_need:'Enter Identity and Branch at least',logout:'Logout',changepwd_btn:'Change password',users_title:'User Management',users_sub:'Manage accounts, permissions and security',utab_users:'Users',utab_security:'Security & Email',utab_log:'Login Log',ce_title:'Card title',ce_calc:'Calculation',ce_cls:'Age class',ce_month:'Month',ce_color:'Color',ce_save:'Save card',ce_cancel:'Cancel',ce_sum:'Sum of quantity',ce_avg:'Average quantity',ce_count:'Item count',ce_max:'Max quantity',ce_min:'Min quantity',ce_all:'All',u_add_title:'Add new user',u_list_title:'Users list',u_perms_modal:'Permissions',u_user:'Username',u_pass:'Password',u_role:'Role',u_add:'Add User',u_admin:'Admin',u_userrole:'User',u_actions:'Actions',u_delete:'Delete',u_exists:'Username already exists',u_need:'Enter username and password',u_perms:'Screen permissions',u_temp:'Temporary',u_all:'All',u_email:'Email',u_mobile:'Mobile',u_password:'Password',u_resetpwd:'Reset Password',set_new_pwd:'Enter a new password for the user:',pwd_changed:'Password updated successfully.',u_pwd_help:'🔑 Password: send a reset link (permanent) or set a 24-hour temporary password · ⚙️ Edit permissions for screen access.',temp_prompt:'Your password is temporary. Please enter a new password:',cols_btn:'Columns',cols_title:'Show / hide columns',cols_hint:'Check a branch to show its column, uncheck to hide it. Changes are saved automatically and apply to both tables.',nav_designer:'Designer',nav_cardbuilder:'Card Builder',nav_pagebuilder:'Page Builder',cb_title:'Card Builder',cb_sub:'Create custom KPI cards that appear on the dashboard',cb_new:'New card',cb_f_title:'Card title',cb_f_calc:'Calculation',cb_f_age:'Age class',cb_f_month:'Month',cb_f_icon:'Icon',cb_f_color:'Color',cb_calc_sum:'Sum of quantity',cb_calc_avg:'Average quantity',cb_calc_count:'Item count',cb_calc_max:'Max value',cb_calc_min:'Min value',cb_age_all:'All classes',cb_month_all:'All months',cb_save:'Save card',cb_cancel:'Cancel',cb_preview:'Live preview',cb_preview_hint:'The value is computed from current data and reflects dashboard filters.',cb_list:'Created cards',cb_empty:'No cards yet. Create your first card above.',designer_title:'Table Designer',designer_sub:'Rename columns, choose the calculation method, reorder and show/hide columns.',calc_method:'Calculation method',calc_sum:'Sum',calc_avg:'Average',calc_count:'Count',calc_max:'Max',calc_min:'Min',calc_hint:'Applies to all value cells in the Summary and SKU tables.',appearance:'Appearance',colors:'Colors',c_primary:'Primary',c_teal:'Teal',c_blue:'Blue',c_orange:'Orange',st_color:'Color',st_font:'Font',st_size:'Font size (px)',st_align:'Text align',dz_al_def:'Default',dz_al_l:'Left',dz_al_c:'Center',dz_al_r:'Right',font_family:'Font',font_default:'Default',display_size:'Display size',card_titles:'Card titles & labels',dz_pick:'Choose screen to edit',dz_pick_hint:'Each screen is edited independently — changes here do not affect other screens.',dz_scr_dash:'Dashboard',dz_scr_sum:'Summary table',dz_scr_sku:'SKU table',dz_scr_fgbal:'FG Balance report',dz_scr_oldid:'OLD Identity report',dz_scr_transit:'FG Transit report',rpt_cols_title:'Report columns',rpt_cols_hint:'Rename headers, set colors and add conditional formatting. Changes apply to this report only.',rpt_no_data:'Upload this report first to load its columns.',dz_scr_appear:'General appearance',chart_order:'Chart cards order / position',dz_branch_order:'Branch column order',dz_col:'Column',dz_name:'Display name',dz_show:'Show',dz_calc:'Calc',calc_default:'Default',dz_reset:'Reset',dz_collapse_all:'Collapse all',dz_expand_all:'Expand all',dz_sum_title:'Summary columns',dz_sku_title:'SKU columns',set_date_label:'Report update date',set_btn:'Set date',saved_date:'\u2713 Update date saved.',dz_color:'Color',dz_cf:'Cond. format',cc_hbg:'Header background',cc_cbg:'Cell background',cc_cfg:'Cell text',cc_clear:'Clear colors',cf_title:'Conditional formatting',cf_sub:'Add rules: when the cell value meets a condition, apply colors. "Whole row" colors the entire row.',cf_if:'If value',cf_and:'and',cf_between:'between',cf_outside:'outside',cf_bg:'Fill',cf_fg:'Text',cf_bold:'Bold',cf_scope:'Apply to',cf_cell:'This cell',cf_row:'Whole row',cf_addrule:'Add rule',cf_done:'Done',cust_title:'Custom calculated columns',cust_help:'Create a new column from a formula. Use column tokens and arithmetic ( + - * / and % ).',cust_avail:'Available tokens',cust_name:'Column name',cust_formula_ph:'e.g.  {total} * 0.15   or   {br_RYD} + {br_HIT}',cust_add:'Add column',em_edit:'Edit titles',em_done:'Finish editing',em_banner:'Edit mode — click any title to rename it. Changes sync to everyone.',portal_titles:'Login portal & platform titles',portal_titles_hint:'Edit the external login page and platform brand wording. Changes sync to everyone and appear on the login screen.',
   sum_title:'Finished Product — Totals Summary',c_year:'Year',c_month:'Month',c_cat:'Category',c_total:'Total',c_pct:'%',sum_grand:'Grand Total',
-  ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',map:{identity:{'1- New Identity':'New Identity','2- OLD Identity':'Old Identity','3- Mai':'Mai','4- Mokabat':'Mokabat','5- SAR':'SAR','6- TG Sparkling':'TG Sparkling'}},grp_daily:'Daily Coverage Report',grp_data:'Data & Tools',grp_admintools:'Admin Tools',u_selall:'Select all',u_selnone:'Clear',nav_masterdata:'Master Data',nav_spaceact:'Space Actuals',nav_rspace:'Space in Warehouses',nav_rfgbal:'FG Balance',nav_roldid:'OLD Identity',nav_rtransit:'FG Transit',nav_rbottle:'FG Bottle Stock',nav_dailyup:'Daily Reports Upload',cloud_title:'\u2601\ufe0f Cloud Sync',cloud_sub:'Store and sync the report data in your chosen cloud database.',cloud_cfg_label:'Firebase configuration',fb_apikey:'API Key',fb_project:'Project ID',fb_authdomain:'Auth Domain',fb_bucket:'Storage Bucket',fb_sender:'Messaging Sender ID',fb_appid:'App ID',fb_paste_toggle:'Or paste the full firebaseConfig',fb_fill:'Fill fields from config',popout_btn:'Window',full_btn:'Fullscreen',export_excel:'Export to Excel',cloud_connect:'Connect',cloud_save:'Save to Cloud',cloud_test:'Test Connection',cloud_load:'Load from Cloud',cloud_auto:'Auto-load on open & auto-save on every change',cloud_live:'Live two-way sync (recommended)',cloud_note_title:'Setup notes',cloud_st_idle:'Not connected',cloud_n1:'Create a Firebase project, enable <b>Firestore Database</b>, then copy the <span class=\"tag\">firebaseConfig</span> from Project settings.',cloud_n2:'For testing, set Firestore rules to test mode. For production, secure your rules.',cloud_n3:'Data is stored in collection <span class=\"tag\">inventory_dashboard</span>, document <span class=\"tag\">latest</span>.',cloud_n4:'All data &amp; settings are stored in the cloud only (no browser storage).',cloud_provider_label:'Cloud database provider',cloud_provider_hint:'Choose where your data is stored. Each device remembers its choice.',cloud_sb_cfg_label:'Supabase configuration',sb_url:'Project URL',sb_anon:'Anon public key',cloud_sb_n1:'Supabase: create a table <span class="tag">cloud_docs</span> with columns col text, doc text, data jsonb, updated_at int8, primary key (col, doc), and enable Realtime on it.',cyl_storage:'Storage area',cyl_used:'Used balance',cyl_transit:'Transit',cyl_empty:'Empty (available)',cyl_branch_title:'Branches',cyl_fact_title:'Factories',
+  ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',map:{identity:{'1- New Identity':'New Identity','2- OLD Identity':'Old Identity','3- Mai':'Mai','4- Mokabat':'Mokabat','5- SAR':'SAR','6- TG Sparkling':'TG Sparkling'}},grp_daily:'Daily Coverage Report',grp_data:'Data & Tools',grp_admintools:'Admin Tools',u_selall:'Select all',u_selnone:'Clear',nav_masterdata:'Master Data',nav_spaceact:'Space Actuals',nav_rspace:'Space in Warehouses',nav_rfgbal:'FG Balance',nav_roldid:'OLD Identity',nav_rtransit:'FG Transit',nav_rbottle:'FG Bottle Stock',nav_dailyup:'Daily Reports Upload',cloud_title:'\u2601\ufe0f Cloud Sync',cloud_sub:'Store and sync the report data in your chosen cloud database.',cloud_cfg_label:'Firebase configuration',fb_apikey:'API Key',fb_project:'Project ID',fb_authdomain:'Auth Domain',fb_bucket:'Storage Bucket',fb_sender:'Messaging Sender ID',fb_appid:'App ID',fb_paste_toggle:'Or paste the full firebaseConfig',fb_fill:'Fill fields from config',popout_btn:'Window',full_btn:'Fullscreen',export_excel:'Export to Excel',cloud_connect:'Connect',cloud_save:'Save to Cloud',cloud_test:'Test Connection',cloud_load:'Load from Cloud',cloud_auto:'Auto-load on open & auto-save on every change',cloud_live:'Live two-way sync (recommended)',cloud_note_title:'Setup notes',cloud_st_idle:'Not connected',cloud_n1:'Create a Firebase project, enable <b>Firestore Database</b>, then copy the <span class=\"tag\">firebaseConfig</span> from Project settings.',cloud_n2:'For testing, set Firestore rules to test mode. For production, secure your rules.',cloud_n3:'Data is stored in collection <span class=\"tag\">inventory_dashboard</span>, document <span class=\"tag\">latest</span>.',cloud_n4:'All data &amp; settings are stored in the cloud only (no browser storage).',cloud_provider_label:'Cloud database provider',cloud_provider_hint:'Choose where your data is stored. Each device remembers its choice.',cloud_sb_cfg_label:'Supabase configuration',sb_url:'Project URL',sb_anon:'Anon public key',cloud_sb_n1:'Supabase: create a table <span class="tag">cloud_docs</span> with columns col text, doc text, data jsonb, updated_at int8, primary key (col, doc), and enable Realtime on it.',cyl_storage:'Storage area',cyl_used:'Used balance',cyl_transit:'Transit',cyl_empty:'Empty (available)',cyl_branch_title:'Branches',cyl_fact_title:'Factories',sp_lbl_actual:'Actual Spaces',sp_lbl_used:'Used Spaces',sp_lbl_transit:'Transit Spaces',sp_lbl_empty:'Empty Space',bt_rpt_title:'Current Bottle Stock &amp; Branch Transit Report',btl_dash_title:'Bottle & Brushing Dashboard',btl_dash_sub:'Production, sales, brushing &amp; damage analytics — from actual file data',btl_kpi_prod:'Production',btl_kpi_sales:'Sales',btl_kpi_brush:'Brushing',btl_kpi_dmg:'Damaged',btl_kpi_brushpct:'Brushing %',btl_kpi_dmgpct:'Damaged %',btl_ch_trend:'Monthly Sales Trend',btl_ch_prodsales:'Production vs Sales',btl_ch_branch:'Brushing by Branch',btl_ch_bd:'Brushing vs Damaged',
   foot:(s,t,q)=>'Showing '+s+' of '+t+' records  •  Total qty '+q+'  •  Click filters to slice',
   imp_title:'&#128228; Import Data — Auto Update',
   imp_sub:'Upload your inventory file and the dashboard refreshes automatically. Supported: <span class="tag">.xlsb</span> <span class="tag">.xlsx</span> <span class="tag">.xls</span> <span class="tag">.csv</span>',
@@ -3393,14 +3645,14 @@ const T={
   readerr:'Could not read the file.',all:'All',clear_data:'Clear Data',update_data:'Update with New Data',cleared:'&#10003; Data cleared. Import a new file to update the report.',confirm_clear:'Clear all current data from the report? This cannot be undone.',
   map:{month:{},branchSum:BRANCH_SUM_EN}},
  ar:{grp_aging:'أعمار المخزون',grp_btl:'القارورة والفرشة',nav_btl_dash:'لوحة المؤشرات',nav_btl_compare:'المقارنات السنوية',nav_btl_table:'الجداول التفصيلية',nav_btl_manage:'إدارة البيانات',grp_settings:'الإعدادات',nav_dash:'لوحة المعلومات',nav_sum:'ملخص الإجماليات',nav_imp:'استيراد البيانات',title:'Smart Inventory Analytics\n&\nAging Dashboard',lastupdate:'آخر تحديث',
-  kpi_total:'إجمالي الكمية',kpi_60:'أقل من 60 يوم',kpi_90:'أقل من 90 يوم',kpi_g90:'أكثر من 90 يوم',
+  kpi_total:'إجمالي الكمية',kpi_60:'أقل من 60 يوم',kpi_90:'أقل من 90 يوم',kpi_g90:'أكثر من 90 يوم',kpi_c1:'حتى 30 يوم',kpi_c2:'31 – 60 يوم',kpi_c3:'61 – 90 يوم',kpi_c4:'91 – 180 يوم',kpi_c5:'181 – 240 يوم',kpi_c6:'أكثر من 240 يوم',
   f_identity:'الهوية',f_branch:'الفرع',f_classify:'التصنيف',clear:'مسح',
   ch_identity:'وزن المخزون حسب الهوية',ch_month:'نمط أعمار المخزون',sub_month:'الكمية الشهرية',
   ch_sizewise:'المخزون حسب الحجم',ch_pack:'المخزون حسب العبوة',sub_pack:'حسب العبوة',
   ch_classify:'تصنيف المخزون',ch_sizeitem:'المخزون حسب الحجم والصنف',sub_sizeitem:'كرتون / شرنك',
   center_total:'إجمالي الكمية',gsearch_ph:'بحث شامل…',login_sub:'لوحة تحليل المخزون',nav_home:'الرئيسية',login_welcome:'مرحباً بعودتك',login_form_sub:'سجّل الدخول للوصول إلى مساحة التقارير',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'أعمار المخزون والتغطية والتحليلات في مساحة عمل واحدة.',login_stat_wh:'مستودعات',login_stat_br:'علامات',login_stat_rp:'تقارير',home_hero_title:'مركز التقارير',home_hero_sub:'اختر تقريراً لفتحه — كل شيء في مكان واحد.',home_open:'فتح',back_btn:'رجوع',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'تانيا • المستودعات',desc_dash:'المؤشرات والرسوم وتحليل الأعمار',desc_sum:'الإجماليات حسب العلامة والشهر والفرع',desc_sku:'إجماليات الأصناف وأعلى المنتجات',desc_rspace:'استغلال مساحة المستودعات',desc_rfgbal:'رصيد المنتج التام حسب الفرع',desc_roldid:'المخزون الراكد / الهوية القديمة',desc_rtransit:'البضائع في الطريق بين المواقع',desc_rbottle:'تغطية مخزون العبوات',desc_imp:'ارفع ملف Excel لتحديث البيانات',desc_cloud:'المزامنة والنسخ الاحتياطي عبر Firebase',desc_records:'عدّل أي خلية، أضف، كرّر أو احذف السجلات',desc_designer:'تخصيص أعمدة الجداول وطرق الحساب',desc_users:'إدارة الحسابات والصلاحيات',desc_dailyup:'رفع ملفات التغطية اليومية',login_user:'اسم المستخدم',login_pass:'كلمة المرور',login_btn:'دخول',col_new_manual:'عمود يدوي جديد',col_new_calc:'عمود محسوب جديد',colm_title:'إدارة الأعمدة',colm_sub:'أضف أعمدة مخصصة (يدوية أو محسوبة) لأي جدول.',colm_screen:'الجدول',colm_add_calc:'+ عمود محسوب',colm_add_manual:'+ عمود يدوي',colm_name:'اسم العمود',colm_formula:'صيغة مثل {total} * 0.15',colm_type:'النوع',colm_t_calc:'محسوب',colm_t_manual:'يدوي',colm_avail:'المتغيرات المتاحة',colm_hbg:'لون الرأس',colm_cbg:'لون الخلية',colm_del:'حذف',colm_none:'لا توجد أعمدة مخصصة بعد.',colm_help_calc:'استخدم المتغيرات بين أقواس معقوفة. يدعم + - * / ( ) ودوال Math.round/abs/min/max.',colm_help_manual:'الأعمدة اليدوية تتيح إدخال قيمة لكل صف مباشرة.',colm_existing:'الأعمدة الموجودة (اضغط للإظهار/الإخفاء)',colm_custom:'الأعمدة المخصصة',colm_hide:'إخفاء العمود',colm_show:'إظهار العمود',forgot_pwd:'نسيت كلمة المرور؟',login_remember:'Remind me',login_bio:'الدخول ببصمة الإصبع / Face ID',bio_or:'أو',bio_setup_title:'دخول سريع',bio_setup_q:'تفعيل بصمة الإصبع / Face ID لتسجيل دخول أسرع في المرة القادمة؟',bio_enable:'تفعيل',bio_later:'ليس الآن',bio_enabled:'تم تفعيل الدخول السريع على هذا الجهاز.',bio_failed:'فشل الدخول البيومتري. استخدم كلمة المرور.',bio_unsupported:'هذا الجهاز لا يدعم الدخول البيومتري.',bio_none:'لا يوجد دخول سريع محفوظ على هذا الجهاز.',bio_disable:'إيقاف الدخول السريع',bio_disabled:'تم إيقاف الدخول السريع على هذا الجهاز.',fpc_title:'تغيير كلمة المرور مطلوب',fpc_sub:'لحماية حسابك، يجب تعيين كلمة مرور جديدة قبل المتابعة.',fpc_new:'كلمة المرور الجديدة',fpc_confirm:'تأكيد كلمة المرور',fpc_save:'حفظ ومتابعة',fpc_r_len:'8 أحرف على الأقل',fpc_r_upper:'حرف كبير (A-Z)',fpc_r_lower:'حرف صغير (a-z)',fpc_r_digit:'رقم (0-9)',fpc_r_symbol:'رمز خاص (!@#$...)',pwd_reset_forced:'تمت إعادة التعيين. سيُطلب من المستخدم تعيين كلمة مرور جديدة عند الدخول.',fp_title:'إعادة تعيين كلمة المرور',fp_desc1:'أدخل اسم المستخدم وسيُرسل رمز تأكيد إلى بريدك المسجّل.',fp_desc2:'أدخل الرمز المُرسل إلى',fp_send:'إرسال الرمز',fp_reset:'إعادة التعيين',fp_resend:'إعادة إرسال الرمز',fp_need_user:'الرجاء إدخال اسم المستخدم.',fp_checking:'جارٍ التحقق…',fp_no_user:'لا يوجد حساب بهذا الاسم.',fp_no_email:'لا يوجد بريد مسجّل لهذا الحساب. تواصل مع المسؤول.',fp_email_unavail:'خدمة البريد غير مُعدّة. تواصل مع المسؤول.',fp_sent_ok:'تم إرسال الرمز. تحقق من بريدك.',fp_send_fail:'تعذّر إرسال الرمز. حاول لاحقاً.',fp_restart:'الرجاء إعادة بدء عملية الاستعادة.',fp_expired:'انتهت صلاحية الرمز. اطلب رمزاً جديداً.',fp_bad_code:'الرمز غير صحيح.',fp_pwd_short:'كلمة المرور يجب أن تكون 4 أحرف على الأقل.',fp_pwd_mismatch:'كلمتا المرور غير متطابقتين.',fp_reset_ok:'تم تغيير كلمة المرور بنجاح.',sec_title:'إعدادات الأمان والبريد',sec_sub:'إعداد خدمة البريد المُستخدمة لإرسال رموز إعادة تعيين كلمة المرور للمستخدمين.',sec_pub:'المفتاح العام EmailJS',sec_svc:'معرّف الخدمة',sec_tpl:'معرّف القالب',sec_save:'حفظ الإعدادات',sec_test:'إرسال بريد تجريبي',sec_note:'تلميح: أنشئ حساباً مجانياً على emailjs.com، أضف خدمة بريد وقالباً يحتوي المتغيّر {{passcode}}، ثم الصق المفاتيح أعلاه.',sec_saved:'تم حفظ الإعدادات.',sec_need_all:'الرجاء تعبئة الحقول الثلاثة.',sec_admin_only:'للمسؤولين فقط.',sec_bad_cfg:'الإعدادات غير صحيحة أو ناقصة.',sec_no_admin_email:'لا يوجد بريد مسجّل لحسابك.',sec_sending:'جارٍ الإرسال…',sec_test_ok:'تم إرسال بريد تجريبي إلى',sec_test_fail:'فشل الإرسال. تحقق من الإعدادات.',log_title:'سجل عمليات الدخول',log_refresh:'تحديث',log_clear:'مسح السجل',log_user:'المستخدم',log_event:'الحدث',log_time:'الوقت',log_empty:'لا يوجد نشاط بعد.',log_k_login:'تسجيل دخول',log_k_reset:'إعادة تعيين كلمة المرور',log_k_failed:'محاولة فاشلة',login_bad:'اسم المستخدم أو كلمة المرور غير صحيحة',login_empty_user:'الرجاء إدخال اسم المستخدم',login_empty_pass:'الرجاء إدخال كلمة المرور',login_empty_both:'الرجاء إدخال اسم المستخدم وكلمة المرور',login_nouser:'لا يوجد حساب بهذا الاسم',login_wrongpass:'كلمة المرور غير صحيحة — حاول مرة أخرى',login_temp_expired:'انتهت صلاحية الرقم المؤقت. الرجاء طلب رقم جديد.',fp_temp_sent:'تم إرسال رقم مؤقت إلى بريدك.',fp_temp_done1:'تم إرسال رقم مؤقت (صالح 24 ساعة) إلى',fp_temp_done2:'سجّل الدخول به — سيُطلب منك تعيين كلمة مرور جديدة.',fp_done_ok:'تم',temp_show_title:'تم توليد رقم مؤقت',temp_show_for:'للمستخدم',temp_show_valid:'صالح حتى',temp_show_hint:'سيُطلب تغيير كلمة المرور بعد الدخول به.',temp_copy:'نسخ الرقم',login_locked:'الحساب مقفل مؤقتاً. حاول بعد {n} ثانية',nav_users:'المستخدمون',nav_records:'محرّر البيانات',rec_title:'محرّر البيانات — تعديل وإضافة السجلات',rec_add:'إضافة سجل',rec_search:'بحث في السجلات',rec_del:'حذف',rec_dup:'تكرار',rec_edit_hint:'انقر أي خلية في الجدول لتعديلها مباشرةً. تُحفظ التغييرات وتُزامَن لكل الأجهزة تلقائياً.',rec_save:'حفظ في السحابة',rec_qty:'الكمية',rec_cat2:'الفئة 2',rec_logo:'الشعار',rec_need:'أدخل الهوية والفرع على الأقل',logout:'خروج',changepwd_btn:'تغيير كلمة المرور',users_title:'إدارة المستخدمين',users_sub:'إدارة الحسابات والصلاحيات والأمان',utab_users:'المستخدمون',utab_security:'الأمان والبريد',utab_log:'سجل الدخول',ce_title:'عنوان البطاقة',ce_calc:'نوع الحساب',ce_cls:'فئة العمر',ce_month:'الشهر',ce_color:'اللون',ce_save:'حفظ البطاقة',ce_cancel:'إلغاء',ce_sum:'مجموع الكمية',ce_avg:'متوسط الكمية',ce_count:'عدد الأصناف',ce_max:'أعلى كمية',ce_min:'أدنى كمية',ce_all:'الكل',u_add_title:'إضافة مستخدم جديد',u_list_title:'قائمة المستخدمين',u_perms_modal:'الصلاحيات',u_user:'اسم المستخدم',u_pass:'كلمة المرور',u_role:'الصلاحية',u_add:'إضافة مستخدم',u_admin:'مسؤول',u_userrole:'مستخدم',u_actions:'إجراءات',u_delete:'حذف',u_exists:'اسم المستخدم موجود مسبقاً',u_need:'أدخل اسم المستخدم وكلمة المرور',u_perms:'صلاحيات الشاشات',u_temp:'مؤقتة',u_all:'الكل',u_email:'البريد الإلكتروني',u_mobile:'الجوال',u_password:'كلمة المرور',u_resetpwd:'إعادة تعيين كلمة المرور',set_new_pwd:'أدخل كلمة مرور جديدة للمستخدم:',pwd_changed:'تم تحديث كلمة المرور بنجاح.',u_pwd_help:'🔑 كلمة المرور: أرسل رابط إعادة تعيين (دائمة) أو عيّن كلمة مرور مؤقتة صالحة 24 ساعة · ⚙️ تعديل الصلاحيات للتحكم بالوصول للشاشات.',temp_prompt:'كلمة مرورك مؤقتة. الرجاء إدخال كلمة مرور جديدة:',cols_btn:'الأعمدة',cols_title:'إظهار / إخفاء الأعمدة',cols_hint:'فعّل الفرع لإظهار عموده، وألغِ التفعيل لإخفائه. تُحفظ التغييرات تلقائياً وتُطبّق على الجدولين.',nav_designer:'تصميم الجداول',nav_cardbuilder:'منشئ البطاقات',nav_pagebuilder:'إدارة الصفحات',cb_title:'منشئ البطاقات',cb_sub:'أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات',cb_new:'بطاقة جديدة',cb_f_title:'عنوان البطاقة',cb_f_calc:'نوع الحساب',cb_f_age:'فئة العمر',cb_f_month:'الشهر',cb_f_icon:'الأيقونة',cb_f_color:'اللون',cb_calc_sum:'مجموع الكمية',cb_calc_avg:'متوسط الكمية',cb_calc_count:'عدد الأصناف',cb_calc_max:'أعلى قيمة',cb_calc_min:'أدنى قيمة',cb_age_all:'كل الفئات',cb_month_all:'كل الشهور',cb_save:'حفظ البطاقة',cb_cancel:'إلغاء',cb_preview:'معاينة حية',cb_preview_hint:'القيمة محسوبة من البيانات الحالية وتتأثر بفلاتر لوحة المعلومات.',cb_list:'البطاقات المنشأة',cb_empty:'لا توجد بطاقات بعد. أنشئ بطاقتك الأولى أعلاه.',designer_title:'تصميم الجداول',designer_sub:'عدّل مسميات الأعمدة، اختر طريقة الحساب، ورتّب وأظهر/أخفِ الأعمدة.',calc_method:'طريقة الحساب',calc_sum:'المجموع',calc_avg:'المتوسط',calc_count:'العدد',calc_max:'الأعلى',calc_min:'الأدنى',calc_hint:'تُطبّق على كل خلايا القيم في جدولي الملخص والأصناف.',appearance:'المظهر',colors:'الألوان',c_primary:'الأساسي',c_teal:'التركواز',c_blue:'الأزرق',c_orange:'البرتقالي',st_color:'اللون',st_font:'الخط',st_size:'حجم الخط (px)',st_align:'محاذاة النص',dz_al_def:'افتراضي',dz_al_l:'يسار',dz_al_c:'وسط',dz_al_r:'يمين',font_family:'الخط',font_default:'افتراضي',display_size:'حجم العرض',card_titles:'عناوين ومسميات البطاقات',dz_pick:'اختر الشاشة للتعديل',dz_pick_hint:'كل شاشة تُعدّل بشكل مستقل — التعديلات هنا لا تؤثر على باقي الشاشات.',dz_scr_dash:'لوحة المعلومات',dz_scr_sum:'جدول الملخص',dz_scr_sku:'جدول الأصناف',dz_scr_fgbal:'تقرير رصيد المنتج التام',dz_scr_oldid:'تقرير الهوية القديمة',dz_scr_transit:'تقرير الترانزيت',rpt_cols_title:'أعمدة التقرير',rpt_cols_hint:'أعد تسمية الرؤوس، وحدّد الألوان، وأضف تنسيقاً شرطياً. تُطبَّق التغييرات على هذا التقرير فقط.',rpt_no_data:'ارفع هذا التقرير أولاً لتحميل أعمدته.',dz_scr_appear:'المظهر العام',chart_order:'ترتيب/مكان بطاقات الرسوم',dz_branch_order:'ترتيب أعمدة الفروع',dz_col:'العمود',dz_name:'الاسم المعروض',dz_show:'إظهار',dz_calc:'الحساب',calc_default:'افتراضي',dz_reset:'استعادة الافتراضي',dz_collapse_all:'طي الكل',dz_expand_all:'فتح الكل',dz_sum_title:'أعمدة الملخص',dz_sku_title:'أعمدة الأصناف',set_date_label:'تاريخ تحديث التقرير',set_btn:'تعيين التاريخ',saved_date:'\u2713 تم حفظ تاريخ التحديث.',dz_color:'اللون',dz_cf:'تنسيق شرطي',cc_hbg:'خلفية العنوان',cc_cbg:'خلفية الخلية',cc_cfg:'لون النص',cc_clear:'مسح الألوان',cf_title:'التنسيق الشرطي',cf_sub:'أضف قواعد: عندما تحقق قيمة الخلية شرطاً، طبّق الألوان. "الصف بالكامل" يلوّن الصف كله.',cf_if:'إذا كانت القيمة',cf_and:'و',cf_between:'بين',cf_outside:'خارج',cf_bg:'التعبئة',cf_fg:'النص',cf_bold:'عريض',cf_scope:'التطبيق على',cf_cell:'هذه الخلية',cf_row:'الصف بالكامل',cf_addrule:'إضافة قاعدة',cf_done:'تم',cust_title:'أعمدة محسوبة مخصصة',cust_help:'أنشئ عموداً جديداً من معادلة. استخدم رموز الأعمدة والعمليات الحسابية ( + - * / و % ).',cust_avail:'الرموز المتاحة',cust_name:'اسم العمود',cust_formula_ph:'مثال:  {total} * 0.15   أو   {br_RYD} + {br_HIT}',cust_add:'إضافة عمود',em_edit:'تعديل العناوين',em_done:'إنهاء التعديل',em_banner:'وضع التعديل — انقر أي عنوان لإعادة تسميته. التغييرات تُزامَن للجميع.',portal_titles:'عناوين بوابة الدخول والمنصة',portal_titles_hint:'عدّل نصوص صفحة الدخول الخارجية واسم المنصة. التغييرات تُزامَن للجميع وتظهر في شاشة الدخول.',
   sum_title:'المنتج التام — ملخص الإجماليات',c_year:'العام',c_month:'الشهر',c_cat:'الفئة',c_total:'الإجمالي',c_pct:'النسبة %',sum_grand:'الإجمالي',
-  ch_brand:'المخزون حسب الفئة (العلامة)',ch_monthly:'الإجماليات الشهرية',nav_sku:'ملخص الأصناف',sku_title:'ملخص إجماليات الأصناف (SKU)',c_code:'كود الصنف',c_size:'الحجم',c_pack2:'الشد',c_dim:'الحجم / الشد',search_item:'بحث بكود الصنف',dimension:'البُعد',ch_topitems:'أعلى الأصناف كميةً',nav_cloud:'السحابة',grp_daily:'التقارير اليومية',grp_data:'البيانات والأدوات',grp_admintools:'أدوات الإدارة',u_selall:'تحديد الكل',u_selnone:'مسح',nav_masterdata:'البيانات الرئيسية',nav_spaceact:'المساحات الفعلية',nav_rspace:'مساحات المستودعات',nav_rfgbal:'أرصدة المنتجات',nav_roldid:'الهوية القديمة',nav_rtransit:'الترانزيت',nav_rbottle:'أرصدة القارورة',nav_dailyup:'رفع التقارير اليومية',cloud_title:'\u2601\ufe0f مزامنة سحابية',cloud_sub:'تخزين ومزامنة بيانات التقرير في القاعدة السحابية المختارة.',cloud_cfg_label:'إعدادات Firebase',fb_apikey:'مفتاح API',fb_project:'معرّف المشروع',fb_authdomain:'نطاق المصادقة',fb_bucket:'مساحة التخزين',fb_sender:'معرّف المرسل',fb_appid:'معرّف التطبيق',fb_paste_toggle:'أو الصق إعدادات firebaseConfig كاملة',fb_fill:'تعبئة الحقول من الإعدادات',popout_btn:'نافذة',full_btn:'ملء الشاشة',export_excel:'تصدير إلى Excel',cloud_connect:'اتصال',cloud_save:'حفظ إلى السحابة',cloud_test:'اختبار الاتصال',cloud_load:'تحميل من السحابة',cloud_auto:'تحميل تلقائي عند الفتح وحفظ تلقائي بعد كل تعديل',cloud_live:'مزامنة لحظية ثنائية (موصى بها)',cloud_note_title:'ملاحظات الإعداد',cloud_st_idle:'غير متصل',cloud_n1:'أنشئ مشروع Firebase، فعّل <b>Firestore Database</b>، ثم انسخ <span class=\"tag\">firebaseConfig</span> من إعدادات المشروع.',cloud_n2:'للاختبار اضبط قواعد Firestore على وضع الاختبار. للإنتاج أمّن القواعد.',cloud_n3:'تُخزّن البيانات في المجموعة <span class=\"tag\">inventory_dashboard</span>، المستند <span class=\"tag\">latest</span>.',cloud_n4:'تُحفظ كل البيانات والإعدادات في السحابة فقط (بدون تخزين محلي في المتصفح).',cloud_provider_label:'مزوّد القاعدة السحابية',cloud_provider_hint:'اختر مكان تخزين بياناتك. يتذكّر كل جهاز اختياره.',cloud_sb_cfg_label:'إعدادات Supabase',sb_url:'رابط المشروع',sb_anon:'مفتاح anon العام',cloud_sb_n1:'Supabase: أنشئ جدولاً باسم <span class="tag">cloud_docs</span> بالأعمدة col text و doc text و data jsonb و updated_at int8، ومفتاح أساسي (col, doc)، وفعّل Realtime عليه.',cyl_storage:'المساحة التخزينية',cyl_used:'رصيد مُستخدم',cyl_transit:'ترانزيت',cyl_empty:'فارغة (متاحة)',cyl_branch_title:'الفروع',cyl_fact_title:'المصانع',
+  ch_brand:'المخزون حسب الفئة (العلامة)',ch_monthly:'الإجماليات الشهرية',nav_sku:'ملخص الأصناف',sku_title:'ملخص إجماليات الأصناف (SKU)',c_code:'كود الصنف',c_size:'الحجم',c_pack2:'الشد',c_dim:'الحجم / الشد',search_item:'بحث بكود الصنف',dimension:'البُعد',ch_topitems:'أعلى الأصناف كميةً',nav_cloud:'السحابة',grp_daily:'التقارير اليومية',grp_data:'البيانات والأدوات',grp_admintools:'أدوات الإدارة',u_selall:'تحديد الكل',u_selnone:'مسح',nav_masterdata:'البيانات الرئيسية',nav_spaceact:'المساحات الفعلية',nav_rspace:'مساحات المستودعات',nav_rfgbal:'أرصدة المنتجات',nav_roldid:'الهوية القديمة',nav_rtransit:'الترانزيت',nav_rbottle:'أرصدة القارورة',nav_dailyup:'رفع التقارير اليومية',cloud_title:'\u2601\ufe0f مزامنة سحابية',cloud_sub:'تخزين ومزامنة بيانات التقرير في القاعدة السحابية المختارة.',cloud_cfg_label:'إعدادات Firebase',fb_apikey:'مفتاح API',fb_project:'معرّف المشروع',fb_authdomain:'نطاق المصادقة',fb_bucket:'مساحة التخزين',fb_sender:'معرّف المرسل',fb_appid:'معرّف التطبيق',fb_paste_toggle:'أو الصق إعدادات firebaseConfig كاملة',fb_fill:'تعبئة الحقول من الإعدادات',popout_btn:'نافذة',full_btn:'ملء الشاشة',export_excel:'تصدير إلى Excel',cloud_connect:'اتصال',cloud_save:'حفظ إلى السحابة',cloud_test:'اختبار الاتصال',cloud_load:'تحميل من السحابة',cloud_auto:'تحميل تلقائي عند الفتح وحفظ تلقائي بعد كل تعديل',cloud_live:'مزامنة لحظية ثنائية (موصى بها)',cloud_note_title:'ملاحظات الإعداد',cloud_st_idle:'غير متصل',cloud_n1:'أنشئ مشروع Firebase، فعّل <b>Firestore Database</b>، ثم انسخ <span class=\"tag\">firebaseConfig</span> من إعدادات المشروع.',cloud_n2:'للاختبار اضبط قواعد Firestore على وضع الاختبار. للإنتاج أمّن القواعد.',cloud_n3:'تُخزّن البيانات في المجموعة <span class=\"tag\">inventory_dashboard</span>، المستند <span class=\"tag\">latest</span>.',cloud_n4:'تُحفظ كل البيانات والإعدادات في السحابة فقط (بدون تخزين محلي في المتصفح).',cloud_provider_label:'مزوّد القاعدة السحابية',cloud_provider_hint:'اختر مكان تخزين بياناتك. يتذكّر كل جهاز اختياره.',cloud_sb_cfg_label:'إعدادات Supabase',sb_url:'رابط المشروع',sb_anon:'مفتاح anon العام',cloud_sb_n1:'Supabase: أنشئ جدولاً باسم <span class="tag">cloud_docs</span> بالأعمدة col text و doc text و data jsonb و updated_at int8، ومفتاح أساسي (col, doc)، وفعّل Realtime عليه.',cyl_storage:'المساحة التخزينية',cyl_used:'رصيد مُستخدم',cyl_transit:'ترانزيت',cyl_empty:'فارغة (متاحة)',cyl_branch_title:'الفروع',cyl_fact_title:'المصانع',sp_lbl_actual:'المساحات الفعلية',sp_lbl_used:'المساحات المستخدمة',sp_lbl_transit:'مساحات الترانزيت',sp_lbl_empty:'المساحة الفارغة',bt_rpt_title:'تقرير أرصدة القارورة الحالية والترانزيت بالفروع',btl_dash_title:'لوحة مؤشرات القارورة والفرشة',btl_dash_sub:'تحليل الإنتاج والمبيعات والفرشة والتالف — من بيانات الملف الفعلية',btl_kpi_prod:'الإنتاج',btl_kpi_sales:'المبيعات',btl_kpi_brush:'الفرشة',btl_kpi_dmg:'التالف',btl_kpi_brushpct:'نسبة الفرشة',btl_kpi_dmgpct:'نسبة التالف',btl_ch_trend:'اتجاه المبيعات الشهري',btl_ch_prodsales:'الإنتاج مقابل المبيعات',btl_ch_branch:'الفرشة حسب الفرع',btl_ch_bd:'الفرشة مقابل التالف',
   foot:(s,t,q)=>'عرض '+s+' من '+t+' سجل  •  إجمالي الكمية '+q+'  •  اضغط الفلاتر للتصفية',
   imp_title:'&#128228; استيراد البيانات — تحديث تلقائي',
   imp_sub:'ارفع ملف المخزون وسيتم تحديث لوحة المعلومات تلقائياً. الصيغ المدعومة: <span class="tag">.xlsb</span> <span class="tag">.xlsx</span> <span class="tag">.xls</span> <span class="tag">.csv</span>',
@@ -3574,9 +3826,10 @@ function go(p){
   if(p==='dailyup'&&typeof renderUploadStatus==='function')renderUploadStatus();
   if(p==='users'){renderUsers();try{renderUserStats();}catch(e){}try{_fillEmailCfgInputs();renderLoginLog();}catch(e){}try{var _ut=LS.getItem('users_tab')||'users';switchUserTab(_ut);}catch(e){}}
   if(p==='records'){try{renderSapHub();}catch(e){console.warn('sapHub',e);}}
-  if(p==='designer'){try{applyNumAlign();}catch(e){}renderDesigner();showDzScreen((document.getElementById('dz-screen')||{}).value||'dash');try{renderColManager();}catch(e){}try{dzRestoreCollapsed();}catch(e){}}
+  if(p==='designer'){try{applyNumAlign();}catch(e){}try{if(window.logoDzSyncUI)window.logoDzSyncUI();}catch(e){}try{if(window.applyLogoDesign)window.applyLogoDesign();}catch(e){}renderDesigner();showDzScreen((document.getElementById('dz-screen')||{}).value||'dash');try{renderColManager();}catch(e){}try{dzRestoreCollapsed();}catch(e){}}
   if(p==='sum')buildSummary();
   setTimeout(()=>{applyChartHeights();addResizers();},30);
+  if(typeof EDITMODE!=='undefined'&&EDITMODE&&typeof bindEditables==='function'){setTimeout(bindEditables,120);}
   if(p==='sku')buildSku();
 }
 function grad(ctx,a,c1,c2){const g=ctx.createLinearGradient(0,a.bottom,0,a.top);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
@@ -3746,6 +3999,7 @@ function renderCustomCards(){
   });
   if(admin)html+='<button class="kpi kpi-add" onclick="openCardBuilderNew()"><div class="kpi-add-ic">&#10133;</div><div class="kpi-add-lbl">'+(ar?'إنشاء بطاقة':'New card')+'</div></button>';
   host.innerHTML=html;
+  if(typeof EDITMODE!=='undefined'&&EDITMODE&&typeof bindEditables==='function'){setTimeout(bindEditables,30);}
 }
 /* فتح شاشة Card Builder لإنشاء بطاقة جديدة (نقل المستخدم للشاشة وتجهيز النموذج) */
 function openCardBuilderNew(){
@@ -4693,7 +4947,17 @@ function buildSummary(){
           if(sC){if(firstBr){html+='<td class="cat" rowspan="'+ids.length+'">'+escHtml(br)+'</td>';firstBr=false;}}
           if(sI)html+='<td class="idc">'+escHtml(mv('identity',id))+'</td>';
           const rt=sumId(m,br,id);
-          VB.forEach(b=>{const v=aggBy(mcol('sum','sum:br:'+b),M[m][br][id][b]||[]);html+='<td class="'+(v?'':'zero')+'">'+fmt(v)+'</td>';});
+          VB.forEach(b=>{
+            const v=aggBy(mcol('sum','sum:br:'+b),M[m][br][id][b]||[]);
+            // ── tooltip لهذا الفرع + هذه الهوية + هذا الشهر ──
+            var _sBrRows=DATA.filter(function(d){return d.identity===id&&d.month===m&&d.branch===b;});
+            var _sBrDates={};_sBrRows.forEach(function(d){var dt=d.prod_date?String(d.prod_date):(d.month?String(d.month):'');if(dt)_sBrDates[dt]=(_sBrDates[dt]||0)+d.qty;});
+            var _sBrPack=_sBrRows.length?(_sBrRows[0].pack||''):'';
+            var _sBrTip={code:'',name:mv('identity',id),identity:id,branch:b,month:mn(m),pack:_sBrPack,total:v,
+              dates:Object.keys(_sBrDates).sort().map(function(dt){return {d:dt,q:_sBrDates[dt]};})};
+            var _sBrStr=encodeURIComponent(JSON.stringify(_sBrTip));
+            html+='<td class="'+(v?'':'zero')+'" onmouseenter="skuShowTip(event,this)" onmouseleave="skuHideTip()" onclick="skuClickPin(event,this)" data-sku-tip="'+_sBrStr+'">'+fmt(v)+'</td>';
+          });
           if(sT)html+='<td class="tot">'+fmt(rt)+'</td>';if(sP)html+='<td class="pct">'+(grand?(rt/grand*100).toFixed(1):0)+'%</td>';
           /* خلايا الأعمدة المخصصة */
           (function(){var _vars={total:rt,pct:(grand?rt/grand*100:0)};VB.forEach(function(b){_vars['br_'+b.replace(/[^A-Za-z0-9_]/g,'')]=aggBy(mcol('sum','sum:br:'+b),M[m][br][id][b]||[]);});var _rk=_rowKey([y,m,br,id]);_cc.forEach(function(c){var cv;if(c.type==='manual'){cv=colManualVal('sum',c.id,_rk);html+='<td style="background:'+(c.cbg||'#ecfdf5')+'"><input class="col-mval" value="'+String(cv).replace(/"/g,'&quot;')+'" onchange="setColManualVal(\'sum\',\''+c.id+'\',\''+_rk.replace(/'/g,"\\'")+'\',this.value)"></td>';}else{cv=custEval(c.formula,_vars);html+='<td style="background:'+(c.cbg||'#ecfdf5')+'">'+(cv===''?'':fmt(cv))+'</td>';}});})();
@@ -4777,10 +5041,27 @@ function buildSku(){
     const items=Object.keys(M[br]).sort((a,b)=>itot(M[br][b])-itot(M[br][a]));
     let firstB=true;
     items.forEach(it=>{
+      // ── بيانات الصنف مجمّعة حسب فرع وتاريخ ──
+      var _tipRows=[];
+      ALL.forEach(function(d){if((d.item_code||'-')===it&&brandOf(d.identity)===br){_tipRows.push(d);}});
+      // دالة تبني بيانات tooltip لفرع محدد
+      function _brTipData(branchName){
+        var rows=_tipRows.filter(function(d){return d.branch===branchName;});
+        var dates={};rows.forEach(function(d){var dt=d.prod_date?String(d.prod_date):(d.month?String(d.month):'');if(dt)dates[dt]=(dates[dt]||0)+d.qty;});
+        var total=rows.reduce(function(s,d){return s+d.qty;},0);
+        var identity=rows.length?(rows[0].identity||br):br;
+        var pack=M[br][it].pack||'';
+        return {code:it,name:br,identity:identity,branch:branchName,pack:pack,total:total,
+          dates:Object.keys(dates).sort().map(function(dt){return {d:dt,q:dates[dt]};})};
+      }
       html+='<tr>';
       if(kC){if(firstB){html+='<td class="yr" rowspan="'+items.length+'">'+escHtml(br)+'</td>';firstB=false;}}
       if(kI)html+='<td class="mo">'+escHtml(it)+'</td>';if(kS)html+='<td class="cat">'+escHtml(fmtSize(M[br][it].size||''))+'</td>';if(kK)html+='<td class="cat">'+escHtml(M[br][it].pack||'')+'</td>';
-      let ra=[];branches.forEach(b=>{if(M[br][it].b[b])ra=ra.concat(M[br][it].b[b]);});const rt=aggBy(mcol('sku','sku:total'),ra);VB.forEach(b=>{const v=aggBy(mcol('sku','sku:br:'+b),M[br][it].b[b]||[]);html+='<td class="'+(v?'':'zero')+'">'+fmt(v)+'</td>';});
+      let ra=[];branches.forEach(b=>{if(M[br][it].b[b])ra=ra.concat(M[br][it].b[b]);});const rt=aggBy(mcol('sku','sku:total'),ra);
+      VB.forEach(b=>{const v=aggBy(mcol('sku','sku:br:'+b),M[br][it].b[b]||[]);
+        var _td=_brTipData(b);var _ts=encodeURIComponent(JSON.stringify(_td));
+        html+='<td class="'+(v?'':'zero')+'" onmouseenter="skuShowTip(event,this)" onmouseleave="skuHideTip()" onclick="skuClickPin(event,this)" data-sku-tip="'+_ts+'">'+fmt(v)+'</td>';
+      });
       if(kT)html+='<td class="tot">'+fmt(rt)+'</td>';if(kP)html+='<td class="pct">'+(grand?(rt/grand*100).toFixed(1):0)+'%</td>';
       (function(){var _vars={total:rt,pct:(grand?rt/grand*100:0)};VB.forEach(function(b){_vars['br_'+b.replace(/[^A-Za-z0-9_]/g,'')]=aggBy(mcol('sku','sku:br:'+b),M[br][it].b[b]||[]);});var _rk=_rowKey([br,it]);_cc.forEach(function(c){var cv;if(c.type==='manual'){cv=colManualVal('sku',c.id,_rk);html+='<td style="background:'+(c.cbg||'#ecfdf5')+'"><input class="col-mval" value="'+String(cv).replace(/"/g,'&quot;')+'" onchange="setColManualVal(\'sku\',\''+c.id+'\',\''+_rk.replace(/'/g,"\\'")+'\',this.value)"></td>';}else{cv=custEval(c.formula,_vars);html+='<td style="background:'+(c.cbg||'#ecfdf5')+'">'+(cv===''?'':fmt(cv))+'</td>';}});})();
       html+='</tr>';
@@ -6303,7 +6584,7 @@ const FB_USERS_DOC='users';
 const FB_SET_DOC='ui_settings';
 // ---- Report-customisation settings sync (titles, labels, colors, conditional formatting, custom columns...) ----
 let _setCloudReady=false,_lastSetJson='',_pushSetT=null,fbSetUnsub=null;
-const SET_KEYS=['col_labels','col_agg2','col_agg_col','branch_order2','hidden_cols','ui_titles','ui_font','ui_scale','chart_order','ui_colors','ui_styles','cond_fmt','col_colors','custom_cols','report_designer','coldef_v1','tania_local_perm'];
+const SET_KEYS=['col_labels','col_agg2','col_agg_col','branch_order2','hidden_cols','ui_titles','ui_font','ui_scale','chart_order','ui_colors','ui_styles','cond_fmt','col_colors','custom_cols','report_designer','coldef_v1','tania_local_perm','tania_logo_design','tania_logo_image'];
 function gatherSettings(){const o={};SET_KEYS.forEach(k=>{try{const v=LS.getItem(k);if(v!=null)o[k]=v;}catch(e){}});return o;}
 function pushSettingsToCloud(){try{
     if(!fbReady||!fbDB||!_setCloudReady)return;
@@ -6336,6 +6617,7 @@ function applySettingsObj(o){if(!o)return;
     try{applyFont();applyScale();applyColors();applyStyles();applyChartOrder();applyLang();rebuildTables();
       if(document.getElementById('page-designer')&&document.getElementById('page-designer').classList.contains('show'))renderDesigner();
       buildColMenu('colpop-sum','sum');buildColMenu('colpop-sku','sku');_rerenderCurrentReport();}catch(e){}
+    try{if(window.applyLogoImage)window.applyLogoImage();if(window.applyLogoDesign)window.applyLogoDesign();if(window.logoDzSyncUI)window.logoDzSyncUI();}catch(e){}
 }
 function fbSettingsSync(){try{
     if(!fbReady||!fbDB)return;
@@ -6895,24 +7177,33 @@ function exportDetailExcel(){try{
   if(!_lastDetail||!_lastDetail.aoa||!window.XLSX)return;const ws=XLSX.utils.aoa_to_sheet(_lastDetail.aoa);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Report');XLSX.writeFile(wb,nm+'.xlsx');
 }catch(e){}}
 function showDetailRows(rows,title){
-  const branches=orderBranches(allBranchesList(),'sum');
+  let branches=orderBranches(allBranchesList(),'sum');
   const MO=['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
-  const M={};rows.forEach(d=>{const k=d.identity+'\u0001'+d.month+'\u0001'+d.pack;if(!M[k])M[k]={i:d.identity,m:d.month,p:d.pack,b:{},t:0};M[k].b[d.branch]=(M[k].b[d.branch]||0)+d.qty;M[k].t+=d.qty;});
-  let keys=Object.keys(M).sort((a,b)=>{const A=M[a],B=M[b];const ai=A.i.localeCompare(B.i);if(ai!==0)return ai;return (MO.indexOf(A.m)-MO.indexOf(B.m))|| (B.t-A.t);});
+  const M={};rows.forEach(d=>{const code=(d.item_code||'').toString().trim();const k=d.identity+'\u0001'+d.month+'\u0001'+(code||d.pack||'')+'\u0001'+(d.size||'');if(!M[k])M[k]={i:d.identity,m:d.month,p:d.pack,c:code,s:d.size||'',b:{},t:0};if(!M[k].c&&code)M[k].c=code;if(!M[k].s&&d.size)M[k].s=d.size;M[k].b[d.branch]=(M[k].b[d.branch]||0)+d.qty;M[k].t+=d.qty;});
+  let keys=Object.keys(M).sort((a,b)=>{const A=M[a],B=M[b];const ya=yearOf(A.m),yb=yearOf(B.m);if(ya!==yb)return ya-yb;const ma=MO.indexOf(A.m)-MO.indexOf(B.m);if(ma!==0)return ma;const ai=A.i.localeCompare(B.i);if(ai!==0)return ai;return B.t-A.t;});
   const _tots=keys.map(k=>M[k].t);const _mx=_tots.length?Math.max.apply(null,_tots):0,_mn=_tots.length?Math.min.apply(null,_tots):0;
   /* رتب التواريخ لتلوين عمود الإجمالي: الأقدم أحمر، الأحدث أخضر */
   const _ranks=keys.map(k=>_dateRank(M[k].m));const _maxR=_ranks.length?Math.max.apply(null,_ranks):0,_minR=_ranks.length?Math.min.apply(null,_ranks):0;
-  let html='<table class="pivot"><thead><tr><th>'+tr('c_year')+'</th><th>'+tr('f_identity')+'</th><th>'+tr('c_month')+'</th><th>'+tr('c_pack2')+'</th>';
+  /* إخفاء أعمدة الفروع التي إجماليها صفر */
+  branches=branches.filter(b=>keys.some(k=>(M[k].b[b]||0)!==0));
+  let html='<table class="pivot"><thead><tr><th>'+tr('f_identity')+'</th><th>'+tr('c_code')+'</th><th>'+tr('c_pack2')+'</th><th>'+tr('c_size')+'</th><th>'+tr('c_year')+'</th><th class="msep">'+tr('c_month')+'</th>';
   branches.forEach(b=>html+='<th>'+bn(b)+'</th>');
   html+='<th>'+tr('c_total')+'</th></tr></thead><tbody>';
-  let gt=0;const gb={};
-  keys.forEach(k=>{const r=M[k];gt+=r.t;html+='<tr><td class="yr">'+yearOf(r.m)+'</td><td class="cat">'+escHtml(mv('identity',r.i))+'</td><td class="mo">'+mn(r.m)+'</td><td class="cat">'+escHtml(r.p||'')+'</td>';
-    branches.forEach(b=>{const v=r.b[b]||0;gb[b]=(gb[b]||0)+v;html+='<td class="'+(v?'':'zero')+'">'+fmt(v)+'</td>';});
+  let gt=0;const gb={};let _prevYr=null;
+  keys.forEach(k=>{const r=M[k];gt+=r.t;const _yr=yearOf(r.m);const _ys=(_prevYr!==null&&_yr!==_prevYr)?'yr-sep':'';_prevYr=_yr;html+='<tr class="'+_ys+'"><td class="cat">'+escHtml(mv('identity',r.i))+'</td><td class="idc">'+escHtml(r.c||'')+'</td><td class="cat">'+escHtml(r.p||'')+'</td><td class="cat">'+escHtml(r.s||'')+'</td><td class="yr">'+yearOf(r.m)+'</td><td class="mo">'+mn(r.m)+'</td>';
+    branches.forEach(b=>{const v=r.b[b]||0;gb[b]=(gb[b]||0)+v;
+      /* بيانات tooltip لهذا الفرع + هذا الصنف */
+      var _dtRows=rows.filter(function(d){return d.identity===r.i&&d.month===r.m&&d.branch===b&&(d.item_code||'').toString().trim()===(r.c||'');});
+      var _dtDates={};_dtRows.forEach(function(d){var dt=d.prod_date?String(d.prod_date):(d.month?String(d.month):'');if(dt)_dtDates[dt]=(_dtDates[dt]||0)+d.qty;});
+      var _dtTip={code:r.c||'',name:mv('identity',r.i),identity:r.i,branch:b,month:mn(r.m),pack:r.p||'',total:v,dates:Object.keys(_dtDates).sort().map(function(dt){return {d:dt,q:_dtDates[dt]};})};
+      var _dtStr=encodeURIComponent(JSON.stringify(_dtTip));
+      html+='<td class="'+(v?'':'zero')+'" onmouseenter="skuShowTip(event,this)" onmouseleave="skuHideTip()" onclick="skuClickPin(event,this)" data-sku-tip="'+_dtStr+'">'+fmt(v)+'</td>';
+    });
     html+='<td class="tot" style="background:'+dateHeat(_dateRank(r.m),_minR,_maxR)+';color:#1e293b;font-weight:800">'+fmt(r.t)+'</td></tr>';});
-  html+='<tr class="grand"><td colspan="4">'+tr('sum_grand')+'</td>';branches.forEach(b=>html+='<td>'+fmt(gb[b]||0)+'</td>');html+='<td>'+fmt(gt)+'</td></tr></tbody></table>';
-  const _aoa=[[tr('c_year'),tr('f_identity'),tr('c_month'),tr('c_pack2')].concat(branches.map(b=>bn(b))).concat([tr('c_total')])];
-  keys.forEach(k=>{const r=M[k];_aoa.push([yearOf(r.m),mv('identity',r.i),mn(r.m),r.p||''].concat(branches.map(b=>r.b[b]||0)).concat([r.t]));});
-  _aoa.push([tr('sum_grand'),'','',''].concat(branches.map(b=>gb[b]||0)).concat([gt]));
+  html+='<tr class="grand"><td colspan="6" class="msep">'+tr('sum_grand')+'</td>';branches.forEach(b=>html+='<td>'+fmt(gb[b]||0)+'</td>');html+='<td>'+fmt(gt)+'</td></tr></tbody></table>';
+  const _aoa=[[tr('f_identity'),tr('c_code'),tr('c_pack2'),tr('c_size'),tr('c_year'),tr('c_month')].concat(branches.map(b=>bn(b))).concat([tr('c_total')])];
+  keys.forEach(k=>{const r=M[k];_aoa.push([mv('identity',r.i),r.c||'',r.p||'',r.s||'',yearOf(r.m),mn(r.m)].concat(branches.map(b=>r.b[b]||0)).concat([r.t]));});
+  _aoa.push([tr('sum_grand'),'','','','',''].concat(branches.map(b=>gb[b]||0)).concat([gt]));
   _lastDetail={aoa:_aoa,title:title||'Report'};
   if(!keys.length)html='<div style="padding:36px;text-align:center;color:#94a3b8;font-weight:600">'+(LANG==='ar'?'لا توجد بيانات':'No data')+'</div>';
   document.getElementById('detail-wrap').innerHTML=html;
@@ -7330,12 +7621,13 @@ function renderSpaceReport(rep){
   function _num(v){return typeof v==='number'?v:(parseFloat(String(v==null?'':v).replace(/[,%\s]/g,''))||0);}
   var _actM2=(_grps[0]&&_grps[0].rows&&_grps[0].rows[0])?_num(_grps[0].rows[0][_grps[0].rows[0].length-1]):0;
   var _IC={'g-actual':'\uD83C\uDFE2','g-used':'\uD83D\uDCE6','g-transit':'\uD83D\uDE9A','g-empty':'\u2705'};
+  var _CLS_KEY={'g-actual':'sp_lbl_actual','g-used':'sp_lbl_used','g-transit':'sp_lbl_transit','g-empty':'sp_lbl_empty'};
   var cards='<div class="sp-cards">';
   _grps.forEach(function(g,gi){var mr=g.rows[0]||[],sr=g.rows[g.rows.length-1]||[];var mg=mr[mr.length-1],sg=sr[sr.length-1];
     var mv=_num(mg);var pct=(gi===0)?100:(_actM2?Math.round(mv/_actM2*100):0);var pctTxt=(gi===0)?'\u0627\u0644\u0633\u0639\u0629 \u0627\u0644\u0643\u0627\u0645\u0644\u0629':(pct+'%');
     var _auto=(rep&&rep._autoComputed&&(gi===1||gi===2||gi===3))?'<span class="sp-card-auto" title="\u0645\u062d\u0633\u0648\u0628 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b">auto</span>':'';
     cards+='<div class="sp-card '+g.cls+'-card" onclick="openSpaceCardDetail('+gi+')" title="'+(drIsAr&&drIsAr()?'اضغط لعرض التفاصيل':'Click for details')+'">'
-      +'<div class="sp-card-top"><span class="sp-card-ic">'+(_IC[g.cls]||'')+'</span><span class="sp-card-t">'+drEsc(g.label)+_auto+'</span></div>'
+      +'<div class="sp-card-top"><span class="sp-card-ic">'+(_IC[g.cls]||'')+'</span><span class="sp-card-t"'+(_CLS_KEY[g.cls]?' data-i18n="'+_CLS_KEY[g.cls]+'"':'')+'>'+drEsc((typeof ttl==="function"&&_CLS_KEY[g.cls])?ttl(_CLS_KEY[g.cls]):g.label)+_auto+'</span></div>'
       +'<div class="sp-card-v">'+(typeof mg==='number'?drFmt(mg):drEsc(mg))+' <small>m\u00b2</small></div>'
       +'<div class="sp-bar"><span style="width:'+Math.max(3,Math.min(100,pct))+'%"></span></div>'
       +'<div class="sp-card-meta"><span class="sp-chip">'+pctTxt+'</span><span class="sp-card-s">'+drEsc(sr[0]||'')+': <b>'+(typeof sg==='number'?drFmt(sg):drEsc(sg))+'</b></span></div>'
@@ -7419,7 +7711,7 @@ function renderSpaceReport(rep){
   (rep.groups||[]).forEach(function(g){
     g.rows.forEach(function(row,ri){
       html+='<tr class="sp-row '+g.cls+(ri===0?' sp-gfirst':'')+(ri===g.rows.length-1?' sp-glast':'')+'">';
-      if(ri===0)html+='<td class="sp-side '+g.cls+'-side" rowspan="'+g.rows.length+'"><span>'+drEsc(g.label)+'</span></td>';
+      if(ri===0)html+='<td class="sp-side '+g.cls+'-side" rowspan="'+g.rows.length+'"><span'+(_CLS_KEY[g.cls]?' data-i18n="'+_CLS_KEY[g.cls]+'"':'')+'>'+drEsc((typeof ttl==="function"&&_CLS_KEY[g.cls])?ttl(_CLS_KEY[g.cls]):g.label)+'</span></td>';
       html+='<td class="sp-metric">'+drEsc(row[0])+'</td>';
       var _isPctRow=/Percentage/i.test(String(row[0]||''))||row.slice(1).filter(function(x){return typeof x==='string'&&/^\d+%$/.test(x.trim());}).length>row.length/2;
       var _isEnoughRow=/Enough Carton/i.test(String(row[0]||''));
@@ -7446,9 +7738,10 @@ function renderSpaceReport(rep){
   var bTip=[],fTip=[];
   for(var _bi=0;_bi<B.length;_bi++)bTip.push(_spTip(_bi+1));
   fTip.push(_spTip(B.length+1));fTip.push(_spTip(B.length+2));
-  html+='<div class="sp-charts"><div class="sp-chart"><h3>'+drEsc(tr('cyl_branch_title'))+'</h3>'+drCyl(B,rep.branchPct||[],BC,bTip)+'</div>';
-  html+='<div class="sp-chart sp-chart-fac"><h3>'+drEsc(tr('cyl_fact_title'))+'</h3>'+drCyl(F,rep.factoryPct||[],FC,fTip)+'</div></div>';
+  html+='<div class="sp-charts"><div class="sp-chart"><h3 data-i18n="cyl_branch_title">'+drEsc(typeof ttl==="function"?ttl('cyl_branch_title'):tr('cyl_branch_title'))+'</h3>'+drCyl(B,rep.branchPct||[],BC,bTip)+'</div>';
+  html+='<div class="sp-chart sp-chart-fac"><h3 data-i18n="cyl_fact_title">'+drEsc(typeof ttl==="function"?ttl('cyl_fact_title'):tr('cyl_fact_title'))+'</h3>'+drCyl(F,rep.factoryPct||[],FC,fTip)+'</div></div>';
   wrap.innerHTML=html;
+  if(typeof EDITMODE!=='undefined'&&EDITMODE&&typeof bindEditables==='function'){setTimeout(bindEditables,30);}
 }
 /* ───── تفاصيل بطاقة المجموعة عند النقر ───── */
 function openSpaceCardDetail(gi){
@@ -7488,9 +7781,15 @@ function closeSpaceCardDetail(){var p=document.getElementById('sp-card-ov');if(p
 function drCyl(labels,pcts,codes,tips){
   /* الألوان من إعدادات الأنابيب (cyl_colors_v1)، والعتبات من إعدادات كل مستودع (sp_wh_thresholds) —
      نفس منطق بطاقات الجوال: لكل مستودع عتبته الخاصة (تحذير/ممتلئ). */
+  /* قراءة قائمة المخفيين ولون نص النسبة من الإعدادات */
+  var _hidden=[];try{_hidden=JSON.parse(localStorage.getItem('cyl_hide_v1')||'[]');}catch(e){}
+  function _isHid(nm){return _hidden.indexOf(String(nm))>=0;}
+  var _pctCol='';try{var _ccx=JSON.parse(localStorage.getItem('cyl_colors_v1')||'{}');_pctCol=_ccx.pctColor||'';}catch(e){}
+  var _pctSt=_pctCol?' style="color:'+_pctCol+';text-shadow:0 1px 3px rgba(0,0,0,.45)"':'';
   function _thFor(name){try{if(typeof spThreshFor==='function')return spThreshFor(name);}catch(e){}return {warn:85,over:100};}
   var h='<div class="cyl-stage"><div class="cyl-row">';
   for(var i=0;i<labels.length;i++){
+    if(_isHid(labels[i]))continue;
     var p=pcts[i]||0;
     var th=_thFor(labels[i]);
     var WARN_FROM=th.warn,OVER_FROM=th.over;if(!(OVER_FROM>WARN_FROM))OVER_FROM=WARN_FROM+1;
@@ -7502,10 +7801,10 @@ function drCyl(labels,pcts,codes,tips){
     var codeStr=codes&&codes[i]?'<span class="cyl-code">'+drEsc(codes[i])+'</span>':'';
     var tip=tips&&tips[i];
     var ta=tip?(' data-tip="'+encodeURIComponent(JSON.stringify({n:labels[i],c:codes&&codes[i]||'',p:p,w:warn?1:0,o:over?1:0,a:tip.actM2,q:tip.qtyE,u:tip.usedM2,b:tip.balCtn,t:tip.trM2,tc:tip.trCtn,e:tip.empM2,ec:tip.enCtn}))+'"'):'';
-    h+='<div class="cyl-item">'
+    h+='<div class="cyl-item" data-cylname="'+labels[i].replace(/"/g,'&quot;')+'">'
       +'<div class="'+cls+'"'+ta+' onmouseenter="cylShowTip(event,this)" onmouseleave="cylHideTip()" ontouchstart="cylTouchTip(event,this)">'
       +'<div class="cyl-fill" style="height:'+fill+'%"></div><div class="cyl-rim"></div>'
-      +'<div class="cyl-pct">'+pTxt+'</div></div>'
+      +'<div class="cyl-pct"'+_pctSt+'>'+pTxt+'</div></div>'
       +'<div class="cyl-lbl">'+lbl+codeStr+'</div></div>';
   }
   h+='</div><div class="cyl-base"></div></div>';
@@ -10919,9 +11218,10 @@ function renderBottleReport(rep){
   for(var i=0;i<leaf;i++){var v=(i<total.length?total[i]:'');if(v==null)v='';trow+='<td>'+(typeof v==='number'?drFmt(v):drEsc(v))+'</td>';}
   trow+='</tr>';
   var html='<div class="bt-topbar"><div class="bt-date"><span class="bt-dl">التاريخ</span><b>'+drEsc(rep.date||'')+'</b></div><div class="bt-date"><span class="bt-dl">وقت الإعداد</span><b>'+drEsc(rep.time||'')+'</b></div></div>';
-  html+='<div class="bt-title">تقرير أرصدة القارورة الحالية والترانزيت بالفروع</div>';
+  html+='<div class="bt-title" data-i18n="bt_rpt_title">'+drEsc(typeof ttl==="function"?ttl('bt_rpt_title'):'تقرير أرصدة القارورة الحالية والترانزيت بالفروع')+'</div>';
   html+='<div class="bt-scroll"><table class="bt-table" dir="rtl"><thead>'+h1+h2+'</thead><tbody>'+body+trow+'</tbody></table></div>';
   wrap.innerHTML=html;
+  if(typeof EDITMODE!=='undefined'&&EDITMODE&&typeof bindEditables==='function'){setTimeout(bindEditables,30);}
 }
 
 </script>
@@ -12890,8 +13190,12 @@ function renderBottleReport(rep){
   .pivot td.dal-c3,.fg-table td.dal-c3{background:#e4f4e9!important;color:#1f7a45!important;font-weight:800}
   .pivot td.dal-c4,.fg-table td.dal-c4{background:#faf1d2!important;color:#8a6d12!important;font-weight:800}
   .pivot td.dal-c5,.fg-table td.dal-c5{background:#f7dede!important;color:#9c2a2a!important;font-weight:800}
-  /* hover ناعم دون طمس عمود الإجمالي */
-  .pivot tbody tr:not(.grand):hover td:not(.yr):not(.mo):not(.tot):not(.cat){background:#eef6ff}
+  /* hover واضح مع إظهار اسم الصنف */
+  .pivot tbody tr:not(.grand):hover td{background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
+  .pivot tbody tr:not(.grand):hover td.tot{background:#aed0f7!important;color:#0d2a55!important;font-weight:800}
+  .pivot tbody tr:not(.grand):hover td.yr,.pivot tbody tr:not(.grand):hover td.mo,
+  .pivot tbody tr:not(.grand):hover td.cat,.pivot tbody tr:not(.grand):hover td.idc{
+    background:#bdd8ff!important;color:#0d2a55!important;font-weight:700}
 }
 </style>
 
@@ -13322,31 +13626,55 @@ function renderBottleReport(rep){
 (function(){
   'use strict';
   var KEY='cyl_colors_v1';
-  var DEF={normal:'#2f7ed8',warn:'#d68a35',over:'#d9564a',warnFrom:85,overFrom:100};
+  var SIZE_KEY='cyl_size_v1';
+  var HIDE_KEY='cyl_hide_v1';
+  var DEF={normal:'#2f7ed8',warn:'#d68a35',over:'#d9564a',pctColor:'#ffffff',surfNormal:'',surfWarn:'',surfOver:''};
+  var DEF_SIZE={h:180,w:56,rowH:200,gap:18};
+
   function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
   function get(){try{return Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){return Object.assign({},DEF);}}
   function save(c){try{localStorage.setItem(KEY,JSON.stringify(c));}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}}
+  function getSize(){try{return Object.assign({},DEF_SIZE,JSON.parse(localStorage.getItem(SIZE_KEY)||'{}'));}catch(e){return Object.assign({},DEF_SIZE);}}
+  function saveSize(s){try{localStorage.setItem(SIZE_KEY,JSON.stringify(s));}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}}
+  function getHidden(){try{var v=localStorage.getItem(HIDE_KEY);return v?JSON.parse(v):[];}catch(e){return [];}}
+  function saveHidden(arr){try{localStorage.setItem(HIDE_KEY,JSON.stringify(arr));}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}}
+
   function shade(hex,amt){try{var n=parseInt(String(hex).replace('#',''),16);var r=Math.max(0,Math.min(255,(n>>16)+amt)),g=Math.max(0,Math.min(255,((n>>8)&255)+amt)),b=Math.max(0,Math.min(255,(n&255)+amt));return '#'+(1<<24|r<<16|g<<8|b).toString(16).slice(1);}catch(e){return hex;}}
   function grad(col){return 'linear-gradient(100deg,'+shade(col,-48)+' 0%,'+shade(col,16)+' 45%,'+shade(col,46)+' 50%,'+shade(col,10)+' 62%,'+shade(col,-52)+' 100%)';}
+  function surfGrad(custom,base){return custom?('linear-gradient(180deg,'+custom+','+shade(custom,-30)+')')
+    :('linear-gradient(180deg,'+shade(base,55)+','+shade(base,20)+')');}
+
   function apply(){
-    var c=get();var st=document.getElementById('cyl-colors-style');
+    var c=get();var sz=getSize();
+    var st=document.getElementById('cyl-colors-style');
     if(!st){st=document.createElement('style');st.id='cyl-colors-style';document.head.appendChild(st);}
+    var pctCol=c.pctColor||'#ffffff';
     st.textContent=
+      /* أبعاد الأنابيب وصف الرسم */
+      '.cyl{max-width:'+sz.w+'px!important;height:'+sz.h+'px!important}'+
+      '.cyl-row{height:'+sz.rowH+'px!important;gap:'+sz.gap+'px!important}'+
+      /* ألوان التعبئة */
       '.cyl-fill{background:'+grad(c.normal)+' !important}'+
-      '.cyl-fill:before{background:linear-gradient(180deg,'+shade(c.normal,55)+','+shade(c.normal,20)+') !important}'+
+      '.cyl-fill:before{background:'+surfGrad(c.surfNormal,c.normal)+' !important}'+
       '.cyl-warn .cyl-fill{background:'+grad(c.warn)+' !important}'+
-      '.cyl-warn .cyl-fill:before{background:linear-gradient(180deg,'+shade(c.warn,55)+','+shade(c.warn,20)+') !important}'+
+      '.cyl-warn .cyl-fill:before{background:'+surfGrad(c.surfWarn,c.warn)+' !important}'+
       '.cyl-over .cyl-fill{background:'+grad(c.over)+' !important}'+
-      '.cyl-over .cyl-fill:before{background:linear-gradient(180deg,'+shade(c.over,55)+','+shade(c.over,20)+') !important}'+
-      /* ربط بطاقات المستودعات (الجوال) بنفس ألوان الحالة */
+      '.cyl-over .cyl-fill:before{background:'+surfGrad(c.surfOver,c.over)+' !important}'+
+      /* لون نص النسبة */
+      '.cyl-pct{color:'+pctCol+'!important;text-shadow:0 1px 3px rgba(0,0,0,.4)!important}'+
+      /* بطاقات الجوال */
       '.sp-wl.st-ok{--st:'+c.normal+'}'+
       '.sp-wl.st-warn{--st:'+c.warn+'}'+
       '.sp-wl.st-over{--st:'+c.over+'}';
   }
-  function rowHtml(k,lbl,val){return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155"><input type="color" data-cyl="'+k+'" value="'+val+'" style="width:44px;height:32px;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer;padding:2px;background:#fff"> '+lbl+'</label>';}
-  function numRow(k,lbl,val){return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155">'+lbl+' <input type="number" min="0" max="999" step="1" data-cylnum="'+k+'" value="'+(val==null?'':val)+'" style="width:72px;height:32px;border:1px solid #cbd5e1;border-radius:8px;padding:4px 8px;font-weight:800;text-align:center"></label>';}
+
+  function colorInp(k,lbl,val){
+    return '<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:#334155">'
+      +'<input type="color" data-cyl="'+k+'" value="'+val+'" style="width:40px;height:30px;border:1px solid #cbd5e1;border-radius:7px;cursor:pointer;padding:2px;background:#fff"> '+lbl+'</label>';}
+
   function _cylRerender(){try{if(typeof renderDailyReport==='function')renderDailyReport('space');else if(window.renderDailyReport)window.renderDailyReport('space');}catch(e){}}
-  /* عتبات كل مستودع (نفس مخزن بطاقات الجوال: sp_wh_thresholds) */
+
+  /* عتبات كل مستودع */
   function thAll(){try{if(typeof getSpThresholds==='function')return getSpThresholds();}catch(e){}try{return JSON.parse(localStorage.getItem('sp_wh_thresholds')||'{}')||{};}catch(e){return {};}}
   function thSave(o){try{if(typeof saveSpThresholds==='function'){saveSpThresholds(o);return;}}catch(e){}try{localStorage.setItem('sp_wh_thresholds',JSON.stringify(o));}catch(e){}}
   function whNames(){var B=[],F=[];try{B=(window._spaceRep&&window._spaceRep.branches)||(window.SPACE_BRANCHES||[]);F=(window._spaceRep&&window._spaceRep.factories)||(window.SPACE_FACT||[]);}catch(e){}
@@ -13356,34 +13684,120 @@ function renderBottleReport(rep){
     return '<div class="cylth-row"><span class="cylth-nm">'+(''+it.lbl).replace(/[<>&]/g,'')+'</span>'
       +'<label class="cylth-l">'+(a?'تحذير':'Warn')+' %<input type="number" min="0" max="200" data-thk="'+it.k+'" data-thf="warn" value="'+(t.warn==null?85:t.warn)+'"></label>'
       +'<label class="cylth-l">'+(a?'ممتلئ':'Full')+' %<input type="number" min="0" max="300" data-thk="'+it.k+'" data-thf="over" value="'+(t.over==null?100:t.over)+'"></label></div>';}
-  function build(){
-    var p=document.getElementById('page-designer'); if(!p)return; var wrap=p.querySelector('.wrap'); if(!wrap)return;
-    if(document.getElementById('cyl-color-card'))return;
-    var c=get(),a=ar();
-    var card=document.createElement('div'); card.className='dz-card full'; card.id='cyl-color-card'; card.style.marginTop='16px';
-    card.innerHTML='<h4 style="font-size:15px;font-weight:800;margin-bottom:4px">\uD83E\uDDEA '+(a?'ألوان وعتبات الحالة (الأنابيب + بطاقات المستودعات)':'Status colors & thresholds (cylinders + warehouse cards)')+'</h4>'+
-      '<p style="font-size:12px;color:#64748b;margin-bottom:14px">'+(a?'اختر لون كل حالة، ثم حدّد عتبات النسبة لكل مستودع. تُطبّق فوراً على الأنابيب في الكمبيوتر وعلى بطاقات المستودعات في الجوال.':'Pick a color per state, then set the % thresholds for each warehouse. Applied live to the desktop cylinders and the mobile warehouse cards.')+'</p>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:center">'+
-        rowHtml('normal',a?'عادي (ضمن الحد)':'Normal',c.normal)+
-        rowHtml('warn',a?'تحذير (منخفض)':'Warning',c.warn)+
-        rowHtml('over',a?'فائض (تجاوز)':'Over',c.over)+
-        '<button id="cyl-col-reset" class="btn-soft sm" style="margin-inline-start:auto">'+(a?'استعادة الألوان':'Reset colors')+'</button>'+
-      '</div>'+
-      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0">'+
-        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span style="font-size:12.5px;color:#334155;font-weight:800">'+(a?'عتبات النسبة لكل مستودع':'Per-warehouse % thresholds')+'</span>'+
-          '<span style="font-size:11px;color:#94a3b8">'+(a?'عادي أقل من «تحذير» · فائض من «ممتلئ» فأعلى':'Normal below Warn · Over at/above Full')+'</span>'+
-          '<button id="cylth-reset" class="btn-soft sm" style="margin-inline-start:auto">'+(a?'افتراضي العتبات':'Reset thresholds')+'</button></div>'+
-        '<div id="cylth-list" class="cylth-list">'+whNames().map(thRow).join('')+'</div>'+
-      '</div>';
-    wrap.appendChild(card);
-    card.querySelectorAll('input[data-cyl]').forEach(function(inp){inp.addEventListener('input',function(){var cc=get();cc[inp.getAttribute('data-cyl')]=inp.value;save(cc);apply();_cylRerender();});});
-    card.querySelectorAll('input[data-thk]').forEach(function(inp){inp.addEventListener('change',function(){var o=thAll();var k=inp.getAttribute('data-thk'),f=inp.getAttribute('data-thf');var v=parseFloat(inp.value);if(!isFinite(v)||v<0)v=(f==='over'?100:85);if(!o[k])o[k]={warn:85,over:100};o[k][f]=v;inp.value=v;thSave(o);_cylRerender();});});
-    var rb=card.querySelector('#cyl-col-reset'); if(rb)rb.addEventListener('click',function(){save(Object.assign({},DEF));apply();card.remove();build();_cylRerender();});
-    var rt=card.querySelector('#cylth-reset'); if(rt)rt.addEventListener('click',function(){thSave({_default:{warn:85,over:100},_total:{warn:85,over:100}});card.remove();build();_cylRerender();});
+
+  function allWh(){var B=[],F=[];try{B=(window._spaceRep&&window._spaceRep.branches)||(window.SPACE_BRANCHES||[]);F=(window._spaceRep&&window._spaceRep.factories)||(window.SPACE_FACT||[]);}catch(e){}return {B:B||[],F:F||[]};}
+
+  function hiddenListHtml(){
+    var wh=allWh();var hidden=getHidden();var a=ar();
+    var all=[].concat(wh.B.map(function(n){return{n:n,fac:false};}),wh.F.map(function(n){return{n:n,fac:true};}));
+    if(!all.length)return '<span style="font-size:12px;color:#94a3b8">'+(a?'لا توجد مستودعات محمّلة بعد.':'No warehouses loaded yet.')+'</span>';
+    return all.map(function(it){
+      var vis=hidden.indexOf(it.n)<0;
+      return '<label style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#334155;padding:6px 10px;background:#f0f7ff;border:1px solid #c7dff7;border-radius:9px;cursor:pointer;user-select:none">'
+        +'<input type="checkbox" data-cylhide="'+it.n.replace(/"/g,'&quot;')+'" '+(vis?'checked':'')+' style="width:15px;height:15px;cursor:pointer;accent-color:#2f7ed8"> '
+        +(it.fac?'🏭':'🏬')+' '+it.n.replace(/[<>&]/g,'')+'</label>';
+    }).join('');
   }
-  function tick(){ try{var p=document.getElementById('page-designer'); if(p&&p.classList.contains('show'))build();}catch(e){} }
-  function start(){ apply(); setInterval(tick,1200); setTimeout(tick,500); }
-  if(document.readyState!=='loading')start(); else document.addEventListener('DOMContentLoaded',start);
+
+  function sectionHtml(title,id,body){
+    return '<div id="'+id+'" style="padding:13px 15px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:13px;margin-bottom:12px">'+
+      '<div style="font-size:11.5px;font-weight:800;color:#64748b;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">'+title+'</div>'+
+      body+'</div>';}
+
+  function build(){
+    var p=document.getElementById('page-designer');if(!p)return;var wrap=p.querySelector('.wrap');if(!wrap)return;
+    if(document.getElementById('cyl-color-card'))return;
+    var c=get(),sz=getSize(),a=ar();
+    var card=document.createElement('div');card.className='dz-card full';card.id='cyl-color-card';card.style.marginTop='16px';
+
+    /* ── قسم 1: ألوان التعبئة وخط السطح ولون النسبة ── */
+    var sec1=sectionHtml('🎨 '+(a?'ألوان التعبئة · خط السطح · نص النسبة':'Fill colors · Surface line · % text'),'cyl-sec-colors',
+      '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px">'+
+        colorInp('normal',a?'عادي':'Normal',c.normal)+
+        colorInp('warn',a?'تحذير':'Warning',c.warn)+
+        colorInp('over',a?'فائض':'Over',c.over)+
+        '<button id="cyl-col-reset" class="btn-soft sm" style="margin-inline-start:auto">'+(a?'إعادة ضبط الألوان':'Reset colors')+'</button>'+
+      '</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">'+
+        colorInp('pctColor',a?'🔢 لون نص النسبة %':'🔢 % text color',c.pctColor||'#ffffff')+
+        colorInp('surfNormal',a?'〰 خط السطح — عادي':'〰 Surface line — normal',c.surfNormal||shade(c.normal,55))+
+        colorInp('surfWarn',a?'〰 خط السطح — تحذير':'〰 Surface line — warn',c.surfWarn||shade(c.warn,55))+
+        colorInp('surfOver',a?'〰 خط السطح — فائض':'〰 Surface line — over',c.surfOver||shade(c.over,55))+
+      '</div>');
+
+    /* ── قسم 2: أبعاد الأنابيب وعرض الرسم ── */
+    function szInp(k,lbl,mn,mx,step,val){
+      return '<label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#334155">'+lbl
+        +' <input type="number" min="'+mn+'" max="'+mx+'" step="'+step+'" data-szkey="'+k+'" value="'+val
+        +'" style="width:68px;height:30px;border:1px solid #cbd5e1;border-radius:8px;padding:3px 7px;font-weight:800;text-align:center;font-size:12.5px"></label>';}
+    var sec2=sectionHtml('📐 '+(a?'حجم الأنابيب وعرض الرسم البياني':'Cylinder size & chart display'),'cyl-sec-size',
+      '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center">'+
+        szInp('h',a?'ارتفاع الأنبوب (px)':'Tube height (px)',60,400,10,sz.h)+
+        szInp('w',a?'عرض الأنبوب (px)':'Tube width (px)',20,160,4,sz.w)+
+        szInp('rowH',a?'ارتفاع صف الرسم (px)':'Chart row height (px)',60,500,10,sz.rowH)+
+        szInp('gap',a?'مسافة بين الأنابيب (px)':'Gap between tubes (px)',0,80,2,sz.gap)+
+        '<button id="cyl-sz-reset" class="btn-soft sm" style="margin-inline-start:auto">'+(a?'إعادة ضبط الحجم':'Reset size')+'</button>'+
+      '</div>');
+
+    /* ── قسم 3: إظهار وإخفاء الأنابيب ── */
+    var sec3=sectionHtml('👁 '+(a?'إظهار / إخفاء الأنابيب':'Show / hide cylinders'),'cyl-sec-hide',
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">'+
+        '<span style="font-size:11.5px;color:#64748b">'+(a?'أزِل التحديد لإخفاء أنبوب من الرسم البياني':'Uncheck to hide a cylinder from the chart')+'</span>'+
+        '<button id="cyl-hide-showall" class="btn-soft sm" style="margin-inline-start:auto">'+(a?'إظهار الكل':'Show all')+'</button>'+
+      '</div>'+
+      '<div id="cyl-hide-list" style="display:flex;flex-wrap:wrap;gap:8px">'+hiddenListHtml()+'</div>');
+
+    /* ── قسم 4: عتبات كل مستودع ── */
+    var sec4=sectionHtml('📊 '+(a?'عتبات النسبة لكل مستودع':'Per-warehouse % thresholds'),'cyl-sec-thresh',
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">'+
+        '<span style="font-size:11.5px;color:#64748b">'+(a?'عادي أقل من «تحذير» · فائض من «ممتلئ» فأعلى':'Normal below Warn · Over at/above Full')+'</span>'+
+        '<button id="cylth-reset" class="btn-soft sm" style="margin-inline-start:auto">'+(a?'إعادة ضبط العتبات':'Reset thresholds')+'</button>'+
+      '</div>'+
+      '<div id="cylth-list" class="cylth-list">'+whNames().map(thRow).join('')+'</div>');
+
+    card.innerHTML=
+      '<h4 style="font-size:15px;font-weight:800;margin-bottom:4px">🧪 '+(a?'ألوان وعتبات الحالة (الأنابيب + بطاقات المستودعات)':'Status colors & thresholds (cylinders + warehouse cards)')+'</h4>'+
+      '<p style="font-size:12px;color:#64748b;margin-bottom:14px">'+(a?'تحكم كامل في ألوان الأنابيب وأبعادها وإظهارها وعتبات كل مستودع.':'Full control over cylinder colors, dimensions, visibility, and per-warehouse thresholds.')+'</p>'+
+      sec1+sec2+sec3+sec4;
+
+    wrap.appendChild(card);
+
+    /* مستمعو ألوان التعبئة/السطح/النص */
+    card.querySelectorAll('input[data-cyl]').forEach(function(inp){
+      inp.addEventListener('input',function(){var cc=get();cc[inp.getAttribute('data-cyl')]=inp.value;save(cc);apply();_cylRerender();});
+    });
+
+    /* مستمعو الأبعاد */
+    card.querySelectorAll('input[data-szkey]').forEach(function(inp){
+      inp.addEventListener('change',function(){var s=getSize();var k=inp.getAttribute('data-szkey');var v=parseInt(inp.value,10);if(isNaN(v)||v<0)return;s[k]=v;saveSize(s);apply();_cylRerender();});
+    });
+
+    /* مستمعو العتبات */
+    card.querySelectorAll('input[data-thk]').forEach(function(inp){
+      inp.addEventListener('change',function(){var o=thAll();var k=inp.getAttribute('data-thk'),f=inp.getAttribute('data-thf');var v=parseFloat(inp.value);if(!isFinite(v)||v<0)v=(f==='over'?100:85);if(!o[k])o[k]={warn:85,over:100};o[k][f]=v;inp.value=v;thSave(o);_cylRerender();});
+    });
+
+    /* مستمعو الإخفاء/الإظهار */
+    card.querySelectorAll('input[data-cylhide]').forEach(function(inp){
+      inp.addEventListener('change',function(){var nm=inp.getAttribute('data-cylhide');var h=getHidden();var idx=h.indexOf(nm);if(inp.checked){if(idx>=0)h.splice(idx,1);}else{if(idx<0)h.push(nm);}saveHidden(h);_cylRerender();});
+    });
+
+    /* إظهار الكل */
+    var sa=card.querySelector('#cyl-hide-showall');if(sa)sa.addEventListener('click',function(){saveHidden([]);_cylRerender();card.remove();build();});
+
+    /* إعادة ضبط الألوان */
+    var rb=card.querySelector('#cyl-col-reset');if(rb)rb.addEventListener('click',function(){save(Object.assign({},DEF));apply();card.remove();build();_cylRerender();});
+
+    /* إعادة ضبط الحجم */
+    var rs=card.querySelector('#cyl-sz-reset');if(rs)rs.addEventListener('click',function(){saveSize(Object.assign({},DEF_SIZE));apply();card.remove();build();_cylRerender();});
+
+    /* إعادة ضبط العتبات */
+    var rt=card.querySelector('#cylth-reset');if(rt)rt.addEventListener('click',function(){thSave({_default:{warn:85,over:100},_total:{warn:85,over:100}});card.remove();build();_cylRerender();});
+  }
+
+  function tick(){try{var p=document.getElementById('page-designer');if(p&&p.classList.contains('show'))build();}catch(e){}}
+  function start(){apply();setInterval(tick,1200);setTimeout(tick,500);}
+  if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
 })();
 </script>
 
@@ -15474,6 +15888,15 @@ window.PageBuilder=PageBuilder;
 .btl-empty .btl-emoji{font-size:42px;display:block;margin-bottom:12px;opacity:.6}
 .btl-search{border:1px solid #cdd8e6;border-radius:9px;padding:7px 12px;font-size:12.5px;font-family:inherit;min-width:200px}
 @media (max-width:760px){.btl-grid2{grid-template-columns:1fr}}
+/* ===== Bottle Dashboard Slicers ===== */
+.btl-slicer-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btl-slicer-row label{font-size:11px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;min-width:48px}
+.btl-slicer-btns{display:inline-flex;flex-wrap:wrap;gap:4px;background:#eef3fb;border:1px solid #dbe6f4;border-radius:10px;padding:3px}
+.btl-slicer-btns .btl-sl{border:none;background:transparent;color:#5a7290;font-family:inherit;font-weight:700;font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btl-slicer-btns .btl-sl:hover{background:rgba(14,165,163,.12);color:#0c7d7b}
+.btl-slicer-btns .btl-sl.on{background:#0ea5a3;color:#fff;box-shadow:0 2px 6px rgba(14,165,163,.35)}
+.btl-slicer-btns .btl-sl.no-data{opacity:.45}
+@media(max-width:600px){.btl-slicer-btns .btl-sl{font-size:11px;padding:4px 8px}}
 </style>
 <script>
 /* ===== BottleAnalytics — وحدة القارورة والفرشة (بيانات فعلية من ملف Excel) ===== */
@@ -15481,7 +15904,7 @@ var BottleAnalytics=(function(){
   var SEED={"monthly":[{"year":2025,"month":"يناير","production":141243,"sales":2318211,"brushing":80254,"damaged":75979,"total":156233},{"year":2025,"month":"فبراير","production":163182,"sales":2239165,"brushing":86145,"damaged":74009,"total":160154},{"year":2025,"month":"مارس","production":209329,"sales":2600449,"brushing":106482,"damaged":78817,"total":185299},{"year":2025,"month":"ابريل","production":223284,"sales":3106762,"brushing":233390,"damaged":86609,"total":319999},{"year":2025,"month":"مـايو","production":255797,"sales":3305745,"brushing":152622,"damaged":86745,"total":239367},{"year":2025,"month":"يونيو","production":218851,"sales":3157425,"brushing":136236,"damaged":84718,"total":220954},{"year":2025,"month":"يوليو","production":223803,"sales":3324747,"brushing":144171,"damaged":83606,"total":227777},{"year":2025,"month":"أغسطس","production":202995,"sales":3428693,"brushing":177504,"damaged":87563,"total":265067},{"year":2025,"month":"سبتمبر","production":260543,"sales":3360677,"brushing":145033,"damaged":94227,"total":239260},{"year":2025,"month":"أكتوبر","production":299831,"sales":3168499,"brushing":132911,"damaged":100841,"total":233752},{"year":2025,"month":"نوفمبر","production":268146,"sales":2896956,"brushing":122728,"damaged":79430,"total":202158},{"year":2025,"month":"ديسمبر","production":201464,"sales":2776862,"brushing":117608,"damaged":79262,"total":196870},{"year":2026,"month":"يناير","production":208987,"sales":2723768,"brushing":147634,"damaged":70617,"total":218251},{"year":2026,"month":"فبراير","production":153614,"sales":2790129,"brushing":143970,"damaged":66052,"total":210022},{"year":2026,"month":"مارس","production":210844,"sales":2894799,"brushing":141822,"damaged":86817,"total":228639},{"year":2026,"month":"أبريل","production":234603,"sales":2986425,"brushing":89947,"damaged":80380,"total":170327},{"year":2026,"month":"مايو","production":127298,"sales":3129704,"brushing":133848,"damaged":72567,"total":206415},{"year":2026,"month":"يونيو - 11","production":53686,"sales":1313196,"brushing":59965,"damaged":25385,"total":85350}],"branches":[{"year":2025,"month":"يناير","riyadh":37406,"kharj":3576,"dammam":22647,"ahsa":6009,"qassim":3780,"jeddah":6552,"makkah":247,"taif":37,"total":80254},{"year":2025,"month":"فبراير","riyadh":47784,"kharj":2825,"dammam":23398,"ahsa":4998,"qassim":3649,"jeddah":3116,"makkah":225,"taif":150,"total":86145},{"year":2025,"month":"مارس","riyadh":51185,"kharj":5174,"dammam":34204,"ahsa":7344,"qassim":3744,"jeddah":4032,"makkah":560,"taif":239,"total":106482},{"year":2025,"month":"ابريل","riyadh":146256,"kharj":8669,"dammam":56452,"ahsa":11239,"qassim":5701,"jeddah":3575,"makkah":915,"taif":583,"total":233390},{"year":2025,"month":"مـايو","riyadh":88992,"kharj":6983,"dammam":36631,"ahsa":8645,"qassim":4441,"jeddah":5544,"makkah":646,"taif":740,"total":152622},{"year":2025,"month":"يونيو","riyadh":71495,"kharj":6553,"dammam":41293,"ahsa":5643,"qassim":4545,"jeddah":5605,"makkah":173,"taif":929,"total":136236},{"year":2025,"month":"يوليو","riyadh":89277,"kharj":713,"dammam":33486,"ahsa":6598,"qassim":4320,"jeddah":9316,"makkah":0,"taif":461,"total":144171},{"year":2025,"month":"أغسطس","riyadh":107509,"kharj":0,"dammam":47273,"ahsa":6864,"qassim":5458,"jeddah":10400,"makkah":0,"taif":0,"total":177504},{"year":2025,"month":"سبتمبر","riyadh":89909,"kharj":0,"dammam":32594,"ahsa":7792,"qassim":3594,"jeddah":11144,"makkah":0,"taif":0,"total":145033},{"year":2025,"month":"أكتوبر","riyadh":77853,"kharj":0,"dammam":34563,"ahsa":5978,"qassim":4423,"jeddah":10094,"makkah":0,"taif":0,"total":132911},{"year":2025,"month":"نوفمبر","riyadh":72917,"kharj":0,"dammam":29168,"ahsa":5509,"qassim":3613,"jeddah":11521,"makkah":0,"taif":0,"total":122728},{"year":2025,"month":"ديسمبر","riyadh":72337,"kharj":0,"dammam":28714,"ahsa":4975,"qassim":3197,"jeddah":7361,"makkah":0,"taif":0,"total":116584},{"year":2026,"month":"يناير","riyadh":72585,"kharj":0,"dammam":56753,"ahsa":4738,"qassim":3740,"jeddah":9818,"makkah":0,"taif":0,"total":147634},{"year":2026,"month":"فبراير","riyadh":86993,"kharj":0,"dammam":37103,"ahsa":4901,"qassim":5332,"jeddah":9641,"makkah":0,"taif":0,"total":143970},{"year":2026,"month":"مارس","riyadh":84764,"kharj":0,"dammam":35400,"ahsa":6225,"qassim":5486,"jeddah":9947,"makkah":0,"taif":0,"total":141822},{"year":2026,"month":"ابريل","riyadh":81831,"kharj":0,"dammam":26191,"ahsa":4737,"qassim":4230,"jeddah":8820,"makkah":0,"taif":0,"total":125809},{"year":2026,"month":"مايو","riyadh":82779,"kharj":0,"dammam":32688,"ahsa":7171,"qassim":3167,"jeddah":8043,"makkah":0,"taif":0,"total":133848},{"year":2026,"month":"يونيو - 11","riyadh":36343,"kharj":0,"dammam":13834,"ahsa":2844,"qassim":1581,"jeddah":5371,"makkah":0,"taif":0,"total":59973}],"branchNames":["الرياض","الخرج","الدمام","الإحساء","القصيم","جدة","مكة","الطائف"]};
   var KEY='btl_data_v1';
   var _charts={};
-  var _state={dashYear:'all'};
+  var _state={dashYear:'all',dashMonth:'all'};
 
   function isAr(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
   function L(ar,en){return isAr()?ar:en;}
@@ -15498,15 +15921,15 @@ var BottleAnalytics=(function(){
   }
   function persist(d){try{var v=JSON.stringify(d);if(typeof LS!=='undefined')LS.setItem(KEY,v);else localStorage.setItem(KEY,v);}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}}
   function years(){var ys={};load().monthly.forEach(function(r){ys[r.year]=1;});return Object.keys(ys).map(Number).sort();}
-  function monthlyFor(y){var m=load().monthly;return (y==='all'||y==null)?m:m.filter(function(r){return r.year===Number(y);});}
+  function monthlyFor(y,mo){var m=load().monthly;var out=(y==='all'||y==null)?m:m.filter(function(r){return r.year===Number(y);});if(mo&&mo!=='all'){var mi=monthIdx(mo);out=out.filter(function(r){return monthIdx(r.month)===mi;});}return out;}
 
   /* أرقام عربية لترتيب الأشهر */
   var MONTH_ORDER=['يناير','فبراير','مارس','ابريل','أبريل','مـايو','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   function monthIdx(m){var c=String(m).replace(/[\s\d\-]/g,'').trim();for(var i=0;i<MONTH_ORDER.length;i++){if(MONTH_ORDER[i].replace(/[\s]/g,'')===c)return i;}return 99;}
 
   /* ════════ حسابات مجمّعة (SSOT) ════════ */
-  function agg(year){
-    var rows=monthlyFor(year);
+  function agg(year,mo){
+    var rows=monthlyFor(year,mo);
     var o={production:0,sales:0,brushing:0,damaged:0,total:0,months:rows.length};
     rows.forEach(function(r){o.production+=r.production;o.sales+=r.sales;o.brushing+=r.brushing;o.damaged+=r.damaged;o.total+=r.total;});
     o.brushPct=o.sales?o.brushing/o.sales*100:0;
@@ -15537,48 +15960,53 @@ var BottleAnalytics=(function(){
   function renderDash(){
     var root=$('btl-dash-root');if(!root)return;
     var ys=years();var y=_state.dashYear;
-    var cur=agg(y);
+    var cur=agg(y,dm);
     /* مقارنة YoY: السنة المختارة مقابل السابقة (إن وُجدت) */
     var yNum=(y==='all')?null:Number(y);
-    var prev=(yNum&&ys.indexOf(yNum)>0)?agg(ys[ys.indexOf(yNum)-1]):null;
+    var prev=(yNum&&ys.indexOf(yNum)>0)?agg(ys[ys.indexOf(yNum)-1],dm):null;
     function delta(curV,prevV){if(!prev||!prevV)return '';var d=(curV-prevV)/prevV*100;return '<div class="btl-k-sub '+(d>=0?'btl-k-up':'btl-k-down')+'">'+(d>=0?'▲ ':'▼ ')+pct(d)+' '+L('عن السابق','vs prev')+'</div>';}
 
-    var yearOpts='<option value="all" '+(y==='all'?'selected':'')+'>'+L('كل الأعوام','All years')+'</option>'+
-      ys.map(function(yy){return '<option value="'+yy+'" '+(String(y)===String(yy)?'selected':'')+'>'+yy+'</option>';}).join('');
+    var BTL_YEARS=[2024,2025,2026];
+    var dm=_state.dashMonth||'all';
+    var MONTHS_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    var yearSlicerBtns='<button class="btl-sl'+(y==='all'?' on':'')+'" onclick="BottleAnalytics.setDashYear(\'all\')">'+L('الكل','All')+'</button>'+BTL_YEARS.map(function(yy){var hasData=ys.indexOf(yy)>=0;return '<button class="btl-sl'+(String(y)===String(yy)?' on':'')+(hasData?'':' no-data')+'" onclick="BottleAnalytics.setDashYear(\''+yy+'\')">'+yy+'</button>';}).join('');
+    var monthSlicerBtns='<button class="btl-sl'+(dm==='all'?' on':'')+'" onclick="BottleAnalytics.setDashMonth(\'all\')">'+L('الكل','All')+'</button>'+MONTHS_AR.map(function(mo){return '<button class="btl-sl'+(dm===mo?' on':'')+'" onclick="BottleAnalytics.setDashMonth(\''+mo+'\')">'+mo+'</button>';}).join('');
 
     var kpis=[
-      {t:L('الإنتاج','Production'),v:cur.production,ic:'🏭',c:'#0ea5a3',d:delta(cur.production,prev&&prev.production)},
-      {t:L('المبيعات','Sales'),v:cur.sales,ic:'💰',c:'#2f7ed8',d:delta(cur.sales,prev&&prev.sales)},
-      {t:L('الفرشة','Brushing'),v:cur.brushing,ic:'🧹',c:'#e0792f',d:delta(cur.brushing,prev&&prev.brushing)},
-      {t:L('التالف','Damaged'),v:cur.damaged,ic:'♻️',c:'#dc2626',d:delta(cur.damaged,prev&&prev.damaged)},
-      {t:L('نسبة الفرشة','Brushing %'),v:null,raw:pct(cur.brushPct).replace('+',''),ic:'📊',c:'#7b5cd6',d:''},
-      {t:L('نسبة التالف','Damaged %'),v:null,raw:pct(cur.dmgPct).replace('+',''),ic:'📉',c:'#16a34a',d:''}
+      {t:L('الإنتاج','Production'),key:'btl_kpi_prod',v:cur.production,ic:'🏭',c:'#0ea5a3',d:delta(cur.production,prev&&prev.production)},
+      {t:L('المبيعات','Sales'),key:'btl_kpi_sales',v:cur.sales,ic:'💰',c:'#2f7ed8',d:delta(cur.sales,prev&&prev.sales)},
+      {t:L('الفرشة','Brushing'),key:'btl_kpi_brush',v:cur.brushing,ic:'🧹',c:'#e0792f',d:delta(cur.brushing,prev&&prev.brushing)},
+      {t:L('التالف','Damaged'),key:'btl_kpi_dmg',v:cur.damaged,ic:'♻️',c:'#dc2626',d:delta(cur.damaged,prev&&prev.damaged)},
+      {t:L('نسبة الفرشة','Brushing %'),key:'btl_kpi_brushpct',v:null,raw:pct(cur.brushPct).replace('+',''),ic:'📊',c:'#7b5cd6',d:''},
+      {t:L('نسبة التالف','Damaged %'),key:'btl_kpi_dmgpct',v:null,raw:pct(cur.dmgPct).replace('+',''),ic:'📉',c:'#16a34a',d:''}
     ];
     var kpiHTML=kpis.map(function(k){return '<div class="btl-kpi" style="--kc:'+k.c+'"><div class="btl-k-ic">'+k.ic+'</div>'+
-      '<div class="btl-k-t">'+esc(k.t)+'</div><div class="btl-k-v">'+(k.v!=null?fmt(k.v):esc(k.raw))+'</div>'+(k.d||'')+'</div>';}).join('');
+      '<div class="btl-k-t"'+(k.key?' data-i18n="'+k.key+'"':'')+'>'+esc(k.key&&typeof ttl==="function"?ttl(k.key):k.t)+'</div><div class="btl-k-v">'+(k.v!=null?fmt(k.v):esc(k.raw))+'</div>'+(k.d||'')+'</div>';}).join('');
 
     root.innerHTML=
       '<div class="btl-wrap">'+
-        '<div class="btl-head"><span class="btl-ic">📊</span><div><h1>'+L('لوحة مؤشرات القارورة والفرشة','Bottle & Brushing Dashboard')+'</h1>'+
-          '<span class="btl-sub">'+L('تحليل الإنتاج والمبيعات والفرشة والتالف — من بيانات الملف الفعلية','Production, sales, brushing & damage analytics — from actual file data')+'</span></div>'+
+        '<div class="btl-head"><span class="btl-ic">📊</span><div><h1 data-i18n="btl_dash_title">'+esc(typeof ttl==="function"?ttl('btl_dash_title'):L('لوحة مؤشرات القارورة والفرشة','Bottle & Brushing Dashboard'))+'</h1>'+
+          '<span class="btl-sub" data-i18n="btl_dash_sub">'+esc(typeof ttl==="function"?ttl('btl_dash_sub'):L('تحليل الإنتاج والمبيعات والفرشة والتالف — من بيانات الملف الفعلية','Production, sales, brushing & damage analytics — from actual file data'))+'</span></div>'+
           '<span class="btl-spacer"></span>'+
           '<button class="btl-btn soft" onclick="BottleAnalytics.exportDash()">📊 '+L('تصدير Excel','Export Excel')+'</button></div>'+
-        '<div class="btl-filterbar"><div class="btl-fld"><label>'+L('العام','Year')+'</label>'+
-          '<select onchange="BottleAnalytics.setDashYear(this.value)">'+yearOpts+'</select></div>'+
-          '<div class="btl-fld"><label>'+L('عدد الأشهر','Months')+'</label><select disabled><option>'+cur.months+'</option></select></div></div>'+
+        '<div class="btl-filterbar" style="flex-direction:column;align-items:flex-start;gap:14px">'+
+          '<div class="btl-slicer-row"><label>'+L('العام','Year')+'</label><div class="btl-slicer-btns">'+yearSlicerBtns+'</div></div>'+
+          '<div class="btl-slicer-row"><label>'+L('الشهر','Month')+'</label><div class="btl-slicer-btns">'+monthSlicerBtns+'</div></div>'+
+        '</div>'+
         '<div class="btl-kpis">'+kpiHTML+'</div>'+
         '<div class="btl-grid2">'+
-          '<div class="btl-card"><div class="btl-ch"><h3>'+L('اتجاه المبيعات الشهري','Monthly Sales Trend')+'</h3></div><div class="btl-cbody"><canvas id="btl-c-trend"></canvas></div></div>'+
-          '<div class="btl-card"><div class="btl-ch"><h3>'+L('الإنتاج مقابل المبيعات','Production vs Sales')+'</h3></div><div class="btl-cbody"><canvas id="btl-c-prodsales"></canvas></div></div>'+
+          '<div class="btl-card"><div class="btl-ch"><h3 data-i18n="btl_ch_trend">'+esc(typeof ttl==="function"?ttl('btl_ch_trend'):L('اتجاه المبيعات الشهري','Monthly Sales Trend'))+'</h3></div><div class="btl-cbody"><canvas id="btl-c-trend"></canvas></div></div>'+
+          '<div class="btl-card"><div class="btl-ch"><h3 data-i18n="btl_ch_prodsales">'+esc(typeof ttl==="function"?ttl('btl_ch_prodsales'):L('الإنتاج مقابل المبيعات','Production vs Sales'))+'</h3></div><div class="btl-cbody"><canvas id="btl-c-prodsales"></canvas></div></div>'+
         '</div>'+
         '<div class="btl-grid2">'+
-          '<div class="btl-card"><div class="btl-ch"><h3>'+L('الفرشة حسب الفرع','Brushing by Branch')+'</h3></div><div class="btl-cbody"><canvas id="btl-c-branch"></canvas></div></div>'+
-          '<div class="btl-card"><div class="btl-ch"><h3>'+L('الفرشة مقابل التالف','Brushing vs Damaged')+'</h3></div><div class="btl-cbody"><canvas id="btl-c-bd"></canvas></div></div>'+
+          '<div class="btl-card"><div class="btl-ch"><h3 data-i18n="btl_ch_branch">'+esc(typeof ttl==="function"?ttl('btl_ch_branch'):L('الفرشة حسب الفرع','Brushing by Branch'))+'</h3></div><div class="btl-cbody"><canvas id="btl-c-branch"></canvas></div></div>'+
+          '<div class="btl-card"><div class="btl-ch"><h3 data-i18n="btl_ch_bd">'+esc(typeof ttl==="function"?ttl('btl_ch_bd'):L('الفرشة مقابل التالف','Brushing vs Damaged'))+'</h3></div><div class="btl-cbody"><canvas id="btl-c-bd"></canvas></div></div>'+
         '</div>'+
       '</div>';
+    if(typeof EDITMODE!=='undefined'&&EDITMODE&&typeof bindEditables==='function'){setTimeout(bindEditables,30);}
 
     /* رسوم */
-    var rows=sortedMonths(monthlyFor(y));
+    var rows=sortedMonths(monthlyFor(y,dm));
     var labels=rows.map(function(r){return String(r.month).trim()+(y==='all'?(' '+r.year):'');});
     drawChart('btl-c-trend',lineCfg(labels,[{label:L('المبيعات','Sales'),data:rows.map(function(r){return r.sales;}),borderColor:'#2f7ed8',backgroundColor:hexA('#2f7ed8',.15),fill:true,tension:.3}]));
     drawChart('btl-c-prodsales',barCfg(labels,[
@@ -15590,6 +16018,7 @@ var BottleAnalytics=(function(){
     drawChart('btl-c-bd',{type:'doughnut',data:{labels:[L('الفرشة','Brushing'),L('التالف','Damaged')],datasets:[{data:[cur.brushing,cur.damaged],backgroundColor:['#e0792f','#dc2626']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
   }
   function setDashYear(v){_state.dashYear=v;renderDash();}
+  function setDashMonth(v){_state.dashMonth=v;renderDash();}
   function exportDash(){
     try{if(typeof XLSX==='undefined'){toast(L('وحدة Excel غير متاحة','Excel unavailable'),'err');return;}
       var rows=sortedMonths(monthlyFor(_state.dashYear));
@@ -15801,7 +16230,7 @@ var BottleAnalytics=(function(){
   if(document.readyState!=='loading')setTimeout(boot,350);else document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,350);});
 
   return {_seed:function(){return SEED;}, _load:load, _years:years, _monthlyFor:monthlyFor, _monthIdx:monthIdx,
-    setDashYear:setDashYear, exportDash:exportDash, printDash:printDash,
+    setDashYear:setDashYear, setDashMonth:setDashMonth, exportDash:exportDash, printDash:printDash,
     setCmp:setCmp, setTQ:setTQ, exportTable:exportTable,
     uploadData:uploadData, resetData:resetData,
     renderDash:renderDash, renderCompare:renderCompare, renderTable:renderTable, renderManage:renderManage,
@@ -18827,5 +19256,474 @@ window.__qrcodeLib=(typeof qrcode!=='undefined')?qrcode:null;
 }
 .btl-kpi .btl-k-sub{grid-column:1 / -1;margin-top:4px !important;}
 </style>
+<!-- ===================================================================
+     مصمم الشعار · Logo Designer  (تحريك / تكبير / محاذاة الشعارات)
+     يُحفظ تلقائياً في localStorage ويُزامَن مع السحابة. للمدير فقط.
+     =================================================================== -->
+<style id="logo-dz-css">
+.logo-dz-card .logo-dz-pick{display:flex;align-items:center;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
+.logo-dz-card .logo-dz-pick label{font-weight:800;color:var(--navy);font-size:13px}
+.logo-dz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.logo-dz-fld{display:flex;flex-direction:column;gap:9px;background:#f6f9fe;border:1px solid #e3ecf8;border-radius:12px;padding:12px 14px}
+.logo-dz-fld>label{font-size:12px;font-weight:800;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.logo-dz-fld>label b{color:var(--blue,#2f7ed8);font-variant-numeric:tabular-nums}
+.logo-dz-fld>select{width:100%}
+.logo-dz-fld input[type=color]{width:42px;height:34px;border:1px solid #cfe0f4;border-radius:9px;background:#fff;cursor:pointer;padding:2px;flex:0 0 auto}
+.logo-dz-seg{display:flex;gap:6px}
+.logo-dz-seg button{flex:1;padding:8px 6px;border:1px solid #cfe0f4;background:#fff;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700;color:#34506e;transition:.15s}
+.logo-dz-seg button:hover{background:#eaf3ff}
+.logo-dz-seg button.on{background:linear-gradient(180deg,#2f7ed8,#1e5fae);color:#fff;border-color:#1e5fae;box-shadow:0 3px 8px -2px rgba(30,95,174,.5)}
+.logo-dz-row{display:flex;align-items:center;gap:10px}
+.logo-dz-row input[type=range],.logo-dz-fld input[type=range]{flex:1;width:100%;accent-color:#2f7ed8}
+.logo-dz-row b{font-size:12px;color:var(--blue,#2f7ed8);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.logo-dz-btn{width:34px;height:34px;border-radius:9px;border:1px solid #cfe0f4;background:#fff;cursor:pointer;font-size:18px;font-weight:800;color:#1e5fae;line-height:1;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.logo-dz-btn:hover{background:#eaf3ff}
+.logo-dz-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.logo-dz-drag,.logo-dz-anim-toggle{padding:9px 14px;border-radius:10px;border:1px solid #cfe0f4;background:#fff;cursor:pointer;font-weight:800;font-size:13px;color:#1e5fae;transition:.15s}
+.logo-dz-drag:hover,.logo-dz-anim-toggle:hover{background:#eaf3ff}
+.logo-dz-drag.on{background:linear-gradient(180deg,#23b07a,#159463);color:#fff;border-color:#159463;box-shadow:0 3px 10px -2px rgba(21,148,99,.5)}
+.logo-dz-anim-toggle.on{background:linear-gradient(180deg,#a259e6,#7c3fce);color:#fff;border-color:#7c3fce;box-shadow:0 3px 10px -2px rgba(124,63,206,.5)}
+.logo-dz-tip{margin-top:12px;font-size:12px;color:var(--muted,#6b7a90);background:#fff7e8;border:1px solid #ffe2ad;border-radius:10px;padding:9px 12px;line-height:1.6}
+body.logo-dz-dragging .logo-dz-target-el{outline:2px dashed #23b07a !important;outline-offset:3px;cursor:grab !important}
+body.logo-dz-grabbing .logo-dz-target-el{cursor:grabbing !important}
+/* ---- بدون برواز · no-frame: إزالة الخلفية والظل والحلقة ---- */
+.logo-noframe{background:transparent !important;box-shadow:none !important;-webkit-box-shadow:none !important}
+.logo-noframe::after,.logo-noframe::before{display:none !important}
+/* ---- حركات الشعار · logo motion keyframes (compose with base translate/scale) ---- */
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes logoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+@keyframes logoBounce{0%,20%,53%,80%,100%{transform:translateY(0)}40%,43%{transform:translateY(-16px)}70%{transform:translateY(-8px)}90%{transform:translateY(-3px)}}
+@keyframes logoSpin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes logoSwing{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes logoShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 0 rgba(47,126,216,0))}50%{filter:drop-shadow(0 0 11px rgba(47,126,216,.7))}}
+</style>
+<script id="logo-dz-js">
+(function(){
+  var KEY='tania_logo_design';
+  var IMGKEY='tania_logo_image';
+  var GROUPS={
+    topbar:{sels:['.home-logo']},
+    sidebar:{sels:['#nav .brand .logo-badge']},
+    login:{sels:['.login-brand .lb-logo','.login-box .lf-mini']}
+  };
+  var DEF={
+    topbar:{s:1,x:0,y:0,a:'left',anim:'none',bgmode:'default',bgcolor:'#ffffff',op:1,shape:'default'},
+    sidebar:{s:1,x:0,y:0,a:'center',anim:'none',bgmode:'default',bgcolor:'#ffffff',op:1,shape:'default'},
+    login:{s:1,x:0,y:0,a:'center',anim:'none',bgmode:'default',bgcolor:'#ffffff',op:1,shape:'default'}
+  };
+  var ORDER=['topbar','sidebar','login'];
+  var ANIMS={
+    none:'none',
+    float:'logoFloat 3.2s ease-in-out infinite',
+    pulse:'logoPulse 1.8s ease-in-out infinite',
+    bounce:'logoBounce 2.2s ease infinite',
+    spin:'logoSpin 6s linear infinite',
+    swing:'logoSwing 2.4s ease-in-out infinite',
+    shake:'logoShake 1.6s ease-in-out infinite',
+    glow:'logoGlow 2s ease-in-out infinite'
+  };
+  var INDIV=(function(){try{return !!(window.CSS&&CSS.supports&&CSS.supports('scale','1')&&CSS.supports('translate','1px'));}catch(e){return false;}})();
+  function clone(o){return JSON.parse(JSON.stringify(o));}
+  var LOGOD=clone(DEF);
+  function LSo(){return window.LS||window.localStorage;}
+  function load(){try{var raw=LSo().getItem(KEY);if(raw){var o=JSON.parse(raw)||{};ORDER.forEach(function(g){if(o[g])LOGOD[g]=Object.assign(clone(DEF[g]),o[g]);});}}catch(e){}}
+  function save(){try{LSo().setItem(KEY,JSON.stringify(LOGOD));}catch(e){}try{if(typeof window.pushSettingsToCloud==='function')window.pushSettingsToCloud();}catch(e){}}
+  function num(v){v=Number(v);return isNaN(v)?0:v;}
+  function eachEl(g,fn){GROUPS[g].sels.forEach(function(sel){var list=document.querySelectorAll(sel);Array.prototype.forEach.call(list,fn);});}
+  function animValue(name){return ANIMS[name]||'none';}
+  function hexToRgba(hex,a){hex=String(hex||'#ffffff').replace('#','');if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];var r=parseInt(hex.substr(0,2),16)||0,g=parseInt(hex.substr(2,2),16)||0,b=parseInt(hex.substr(4,2),16)||0;var al=(a==null?1:Number(a));if(isNaN(al))al=1;return 'rgba('+r+','+g+','+b+','+al+')';}
+  function applyBgShape(el,c){
+    /* الخلفية · background */
+    var noframe=(c.shape==='none');
+    if(noframe||c.bgmode==='transparent'){el.style.setProperty('background','transparent','important');}
+    else if(c.bgmode==='white'){el.style.setProperty('background',hexToRgba('#ffffff',c.op),'important');}
+    else if(c.bgmode==='custom'){el.style.setProperty('background',hexToRgba(c.bgcolor,c.op),'important');}
+    else{el.style.removeProperty('background');}
+    /* الشكل · shape */
+    el.classList.remove('logo-noframe');
+    el.style.removeProperty('border-radius');
+    el.style.removeProperty('box-shadow');
+    if(!ANIMS[c.anim]||c.anim==='none'){/* rotate handled below */}
+    var rot='';
+    if(c.shape==='circle'){el.style.setProperty('border-radius','50%','important');}
+    else if(c.shape==='oval'){el.style.setProperty('border-radius','50% / 38%','important');}
+    else if(c.shape==='square'){el.style.setProperty('border-radius','12px','important');}
+    else if(c.shape==='ovaltilt'){el.style.setProperty('border-radius','50% / 38%','important');rot='-12deg';}
+    else if(c.shape==='none'){el.classList.add('logo-noframe');el.style.setProperty('border-radius','0','important');}
+    /* الميل عبر خاصية rotate المفردة لتتركّب مع الحركة والموضع */
+    if(INDIV)el.style.rotate=rot; else if(rot)el.style.transform=(el.style.transform||'')+' rotate('+rot+')';
+  }
+  function applyGroup(g){
+    var c=LOGOD[g];
+    eachEl(g,function(el){
+      el.style.transformOrigin='center center';
+      el.style.animation='none';
+      if(INDIV)el.style.rotate='';
+      var alignX=0,cont=el.parentElement;
+      if(INDIV){el.style.transform='';el.style.translate='0px 0px';el.style.scale=String(c.s);}
+      else{el.style.transform='scale('+c.s+')';}
+      var er=el.getBoundingClientRect();
+      if(er.width===0&&er.height===0){
+        if(INDIV){el.style.translate=num(c.x)+'px '+num(c.y)+'px';}
+        else{el.style.transform='translate('+num(c.x)+'px,'+num(c.y)+'px) scale('+c.s+')';}
+        el.style.animation=animValue(c.anim);applyBgShape(el,c);return;
+      }
+      if(cont){
+        var cr=cont.getBoundingClientRect();
+        var cs=window.getComputedStyle(cont);
+        var padL=parseFloat(cs.paddingLeft)||0,padR=parseFloat(cs.paddingRight)||0;
+        var innerL=cr.left+padL,innerR=cr.right-padR,desiredL;
+        if(c.a==='left')desiredL=innerL;
+        else if(c.a==='right')desiredL=innerR-er.width;
+        else desiredL=innerL+((innerR-innerL)-er.width)/2;
+        alignX=desiredL-er.left;
+      }
+      if(INDIV){el.style.translate=(alignX+num(c.x))+'px '+num(c.y)+'px';}
+      else{el.style.transform='translate('+(alignX+num(c.x))+'px,'+num(c.y)+'px) scale('+c.s+')';}
+      el.style.animation=animValue(c.anim);
+      applyBgShape(el,c);
+    });
+  }
+  function applyAll(){ORDER.forEach(applyGroup);}
+  window.applyLogoDesign=applyAll;
+
+  /* ===== صورة الشعار · logo image replace ===== */
+  function applyLogoImage(){
+    var src=null;try{src=LSo().getItem(IMGKEY);}catch(e){}
+    var imgs=document.querySelectorAll('img.tania-logo, img.home-logo');
+    Array.prototype.forEach.call(imgs,function(im){
+      if(!im.getAttribute('data-logo-orig'))im.setAttribute('data-logo-orig',im.getAttribute('src')||'');
+      if(src){if(im.src!==src)im.src=src;}
+      else{var o=im.getAttribute('data-logo-orig');if(o&&im.src!==o)im.src=o;}
+    });
+  }
+  window.applyLogoImage=applyLogoImage;
+  window.uploadLogoImage=function(input){
+    var f=input&&input.files&&input.files[0];if(!f)return;
+    if(!/^image\//.test(f.type||'')){alert('الملف ليس صورة · The file is not an image');input.value='';return;}
+    var rd=new FileReader();
+    rd.onload=function(){
+      var data=rd.result;
+      if(data&&data.length>190000){alert('الصورة كبيرة جداً للحفظ الدائم (>180KB). استخدم صورة أصغر/مضغوطة. · Image too large to save (>180KB). Use a smaller/compressed image.');}
+      try{LSo().setItem(IMGKEY,data);}catch(e){}
+      applyLogoImage();
+      try{if(window.pushSettingsToCloud)window.pushSettingsToCloud();}catch(e){}
+    };
+    rd.readAsDataURL(f);
+    input.value='';
+  };
+  window.restoreLogoImage=function(){
+    try{LSo().removeItem(IMGKEY);}catch(e){}
+    applyLogoImage();
+    try{if(window.pushSettingsToCloud)window.pushSettingsToCloud();}catch(e){}
+  };
+
+  function curTarget(){var sel=document.getElementById('logo-dz-target');return sel?sel.value:'all';}
+  function targetsOf(t){return t==='all'?ORDER.slice():[t];}
+  function repGroup(){var t=curTarget();return t==='all'?'topbar':t;}
+
+  window.logoDzPick=function(){syncUI();markDraggable();};
+  window.setLogoAlign=function(a){targetsOf(curTarget()).forEach(function(g){LOGOD[g].a=a;applyGroup(g);});save();syncUI();};
+  window.setLogoScale=function(v){v=num(v);targetsOf(curTarget()).forEach(function(g){LOGOD[g].s=v;applyGroup(g);});save();syncScaleLabel();};
+  window.nudgeLogoScale=function(d){var base=LOGOD[repGroup()].s;var nv=Math.min(2.5,Math.max(0.4,Math.round((num(base)+d)*100)/100));targetsOf(curTarget()).forEach(function(g){LOGOD[g].s=nv;applyGroup(g);});save();syncUI();};
+  window.setLogoMove=function(axis,v){v=num(v);targetsOf(curTarget()).forEach(function(g){LOGOD[g][axis]=v;applyGroup(g);});save();syncMoveLabels();};
+  window.setLogoAnim=function(name){if(!ANIMS[name])name='none';targetsOf(curTarget()).forEach(function(g){LOGOD[g].anim=name;applyGroup(g);});save();syncUI();};
+  window.toggleLogoAnim=function(){var cur=LOGOD[repGroup()].anim;var nv=(cur&&cur!=='none')?'none':'float';targetsOf(curTarget()).forEach(function(g){LOGOD[g].anim=nv;applyGroup(g);});save();syncUI();};
+  window.setLogoBgMode=function(m){targetsOf(curTarget()).forEach(function(g){LOGOD[g].bgmode=m;applyGroup(g);});save();syncUI();};
+  window.setLogoBgColor=function(v){targetsOf(curTarget()).forEach(function(g){LOGOD[g].bgcolor=v;if(LOGOD[g].bgmode==='default'||LOGOD[g].bgmode==='transparent')LOGOD[g].bgmode='custom';applyGroup(g);});save();syncUI();};
+  window.setLogoBgOpacity=function(v){v=Math.max(0,Math.min(1,num(v)));targetsOf(curTarget()).forEach(function(g){LOGOD[g].op=v;applyGroup(g);});save();syncBgLabel();};
+  window.setLogoShape=function(sp){targetsOf(curTarget()).forEach(function(g){LOGOD[g].shape=sp;applyGroup(g);});save();syncUI();};
+  window.resetLogoGroup=function(){targetsOf(curTarget()).forEach(function(g){LOGOD[g]=clone(DEF[g]);applyGroup(g);});save();syncUI();};
+
+  function setVal(id,v){var e=document.getElementById(id);if(e)e.value=v;}
+  function setTxt(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+  function syncScaleLabel(){var c=LOGOD[repGroup()];setTxt('logo-dz-scaleval',Math.round(num(c.s)*100)+'%');setVal('logo-dz-scale',c.s);}
+  function syncMoveLabels(){var c=LOGOD[repGroup()];setTxt('logo-dz-xval',Math.round(num(c.x)));setTxt('logo-dz-yval',Math.round(num(c.y)));setVal('logo-dz-x',c.x);setVal('logo-dz-y',c.y);}
+  function syncBgLabel(){var c=LOGOD[repGroup()];setTxt('logo-dz-bgopval',Math.round(num(c.op)*100)+'%');setVal('logo-dz-bgop',c.op);}
+  function syncUI(){
+    var c=LOGOD[repGroup()];
+    syncScaleLabel();syncMoveLabels();syncBgLabel();
+    var seg=document.getElementById('logo-dz-align');
+    if(seg){Array.prototype.forEach.call(seg.querySelectorAll('button'),function(b){b.classList.toggle('on',b.getAttribute('data-a')===c.a);});}
+    setVal('logo-dz-anim',c.anim||'none');
+    var ab=document.getElementById('logo-dz-animbtn');if(ab)ab.classList.toggle('on',!!(c.anim&&c.anim!=='none'));
+    setVal('logo-dz-bgmode',c.bgmode||'default');
+    setVal('logo-dz-bgcolor',c.bgcolor||'#ffffff');
+    setVal('logo-dz-shape',c.shape||'default');
+  }
+  window.logoDzSyncUI=syncUI;
+
+  /* ---- وضع السحب · drag mode ---- */
+  var dragOn=false,dragging=null,dgroups=null,sx=0,sy=0;
+  function markDraggable(){
+    Array.prototype.forEach.call(document.querySelectorAll('.logo-dz-target-el'),function(e){e.classList.remove('logo-dz-target-el');});
+    if(!dragOn)return;
+    targetsOf(curTarget()).forEach(function(g){eachEl(g,function(el){el.classList.add('logo-dz-target-el');});});
+  }
+  window.toggleLogoDrag=function(){
+    dragOn=!dragOn;
+    setTxt('logo-dz-dragstate',dragOn?'تشغيل · On':'إيقاف · Off');
+    var b=document.getElementById('logo-dz-dragbtn');if(b)b.classList.toggle('on',dragOn);
+    document.body.classList.toggle('logo-dz-dragging',dragOn);
+    markDraggable();
+  };
+  document.addEventListener('pointerdown',function(e){
+    if(!dragOn)return;
+    var groups=targetsOf(curTarget()),hit=null,hg=null;
+    groups.some(function(g){return GROUPS[g].sels.some(function(sel){var el=e.target.closest&&e.target.closest(sel);if(el){hit=el;hg=g;return true;}return false;});});
+    if(!hit)return;
+    e.preventDefault();
+    dragging=hg;dgroups=groups;sx=e.clientX;sy=e.clientY;
+    document.body.classList.add('logo-dz-grabbing');
+  },true);
+  document.addEventListener('pointermove',function(e){
+    if(!dragging)return;
+    var dx=e.clientX-sx,dy=e.clientY-sy;sx=e.clientX;sy=e.clientY;
+    dgroups.forEach(function(g){
+      LOGOD[g].x=Math.max(-150,Math.min(150,num(LOGOD[g].x)+dx));
+      LOGOD[g].y=Math.max(-150,Math.min(150,num(LOGOD[g].y)+dy));
+      applyGroup(g);
+    });
+    syncMoveLabels();
+  });
+  document.addEventListener('pointerup',function(){
+    if(dragging){dragging=null;dgroups=null;document.body.classList.remove('logo-dz-grabbing');save();}
+  });
+
+  /* ---- init + hooks ---- */
+  function boot(){
+    load();applyLogoImage();
+    var tries=0;(function t(){applyLogoImage();applyAll();if(++tries<6)setTimeout(t,400);})();
+    syncUI();
+  }
+  if(document.readyState!=='loading')setTimeout(boot,300);
+  else document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,300);});
+  window.addEventListener('load',function(){setTimeout(function(){applyLogoImage();applyAll();},200);});
+  var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(applyAll,150);});
+  (function(){var _go=window.go;if(typeof _go==='function'){window.go=function(){var r=_go.apply(this,arguments);setTimeout(function(){applyLogoImage();applyAll();},80);return r;};}})();
+})();
+</script>
+
+<!-- SKU / Aging Detail Tooltip Popup -->
+<div id="sku-detail-pop"></div>
+
+<script>
+/* ═══ SKU Detail Card — تتبع الماوس + تثبيت بـ Enter أو click ═══ */
+(function(){
+  var _pop=null,_ht=null,_pinned=false,_dragging=false,_dx=0,_dy=0,_ox=0,_oy=0;
+  var _lastEl=null; // آخر خلية تم hover عليها
+
+  function _ep(){
+    if(!_pop){
+      _pop=document.getElementById('sku-detail-pop');
+      if(_pop){
+        _pop.addEventListener('mousedown',_onDragStart,false);
+        _pop.addEventListener('touchstart',_onTouchStart,{passive:false});
+      }
+    }
+    return _pop;
+  }
+
+  function _fmt(n){
+    if(n==null||n===''||n===0)return '0';
+    n=Number(n);if(isNaN(n))return '—';
+    return n>=1000?n.toLocaleString():(n%1===0?String(n):n.toFixed(1));
+  }
+  function _esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function _build(d){
+    var ar=(typeof LANG!=='undefined'&&LANG==='ar');
+    var dir=ar?'rtl':'ltr';
+    var L={
+      pinBtn:   ar?'📌 تثبيت':'📌 Pin',
+      closeBtn: '✕',
+      code:     ar?'كود الصنف':'Item Code',
+      dates:    ar?'الكمية حسب تاريخ الإنتاج':'Qty by Production Date',
+      total:    ar?'إجمالي الفرع':'Branch Total',
+      noData:   ar?'لا توجد بيانات':'No data'
+    };
+
+    // اسم الفرع مترجم
+    var brLabel=d.branch;
+    try{var _bm=(T&&T[LANG]&&T[LANG].map&&T[LANG].map.branchSum)||{};brLabel=_bm[d.branch]||d.branch;}catch(e){}
+
+    // اسم الهوية مترجم
+    var idLabel=d.name||d.identity||'';
+    try{idLabel=mv('identity',d.identity)||idLabel;}catch(e){}
+
+    var html='<div style="direction:'+dir+';font-family:inherit">';
+
+    /* ── الشريط العلوي: أيقونة + اسم الفرع | أزرار ── */
+    html+='<div class="sdp-top-bar">'
+      +'<span class="sdp-branch-lbl"><span class="sdp-branch-icon">🏢</span>'+_esc(brLabel)+'</span>'
+      +'<div class="sdp-top-btns">'
+      +'<button class="sdp-pin-btn'+(_pinned?' active':'')+'" onclick="skuTogglePin(this)" title="'+(ar?'تثبيت (Enter)':'Pin (Enter)')+'">'+L.pinBtn+'</button>'
+      +'<button class="sdp-close-btn" onclick="skuForceHide()">'+L.closeBtn+'</button>'
+      +'</div>'
+      +'</div>';
+
+    /* ── الصف الثاني: اسم الصنف + شهر + pack ── */
+    html+='<div class="sdp-info-row">';
+    html+='<span class="sdp-name-main">'+_esc(idLabel)+'</span>';
+    if(d.month)html+='<span class="sdp-badge">📅 '+_esc(d.month)+'</span>';
+    if(d.pack) html+='<span class="sdp-badge">📦 '+_esc(d.pack)+'</span>';
+    if(d.code) html+='<span class="sdp-code-tag">'+_esc(d.code)+'</span>';
+    html+='</div>';
+
+    /* ── الجسم ── */
+    html+='<div class="sdp-body">';
+    if(d.dates&&d.dates.length){
+      html+='<div class="sdp-section-label">'+_esc(L.dates)+'</div>';
+      d.dates.forEach(function(r){
+        html+='<div class="sdp-date-row">'
+          +'<span class="sdp-date-lbl"><span class="sdp-date-dot"></span>'+_esc(r.d)+'</span>'
+          +'<span class="sdp-date-qty">'+_fmt(r.q)+'</span>'
+          +'</div>';
+      });
+    } else {
+      html+='<div class="sdp-empty-note">'+_esc(L.noData)+'</div>';
+    }
+    html+='<div class="sdp-total-bar">'
+      +'<span class="sdp-total-lbl">'+_esc(L.total)+'</span>'
+      +'<span class="sdp-total-val">'+_fmt(d.total)+'</span>'
+      +'</div>';
+    html+='</div></div>';
+    return html;
+  }
+
+  /* موضع البطاقة بجانب الماوس */
+  function _place(cx,cy){
+    var pop=_ep();if(!pop)return;
+    var pw=pop.offsetWidth||260,ph=pop.offsetHeight||200;
+    var tx=cx+14,ty=cy-ph/2;
+    if(tx+pw>window.innerWidth-8)tx=cx-pw-14;
+    if(ty<8)ty=8;
+    if(ty+ph>window.innerHeight-8)ty=window.innerHeight-ph-8;
+    pop.style.left=tx+'px';pop.style.top=ty+'px';
+  }
+
+  /* ── عرض/تحديث البطاقة عند hover ── */
+  window.skuShowTip=function(e,el){
+    if(_pinned)return;
+    clearTimeout(_ht);
+    _lastEl=el;
+    var raw=el&&el.dataset&&el.dataset.skuTip;
+    if(!raw)return;
+    var d;try{d=JSON.parse(decodeURIComponent(raw));}catch(_e){return;}
+    var pop=_ep();if(!pop)return;
+    pop.innerHTML=_build(d);
+    pop.style.display='block';
+    pop.classList.remove('pinned');
+    requestAnimationFrame(function(){
+      _place(e.clientX,e.clientY);
+      requestAnimationFrame(function(){pop.classList.add('show');});
+    });
+  };
+
+  /* ── تثبيت/فتح بطاقة أخرى عند click ── */
+  window.skuClickPin=function(e,el){
+    if(_pinned){
+      /* مثبّتة — افتح بطاقة جديدة بجانبها */
+      _pinned=false;
+      var pop=_ep();if(pop){pop.classList.remove('pinned');}
+      /* اعرض البطاقة الجديدة مباشرة */
+      skuShowTip(e,el);
+      /* ثم ثبّت مباشرة */
+      _doPinNow();
+    } else {
+      /* ثبّت البطاقة الحالية */
+      _doPinNow();
+    }
+  };
+
+  function _doPinNow(){
+    var pop=_ep();if(!pop||pop.style.display==='none')return;
+    _pinned=true;
+    pop.classList.add('pinned');
+    /* تحديث زر Pin */
+    var btn=pop.querySelector('.sdp-pin-btn');
+    if(btn)btn.classList.add('active');
+  }
+
+  /* ── تثبيت بـ Enter عند focus على خلية ── */
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&_lastEl){
+      e.preventDefault();
+      if(!_pinned) _doPinNow();
+      else skuForceHide();
+    }
+  },false);
+
+  window.skuHideTip=function(){
+    if(_pinned)return;
+    _ht=setTimeout(function(){
+      var pop=_ep();if(!pop)return;
+      pop.classList.remove('show');
+      setTimeout(function(){if(!pop.classList.contains('show'))pop.style.display='none';},180);
+    },140);
+  };
+
+  window.skuForceHide=function(){
+    _pinned=false;_lastEl=null;
+    var pop=_ep();if(!pop)return;
+    pop.classList.remove('show','pinned');
+    setTimeout(function(){pop.style.display='none';},180);
+  };
+
+  window.skuTogglePin=function(btn){
+    if(_pinned){skuForceHide();}
+    else{_doPinNow();}
+  };
+
+  /* ── سحب الماوس (بعد التثبيت) ── */
+  function _onDragStart(e){
+    if(!_pinned)return;
+    if(e.target.closest('.sdp-pin-btn,.sdp-close-btn'))return;
+    e.preventDefault();
+    _dragging=true;
+    var pop=_ep();
+    _ox=parseInt(pop.style.left)||0;_oy=parseInt(pop.style.top)||0;
+    _dx=e.clientX;_dy=e.clientY;
+    document.addEventListener('mousemove',_onDragMove,false);
+    document.addEventListener('mouseup',_onDragEnd,false);
+  }
+  function _onDragMove(e){
+    if(!_dragging)return;
+    var pop=_ep();if(!pop)return;
+    var nx=Math.max(0,Math.min(window.innerWidth-pop.offsetWidth, _ox+(e.clientX-_dx)));
+    var ny=Math.max(0,Math.min(window.innerHeight-pop.offsetHeight,_oy+(e.clientY-_dy)));
+    pop.style.left=nx+'px';pop.style.top=ny+'px';
+  }
+  function _onDragEnd(){
+    _dragging=false;
+    document.removeEventListener('mousemove',_onDragMove,false);
+    document.removeEventListener('mouseup',_onDragEnd,false);
+  }
+
+  /* ── سحب اللمس ── */
+  var _tx0=0,_ty0=0,_tox=0,_toy=0;
+  function _onTouchStart(e){
+    if(!_pinned)return;
+    if(e.target.closest('.sdp-pin-btn,.sdp-close-btn'))return;
+    var t=e.touches[0];var pop=_ep();
+    _tox=parseInt(pop.style.left)||0;_toy=parseInt(pop.style.top)||0;
+    _tx0=t.clientX;_ty0=t.clientY;
+    document.addEventListener('touchmove',_onTouchMove,{passive:false});
+    document.addEventListener('touchend',_onTouchEnd,false);
+  }
+  function _onTouchMove(e){
+    e.preventDefault();
+    var t=e.touches[0];var pop=_ep();if(!pop)return;
+    var nx=Math.max(0,Math.min(window.innerWidth-pop.offsetWidth, _tox+(t.clientX-_tx0)));
+    var ny=Math.max(0,Math.min(window.innerHeight-pop.offsetHeight,_toy+(t.clientY-_ty0)));
+    pop.style.left=nx+'px';pop.style.top=ny+'px';
+  }
+  function _onTouchEnd(){
+    document.removeEventListener('touchmove',_onTouchMove,false);
+    document.removeEventListener('touchend',_onTouchEnd,false);
+  }
+})();
+</script>
 </body>
 </html>
