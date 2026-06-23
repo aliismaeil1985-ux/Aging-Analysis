@@ -2959,7 +2959,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
           <h2 class="sec-h"><span>&#10133;</span> <span data-i18n="u_add_title">إضافة مستخدم جديد</span></h2>
           <div class="uform">
             <div class="sf"><label data-i18n="u_user">Username</label><input type="text" id="nu-user"></div>
-            <div class="sf"><label data-i18n="u_email">Email</label><input type="email" id="nu-email"></div>
+            <div class="sf"><label data-i18n="u_email">Email</label><input type="text" id="nu-email" autocomplete="email" inputmode="email"></div>
             <div class="sf"><label data-i18n="u_mobile">Mobile</label><input type="text" id="nu-mobile"></div>
             <div class="sf"><label data-i18n="u_pass">Password</label><input type="text" id="nu-pass"></div>
             <div class="sf"><label data-i18n="u_role">Role</label><select id="nu-role"><option value="user" data-i18n="u_userrole">User</option><option value="admin" data-i18n="u_admin">Admin</option></select></div>
@@ -11849,6 +11849,46 @@ function renderBottleReport(rep){
   /* neutralize the legacy local-account bootstrap & session restore */
   window.seedUsers=function(){};
   window.initAuth=function(){ var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex'; tryInitAuth(); };
+
+  /* ===== Login Log: Firestore Sync ===== */
+  (function(){
+    var LOG_COL='login_logs';
+    function _fbDB(){return (typeof fbDB!=='undefined'&&fbDB)?fbDB:null;}
+    function _dev(){try{return typeof _detectDeviceType==='function'?_detectDeviceType():'desktop';}catch(e){return 'desktop';}}
+    window.logLogin=function(uname,kind){
+      var entry={u:String(uname||''),k:kind||'login',t:Date.now(),dev:_dev()};
+      try{var loc=JSON.parse(LS.getItem('login_log')||'[]');loc.unshift(entry);if(loc.length>500)loc=loc.slice(0,500);LS.setItem('login_log',JSON.stringify(loc));}catch(e){}
+      try{var db=_fbDB();if(db)db.collection(LOG_COL).add(entry).catch(function(){});}catch(e){}
+    };
+    window.renderLoginLog=function(){
+      var t=document.getElementById('loglog');if(!t)return;
+      var ar=(typeof LANG!=='undefined'&&LANG==='ar');
+      var kindLbl={'login':ar?'دخول':'Login','password-reset':ar?'إعادة كلمة مرور':'Password Reset','failed':ar?'محاولة فاشلة':'Failed','local':ar?'دخول محلي':'Local Login'};
+      var devMap={'desktop':{ic:'💻',lbl:ar?'كمبيوتر':'Desktop'},'mobile':{ic:'📱',lbl:ar?'جوال':'Mobile'},'tablet':{ic:'📲',lbl:ar?'لوحي':'Tablet'}};
+      function devCell(dv){var d=devMap[dv]||{ic:'❔',lbl:ar?'غير معروف':'Unknown'};return '<span style="display:inline-flex;align-items:center;gap:5px;font-weight:600;color:#475569"><span style="font-size:14px">'+d.ic+'</span>'+d.lbl+'</span>';}
+      function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+      function buildTable(log){
+        var h='<thead><tr><th>'+(ar?'المستخدم':'User')+'</th><th>'+(ar?'الحدث':'Event')+'</th><th>'+(ar?'الجهاز':'Device')+'</th><th>'+(ar?'الوقت':'Time')+'</th></tr></thead><tbody>';
+        if(!log||!log.length){h+='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:18px">'+(ar?'لا توجد سجلات':'No login entries yet')+'</td></tr>';}
+        else{log.forEach(function(e){var d=new Date(e.t);var ds=d.toLocaleString(ar?'ar-EG':'en-GB');var badge=e.k==='failed'?'#c4452a':(e.k==='password-reset'?'#b45309':'#15803d');h+='<tr><td><b>'+esc(e.u||'')+'</b></td><td><span style="color:'+badge+';font-weight:600">'+esc(kindLbl[e.k]||e.k)+'</span></td><td>'+devCell(e.dev)+'</td><td style="color:#64748b">'+esc(ds)+'</td></tr>';});}
+        h+='</tbody>';t.innerHTML=h;
+      }
+      var db=_fbDB();
+      if(db){
+        t.innerHTML='<tbody><tr><td colspan="4" style="padding:14px;color:#94a3b8">'+(ar?'جارٍ التحميل…':'Loading...')+'</td></tr></tbody>';
+        db.collection(LOG_COL).orderBy('t','desc').limit(500).get()
+          .then(function(qs){var log=[];qs.forEach(function(d){log.push(d.data());});buildTable(log);})
+          .catch(function(){var loc=[];try{loc=JSON.parse(LS.getItem('login_log')||'[]');}catch(e){}buildTable(loc);});
+      }else{var loc=[];try{loc=JSON.parse(LS.getItem('login_log')||'[]');}catch(e){}buildTable(loc);}
+    };
+    window.clearLoginLog=function(){
+      if(typeof isAdmin==='function'&&!isAdmin())return;
+      try{LS.removeItem('login_log');}catch(e){}
+      var db=_fbDB();
+      if(db){db.collection(LOG_COL).limit(500).get().then(function(qs){var b=db.batch();qs.forEach(function(d){b.delete(d.ref);});return b.commit();}).then(function(){window.renderLoginLog();}).catch(function(){window.renderLoginLog();});}
+      else{window.renderLoginLog();}
+    };
+  })();
 
   /* ===================== admin: user management ===================== */
   function listProfiles(){return fbDB.collection(PROF_COL).get().then(function(qs){var a=[];qs.forEach(function(d){var x=d.data()||{};x.email=x.email||d.id;a.push(x);});return a;}).catch(function(){return [];});}
