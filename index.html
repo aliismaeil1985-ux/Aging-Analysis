@@ -261,7 +261,7 @@ html[dir=rtl] body{font-family:'Cairo','Inter',sans-serif}
 .pivot td.idc{text-align:start;color:#334155;font-weight:600;font-size:12.5px}
 .pivot td.tot{font-weight:800;background:#f3f7fc;color:var(--navy)}
 .pivot td.pct{font-weight:700;color:var(--teal);background:#f3f7fc}
-.pivot tbody tr:not(.grand):hover td{background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
+.pivot tbody tr:not(.grand):hover td:not(.fg-vsep){background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
 .pivot tbody tr:not(.grand):hover td.tot{background:#aed0f7!important;color:#0d2a55!important;font-weight:800}
 .pivot tbody tr:not(.grand):hover td.yr,.pivot tbody tr:not(.grand):hover td.mo,
 .pivot tbody tr:not(.grand):hover td.cat,.pivot tbody tr:not(.grand):hover td.idc{background:#bdd8ff!important;color:#0d2a55!important}
@@ -856,7 +856,7 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
   #detail-ov .pivot td.mo{font-size:11px}
   #detail-ov .pivot td.zero{color:#d3dbe6;font-size:11px}
   #detail-ov .pivot tbody tr:nth-child(even):not(.grand) td:not(.yr):not(.mo){background:#f6faff}
-  #detail-ov .pivot tbody tr:not(.grand):hover td{background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
+  #detail-ov .pivot tbody tr:not(.grand):hover td:not(.fg-vsep){background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
   #detail-ov .pivot tbody tr:not(.grand):hover td.tot{background:#aed0f7!important;color:#0d2a55!important;font-weight:800}
   #detail-ov .pivot tbody tr:not(.grand):hover td.yr,#detail-ov .pivot tbody tr:not(.grand):hover td.mo,
   #detail-ov .pivot tbody tr:not(.grand):hover td.cat,#detail-ov .pivot tbody tr:not(.grand):hover td.idc{background:#bdd8ff!important;color:#0d2a55!important}
@@ -1209,7 +1209,7 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-clear{border:1px solid #d6e0ec;background:#fff;color:#c4452a;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .fg-clear:hover{background:#fdecea;border-color:#f0c4bd}
 .fg-count{font-size:12.5px;font-weight:800;color:var(--navy);margin-inline-start:auto}
-.fg-table{min-width:1120px}.fg-table.fg-cols-fit{min-width:0;width:max-content;max-width:100%}.fg-table.fg-cols-fit th,.fg-table.fg-cols-fit td{min-width:80px;white-space:nowrap}.fg-table.fg-cols-fit th:first-child,.fg-table.fg-cols-fit td:first-child{min-width:130px}
+.fg-table{min-width:1120px;width:100%}.fg-table.fg-cols-fit{min-width:0;width:100%}.fg-table.fg-cols-fit th,.fg-table.fg-cols-fit td{min-width:80px;white-space:nowrap}.fg-table.fg-cols-fit th:first-child,.fg-table.fg-cols-fit td:first-child{min-width:130px}
 .fg-table thead th{position:sticky;top:0;z-index:3}
 .fg-table tbody tr.fg-hl td:not(.fg-vsep){background:#dbe8f7 !important;font-weight:700;color:#1e3a5f}
 .fg-cards{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}
@@ -1219,8 +1219,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-cl small{display:block;font-size:9.5px;color:#9fb1c7;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:1px}
 .fg-cv{display:block;margin-top:7px;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:.3px}
 .fg-c-carton{--ac:#2f7ed8}.fg-c-shrink{--ac:#0f9b8e}.fg-c-pack{--ac:#e0792f}.fg-c-bottle{--ac:#7b5cd6}.fg-c-transit{--ac:#c4452a}
-.fg-vsep{border:none !important;background:#fff !important;padding:0 !important;width:10px;min-width:10px}
-.fg-table tr.grand.fg-gB td{background:#15506e}
+.fg-vsep{display:none!important;width:0!important;min-width:0!important;max-width:0!important;padding:0!important;border:none!important}
+.fg-table tr.grand td.tot{border-inline-end:2px solid rgba(255,255,255,.2) !important}.fg-table tr.grand.fg-gB td{background:#15506e}
 .fg-card{cursor:pointer;transition:transform .12s,box-shadow .12s}
 .fg-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-h)}
 .fg-card:active{transform:translateY(0)}
@@ -1247,8 +1247,8 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-c-grand .fg-cl{color:rgba(255,255,255,.9)}
 .fg-c-grand .fg-cv{color:#fff;font-size:23px}
 .fg-c-grand:after{content:'';position:absolute;inset-inline-end:-22px;top:-22px;width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.09)}
-.fg-table tbody tr:not(.grand) td.fg-trcol{background:#fdeede;color:#9a5a1e;font-weight:700}
-.fg-table th.fg-trth{background:#e0792f !important;color:#fff}
+.fg-table tbody tr:not(.grand) td.tot{border-inline-end:2px solid #c8d5e6 !important}.fg-table tbody tr:not(.grand) td.fg-trcol{background:#fdeede;color:#9a5a1e;font-weight:700}
+.fg-table th.fg-toth{border-inline-end:2px solid rgba(255,255,255,.28) !important}.fg-table th.fg-trth{background:#e0792f !important;color:#fff;border-left:4px solid rgba(0,0,0,0.25)!important}.fg-table td.fg-trtd{border-left:4px solid rgba(0,0,0,0.12)!important}
 .fg-gt{font-size:14px;font-weight:800;letter-spacing:.6px}
 .fg-gsub{font-size:10.5px;font-weight:600;opacity:.82;margin-inline-start:4px}
 .fg-table th:first-child,.fg-table tbody tr:not(.grand) td:first-child{width:90px;max-width:90px;white-space:nowrap}
@@ -3027,6 +3027,54 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
           </div>
         </div>
       </div>
+      <!-- ===== Table Layout Settings card ===== -->
+      <div class="dz-card full" id="tbl-layout-card" style="margin-bottom:16px;padding:14px 18px">
+        <h4 class="dz-h4-toggle" onclick="dzToggleCard(this)" style="margin-bottom:12px"><span class="dz-h4-arrow">&#9650;</span>&#128208; <span>إعدادات تخطيط الجداول &middot; Table Layout Settings</span></h4>
+        <!-- Screen selector -->
+        <div style="margin-bottom:12px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:6px">&#128250; اختر الشاشة والجدول &middot; Select Screen / Table</div>
+          <div class="tbl-scr-row" id="tbl-scr-row">
+            <button class="tbl-scr-btn on" data-sc="transit"  onclick="tblSwitchScreen('transit')">&#128666; FG Transit</button>
+            <button class="tbl-scr-btn"    data-sc="fgbal"    onclick="tblSwitchScreen('fgbal')">&#128230; FG Balance</button>
+            <button class="tbl-scr-btn"    data-sc="oldid"    onclick="tblSwitchScreen('oldid')">&#128336; OLD Identity</button>
+            <button class="tbl-scr-btn"    data-sc="sum"      onclick="tblSwitchScreen('sum')">&#128202; Summary</button>
+            <button class="tbl-scr-btn"    data-sc="sku"      onclick="tblSwitchScreen('sku')">&#127991; SKU</button>
+            <button class="tbl-scr-btn"    data-sc="space"    onclick="tblSwitchScreen('space')">&#127981; Space</button>
+            <button class="tbl-scr-btn"    data-sc="bottle"   onclick="tblSwitchScreen('bottle')">&#129748; Bottle</button>
+          </div>
+        </div>
+        <!-- Sliders -->
+        <div class="tbl-layout-grid">
+          <div class="fld2">
+            <label style="font-size:12px;font-weight:700;color:var(--navy)">مسافة الفاصل Total &#8596; Transit (px)</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+              <input type="range" id="tbl-vsep" min="0" max="12" step="0.25" value="4"
+                     oninput="setTblLayout('vsep',this.value);document.getElementById('tbl-vsep-val').textContent=parseFloat(this.value).toFixed(2)+'px'">
+              <b id="tbl-vsep-val" style="min-width:42px;font-size:13px;color:var(--teal)">4.00px</b>
+            </div>
+          </div>
+          <div class="fld2">
+            <label style="font-size:12px;font-weight:700;color:var(--navy)">حشوة الصفوف (Row Padding) (px)</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+              <input type="range" id="tbl-pad" min="2" max="16" step="1" value="6"
+                     oninput="setTblLayout('pad',this.value);document.getElementById('tbl-pad-val').textContent=this.value+'px'">
+              <b id="tbl-pad-val" style="min-width:42px;font-size:13px;color:var(--teal)">6px</b>
+            </div>
+          </div>
+          <div class="fld2">
+            <label style="font-size:12px;font-weight:700;color:var(--navy)">أدنى عرض للأعمدة (Min Col Width) (px)</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+              <input type="range" id="tbl-colw" min="50" max="180" step="5" value="80"
+                     oninput="setTblLayout('colw',this.value);document.getElementById('tbl-colw-val').textContent=this.value+'px'">
+              <b id="tbl-colw-val" style="min-width:42px;font-size:13px;color:var(--teal)">80px</b>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+            <button class="btn-clear" onclick="resetTblLayout()"><span>&#8635;</span> إعادة هذه الشاشة &middot; Reset Screen</button>
+            <button class="btn-clear" onclick="resetAllTblLayout()" style="background:#fef2f2;border-color:#fecaca;color:#dc2626">&#128465; مسح الكل &middot; Reset All</button>
+          </div>
+        </div>
+      </div>
       <div class="dz-card full" style="margin-bottom:16px"><h4 class="dz-h4-toggle" onclick="dzToggleCard(this)"><span class="dz-h4-arrow">&#9650;</span>&#128250; <span data-i18n="dz_pick">Choose screen to edit</span></h4>
         <select class="dz-agg" id="dz-screen" onchange="showDzScreen(this.value)">
           <option value="dash" data-i18n="dz_scr_dash">Dashboard</option>
@@ -3716,6 +3764,7 @@ function applyLang(){
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{el.innerHTML=tr(el.dataset.i18nHtml);});
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=tr(el.dataset.i18nPh);});
   applyStyles();
+  try{applyTblLayout();}catch(e){}
   try{var _sp=document.querySelector('.page.show');if(_sp&&typeof updateTopnav==='function')updateTopnav(_sp.id.replace('page-',''));}catch(e){}
   buildFilters(false);render();
   if(document.getElementById('page-sum').classList.contains('show'))buildSummary();
@@ -4661,6 +4710,68 @@ function applyFont(){const ff=FONT?("'"+FONT+"', sans-serif"):'';document.body.s
 function setFont(v){FONT=v;try{LS.setItem('ui_font',v);}catch(e){}applyFont();pushSettingsToCloud();}
 function applyScale(){const c=document.querySelector('.content');if(c)c.style.zoom=(parseInt(UISCALE,10)||100)/100;}
 function setScale(v){UISCALE=v;try{LS.setItem('ui_scale',v);}catch(e){}applyScale();pushSettingsToCloud();}
+
+/* ===== Table Layout Settings (admin) — per-screen ===== */
+var TBL_SCREENS=[
+  {key:'transit',pg:'page-rtransit', label:'FG Transit'},
+  {key:'fgbal',  pg:'page-rfgbal',   label:'FG Balance'},
+  {key:'oldid',  pg:'page-roldid',   label:'OLD Identity'},
+  {key:'sum',    pg:'page-sum',      label:'Summary'},
+  {key:'sku',    pg:'page-sku',      label:'SKU'},
+  {key:'space',  pg:'page-rspace',   label:'Space'},
+  {key:'bottle', pg:'page-rbottle',  label:'Bottle'}
+];
+var TBL_LAYOUT_DEF={vsep:4,pad:6,colw:80};
+var TBL_LAYOUT={};
+try{var _tl=JSON.parse(LS.getItem('tbl_layout_v2')||'null');if(_tl&&typeof _tl==='object')TBL_LAYOUT=_tl;}catch(e){}
+var _tblCurrentScreen='transit';
+function _tblGet(sc){return Object.assign({},TBL_LAYOUT_DEF,TBL_LAYOUT[sc]||{});}
+function applyTblLayout(){
+  var st=document.getElementById('tbl-layout-dyn');
+  if(!st){st=document.createElement('style');st.id='tbl-layout-dyn';document.head.appendChild(st);}
+  var css='';
+  TBL_SCREENS.forEach(function(s){
+    var l=_tblGet(s.key);
+    var vsep=parseFloat(l.vsep)||0;var pad=parseInt(l.pad)||6;var colw=parseInt(l.colw)||80;
+    var p='#'+s.pg;
+    css+=p+' .fg-vsep{display:none!important;width:0!important;min-width:0!important;max-width:0!important;padding:0!important;border:none!important}';
+    css+=p+' .fg-table th.fg-trth,'+p+' .fg-table td.fg-trtd{border-left:'+vsep+'px solid rgba(0,0,0,0.18)!important}';
+    css+=p+' .pivot tbody td,'+p+' .pivot thead th,'+p+' .fg-table tbody td,'+p+' .fg-table thead th{padding-top:'+pad+'px!important;padding-bottom:'+pad+'px!important}';
+    css+=p+' .fg-table.fg-cols-fit th,'+p+' .fg-table.fg-cols-fit td,'+p+' .dr-table th,'+p+' .dr-table td{min-width:'+colw+'px!important}';
+    css+=p+' .fg-table.fg-cols-fit th:first-child,'+p+' .fg-table.fg-cols-fit td:first-child{min-width:'+Math.round(colw*1.6)+'px!important}';
+  });
+  st.textContent=css;
+}
+function setTblLayout(k,v){
+  var sc=_tblCurrentScreen;
+  TBL_LAYOUT[sc]=Object.assign({},_tblGet(sc));
+  TBL_LAYOUT[sc][k]=parseFloat(v);
+  try{LS.setItem('tbl_layout_v2',JSON.stringify(TBL_LAYOUT));}catch(e){}
+  applyTblLayout();try{pushSettingsToCloud();}catch(e){}
+}
+function resetTblLayout(){
+  delete TBL_LAYOUT[_tblCurrentScreen];
+  try{LS.setItem('tbl_layout_v2',JSON.stringify(TBL_LAYOUT));}catch(e){}
+  applyTblLayout();_tblLayoutSyncUI();
+}
+function resetAllTblLayout(){
+  TBL_LAYOUT={};
+  try{LS.removeItem('tbl_layout_v2');}catch(e){}
+  applyTblLayout();_tblLayoutSyncUI();
+}
+function tblSwitchScreen(sc){
+  _tblCurrentScreen=sc;_tblLayoutSyncUI();
+}
+function _tblLayoutSyncUI(){
+  var l=_tblGet(_tblCurrentScreen);var el;
+  el=document.getElementById('tbl-vsep');if(el)el.value=l.vsep;
+  el=document.getElementById('tbl-vsep-val');if(el)el.textContent=parseFloat(l.vsep).toFixed(2)+'px';
+  el=document.getElementById('tbl-pad');if(el)el.value=l.pad;
+  el=document.getElementById('tbl-pad-val');if(el)el.textContent=l.pad+'px';
+  el=document.getElementById('tbl-colw');if(el)el.value=l.colw;
+  el=document.getElementById('tbl-colw-val');if(el)el.textContent=l.colw+'px';
+  document.querySelectorAll('.tbl-scr-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-sc')===_tblCurrentScreen);});
+}
 var _booting=true;
 function refreshCharts(){if(_booting)return;try{render();}catch(e){}rebuildTables();}
 function tagCards(){const g=document.getElementById('chart-grid');if(!g)return[];const cards=[...g.children];cards.forEach((c,i)=>{if(!c.dataset.chart)c.dataset.chart=CHART_DEF[i]||('x'+i);});return cards;}
@@ -4816,6 +4927,7 @@ function custSet(which,i,p,v){const c=(CUSTCOL[which]||[])[i];if(!c)return;c[p]=
 function custDel(which,i){if(!CUSTCOL[which])return;CUSTCOL[which].splice(i,1);_saveCust();renderDesigner();rebuildTables();}
 function dzBranchOrder(which,contId){const c=document.getElementById(contId);if(!c)return;let html='';const arr=orderBranches(allBranchesList(),which);arr.forEach((b,i)=>{const bb=b.replace(/'/g,'');html+='<div class="dz-brow"><span>'+clabel(which+':br:'+b,bn(b))+'</span><span class="dz-ord"><button onclick="moveBranch(\''+which+'\',\''+bb+'\',-1)" '+(i===0?'disabled':'')+'>&#9650;</button><button onclick="moveBranch(\''+which+'\',\''+bb+'\',1)" '+(i===arr.length-1?'disabled':'')+'>&#9660;</button></span></div>';});c.innerHTML=html;}
 function renderDesigner(){
+  try{_tblLayoutSyncUI();}catch(e){}
   const a1=document.getElementById('dz-agg-sum');if(a1)a1.value=AGGS.sum;
   const a2=document.getElementById('dz-agg-sku');if(a2)a2.value=AGGS.sku;
   dzBranchOrder('sum','dz-branchorder-sum');dzBranchOrder('sku','dz-branchorder-sku');
@@ -11233,6 +11345,7 @@ function rrRefresh(){
         if(c.brand>=0&&k===c.brand)dispV=drBrandLabel(String(v));
         else if(c.size>=0&&k===c.size)dispV=drSizeLabel(String(v));
       }
+      if(k===tri&&tri>=0)cls+=(cls?' ':'')+'fg-trtd';
       html+='<td class="'+cls+'"'+_dalAttr+'>'+((num&&k>=nf)?drFmt(v):drEsc(dispV))+'</td>';
     }
     /* خلايا الأعمدة المخصصة */
@@ -11253,7 +11366,8 @@ function rrRefresh(){
     for(var k=nf;k<h.length;k++){
       if(HIDDEN.has(P+':col:'+k))continue;
       if(k===tri&&tri>=0)s+='<td class="fg-vsep"></td>';
-      if(hasNum[k])s+='<td>'+drFmt(Math.round(sums[k]*100)/100)+'</td>';else s+='<td></td>';
+      var _gtrcls=(k===tri&&tri>=0?'fg-trtd':'');
+      if(hasNum[k])s+='<td'+((_gtrcls)?' class="'+_gtrcls+'"':'')+'>'+drFmt(Math.round(sums[k]*100)/100)+'</td>';else s+='<td'+((_gtrcls)?' class="'+_gtrcls+'"':'')+'>'+''+'</td>';
     }
     /* خلايا الأعمدة المخصصة في صف الإجمالي */
     (function(){var _cc=COLDEF[P]||[];if(!_cc.length)return;
@@ -13323,6 +13437,13 @@ function renderBottleReport(rep){
   if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
 })();
 </script>
+.tbl-layout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 24px;margin-top:4px}
+.tbl-layout-grid input[type=range]{width:100%;accent-color:var(--teal)}
+.tbl-scr-row{display:flex;flex-wrap:wrap;gap:6px}
+.tbl-scr-btn{border:1.5px solid #dbe6f4;background:#f4f8fd;color:#4a6a90;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit;transition:.13s}
+.tbl-scr-btn:hover{border-color:var(--teal);background:#edfaf8;color:var(--teal)}
+.tbl-scr-btn.on{border-color:var(--teal);background:var(--teal);color:#fff;box-shadow:0 2px 6px rgba(15,155,142,.25)}
+</style>
 <style id="elegant-tables-v2">
 @media screen{
   /* ============ جداول التقارير — تنسيق أنيق واحترافي ============ */
@@ -13345,6 +13466,7 @@ function renderBottleReport(rep){
   .pivot tbody tr.grand.fg-gB td{background:linear-gradient(180deg,#15506e,#0e3a52)!important}
   /* الفاصل بين الإجمالي والترانزيت: بلا أي لون (أبيض) في الرأس والصفوف وصف الإجمالي */
   .pivot td.fg-vsep,.fg-table td.fg-vsep,.pivot th.fg-vsep,.fg-table th.fg-vsep,.pivot tbody tr.grand td.fg-vsep,.fg-table tbody tr.grand td.fg-vsep,.fg-table tr.grand td.fg-vsep{background:#fff!important;background-image:none!important;border:none!important;box-shadow:none!important}
+  .pivot td.fg-vsep,.fg-table td.fg-vsep,.pivot th.fg-vsep,.fg-table th.fg-vsep{display:none!important;width:0!important;min-width:0!important;max-width:0!important;padding:0!important;overflow:hidden!important}
   /* عمود الترانزيت — برتقالي مهذّب أنعم */
   .pivot th.fg-trth,.fg-table th.fg-trth{background:linear-gradient(180deg,#d9822f,#bd6a22)!important;color:#fff!important}
   .pivot td.fg-trcol,.fg-table td.fg-trcol{background:#fcf1ea!important;color:#9a5a1e!important;font-weight:700}
@@ -13355,7 +13477,7 @@ function renderBottleReport(rep){
   .pivot td.dal-c4,.fg-table td.dal-c4{background:#faf1d2!important;color:#8a6d12!important;font-weight:800}
   .pivot td.dal-c5,.fg-table td.dal-c5{background:#f7dede!important;color:#9c2a2a!important;font-weight:800}
   /* hover واضح مع إظهار اسم الصنف */
-  .pivot tbody tr:not(.grand):hover td{background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
+  .pivot tbody tr:not(.grand):hover td:not(.fg-vsep){background:#cce0ff!important;color:#0d2a55!important;font-weight:700}
   .pivot tbody tr:not(.grand):hover td.tot{background:#aed0f7!important;color:#0d2a55!important;font-weight:800}
   .pivot tbody tr:not(.grand):hover td.yr,.pivot tbody tr:not(.grand):hover td.mo,
   .pivot tbody tr:not(.grand):hover td.cat,.pivot tbody tr:not(.grand):hover td.idc{
