@@ -1248,7 +1248,7 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-c-grand .fg-cv{color:#fff;font-size:23px}
 .fg-c-grand:after{content:'';position:absolute;inset-inline-end:-22px;top:-22px;width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.09)}
 .fg-table tbody tr:not(.grand) td.tot{border-inline-end:2px solid #c8d5e6 !important}.fg-table tbody tr:not(.grand) td.fg-trcol{background:#fdeede;color:#9a5a1e;font-weight:700}
-.fg-table th.fg-toth{border-inline-end:2px solid rgba(255,255,255,.28) !important}.fg-table th.fg-trth{background:#e0792f !important;color:#fff;border-left:4px solid rgba(0,0,0,0.25)!important}.fg-table td.fg-trtd{border-left:4px solid rgba(0,0,0,0.12)!important}
+.fg-table th.fg-toth{border-inline-end:2px solid rgba(255,255,255,.28) !important}.fg-table th.fg-trth{background:#e0792f !important;color:#fff;border-left:4px solid #cccccc!important}.fg-table td.fg-trtd{border-left:4px solid #cccccc!important}
 .fg-gt{font-size:14px;font-weight:800;letter-spacing:.6px}
 .fg-gsub{font-size:10.5px;font-weight:600;opacity:.82;margin-inline-start:4px}
 .fg-table th:first-child,.fg-table tbody tr:not(.grand) td:first-child{width:90px;max-width:90px;white-space:nowrap}
@@ -3054,6 +3054,15 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
             </div>
           </div>
           <div class="fld2">
+            <label style="font-size:12px;font-weight:700;color:var(--navy)">لون الفاصل · Separator Color</label>
+            <div style="display:flex;gap:10px;align-items:center;margin-top:4px;flex-wrap:wrap">
+              <input type="color" id="tbl-vsep-color" value="#cccccc" style="width:44px;height:32px;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;padding:2px"
+                     oninput="setTblLayout('vsepColor',this.value);document.getElementById('tbl-vsep-color-val').textContent=this.value">
+              <b id="tbl-vsep-color-val" style="font-size:13px;color:var(--teal)">#cccccc</b>
+              <span style="font-size:11px;color:#7c8aa0">الضغط على المربع يفتح اختيار اللون</span>
+            </div>
+          </div>
+          <div class="fld2">
             <label style="font-size:12px;font-weight:700;color:var(--navy)">حشوة الصفوف (Row Padding) (px)</label>
             <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
               <input type="range" id="tbl-pad" min="2" max="16" step="1" value="6"
@@ -3549,11 +3558,11 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       </div>
       <div class="dr-up-grid">
         <div class="dr-slot">
-          <h4>&#9312; الملف الرئيسي — Daily Coverage (Space + FG Balance + OLD Identity)</h4>
-          <p>ملف Excel واحد يحتوي أوراق التقارير الثلاثة (تُطابَق بالاسم تلقائياً). القالب يتضمن أوراق «Example» توضيحية تُتجاهل عند الرفع — في Space يكفي تعبئة 7 صفوف، وعمود Total يُحسب تلقائياً.</p>
-          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls" onchange="drUploadMain(this)"><button class="btn-soft sm" onclick="drTemplateMain()"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearMain()" title="تفريغ بيانات Space و FG Balance و OLD Identity"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
+          <h4>&#9312; الملف الموحّد — All Daily Reports (Space + FG Balance + OLD Identity + Transit + Bottle)</h4>
+          <p>ملف Excel واحد يحتوي <b>5 أوراق</b> للتقارير الخمسة (تُطابَق بالاسم تلقائياً). يمكنك رفع ورقة واحدة أو أكثر من الملف ذاته. القالب يتضمن أوراق «Example» توضيحية تُتجاهل عند الرفع — في Space يكفي تعبئة 7 صفوف، وعمود Total يُحسب تلقائياً.</p>
+          <div class="dr-row"><input class="dr-file" type="file" accept=".xlsx,.xls" onchange="drUploadMain(this)"><button class="btn-soft sm" onclick="drTemplateMain()"><span>&#11015;&#65039;</span> تنزيل القالب</button><button class="btn-soft sm dr-clear-btn" onclick="drClearMain()" title="تفريغ بيانات الملف الموحّد (Space + FG Balance + OLD Identity + Transit + Bottle)"><span>&#128465;&#65039;</span> تفريغ البيانات</button></div>
           <div class="dr-st" id="dr-st-main"></div><div class="dr-fname" id="dr-fname-main" style="display:none;font-size:12px;color:#0f766e;font-weight:700;margin-top:4px"></div>
-          <div class="dr-tpl"><span class="dr-meta">Space: <b id="dr-info-space">—</b></span><span class="dr-meta">FG Balance: <b id="dr-info-fgbal">—</b></span><span class="dr-meta">OLD Identity: <b id="dr-info-oldid">—</b></span></div>
+          <div class="dr-tpl"><span class="dr-meta">Space: <b id="dr-info-space">—</b></span><span class="dr-meta">FG Balance: <b id="dr-info-fgbal">—</b></span><span class="dr-meta">OLD Identity: <b id="dr-info-oldid">—</b></span><span class="dr-meta">Transit: <b id="dr-info-transit-u">—</b></span><span class="dr-meta">Bottle: <b id="dr-info-bottle-u">—</b></span></div>
         </div>
         <div class="dr-slot">
           <h4>&#9313; FG Transit Report — ملف منفصل</h4>
@@ -4721,7 +4730,7 @@ var TBL_SCREENS=[
   {key:'space',  pg:'page-rspace',   label:'Space'},
   {key:'bottle', pg:'page-rbottle',  label:'Bottle'}
 ];
-var TBL_LAYOUT_DEF={vsep:4,pad:6,colw:80};
+var TBL_LAYOUT_DEF={vsep:4,pad:6,colw:80,vsepColor:'#cccccc'};
 var TBL_LAYOUT={};
 try{var _tl=JSON.parse(LS.getItem('tbl_layout_v2')||'null');if(_tl&&typeof _tl==='object')TBL_LAYOUT=_tl;}catch(e){}
 var _tblCurrentScreen='transit';
@@ -4732,10 +4741,10 @@ function applyTblLayout(){
   var css='';
   TBL_SCREENS.forEach(function(s){
     var l=_tblGet(s.key);
-    var vsep=parseFloat(l.vsep)||0;var pad=parseInt(l.pad)||6;var colw=parseInt(l.colw)||80;
+    var vsep=parseFloat(l.vsep)||0;var pad=parseInt(l.pad)||6;var colw=parseInt(l.colw)||80;var vsepColor=l.vsepColor||'#cccccc';
     var p='#'+s.pg;
     css+=p+' .fg-vsep{display:none!important;width:0!important;min-width:0!important;max-width:0!important;padding:0!important;border:none!important}';
-    css+=p+' .fg-table th.fg-trth,'+p+' .fg-table td.fg-trtd{border-left:'+vsep+'px solid rgba(0,0,0,0.18)!important}';
+    css+=p+' .fg-table th.fg-trth,'+p+' .fg-table td.fg-trtd{border-left:'+vsep+'px solid '+vsepColor+' !important}';
     css+=p+' .pivot tbody td,'+p+' .pivot thead th,'+p+' .fg-table tbody td,'+p+' .fg-table thead th{padding-top:'+pad+'px!important;padding-bottom:'+pad+'px!important}';
     css+=p+' .fg-table.fg-cols-fit th,'+p+' .fg-table.fg-cols-fit td,'+p+' .dr-table th,'+p+' .dr-table td{min-width:'+colw+'px!important}';
     css+=p+' .fg-table.fg-cols-fit th:first-child,'+p+' .fg-table.fg-cols-fit td:first-child{min-width:'+Math.round(colw*1.6)+'px!important}';
@@ -4745,7 +4754,7 @@ function applyTblLayout(){
 function setTblLayout(k,v){
   var sc=_tblCurrentScreen;
   TBL_LAYOUT[sc]=Object.assign({},_tblGet(sc));
-  TBL_LAYOUT[sc][k]=parseFloat(v);
+  var _num=parseFloat(v);TBL_LAYOUT[sc][k]=isNaN(_num)?v:_num;
   try{LS.setItem('tbl_layout_v2',JSON.stringify(TBL_LAYOUT));}catch(e){}
   applyTblLayout();try{pushSettingsToCloud();}catch(e){}
 }
@@ -4766,6 +4775,8 @@ function _tblLayoutSyncUI(){
   var l=_tblGet(_tblCurrentScreen);var el;
   el=document.getElementById('tbl-vsep');if(el)el.value=l.vsep;
   el=document.getElementById('tbl-vsep-val');if(el)el.textContent=parseFloat(l.vsep).toFixed(2)+'px';
+  el=document.getElementById('tbl-vsep-color');if(el)el.value=l.vsepColor||'#cccccc';
+  el=document.getElementById('tbl-vsep-color-val');if(el)el.textContent=l.vsepColor||'#cccccc';
   el=document.getElementById('tbl-pad');if(el)el.value=l.pad;
   el=document.getElementById('tbl-pad-val');if(el)el.textContent=l.pad+'px';
   el=document.getElementById('tbl-colw');if(el)el.value=l.colw;
@@ -8123,19 +8134,21 @@ function _drBlankSpace(){
 }
 function drClearMain(){
   var ar=drIsAr&&drIsAr();
-  var msg=ar?'هل تريد تفريغ بيانات الملف الرئيسي؟\n(Space + FG Balance + OLD Identity)\nتُمسح الأرصدة المرفوعة وتبقى بيانات المساحات. لا يمكن التراجع.':'Clear main file data?\n(Space + FG Balance + OLD Identity)\nUploaded balances are cleared; Space master data is kept. This cannot be undone.';
+  var msg=ar?'هل تريد تفريغ بيانات الملف الموحّد؟\n(Space + FG Balance + OLD Identity + Transit + Bottle)\nتُمسح جميع الأرصدة المرفوعة. لا يمكن التراجع.':'Clear all unified file data?\n(Space + FG Balance + OLD Identity + Transit + Bottle)\nAll uploaded balances are cleared. This cannot be undone.';
   if(typeof confirm==='function'&&!confirm(msg))return;
   var blankSpace=_drBlankSpace();                         /* يحذف s.space داخلياً ويعيد بناءه فارغاً */
   var s=getDR();
   if(blankSpace)s.space=blankSpace; else delete s.space;
   s.fgbal=_drBlankReport('fgbal');
   s.oldid=_drBlankReport('oldid');
+  s.transit=_drBlankReport('transit');
+  s.bottle=_drBlankReport('bottle');
   saveDR(s);_drCloudReady=true;
-  ['space','fgbal','oldid'].forEach(function(k){try{renderDailyReport(k);}catch(e){}});
+  ['space','fgbal','oldid','transit','bottle'].forEach(function(k){try{renderDailyReport(k);}catch(e){}});
   renderUploadStatus();try{drPush();}catch(e){}try{updateHomeDates();}catch(e){}
   try{var fi=document.querySelector('#page-dailyup .dr-slot input.dr-file');if(fi)fi.value='';}catch(e){}
-  try{['main','fgbal','oldid','space'].forEach(function(id){drSetFileName(id,'');});}catch(e){}
-  drSetSt('main',ar?'✓ تم تفريغ بيانات الملف الرئيسي':'✓ Main file data cleared','ok');
+  try{['main','fgbal','oldid','space','transit','bottle'].forEach(function(id){drSetFileName(id,'');});}catch(e){}
+  drSetSt('main',ar?'✓ تم تفريغ بيانات الملف الموحّد (5 تقارير)':'✓ All 5 report data cleared','ok');
 }
 function drClearOne(key){
   var ar=drIsAr&&drIsAr();
@@ -8178,7 +8191,7 @@ function drUploadMain(input){
   drReadFile(f,function(wb){
     if(!wb){drSetSt('main','تعذّر قراءة الملف','err');try{drSetFileName('main',f.name,'err');}catch(e){}return;}
     var names=wb.SheetNames.filter(function(n){return !drIsExSheet(n);});
-    var map=[['space',['space']],['fgbal',['fg balance','balance']],['oldid',['old','identity']]];
+    var map=[['space',['space']],['fgbal',['fg balance','balance']],['oldid',['old','identity']],['transit',['transit','ترانزيت','عبور']],['bottle',['bottle','قارورة','عبوة','قوارير']]];
     var done=[],fail=[];
     map.forEach(function(m){
       var key=m[0],kw=m[1];
@@ -8186,15 +8199,19 @@ function drUploadMain(input){
       if(!sn)return;
       var aoa=sheetToAoa(wb.Sheets[sn]);var p;
       if(key==='space')p=parseSpaceTemplate(aoa)||parseSpaceSheet(aoa);
+      else if(key==='bottle')p=parseBottleTemplate(aoa)||parseBottleSheet(aoa);
       else p=drAutoTotal(key,drParseGeneric(aoa));
-      if(p){if(key==='fgbal'||key==='oldid'){try{wmCanonicalizeReport(p);}catch(e){}}var s=getDR();s[key]=p;saveDR(s);done.push(key);try{updateHomeDates();}catch(e){}}else fail.push(key);
+      if(p){if(key==='fgbal'||key==='oldid'){try{wmCanonicalizeReport(p);}catch(e){}}var s=getDR();s[key]=p;saveDR(s);done.push(key);try{updateHomeDates();}catch(e){}}else if(sn)fail.push(key);
     });
     if(done.length){_drCloudReady=true;try{done.forEach(function(k){drStampFile(k,f.name,true);});}catch(e){}done.forEach(renderDailyReport);renderUploadStatus();drPush();if(done.indexOf('fgbal')>=0||done.indexOf('space')>=0){try{renderDailyReport('space');if(document.getElementById('sp-conv-body')&&document.getElementById('sp-conv-body').style.display==='block')renderSpaceConvTable();}catch(e){}}}
+    /* تحديث حقول اسم الملف لـ Transit و Bottle إذا رُفعا من الملف الموحّد */
+    if(done.indexOf('transit')>=0){try{drSetFileName('transit',f.name,'ok');}catch(e){}}
+    if(done.indexOf('bottle')>=0){try{drSetFileName('bottle',f.name,'ok');}catch(e){}}
     if(done.length&&!fail.length){drSetSt('main','✅ تم تحديث: '+done.join(' / '),'ok');try{drSetFileName('main',f.name,'ok');}catch(e){}}
     else if(done.length){drSetSt('main','✅ تم تحديث: '+done.join(' / ')+' — ⚠️ تعذّر قراءة: '+fail.join(' / '),'err');try{drSetFileName('main',f.name,'err');}catch(e){}}
     else if(fail.length){drSetSt('main','تعذّرت قراءة بيانات: '+fail.join(' / ')+' — نزّل القالب وعبّئ أوراق البيانات (أوراق Example للتوضيح فقط)','err');try{drSetFileName('main',f.name,'err');}catch(e){}}
     else {drSetSt('main','لم يتم العثور على أوراق مطابقة (Space / FG Balance / OLD Identity)','err');try{drSetFileName('main',f.name,'err');}catch(e){}}
-    try{if(done.length)wmShowUploadAlert('main',['fgbal','oldid','transit']);}catch(e){}
+    try{if(done.length)wmShowUploadAlert('main',['fgbal','oldid','transit','bottle']);}catch(e){}
     input.value='';
   });
 }
@@ -8325,7 +8342,24 @@ function drTemplateMain(){
   drBuildSimpleSheets(wb,'oldid',
     [[30000004,'Tania','G- 200 ml','Carton','40 × 200 ml',78859,0,0,0,0,'',8.76]],
     'اترك عمود Total فارغاً وسيُحسب تلقائياً (مجموع المواقع).');
-  XLSX.writeFile(wb,'Daily_Coverage_Template.xlsx');
+  /* ➕ Transit sheet */
+  drBuildSimpleSheets(wb,'transit',
+    [[30000153,'KR FG Carton 200 ML × 48 Tania','','','','',4032,'','','',''],
+     [30000176,'KR FG Shrink 1500 ML × 6 Tania','','','','',4416,'','','','']],
+    'اترك عمود Total فارغاً وسيُحسب تلقائياً (مجموع المواقع).');
+  /* ➕ Bottle sheet */
+  (function(){
+    var H=DEFAULT_DAILY_REPORTS.bottle.headers;
+    var bottleAoa=[H];DR_BOTTLE_BRANCHES.forEach(function(b){bottleAoa.push(drBlankRow(b,H.length));});
+    var bottleW=H.map(function(h,i){return i===0?16:14;});
+    var bottleT=DR_TEMPLATES['bottle'];
+    XLSX.utils.book_append_sheet(wb,drTplSheet(bottleAoa,bottleW),bottleT.sheet);
+    var bottleEx=drExIntro(bottleT.sheet,'الأعمدة التالية تُحسب تلقائياً إن تُركت فارغة: «اجمالي المعبأة والترانزيت»، «مبيعات»، «اجمالي الفارغة والمرتجعة للمصنع»، «الاجمالي الكلي للقارورة».');
+    bottleEx.push(H);
+    bottleEx.push(['الاحساء',5267,4160,'',6500,5664,298,'',5776,0,0,0,7669,0,0,'','',5,0,'']);
+    XLSX.utils.book_append_sheet(wb,drTplSheet(bottleEx,bottleW),'Example - Bottle');
+  })();
+  XLSX.writeFile(wb,'Daily_All_Reports_Template.xlsx');
 }
 function drTemplateOne(key){
   var t=DR_TEMPLATES[key];var wb=XLSX.utils.book_new();
@@ -13437,16 +13471,17 @@ function renderBottleReport(rep){
   if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
 })();
 </script>
-.tbl-layout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 24px;margin-top:4px}
-.tbl-layout-grid input[type=range]{width:100%;accent-color:var(--teal)}
-.tbl-scr-row{display:flex;flex-wrap:wrap;gap:6px}
-.tbl-scr-btn{border:1.5px solid #dbe6f4;background:#f4f8fd;color:#4a6a90;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit;transition:.13s}
-.tbl-scr-btn:hover{border-color:var(--teal);background:#edfaf8;color:var(--teal)}
-.tbl-scr-btn.on{border-color:var(--teal);background:var(--teal);color:#fff;box-shadow:0 2px 6px rgba(15,155,142,.25)}
 </style>
 <style id="elegant-tables-v2">
 @media screen{
   /* ============ جداول التقارير — تنسيق أنيق واحترافي ============ */
+  /* ── Table Layout Designer Controls ── */
+  .tbl-layout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 24px;margin-top:4px}
+  .tbl-layout-grid input[type=range]{width:100%;accent-color:var(--teal)}
+  .tbl-scr-row{display:flex;flex-wrap:wrap;gap:6px}
+  .tbl-scr-btn{border:1.5px solid #dbe6f4;background:#f4f8fd;color:#4a6a90;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit;transition:.13s}
+  .tbl-scr-btn:hover{border-color:var(--teal);background:#edfaf8;color:var(--teal)}
+  .tbl-scr-btn.on{border-color:var(--teal);background:var(--teal);color:#fff;box-shadow:0 2px 6px rgba(15,155,142,.25)}
   .pivot{font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
   .pivot-wrap,.fg-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
   /* رؤوس راقية بتدرّج كحلي هادئ بلا حدود ثقيلة */
