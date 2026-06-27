@@ -2732,17 +2732,6 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="navbtn admin-only" data-page="spaceact" onclick="go('spaceact')" style="--c:#12b1a2"><span class="nico" data-icon="building"></span><span class="lbl">Space Actuals</span></button>
       </div>
     </div>
-    <!-- ══ HR GROUP ══ -->
-    <div class="nav-group collapsed" data-grp="hr">
-      <button class="nav-head" onclick="toggleGroup('hr')"><span class="gbar" style="--gc:#e05c2a;width:4px;height:16px;border-radius:3px;flex-shrink:0;background:var(--gc)"></span><span class="glbl" style="font-weight:800">HR Dashboard</span><span class="gchev">▾</span></button>
-      <div class="nav-sub">
-        <button class="navbtn" data-page="hr-dash" onclick="go('hr-dash');setTimeout(function(){if(window.hrRefreshDash)window.hrRefreshDash();},200)" style="--c:#e05c2a"><span class="nico" data-icon="chart"></span><span class="lbl">Executive Dashboard</span></button>
-        <button class="navbtn" data-page="hr-emp" onclick="go('hr-emp');setTimeout(function(){if(window.hrRefreshEmp)window.hrRefreshEmp();},200)" style="--c:#12b1a2"><span class="nico" data-icon="users"></span><span class="lbl">HR Summary Table</span></button>
-        <button class="navbtn" data-page="hr-pending" onclick="go('hr-pending');setTimeout(function(){if(window.hrRefreshPending)window.hrRefreshPending();},200)" style="--c:#f2974a"><span class="nico" data-icon="clock"></span><span class="lbl">HR Pending Items</span></button>
-        <button class="navbtn" data-page="hr-upload" onclick="go('hr-upload')" style="--c:#4a93f2"><span class="nico" data-icon="import"></span><span class="lbl">Upload Center</span></button>
-      </div>
-    </div>
-
     <div class="userbox">
       <div class="ubadge"><b id="cur-user">—</b><span class="urole" id="cur-role">—</span></div>
       <button class="logoutbtn" onclick="openChangePwd()" style="margin-bottom:7px">🔑 <span data-i18n="changepwd_btn">Change password</span></button>
@@ -3017,12 +3006,12 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         </div>
       </div>
 
-    </div></div>
+    </div>
 
     <!-- ═══ CARD BUILDER — منشئ البطاقات (للمدير) ═══ -->
     <div class="page" id="page-cardbuilder"><div class="wrap">
       <div id="cb-root" style="font-family:inherit"></div>
-    </div></div>
+    </div></div></div>
 
     <!-- TABLE DESIGNER -->
     <div class="page" id="page-designer"><div class="wrap">
@@ -3595,782 +3584,6 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
     <!-- ════════ PAGE BUILDER (Low-Code) — حاوية تُملأ ديناميكياً ════════ -->
     <div class="page" id="page-pagebuilder"><div class="wrap" id="pb-admin-root"></div></div>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         HR MODULE — وحدة الموارد البشرية
-         ══════════════════════════════════════════════════════════════ -->
-
-    <!-- ══ HR: Upload Center ══ -->
-    <div class="page" id="page-hr-upload"><div class="wrap" style="max-width:860px">
-      <div class="topbar">
-        <div class="htext"><h1 style="display:flex;align-items:center;gap:10px"><span style="font-size:26px">📤</span> Upload Center — رفع ملف HR</h1>
-        <span class="upd"><span class="dot"></span> رفع ملف Excel لتحديث بيانات الموارد البشرية</span></div>
-      </div>
-      <div class="imp">
-        <div class="drop" id="hr-drop" onclick="document.getElementById('hr-file-inp').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="hrHandleDrop(event)">
-          <div class="big">📊</div>
-          <div class="t1">اسحب ملف Excel هنا أو انقر للاختيار</div>
-          <div class="t2">يدعم .xlsx · .xls — يجب أن يحتوي على أعمدة HR الموضّحة أدناه</div>
-          <a class="browse">اختيار ملف</a>
-          <input type="file" id="hr-file-inp" accept=".xlsx,.xls" style="display:none" onchange="hrHandleFile(this.files[0])">
-        </div>
-        <div class="status" id="hr-status"></div>
-        <div class="imp-actions" id="hr-actions" style="display:none">
-          <button class="btn-primary" onclick="hrApplyData()">✅ تطبيق البيانات</button>
-          <button class="btn-clear" onclick="hrClearData()">🗑 مسح البيانات</button>
-        </div>
-        <div style="text-align:center;margin-top:14px">
-          <button class="btn-soft" onclick="hrLoadDemo()" style="color:#7b5cd6;border-color:#c4b5fd">🎲 تحميل بيانات نموذجية للمعاينة</button>
-          <span id="hr-demo-note" style="display:none;margin-inline-start:10px;font-size:12px;color:#7b5cd6;font-weight:600">✅ تم تحميل بيانات نموذجية</span>
-        </div>
-        <div class="note" style="margin-top:24px">
-          <h4>📋 الأعمدة المطلوبة في ملف Excel</h4>
-          <ul style="margin-top:10px;line-height:2;font-size:13px;color:#475569">
-            <li><b>الرقم الوظيفي</b> — رقم الموظف</li>
-            <li><b>اسم الموظف</b> — الاسم الكامل</li>
-            <li><b>الوظيفة الفعلية</b> — المسمى الفعلي</li>
-            <li><b>الوظيفة بالنظام</b> — المسمى في النظام</li>
-            <li><b>جهة العمل</b> — اسم الجهة / المستودع</li>
-            <li><b>نظام التشغيل</b> — نوع نظام التشغيل</li>
-            <li><b>نوع التخزين</b> — بارد / جاف / مجمّد</li>
-            <li><b>المنطقة</b> — المنطقة الجغرافية</li>
-            <li><b>حالة الموظف</b> — نشط / غير نشط</li>
-            <li><b>الجنسية</b> — سعودي / غير سعودي</li>
-            <li><b>رقم الإقامة</b> — رقم الإقامة أو الهوية</li>
-            <li><b>تاريخ التعيين</b> — تاريخ بدء العمل</li>
-            <li><b>تاريخ الميلاد</b> — تاريخ الميلاد</li>
-            <li><b>العمر</b> — العمر بالسنوات</li>
-            <li><b>نوع العقد</b> — محدد المدة / غير محدد</li>
-            <li><b>عدد سنوات العقد</b> — مدة العقد</li>
-            <li><b>شركة الإيجار</b> — اسم شركة الإيجار (إن وجدت)</li>
-            <li><b>الملاحظات</b> — ملاحظات على الموظف</li>
-          </ul>
-        </div>
-        <!-- إحصائيات سريعة بعد الرفع -->
-        <div id="hr-preview-stats" style="display:none;margin-top:18px"></div>
-      </div>
-    </div></div>
-
-    <!-- ══ HR: Executive Dashboard ══ -->
-    <div class="page" id="page-hr-dash"><div class="wrap">
-      <div class="topbar">
-        <div class="whicon" style="background:linear-gradient(135deg,#e05c2a,#b84520)">👥</div>
-        <div class="htext">
-          <h1>HR Executive Dashboard</h1>
-          <span class="upd"><span class="dot"></span> <span id="hr-dash-upd" data-i18n="hr_no_upload">لم يتم رفع بيانات بعد</span></span>
-        </div>
-        <div style="margin-inline-start:auto;display:flex;gap:8px">
-          <button class="btn-soft sm" onclick="hrRefreshDash()">🔄 <span data-i18n="hr_refresh">تحديث</span></button>
-          <button class="btn-soft sm" onclick="go('hr-upload')">📤 <span data-i18n="hr_upload_btn">رفع بيانات</span></button>
-        </div>
-      </div>
-      <!-- No-data state -->
-      <div id="hr-dash-nodata" style="text-align:center;padding:80px 20px">
-        <div style="font-size:64px;margin-bottom:16px">📊</div>
-        <h2 style="color:#1e293b;font-size:22px;margin-bottom:8px"><span data-i18n="hr_nodata_title">لا توجد بيانات HR بعد</span></h2>
-        <p style="color:#64748b;font-size:14px;margin-bottom:24px"><span data-i18n="hr_nodata_desc">ارفع ملف Excel من Upload Center لعرض الداشبورد</span></p>
-        <button class="btn-primary" onclick="go('hr-upload')">📤 <span data-i18n="hr_upload_hr">رفع ملف HR</span></button>
-      </div>
-      <!-- Dashboard content -->
-      <div id="hr-dash-content" style="display:none">
-        <!-- ═══ ROW 1 — KPI Cards ═══ -->
-        <div class="kpis" id="hr-kpi-row1" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:16px"></div>
-        <!-- ═══ ROW 2 — Job-type KPIs ═══ -->
-        <div class="kpis" id="hr-kpi-jobs" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px"></div>
-        <!-- ═══ ROW 3 — Gauge indicators ═══ -->
-        <div class="grid" style="margin-bottom:16px" id="hr-gauges-row"></div>
-        <!-- ═══ ROW 4 — 3 Charts ═══ -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-          <!-- Chart 1: Region — full left column, tall to show all 17 regions -->
-          <div class="card" style="grid-row:span 2">
-            <div class="ch"><div class="acc" style="background:#e05c2a"></div><h5 data-i18n="hr_chart_region">توزيع حسب المنطقة</h5></div>
-            <div class="chartbox" style="height:380px"><canvas id="hr-chart-region"></canvas></div>
-          </div>
-          <!-- Chart 2: Nationality doughnut -->
-          <div class="card">
-            <div class="ch"><div class="acc" style="background:#3f6fd1"></div><h5 data-i18n="hr_chart_nat">الموظفون حسب الجنسية</h5></div>
-            <div class="chartbox" style="height:180px"><canvas id="hr-chart-nat"></canvas></div>
-          </div>
-          <!-- Chart 3: Age distribution -->
-          <div class="card">
-            <div class="ch"><div class="acc" style="background:#e0a32e"></div><h5 data-i18n="hr_chart_age">توزيع الأعمار</h5></div>
-            <div class="chartbox" style="height:180px"><canvas id="hr-chart-age"></canvas></div>
-          </div>
-        </div>
-        <!-- ═══ ROW 6 — Alerts ═══ -->
-        <div class="card" style="margin-bottom:16px">
-          <div class="ch"><div class="acc" style="background:#dc2626"></div><h5 data-i18n="hr_alerts_title">🔔 تنبيهات تلقائية</h5></div>
-          <div id="hr-alerts-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:4px"></div>
-        </div>
-        <!-- ═══ ROW 7 — Quick Table ═══ -->
-        <div class="card" style="margin-bottom:16px">
-          <div class="ch"><div class="acc" style="background:#1e4e8c"></div><h5 data-i18n="hr_emp_list">قائمة الموظفين — عرض سريع</h5>
-            <span class="sub" style="margin-inline-start:auto">
-              <button class="btn-soft sm" onclick="go('hr-emp')" style="font-size:11px;padding:5px 12px"><span data-i18n="hr_view_all">عرض الكل ↗</span></button>
-            </span>
-          </div>
-          <div style="overflow:auto;max-height:360px"><table class="utable" id="hr-quick-table"><thead><tr>
-            <th data-i18n="hr_tbl_no">الرقم</th><th data-i18n="hr_tbl_name">الاسم</th><th data-i18n="hr_tbl_job">الوظيفة</th><th data-i18n="hr_tbl_region">المنطقة</th><th data-i18n="hr_tbl_nat">الجنسية</th><th data-i18n="hr_tbl_status">الحالة</th><th data-i18n="hr_tbl_age">العمر</th><th data-i18n="hr_tbl_hire">تاريخ التعيين</th>
-          </tr></thead><tbody id="hr-quick-tbody"></tbody></table></div>
-        </div>
-      </div>
-    </div></div>
-
-    <!-- ══ HR: Summary Table (تفصيلي الموظفين) ══ -->
-    <div class="page" id="page-hr-emp"><div class="wrap">
-      <div class="topbar">
-        <div class="whicon" style="background:linear-gradient(135deg,#12b1a2,#0d8a7e)">📋</div>
-        <div class="htext"><h1>HR Summary Table</h1><span class="upd"><span class="dot"></span> <span data-i18n="hr_emp_details">تفصيلي بيانات الموظفين</span></span></div>
-        <div style="margin-inline-start:auto;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-soft sm" onclick="hrEmpExportXLSX()">⬇ Excel</button>
-          <button class="btn-soft sm" onclick="window.print()">🖨 <span data-i18n="hr_print">طباعة</span></button>
-        </div>
-      </div>
-      <!-- Filters -->
-      <div id="hr-emp-nodata" style="text-align:center;padding:80px 20px">
-        <div style="font-size:64px;margin-bottom:16px">📋</div>
-        <h2 style="color:#1e293b;font-size:22px;margin-bottom:8px"><span data-i18n="hr_nodata_simple">لا توجد بيانات</span></h2>
-        <button class="btn-primary" onclick="go('hr-upload')">📤 <span data-i18n="hr_upload_hr">رفع ملف HR</span></button>
-      </div>
-      <div id="hr-emp-content" style="display:none">
-        <div class="fbox" style="margin-bottom:14px">
-          <h4 data-i18n="hr_filters">الفلاتر</h4>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-            <div class="sf"><label>بحث</label><input type="text" id="hr-f-search" placeholder="اسم أو رقم…" oninput="hrEmpFilter()" style="min-width:160px"></div>
-            <div class="sf"><label data-i18n="hr_region">المنطقة</label><select id="hr-f-region" onchange="hrEmpFilter()"><option value="">الكل</option></select></div>
-            <div class="sf"><label data-i18n="hr_entity">جهة العمل</label><select id="hr-f-entity" onchange="hrEmpFilter()"><option value="">الكل</option></select></div>
-            <div class="sf"><label data-i18n="hr_nationality">الجنسية</label><select id="hr-f-nat" onchange="hrEmpFilter()"><option value="">الكل</option></select></div>
-            <div class="sf"><label data-i18n="hr_status_col">الحالة</label><select id="hr-f-status" onchange="hrEmpFilter()"><option value="">الكل</option></select></div>
-            <div class="sf"><label data-i18n="hr_contract_col">نوع العقد</label><select id="hr-f-contract" onchange="hrEmpFilter()"><option value="">الكل</option></select></div>
-            <div class="sf"><label data-i18n="hr_storage_col">نوع التخزين</label><select id="hr-f-storage" onchange="hrEmpFilter()"><option value="">الكل</option></select></div>
-            <div class="sf"><label data-i18n="hr_leasing_col">شركة الإيجار</label><select id="hr-f-leasing" onchange="hrEmpFilter()"><option value="">الكل</option></select></div>
-            <button class="sf-clear" onclick="hrEmpClearFilters()" style="align-self:flex-end">مسح</button>
-            <span class="sf-count" id="hr-emp-count" style="align-self:flex-end"></span>
-          </div>
-        </div>
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="overflow:auto;max-height:68vh">
-            <table class="utable" id="hr-emp-table" style="min-width:1200px">
-              <thead><tr>
-                <th onclick="hrEmpSort('emp_id')" style="cursor:pointer"><span data-i18n="hr_tbl_no">الرقم</span> ↕</th>
-                <th onclick="hrEmpSort('name')" style="cursor:pointer"><span data-i18n="hr_tbl_name">الاسم</span> ↕</th>
-                <th onclick="hrEmpSort('actual_job')" style="cursor:pointer"><span data-i18n="hr_chart_job">الوظيفة الفعلية</span> ↕</th>
-                <th data-i18n="hr_tbl_job">الوظيفة بالنظام</th>
-                <th onclick="hrEmpSort('work_entity')" style="cursor:pointer"><span data-i18n="hr_entity">جهة العمل</span> ↕</th>
-                <th onclick="hrEmpSort('region')" style="cursor:pointer"><span data-i18n="hr_region">المنطقة</span> ↕</th>
-                <th data-i18n="hr_storage_col">نوع التخزين</th>
-                <th onclick="hrEmpSort('nationality')" style="cursor:pointer"><span data-i18n="hr_tbl_nat">الجنسية</span> ↕</th>
-                <th onclick="hrEmpSort('status')" style="cursor:pointer"><span data-i18n="hr_tbl_status">الحالة</span> ↕</th>
-                <th onclick="hrEmpSort('age')" style="cursor:pointer"><span data-i18n="hr_tbl_age">العمر</span> ↕</th>
-                <th onclick="hrEmpSort('hire_date')" style="cursor:pointer"><span data-i18n="hr_tbl_hire">تاريخ التعيين</span> ↕</th>
-                <th data-i18n="hr_tbl_service">مدة الخدمة</th>
-                <th data-i18n="hr_tbl_contract">نوع العقد</th>
-                <th data-i18n="hr_tbl_leasing_co">شركة الإيجار</th>
-                <th data-i18n="hr_tbl_iqama">رقم الإقامة</th>
-                <th data-i18n="hr_tbl_notes">الملاحظات</th>
-              </tr></thead>
-              <tbody id="hr-emp-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div></div>
-
-    <!-- ══ HR: Pending Items ══ -->
-    <div class="page" id="page-hr-pending"><div class="wrap">
-      <div class="topbar">
-        <div class="whicon" style="background:linear-gradient(135deg,#f2974a,#d97b2a)">⚠️</div>
-        <div class="htext"><h1>HR Pending Items</h1><span class="upd"><span class="dot"></span> <span data-i18n="hr_upd_suffix">التنبيهات والبنود المعلّقة</span></span></div>
-        <button class="btn-soft sm" onclick="hrRefreshPending()" style="margin-inline-start:auto">🔄 <span data-i18n="hr_refresh">تحديث</span></button>
-      </div>
-      <div id="hr-pending-nodata" style="text-align:center;padding:80px 20px">
-        <div style="font-size:64px;margin-bottom:16px">⚠️</div>
-        <h2 style="color:#1e293b;font-size:22px;margin-bottom:8px"><span data-i18n="hr_nodata_simple">لا توجد بيانات</span></h2>
-        <button class="btn-primary" onclick="go('hr-upload')">📤 <span data-i18n="hr_upload_hr">رفع ملف HR</span></button>
-      </div>
-      <div id="hr-pending-content" style="display:none">
-        <div class="kpis" id="hr-pending-kpis" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:16px"></div>
-        <!-- Alert sections -->
-        <div id="hr-pending-sections"></div>
-      </div>
-    </div></div>
-
-    <!-- ══ END HR MODULE ══ -->
-
-    <!-- ══ HR MODULE STYLES ══ -->
-    <style id="hr-styles">
-    /* ─── HR Page Wrapper ─── */
-    #page-hr-dash .topbar,
-    #page-hr-emp  .topbar,
-    #page-hr-pending .topbar{background:linear-gradient(135deg,#1a2f5a 0%,#213a6e 100%);padding:18px 24px;border-radius:16px;margin-bottom:20px;color:#fff}
-    #page-hr-dash .topbar h1,
-    #page-hr-emp  .topbar h1,
-    #page-hr-pending .topbar h1{color:#fff;font-size:20px;font-weight:800;margin:0 0 2px}
-    #page-hr-dash .topbar .upd,
-    #page-hr-emp  .topbar .upd,
-    #page-hr-pending .topbar .upd{color:rgba(255,255,255,.75);font-size:12px}
-    #page-hr-dash .topbar .dot,
-    #page-hr-emp  .topbar .dot,
-    #page-hr-pending .topbar .dot{background:#4ade80}
-
-    /* ─── HR KPI cards ─── */
-    .hr-kpi{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--line);position:relative;overflow:hidden;transition:.18s}
-    .hr-kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-h)}
-    .hr-kpi::before{content:'';position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
-    .hr-kpi.hk-total::before{background:linear-gradient(180deg,#1a4ecf,#3b71e0)}
-    .hr-kpi.hk-saudi::before{background:linear-gradient(180deg,#0f9b5e,#1fbb74)}
-    .hr-kpi.hk-nonsaudi::before{background:linear-gradient(180deg,#6366f1,#818cf8)}
-    .hr-kpi.hk-leasing::before{background:linear-gradient(180deg,#e05c2a,#f07a4a)}
-    .hr-kpi.hk-own::before{background:linear-gradient(180deg,#0891b2,#22d3ee)}
-    .hr-kpi.hk-avg::before{background:linear-gradient(180deg,#d97706,#fbbf24)}
-    .hr-kpi.hk-job::before{background:linear-gradient(180deg,#7c3aed,#a78bfa)}
-    .hr-kpi .hk-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-    .hr-kpi .hk-val{font-size:28px;font-weight:800;color:var(--text);line-height:1;margin-bottom:2px}
-    .hr-kpi .hk-icon{font-size:26px;opacity:.8}
-    .hr-kpi .hk-row{display:flex;align-items:flex-end;justify-content:space-between}
-
-    /* ─── HR Gauge card ─── */
-    .hr-gauge-card{background:var(--card);border-radius:14px;padding:20px 16px;box-shadow:var(--shadow);border:1px solid var(--line);text-align:center;transition:.18s}
-    .hr-gauge-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-h)}
-    .hr-gauge-card .hg-label{font-size:11.5px;font-weight:700;color:#475569;margin-top:8px}
-    .hr-gauge-card .hg-sub{font-size:11px;color:var(--muted);margin-top:2px}
-
-    /* ─── HR chart cards ─── */
-    #page-hr-dash .card .ch h5{font-weight:700;font-size:13px}
-    #page-hr-dash .chartbox{border-radius:10px;overflow:hidden}
-
-    /* ─── HR Alerts grid ─── */
-    .hr-alert-card{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);border:1px solid var(--line);border-top:3px solid}
-    .hr-alert-card .ha-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-    .hr-alert-card .ha-label{font-weight:700;font-size:13px;color:var(--text)}
-    .hr-alert-card .ha-count{font-size:24px;font-weight:900;line-height:1}
-    .hr-alert-card .ha-preview{font-size:11.5px;color:#475569;line-height:1.7}
-    .hr-alert-card .ha-ok{color:#22c55e;font-size:12px;font-weight:600}
-
-    /* ─── HR Table ─── */
-    #hr-quick-table{width:100%;font-size:12.5px}
-    #hr-quick-table th{background:#f1f5f9;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;color:#64748b;white-space:nowrap}
-    #hr-quick-table td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-    #hr-quick-table tr:hover td{background:#f8fafc}
-
-    /* ─── HR no-data state ─── */
-    #hr-dash-nodata,#hr-emp-nodata,#hr-pending-nodata{background:radial-gradient(ellipse at center,#f0f4ff 0%,#f8fafc 100%);border-radius:16px;margin:20px 0}
-    #hr-dash-nodata h2,#hr-emp-nodata h2,#hr-pending-nodata h2{font-size:20px;font-weight:700}
-
-    /* ─── HR filter box ─── */
-    #page-hr-emp .fbox{background:linear-gradient(135deg,#f8faff,#f0f4ff);border:1px solid #dbeafe;border-radius:14px;padding:16px 18px}
-    #page-hr-emp .fbox h4{font-weight:700;color:#1e3a8a;margin-bottom:12px;font-size:13px}
-
-    /* ─── Section grid row ─── */
-    #page-hr-dash .grid{gap:14px}
-
-    /* ─── Topbar buttons ─── */
-    #page-hr-dash .btn-soft,
-    #page-hr-emp  .btn-soft,
-    #page-hr-pending .btn-soft{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(4px)}
-    #page-hr-dash .btn-soft:hover,
-    #page-hr-emp  .btn-soft:hover,
-    #page-hr-pending .btn-soft:hover{background:rgba(255,255,255,.32)}
-
-    /* ─── 3D Job Icons ─── */
-    .hr-job-kpi{text-align:center;cursor:default;padding:18px 12px}
-    .hr-3d-wrap{position:relative;display:inline-block;margin:0 auto 10px}
-    .hr-3d-icon{
-      width:58px;height:58px;border-radius:16px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:28px;position:relative;z-index:1;
-      transition:transform .2s ease,box-shadow .2s ease;
-    }
-    .hr-3d-face{
-      position:absolute;bottom:-7px;left:3px;right:3px;height:8px;
-      border-radius:0 0 10px 10px;filter:brightness(0.55);z-index:0;
-    }
-    .hr-3d-side{
-      position:absolute;top:6px;right:-6px;width:7px;bottom:0;
-      border-radius:0 10px 10px 0;filter:brightness(0.72);z-index:0;
-    }
-    .hr-job-kpi:hover .hr-3d-icon{
-      transform:translateY(-5px);
-      box-shadow:0 14px 24px rgba(0,0,0,.18)!important;
-    }
-    .hr-job-kpi:hover .hr-3d-face{bottom:-12px;height:13px}
-    .hr-job-kpi .hk-val{font-size:26px;font-weight:900;line-height:1.1;margin:2px 0}
-    .hr-job-kpi .hk-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.3px}
-    </style>
-
-    <script id="hr-module-js">
-    /* ══════════════════════════════════════════════════
-       HR MODULE — معالجة بيانات الموارد البشرية
-       ══════════════════════════════════════════════════ */
-    (function(){
-      /* ── Storage ── */
-      /* ══ البيانات الأصلية مضمّنة مباشرة من ملف Excel ══ */
-      var HR_EMBEDDED = [{"emp_id":"5805","name":"السيد حفني بكر العماوي","actual_job":"مدير المستودعات","system_job":"Warehouse Manager","work_entity":"الاداره","os_type":"شركه","storage_type":"عام","region":"1 - الاداره","status":"على راس العمل","nationality":"Egypt","iqama":"2088652074","hire_date":"2016-02-22","hire_date_raw":"2016-02-22","birth_date":"1968-01-01","age":58,"contract_type":"Married","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5806","name":"علي احمد محمد اسماعيل","actual_job":"منسق و مراجع","system_job":"Warehouse Coordinator","work_entity":"الاداره","os_type":"شركه","storage_type":"عام","region":"1 - الاداره","status":"على راس العمل","nationality":"Egypt","iqama":"2297054427","hire_date":"2016-02-22","hire_date_raw":"2016-02-22","birth_date":"1985-12-06","age":40,"contract_type":"Married","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7757","name":"عبدالرحمن عبدالرزاق","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"اجازه","status":"على راس العمل","nationality":"Egypt","iqama":"2340113527","hire_date":"2017-02-28","hire_date_raw":"2017-02-28","birth_date":"1985-11-30","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5135","name":"حسام حامد محمد نصار","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2402523167","hire_date":"2016-07-23","hire_date_raw":"2016-07-23","birth_date":"1992-05-21","age":34,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5170","name":"محمد هشام صلاح عرفه","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"أجازه","nationality":"Egypt","iqama":"2402366559","hire_date":"2016-08-11","hire_date_raw":"2016-08-11","birth_date":"1992-11-01","age":33,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5889","name":"احمد محمود الشرقاوي ندا","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2397176906","hire_date":"2016-04-21","hire_date_raw":"2016-04-21","birth_date":"1989-03-24","age":37,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9493","name":"عامر محمد عامر الهلالي","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Saudi Arabia","iqama":"1086452396","hire_date":"2020-04-28","hire_date_raw":"2020-04-28","birth_date":"1994-06-23","age":32,"contract_type":"Married","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"10141","name":"محمد احمد محمد حموده","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2504908571","hire_date":"2024-03-20","hire_date_raw":"2024-03-20","birth_date":"1997-09-01","age":28,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"1307","name":"مهران علي خان انور","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Pakistan","iqama":"2305227320","hire_date":"2011-04-21","hire_date_raw":"2011-04-21","birth_date":"1986-12-21","age":39,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2045","name":"فياض امجد  محمد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Pakistan","iqama":"2205407188","hire_date":"2004-03-22","hire_date_raw":"2004-03-22","birth_date":"1978-03-11","age":48,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9794","name":"احمد محمد احمد محمد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الخرج - ساحه الإنتاج  - م . رئيسى","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2499243935","hire_date":"2021-05-19","hire_date_raw":"2021-05-19","birth_date":"1994-01-01","age":32,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"4630","name":"نايف مسفر العرجانى العجمي","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Saudi Arabia","iqama":"1092019940","hire_date":"2023-09-28","hire_date_raw":"2023-09-28","birth_date":"1995-07-17","age":30,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"1919","name":"مباروك   اوسين","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2517032393","hire_date":"2022-05-19","hire_date_raw":"2022-05-19","birth_date":"1997-05-12","age":29,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2268","name":"عالم توجو  مياة","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"أجازه","nationality":"Bangladesh","iqama":"2226464648","hire_date":"2006-04-20","hire_date_raw":"2006-04-20","birth_date":"1977-06-26","age":49,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3922","name":"دنيش كومار جاج موهان","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"India","iqama":"2379154640","hire_date":"2014-10-19","hire_date_raw":"2014-10-19","birth_date":"1990-10-25","age":35,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"4448","name":"والي الله سامين الله","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Pakistan","iqama":"2542329632","hire_date":"2023-04-17","hire_date_raw":"2023-04-17","birth_date":"1994-04-06","age":32,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5729","name":"عابد ناداف راشد ناداف","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"India","iqama":"2407756770","hire_date":"2016-01-26","hire_date_raw":"2016-01-26","birth_date":"1976-05-02","age":50,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9576","name":"محمد شابوس  بتان","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2491848988","hire_date":"2020-10-25","hire_date_raw":"2020-10-25","birth_date":"1973-05-12","age":53,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2543040386","name":"شهباز على محمد أنور","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2543040386","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2543040451","name":"غلام عباس الله يار","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2543040451","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2595265915","name":"أسعد محمد اسلم","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2595265915","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2593006378","name":"مد رام على","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2593006378","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2535999417","name":"Mad Royal Ocean","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2625074675","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2540712904","name":"خندكار مد ابادات حسين","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2540712904","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2520901567","name":"مد سوان","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"A02012665","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2545825719","name":"شيخ محب الله","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2545825719","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2608287583","name":"مد رحيم ماندو","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2608287583","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2599317332","name":"مد محبوب مد علم","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2599317332","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"8023","name":"رام مانيج  ماهاتو","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Nepal","iqama":"2416369326","hire_date":"2016-05-19","hire_date_raw":"2016-05-19","birth_date":"1994-05-08","age":32,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5997","name":"بهوبال   الراي","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Nepal","iqama":"2415657523","hire_date":"2016-05-24","hire_date_raw":"2016-05-24","birth_date":"1985-09-04","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2695","name":"سلام الدين محمد  حاديس","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"3 - الخرج انتاج تام","status":"على راس العمل","nationality":"India","iqama":"2302986019","hire_date":"2011-03-10","hire_date_raw":"2011-03-10","birth_date":"1987-07-15","age":38,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"4449","name":"زرشاد اسلم نور اسلم","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"اجازه","status":"على راس العمل","nationality":"Pakistan","iqama":"2542329491","hire_date":"2023-04-17","hire_date_raw":"2023-04-17","birth_date":"1996-03-03","age":30,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"10144","name":"محمد زاهد  خان","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"اجازه","status":"على راس العمل","nationality":"Pakistan","iqama":"2302308966","hire_date":"2024-03-11","hire_date_raw":"2024-03-11","birth_date":"1986-06-05","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8672","name":"محمد فيروز  مولا","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2436359018","hire_date":"2018-03-08","hire_date_raw":"2018-03-08","birth_date":"1980-06-04","age":46,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9359","name":"ايسوب علي امير حسين","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2477856872","hire_date":"2019-11-07","hire_date_raw":"2019-11-07","birth_date":"1981-01-02","age":45,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7852","name":"جمال احمد علي محمد","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2277176364","hire_date":"2017-03-27","hire_date_raw":"2017-03-27","birth_date":"1970-11-18","age":55,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3027","name":"جمشيد   تيكاتيل","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"هيت إنتاج تام - قطع الغيار ( المستودعات النوعية )","os_type":"شركه","storage_type":"قطع غيار","region":"هيت","status":"على راس العمل","nationality":"India","iqama":"2262305549","hire_date":"2008-08-15","hire_date_raw":"2008-08-15","birth_date":"1986-01-16","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3812","name":"محمد على محمود على","actual_job":"سائق فور كلفت","system_job":"Store Labor","work_entity":"هيت إنتاج تام - قطع الغيار ( المستودعات النوعية )","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"India","iqama":"2369639923","hire_date":"2014-06-18","hire_date_raw":"2014-06-18","birth_date":"1980-07-20","age":45,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2732","name":"الطاف ظفر  انصارى","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع  الخرج مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"الخرج مواد خام","status":"على راس العمل","nationality":"India","iqama":"2305224830","hire_date":"2011-04-09","hire_date_raw":"2011-04-09","birth_date":"1976-03-02","age":50,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"1035","name":"محمد الامين  عبدالرحمن","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع  الخرج مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"الخرج مواد خام","status":"على راس العمل","nationality":"Bangladesh","iqama":"2242642797","hire_date":"2007-09-19","hire_date_raw":"2007-09-19","birth_date":"1985-05-15","age":41,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7194","name":"ناريان   شودهاري","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع  الخرج مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"الخرج مواد خام","status":"على راس العمل","nationality":"Nepal","iqama":"2423630330","hire_date":"2016-10-24","hire_date_raw":"2016-10-24","birth_date":"1987-07-21","age":38,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8875","name":"محمد السيد السيد محمد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"مواد خام","region":"جده","status":"على راس العمل","nationality":"Egypt","iqama":"2449311642","hire_date":"2018-05-15","hire_date_raw":"2018-05-15","birth_date":"1993-01-12","age":33,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3551","name":"شمس الدين منسي  رضا","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"الرياض مواد خام","status":"أجازه","nationality":"India","iqama":"2351643222","hire_date":"2013-06-25","hire_date_raw":"2013-06-25","birth_date":"1984-01-01","age":42,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"1130","name":"عالم جير  ابو الحسن","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الخرج - اسكراب","os_type":"شركه","storage_type":"إسكراب","region":"الخرج اسكراب","status":"على راس العمل","nationality":"Bangladesh","iqama":"2234987580","hire_date":"2007-02-24","hire_date_raw":"2007-02-24","birth_date":"1982-07-06","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8014","name":"عمرو احمد عبدالرحيم احمد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"3 - الخرج انتاج تام","status":"على راس العمل","nationality":"Egypt","iqama":"2303139212","hire_date":"2016-05-08","hire_date_raw":"2016-05-08","birth_date":"1984-11-01","age":41,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"10000","name":"فهد مسفر العرجاني العجمي","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الخرج - ساحه الإنتاج  - م . رئيسى","os_type":"شركه","storage_type":"إنتاج تام","region":"3 - الخرج انتاج تام","status":"على راس العمل","nationality":"Saudi Arabia","iqama":"1073942649","hire_date":"2023-11-20","hire_date_raw":"2023-11-20","birth_date":"1990-09-30","age":35,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9577","name":"مد شاكيل  ميا","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الخرج - ساحه الإنتاج  - م . رئيسى","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"أجازه","nationality":"","iqama":"","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7820","name":"كومار   اشوك","actual_job":"سائق فور كلفت / عامل","system_job":"Store Labor","work_entity":"مصنع الخرج - ساحه الإنتاج  - م . رئيسى","os_type":"شركه","storage_type":"إنتاج تام","region":"3 - الخرج انتاج تام","status":"على راس العمل","nationality":"India","iqama":"2430548228","hire_date":"2017-03-20","hire_date_raw":"2017-03-20","birth_date":"1980-05-08","age":46,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5888","name":"شاة جيهان  ميرا","actual_job":"مشرف مستودعات","system_job":"Warehouse Supervisor","work_entity":"مصنع الخرج ق . غيار","os_type":"شركه","storage_type":"قطع غيار","region":"ق.غيار","status":"على راس العمل","nationality":"India","iqama":"2415473251","hire_date":"2016-04-24","hire_date_raw":"2016-04-24","birth_date":"1977-04-10","age":49,"contract_type":"Married","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"1022","name":"محمد   شريف","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الخرج ق . غيار","os_type":"شركه","storage_type":"قطع غيار","region":"الخرج قطع غيار","status":"على راس العمل","nationality":"India","iqama":"2262295823","hire_date":"2008-08-28","hire_date_raw":"2008-08-28","birth_date":"1987-04-05","age":39,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7219","name":"عبدالبشير   هامابا","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الخرج ق . غيار","os_type":"شركه","storage_type":"قطع غيار","region":"الخرج قطع غيار","status":"أجازه","nationality":"India","iqama":"2268314651","hire_date":"2016-10-25","hire_date_raw":"2016-10-25","birth_date":"1970-10-16","age":55,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7198","name":"تانك بهادور  خاطري","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الخرج ق . غيار","os_type":"شركه","storage_type":"قطع غيار","region":"اجازه","status":"على راس العمل","nationality":"Nepal","iqama":"2423630587","hire_date":"2016-10-24","hire_date_raw":"2016-10-24","birth_date":"1980-02-18","age":46,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7894","name":"محمد عبدالله محمد عبدالنبي","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مستودع جدة","os_type":"شركه","storage_type":"إنتاج تام","region":"اجازه","status":"على راس العمل","nationality":"Egypt","iqama":"2431084314","hire_date":"2017-04-11","hire_date_raw":"2017-04-11","birth_date":"1985-10-01","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9571","name":"مد الامين","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مستودع جدة","os_type":"شركه","storage_type":"إنتاج تام","region":"جده","status":"على راس العمل","nationality":"Bangladesh","iqama":"2488135225","hire_date":"2020-10-14","hire_date_raw":"2020-10-14","birth_date":"1994-05-01","age":32,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5933","name":"تنوير علم زاكر حسين","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مستودع جدة","os_type":"شركه","storage_type":"إنتاج تام","region":"جده","status":"أجازه","nationality":"India","iqama":"2416401038","hire_date":"2016-05-08","hire_date_raw":"2016-05-08","birth_date":"1994-06-20","age":32,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7190","name":"جيت بهادور  شودري","actual_job":"سائق فور كلفت","system_job":"Store Labor","work_entity":"مستودع جدة","os_type":"شركه","storage_type":"إنتاج تام","region":"جده","status":"على راس العمل","nationality":"Nepal","iqama":"2423630397","hire_date":"2016-10-24","hire_date_raw":"2016-10-24","birth_date":"1988-08-11","age":37,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8114","name":"عمر   فاروق","actual_job":"سائق فور كلفت / عامل","system_job":"Store Labor","work_entity":"مستودع جدة","os_type":"شركه","storage_type":"إنتاج تام","region":"مصنع جده","status":"على راس العمل","nationality":"India","iqama":"2422925814","hire_date":"2016-09-26","hire_date_raw":"2016-09-26","birth_date":"1987-05-01","age":39,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9591","name":"طارق احمد سعد ابو سيف","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع   جدة ( انتاج و خام و ق , غيار )","os_type":"شركه","storage_type":"إنتاج تام - مواد خام - ق . غيار","region":"مصنع جده","status":"على راس العمل","nationality":"Egypt","iqama":"2464273560","hire_date":"2020-10-27","hire_date_raw":"2020-10-27","birth_date":"1990-10-05","age":35,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"10137","name":"احمد لطفى عطيه بهنسى","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع   جدة ( انتاج و خام و ق , غيار )","os_type":"شركه","storage_type":"إنتاج تام - مواد خام - ق . غيار","region":"مصنع جده","status":"على راس العمل","nationality":"Egypt","iqama":"2543047159","hire_date":"2024-03-10","hire_date_raw":"2024-03-10","birth_date":"1986-07-01","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2561217726","name":"محمد خليفه باشا","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع   جدة ( انتاج و خام و ق , غيار )","os_type":"إيجار","storage_type":"إسكراب","region":"مستودع جدة","status":"على راس العمل","nationality":"","iqama":"2561217726","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"2603","name":"رابيول سيكة  موسان","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مستودع جدة","os_type":"شركه","storage_type":"إنتاج تام - مواد خام","region":"مصنع جده","status":"على راس العمل","nationality":"India","iqama":"2291889000","hire_date":"2010-06-22","hire_date_raw":"2010-06-22","birth_date":"1988-01-01","age":38,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2822","name":"انصاري قطب الدين  محمد","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع   جدة ( انتاج و خام و ق , غيار )","os_type":"شركه","storage_type":"إنتاج تام - مواد خام","region":"مصنع جده","status":"على راس العمل","nationality":"India","iqama":"2309039127","hire_date":"2011-06-14","hire_date_raw":"2011-06-14","birth_date":"1976-07-20","age":49,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8019","name":"ليلى رام  تشودري","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع   جدة ( انتاج و خام و ق , غيار )","os_type":"شركه","storage_type":"إنتاج تام","region":"اجازه","status":"على راس العمل","nationality":"Nepal","iqama":"2415703566","hire_date":"2016-05-19","hire_date_raw":"2016-05-19","birth_date":"1985-10-31","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2552096063","name":"سنجيت بيشو","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع   جدة ( انتاج و خام و ق , غيار )","os_type":"إيجار","storage_type":"إنتاج تام - مواد خام - ق . غيار","region":"مصنع جده","status":"على راس العمل","nationality":"","iqama":"2552096063","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"4539","name":"حمزه يحي سعيد الزهراني","actual_job":"مشرف مستودعات","system_job":"Warehouse Supervisor","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Saudi Arabia","iqama":"1073797696","hire_date":"2023-07-19","hire_date_raw":"2023-07-19","birth_date":"1992-10-01","age":33,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7538","name":"حامد عبدالفتاح محمد عرفة","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Egypt","iqama":"2425437643","hire_date":"2017-01-19","hire_date_raw":"2017-01-19","birth_date":"1991-04-16","age":35,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7539","name":"احمد محمد احمد محمد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Egypt","iqama":"2419067562","hire_date":"2017-01-19","hire_date_raw":"2017-01-19","birth_date":"1988-03-21","age":38,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8622","name":"طاهر كمال يونس سيد احمد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"أجازه","nationality":"Egypt","iqama":"2430846820","hire_date":"2018-02-17","hire_date_raw":"2018-02-17","birth_date":"1985-04-20","age":41,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8015","name":"عبدالله نشأت احمد حسين","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الاحساء","status":"على راس العمل","nationality":"Egypt","iqama":"2403407659","hire_date":"2016-05-08","hire_date_raw":"2016-05-08","birth_date":"1983-07-01","age":43,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7189","name":"دهان بهادور  صنار","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Nepal","iqama":"2423630421","hire_date":"2016-10-24","hire_date_raw":"2016-10-24","birth_date":"1981-08-28","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7684","name":"يوسف مياه  نعيم الدين","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Bangladesh","iqama":"2352051680","hire_date":"2017-02-05","hire_date_raw":"2017-02-05","birth_date":"1981-05-05","age":45,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8899","name":"محمد هارون  رشيد","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Bangladesh","iqama":"2442523623","hire_date":"2018-06-06","hire_date_raw":"2018-06-06","birth_date":"1988-01-01","age":38,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8937","name":"راميج   مياه","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Bangladesh","iqama":"2429418342","hire_date":"2018-08-15","hire_date_raw":"2018-08-15","birth_date":"1989-05-22","age":37,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2557222888","name":"بشرات حسين ساخي محمد","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"إيجار","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"","iqama":"2557222888","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"7193","name":"نار بهادور تارام ماجر","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Nepal","iqama":"2423630355","hire_date":"2016-10-24","hire_date_raw":"2016-10-24","birth_date":"1984-12-18","age":41,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5996","name":"باسل كومار كورال كشتري","actual_job":"سائق فور كلفت","system_job":"Store Labor","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Nepal","iqama":"2416375174","hire_date":"2016-05-24","hire_date_raw":"2016-05-24","birth_date":"1986-06-24","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5285","name":"بير ناريان  شودهاري","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Nepal","iqama":"2397654175","hire_date":"2015-09-05","hire_date_raw":"2015-09-05","birth_date":"1981-10-06","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9425","name":"محمد   كلام","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Bangladesh","iqama":"2479035269","hire_date":"2020-02-02","hire_date_raw":"2020-02-02","birth_date":"1983-02-22","age":43,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9792","name":"محمد على احمد بغدادي","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"الاحساء","os_type":"شركه","storage_type":"إنتاج تام","region":"الاحساء","status":"على راس العمل","nationality":"Egypt","iqama":"2469166470","hire_date":"2021-05-18","hire_date_raw":"2021-05-18","birth_date":"1993-06-23","age":33,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9366","name":"محمد عبدالكلام  ازاد","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"الاحساء","os_type":"شركه","storage_type":"إنتاج تام","region":"الاحساء","status":"على راس العمل","nationality":"Bangladesh","iqama":"2479035178","hire_date":"2019-12-08","hire_date_raw":"2019-12-08","birth_date":"1983-01-02","age":43,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"10146","name":"داوود علي كمال سعيد","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"الاحساء","os_type":"شركه","storage_type":"إنتاج تام","region":"الاحساء","status":"على راس العمل","nationality":"Pakistan","iqama":"2416175830","hire_date":"2024-03-31","hire_date_raw":"2024-03-31","birth_date":"1993-10-10","age":32,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8013","name":"محمد عزت فرج القرموط","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"القصيم","os_type":"شركه","storage_type":"إنتاج تام","region":"القصيم","status":"على راس العمل","nationality":"Egypt","iqama":"2397062866","hire_date":"2016-05-27","hire_date_raw":"2016-05-27","birth_date":"1982-02-10","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3056","name":"بيندو موكيا  مالا","actual_job":"سائق فور كلفت","system_job":"Store Labor","work_entity":"القصيم","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Nepal","iqama":"2321593036","hire_date":"2012-02-27","hire_date_raw":"2012-02-27","birth_date":"1977-04-13","age":49,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7184","name":"فارات   خاطري","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"القصيم","os_type":"شركه","storage_type":"إنتاج تام","region":"القصيم","status":"على راس العمل","nationality":"Nepal","iqama":"2423630447","hire_date":"2016-10-24","hire_date_raw":"2016-10-24","birth_date":"1982-03-10","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3523","name":"فيروز كاشيم  خان","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"India","iqama":"2347729457","hire_date":"2013-06-10","hire_date_raw":"2013-06-10","birth_date":"1983-09-15","age":42,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5887","name":"محمود كمال يونس احمد","actual_job":"مشرف مستودعات","system_job":"Warehouse Supervisor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2327257446","hire_date":"2016-04-17","hire_date_raw":"2016-04-17","birth_date":"1988-08-10","age":37,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5869","name":"وليد مصطفي رمضان ابراهيم","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2427947847","hire_date":"2016-04-14","hire_date_raw":"2016-04-14","birth_date":"1982-02-02","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8012","name":"مصطفي السيد محمد الرفاعي","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Egypt","iqama":"2405193984","hire_date":"2016-05-08","hire_date_raw":"2016-05-08","birth_date":"1978-09-10","age":47,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5188","name":"محمد علي اسماعيل احمد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2410561381","hire_date":"2016-09-20","hire_date_raw":"2016-09-20","birth_date":"1992-09-29","age":33,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8333","name":"معصوم شيخ علاء الدين شيخ","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الخرج - ساحه الإنتاج  - م . رئيسى","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2222446862","hire_date":"2017-08-31","hire_date_raw":"2017-08-31","birth_date":"1976-03-22","age":50,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5344","name":"ماهيشوار   ياداف","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"مطلوب تعين بديل  ( دخول السجن )","nationality":"Nepal","iqama":"2397169141","hire_date":"2015-10-13","hire_date_raw":"2015-10-13","birth_date":"1991-08-27","age":34,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8984","name":"اولي   اولا","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"الرياض مواد خام","status":"على راس العمل","nationality":"Bangladesh","iqama":"2456694294","hire_date":"2018-10-15","hire_date_raw":"2018-10-15","birth_date":"1979-11-30","age":46,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7847","name":"رام ريجان  يداف","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"اجازه","status":"على راس العمل","nationality":"Nepal","iqama":"2433320302","hire_date":"2017-03-27","hire_date_raw":"2017-03-27","birth_date":"1986-04-27","age":40,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3569","name":"مختار شاه  والي","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الخرج - اسكراب","os_type":"شركه","storage_type":"إسكراب","region":"الخرج اسكراب","status":"على راس العمل","nationality":"Pakistan","iqama":"2363135514","hire_date":"2013-07-14","hire_date_raw":"2013-07-14","birth_date":"1980-03-08","age":46,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"3740","name":"رام لاكحان  ياداف","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الدمام","os_type":"شركه","storage_type":"إنتاج تام","region":"الدمام","status":"على راس العمل","nationality":"Nepal","iqama":"2367032279","hire_date":"2014-06-08","hire_date_raw":"2014-06-08","birth_date":"1983-02-02","age":43,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"7915","name":"رجب   هارون","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2257780953","hire_date":"2017-05-01","hire_date_raw":"2017-05-01","birth_date":"1982-01-02","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9367","name":"محمد   شميم","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2478912625","hire_date":"2019-12-08","hire_date_raw":"2019-12-08","birth_date":"1981-06-06","age":45,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"2933","name":"ديليب فيكتور  فيكتور","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"الرياض مواد خام","status":"على راس العمل","nationality":"India","iqama":"2321588200","hire_date":"2012-01-08","hire_date_raw":"2012-01-08","birth_date":"1982-05-25","age":44,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"8983","name":"معروف   حسن","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Bangladesh","iqama":"2439632940","hire_date":"2018-10-15","hire_date_raw":"2018-10-15","birth_date":"1991-04-02","age":35,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5157","name":"محمود حامد عبدالسميع علي","actual_job":"مشرف عمال","system_job":"Supervisor Workers","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"على راس العمل","nationality":"Egypt","iqama":"2415273610","hire_date":"2016-07-27","hire_date_raw":"2016-07-27","birth_date":"1970-08-22","age":55,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"5720","name":"نيترا بهادور  دماى","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"أجازه","nationality":"Nepal","iqama":"2407452859","hire_date":"2016-01-24","hire_date_raw":"2016-01-24","birth_date":"1993-06-15","age":33,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9424","name":"توحيد   خان","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"مطلوب تعين بديل ( إنهاء خدمات )","nationality":"Bangladesh","iqama":"2476776956","hire_date":"2020-02-02","hire_date_raw":"2020-02-02","birth_date":"1987-04-15","age":39,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"10398","name":"محمد شاكيل  علي","actual_job":"سائق فور كلفت","system_job":"Forklift Driver","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"2- مصنع الرياض","status":"مطلوب تعين بديل ( إنهاء خدمات )","nationality":"","iqama":"","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"9389","name":"محمد هيرو  علي","actual_job":"عامل","system_job":"Store Labor","work_entity":"مصنع الرياض  إنتاج تام","os_type":"شركه","storage_type":"إنتاج تام","region":"اجازه","status":"مطلوب تعين بديل ( إنهاء خدمات )","nationality":"Bangladesh","iqama":"2479942621","hire_date":"2020-01-15","hire_date_raw":"2020-01-15","birth_date":"1987-07-22","age":38,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"10419","name":"محمد عبد الحميد","actual_job":"امين مستودع","system_job":"Store Keeper","work_entity":"مصنع الرياض  - مواد خام","os_type":"شركه","storage_type":"مواد خام","region":"الرياض مواد خام","status":"على راس العمل","nationality":"Egypt","iqama":"2425656481","hire_date":"2017-01-19","hire_date_raw":"2017-01-19","birth_date":"1991-01-01","age":35,"contract_type":"Single","contract_years":"","leasing_co":"","notes":"","contract_end":""},{"emp_id":"تعين جديد","name":"اولى الحق","actual_job":"سائق فور كلفت","system_job":"","work_entity":"استبدال","os_type":"إيجار","storage_type":"مواد خام","region":"مطلوب استبداله","status":"مطلوب تعين بديل","nationality":"","iqama":"","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""},{"emp_id":"تعين جديد","name":"لخدمه مبيعات القاروره","actual_job":"عامل","system_job":"","work_entity":"استبدال","os_type":"إيجار","storage_type":"مواد خام","region":"مطلوب استبداله","status":"مطلوب تعين بديل","nationality":"","iqama":"","hire_date":"","hire_date_raw":"","birth_date":"","age":0,"contract_type":"","contract_years":"","leasing_co":"إيجار","notes":"","contract_end":""}];
-      var HR = { data: [], charts: {}, sortKey: '', sortDir: 1 };
-
-      /* ── Startup: بيانات مضمّنة + localStorage override ── */
-      (function(){
-        var saved = null;
-        try { saved = localStorage.getItem('hr_data_v1'); } catch(e){}
-        if(saved) {
-          try { HR.data = JSON.parse(saved); } catch(e){ HR.data = HR_EMBEDDED.slice(); }
-        } else {
-          HR.data = HR_EMBEDDED.slice();
-          /* حفظ في localStorage لأول مرة */
-          try {
-            localStorage.setItem('hr_data_v1', JSON.stringify(HR.data));
-            localStorage.setItem('hr_data_ts', 'من ملف Excel - تفصيلى الموظفين2');
-          } catch(e){}
-        }
-      })();
-
-      /* ── Column mapping (flexible, Arabic headers) ── */
-      function mapRow(r){
-        function g(){ for(var i=0;i<arguments.length;i++){var k=arguments[i];if(r[k]!==undefined&&r[k]!=='')return String(r[k]).trim();}return '';}
-        return {
-          emp_id:       g('الرقم الوظيفي','رقم الموظف','الرقم','emp_id'),
-          name:         g('اسم الموظف','الاسم','name'),
-          actual_job:   g('الوظيفة الفعلية','الوظيفة','actual_job'),
-          system_job:   g('الوظيفة بالنظام','system_job'),
-          work_entity:  g('جهة العمل','المستودع','work_entity'),
-          os_type:      g('نظام التشغيل','os_type'),
-          storage_type: g('نوع التخزين','storage_type'),
-          region:       g('المنطقة','region'),
-          status:       g('حالة الموظف','الحالة','status'),
-          nationality:  g('الجنسية','nationality'),
-          iqama:        g('رقم الإقامة','iqama'),
-          hire_date:    g('تاريخ التعيين','hire_date'),
-          birth_date:   g('تاريخ الميلاد','birth_date'),
-          age:          parseFloat(g('العمر','age'))||0,
-          contract_type:g('نوع العقد','contract_type'),
-          contract_years:parseFloat(g('عدد سنوات العقد','contract_years'))||0,
-          leasing_co:   g('شركة الإيجار','leasing_co'),
-          notes:        g('الملاحظات','notes'),
-          hire_date_raw: g('تاريخ التعيين','hire_date'),
-          contract_end: g('تاريخ انتهاء العقد','contract_end')
-        };
-      }
-
-      /* ── Demo Data Generator ── */
-      window.hrLoadDemo = function(){
-        var jobs = ['مدير مستودع','أمين مستودع','سائق','عامل','مشرف','فني','موظف إداري','أمين مستودع','سائق','عامل','عامل','سائق'];
-        var regions = ['الرياض','جدة','الدمام','مكة المكرمة','المدينة المنورة','أبها','تبوك','القصيم'];
-        var entities = ['مستودع الرياض الرئيسي','مستودع جدة','مستودع الشرقية','مستودع مكة','مستودع المدينة','مستودع أبها'];
-        var storages = ['جاف','بارد','مجمّد','جاف','جاف','بارد'];
-        var nats = ['سعودي','سعودي','سعودي','غير سعودي - مصري','غير سعودي - باكستاني','غير سعودي - هندي','سعودي','غير سعودي - يمني'];
-        var contracts = ['محدد المدة','غير محدد المدة','محدد المدة','محدد المدة','غير محدد المدة'];
-        var leasings = ['','','','شركة القوى العاملة','المجموعة المتحدة للقوى','','شركة العمالة الوطنية',''];
-        var names = ['أحمد محمد العمري','خالد عبدالله الشمري','محمد علي الغامدي','عبدالرحمن حسن القحطاني','سعد ناصر الدوسري',
-          'فهد سلمان الحربي','عمر يوسف الزهراني','إبراهيم عبدالعزيز المطيري','طارق صالح العتيبي','بندر فهد السبيعي',
-          'عادل محمود الرشيدي','حسين أحمد البلوي','وليد سعد الثبيتي','ماجد ناصر الجهني','نواف عبدالله الرويلي',
-          'Abdullah Hassan','Muhammad Ali','Ahmed Karim','Hassan Mohamed','Rajesh Kumar',
-          'Suresh Patel','Vikram Singh','Muhammad Arif','Tariq Mahmood','Syed Hasan',
-          'أنس محمد السلمي','تركي عبدالرحمن الحقباني','زياد فارس الشهري','منصور علي القرني','أسامة خالد الغامدي'];
-        var data = [];
-        var today = new Date();
-        for(var i=0;i<80;i++){
-          var age = 22+Math.floor(Math.random()*42);
-          var yearsService = Math.floor(Math.random()*15);
-          var hireDate = new Date(today.getFullYear()-yearsService, Math.floor(Math.random()*12), Math.floor(Math.random()*28)+1);
-          var ji = Math.floor(Math.random()*jobs.length);
-          var ri = Math.floor(Math.random()*regions.length);
-          var ei = Math.floor(Math.random()*entities.length);
-          var ni = Math.floor(Math.random()*nats.length);
-          var li = Math.floor(Math.random()*leasings.length);
-          data.push({
-            emp_id: '10'+(1000+i),
-            name: names[i%names.length],
-            actual_job: jobs[ji],
-            system_job: jobs[ji],
-            work_entity: entities[ei],
-            os_type: Math.random()>.5?'Windows':'Linux',
-            storage_type: storages[ei%storages.length],
-            region: regions[ri],
-            status: Math.random()>.1?'نشط':'غير نشط',
-            nationality: nats[ni],
-            iqama: Math.random()>.15?'10'+Math.floor(Math.random()*90000000+10000000):'',
-            hire_date: hireDate.toISOString().slice(0,10),
-            hire_date_raw: hireDate.toISOString().slice(0,10),
-            birth_date: new Date(today.getFullYear()-age,Math.floor(Math.random()*12),1).toISOString().slice(0,10),
-            age: age,
-            contract_type: contracts[Math.floor(Math.random()*contracts.length)],
-            contract_years: Math.floor(Math.random()*5)+1,
-            leasing_co: leasings[li],
-            contract_end: '',
-            notes: Math.random()>.75?['مطلوب تجديد الإقامة','تحت الاختبار','موظف متميز','ينتهي عقده قريباً'][Math.floor(Math.random()*4)]:''
-          });
-        }
-        HR.data = data;
-        try{localStorage.setItem('hr_data_v1',JSON.stringify(data));localStorage.setItem('hr_data_ts',new Date().toLocaleString('ar-SA'));}catch(e){}
-        document.getElementById('hr-demo-note').style.display='inline';
-        setTimeout(function(){document.getElementById('hr-demo-note').style.display='none';},3000);
-      };
-
-      /* ── Parse Excel ── */
-      window.hrHandleDrop = function(e){
-        e.preventDefault();
-        document.getElementById('hr-drop').classList.remove('over');
-        var f = e.dataTransfer.files[0];
-        if(f) hrHandleFile(f);
-      };
-      window.hrHandleFile = function(f){
-        if(!f) return;
-        var st = document.getElementById('hr-status');
-        st.className='status'; st.style.display='block'; st.textContent='جارٍ قراءة الملف…';
-        var r = new FileReader();
-        r.onload = function(ev){
-          try {
-            var wb = XLSX.read(ev.target.result,{type:'binary',cellDates:true});
-            var ws = wb.Sheets[wb.SheetNames[0]];
-            var rows = XLSX.utils.sheet_to_json(ws,{defval:''});
-            if(!rows.length) throw new Error('الملف فارغ');
-            window._hr_preview = rows.map(mapRow);
-            st.className='status ok';
-            st.innerHTML = '✅ تم قراءة <b>'+ rows.length +'</b> موظف من الملف — اضغط "تطبيق البيانات"';
-            document.getElementById('hr-actions').style.display='flex';
-            hrShowPreviewStats(window._hr_preview);
-          } catch(e){
-            st.className='status err'; st.textContent='❌ خطأ: '+e.message;
-          }
-        };
-        r.readAsBinaryString(f);
-      };
-      window.hrApplyData = function(){
-        if(!window._hr_preview || !window._hr_preview.length) return;
-        HR.data = window._hr_preview;
-        try{ localStorage.setItem('hr_data_v1', JSON.stringify(HR.data)); }catch(e){}
-        try{ localStorage.setItem('hr_data_ts', new Date().toLocaleString('ar-SA')); }catch(e){}
-        var st = document.getElementById('hr-status');
-        st.className='status ok'; st.innerHTML='✅ تم تطبيق بيانات <b>'+HR.data.length+'</b> موظف بنجاح!';
-        document.getElementById('hr-actions').style.display='none';
-      };
-      window.hrClearData = function(){
-        HR.data = []; window._hr_preview = null;
-        localStorage.removeItem('hr_data_v1'); localStorage.removeItem('hr_data_ts');
-        var st = document.getElementById('hr-status');
-        st.className='status ok'; st.textContent='تم مسح البيانات.';
-        document.getElementById('hr-actions').style.display='none';
-        document.getElementById('hr-preview-stats').style.display='none';
-      };
-      function hrShowPreviewStats(d){
-        var el = document.getElementById('hr-preview-stats');
-        if(!el) return;
-        var saudis = d.filter(function(r){return r.nationality&&r.nationality.includes('سعودي')&&!r.nationality.includes('غير');}).length;
-        el.style.display='block';
-        el.innerHTML='<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">'+
-          hrKpiHtml(tr('hr_total_emp'), d.length, '👥','t-total')+
-          hrKpiHtml(tr('hr_saudi'), saudis, '🇸🇦','t-60')+
-          hrKpiHtml(tr('hr_non_saudi'), d.length-saudis, '🌍','t-90')+
-        '</div>';
-      }
-
-      /* ── Helpers ── */
-      function count(arr, fn){ return arr.filter(fn).length; }
-      function grpBy(arr, fn){
-        var m={};
-        arr.forEach(function(r){ var k=fn(r)||tr('hr_unknown'); m[k]=(m[k]||0)+1; });
-        return m;
-      }
-      function topN(obj, n){
-        return Object.entries(obj).sort(function(a,b){return b[1]-a[1];}).slice(0,n);
-      }
-      function hrKpiHtml(label, val, icon, cls){
-        var clsMap={'t-total':'hk-total','t-60':'hk-saudi','t-90':'hk-own','t-g90':'hk-leasing'};
-        var hkCls=clsMap[cls]||'hk-total';
-        return '<div class="hr-kpi '+hkCls+'">'+
-          '<div class="hk-label">'+label+'</div>'+
-          '<div class="hk-row"><div class="hk-val">'+val+'</div><div class="hk-icon">'+icon+'</div></div>'+
-          '</div>';
-      }
-      function hrAlertCard(label, count, icon, color, items){
-        var isEmpty = count===0;
-        return '<div class="card" style="border-top:3px solid '+(isEmpty?'#22c55e':color)+';margin-bottom:12px">'+
-          '<div class="ch"><h5>'+icon+' '+label+'</h5><span class="sub" style="color:'+(isEmpty?'#22c55e':color)+';font-weight:800;font-size:16px">'+count+'</span></div>'+
-          (!isEmpty && items && items.length ?
-            '<div style="overflow:auto;max-height:200px"><table class="utable" style="font-size:12px"><thead><tr><th>'+tr('hr_tbl_no')+'</th><th>'+tr('hr_tbl_name')+'</th><th>'+tr('hr_tbl_job')+'</th><th>'+tr('hr_tbl_entity')+'</th></tr></thead><tbody>'+
-            items.slice(0,20).map(function(r){return '<tr><td>'+r.emp_id+'</td><td>'+r.name+'</td><td>'+r.actual_job+'</td><td>'+r.work_entity+'</td></tr>';}).join('')+
-            '</tbody></table></div>' : '<div style="color:#22c55e;font-size:13px;padding:4px 0">✅ لا توجد بنود</div>')+
-        '</div>';
-      }
-
-      /* ── Gauge SVG ── */
-      function gaugeHtml(label, pct, color){
-        var arc=Math.PI*50, off=arc*(1-pct/100);
-        return '<div class="hr-gauge-card">'+
-          '<svg width="120" height="80" viewBox="0 0 120 80" style="display:block;margin:0 auto">'+
-          '<path d="M 10 70 A 50 50 0 0 1 110 70" fill="none" stroke="#e8edf4" stroke-width="10" stroke-linecap="round"/>'+
-          '<path d="M 10 70 A 50 50 0 0 1 110 70" fill="none" stroke="'+color+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+arc+'" stroke-dashoffset="'+off+'"/>'+
-          '<text x="60" y="68" text-anchor="middle" font-size="20" font-weight="900" fill="'+color+'">'+pct+'%</text>'+
-          '</svg>'+
-          '<div class="hg-label">'+label+'</div>'+
-          '</div>';
-      }
-
-      /* ── Draw Chart ── */
-      function drawChart(id, type, labels, data, colors, opts){
-        var canvas = document.getElementById(id);
-        if(!canvas) return;
-        if(HR.charts[id]) { try{HR.charts[id].destroy();}catch(e){} }
-        var defaults = {
-          responsive:true, maintainAspectRatio:false,
-          plugins:{legend:{display:type==='pie'||type==='doughnut',position:'bottom',labels:{boxWidth:10,font:{size:11}}}}
-        };
-        if(type==='bar'){ defaults.scales={y:{beginAtZero:true,ticks:{font:{size:11}}},x:{ticks:{font:{size:10}}}}; }
-        HR.charts[id] = new Chart(canvas, {
-          type: type,
-          data: { labels: labels, datasets:[{ data: data, backgroundColor: colors, borderWidth:1, borderRadius:type==='bar'?5:0 }] },
-          options: Object.assign(defaults, opts||{})
-        });
-      }
-
-      var PALETTE = ['#2f7ed8','#12b1a2','#e05c2a','#7b5cd6','#f2974a','#e0a32e','#3f6fd1','#dc2626','#0f9b8e','#e85ec8','#1f9d57','#64748b'];
-
-      /* ══ Dashboard Render ══ */
-      window.hrRefreshDash = function(){
-        var d = HR.data;
-        var nodata = document.getElementById('hr-dash-nodata');
-        var content = document.getElementById('hr-dash-content');
-        if(!d || !d.length){ nodata.style.display=''; content.style.display='none'; return; }
-        nodata.style.display='none'; content.style.display='';
-
-        // TS
-        var ts = localStorage.getItem('hr_data_ts')||'';
-        document.getElementById('hr-dash-upd').textContent = ts ? 'آخر تحديث: '+ts : 'بيانات محمّلة';
-
-        var total = d.length;
-        var saudis = count(d,function(r){return r.nationality&&(r.nationality.includes('سعودي')||r.nationality==='Saudi Arabia'||r.nationality==='Saudi');});
-        var nonSaudi = total - saudis;
-        var leasing = count(d,function(r){return r.os_type&&r.os_type.includes('إيجار') || r.leasing_co&&r.leasing_co!='';});
-        var own = total - leasing;
-        var ages = d.map(function(r){return r.age;}).filter(function(a){return a>0;});
-        var avgAge = ages.length ? Math.round(ages.reduce(function(a,b){return a+b;},0)/ages.length) : 0;
-        var serviceLens = d.map(function(r){
-          if(!r.hire_date_raw) return 0;
-          var hd = new Date(r.hire_date_raw); var now = new Date();
-          return isNaN(hd)? 0 : (now-hd)/(365.25*24*3600*1000);
-        });
-        var avgSvc = serviceLens.length ? Math.round(serviceLens.reduce(function(a,b){return a+b;},0)/serviceLens.length*10)/10 : 0;
-
-        // Row 1
-        document.getElementById('hr-kpi-row1').innerHTML =
-          hrKpiHtml(tr('hr_total_emp'), total, '👥', 't-total')+
-          hrKpiHtml(tr('hr_saudi'), saudis, '🇸🇦', 't-60')+
-          hrKpiHtml(tr('hr_non_saudi'), nonSaudi, '🌍', 't-90')+
-          hrKpiHtml(tr('hr_leasing_emp'), leasing, '🏢', 't-g90')+
-          hrKpiHtml(tr('hr_company_emp'), own, '🏭', 't-90')+
-          hrKpiHtml(tr('hr_avg_age'), avgAge+' '+tr('hr_year'), '📅', 't-60')+
-          hrKpiHtml(tr('hr_avg_service'), avgSvc+' '+tr('hr_year'), '⏱', 't-60');
-
-        // Chart 1: Region (horizontal bar, top 17)
-        var byRegion = grpBy(d,function(r){return r.region;});
-        var topRegion = topN(byRegion,17);
-        drawChart('hr-chart-region','bar',topRegion.map(function(x){return x[0];}),topRegion.map(function(x){return x[1];}),PALETTE,{indexAxis:'y'});
-
-        // Row 3 — Job-type KPIs
-        var jobKeywords = [
-          {label:tr('hr_job_wm'),icon:'🏢',imgSrc:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KPGRlZnM+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzYwYTVmYSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFkNGVkOCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJiVG9wIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjOTNjNWZkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjM2I4MmY2Ii8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8bGluZWFyR3JhZGllbnQgaWQ9ImJGcm9udCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzI1NjNlYiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFlNDBhZiIvPgogIDwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPCEtLSBCRyAtLT4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyNCIgZmlsbD0idXJsKCNiZykiLz4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI1NiIgcng9IjI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iLjA3Ii8+CjwhLS0gU2hhZG93IC0tPgo8ZWxsaXBzZSBjeD0iNjAiIGN5PSI5NyIgcng9IjM0IiByeT0iNSIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iLjI1Ii8+CjwhLS0gQnJpZWZjYXNlIHRvcCBmYWNlIC0tPgo8cG9seWdvbiBwb2ludHM9IjI2LDUyIDk0LDUyIDEwMiw0MiAzNCw0MiIgZmlsbD0idXJsKCNiVG9wKSIvPgo8IS0tIEJyaWVmY2FzZSBmcm9udCBmYWNlIC0tPgo8cmVjdCB4PSIyNiIgeT0iNTIiIHdpZHRoPSI2OCIgaGVpZ2h0PSIzOCIgcng9IjMiIGZpbGw9InVybCgjYkZyb250KSIvPgo8IS0tIEJyaWVmY2FzZSByaWdodCBmYWNlIC0tPgo8cG9seWdvbiBwb2ludHM9Ijk0LDUyIDEwMiw0MiAxMDIsODAgOTQsOTAiIGZpbGw9IiMxZTNhOGEiLz4KPCEtLSBMYXRjaCBjZW50ZXIgbGluZSAtLT4KPHJlY3QgeD0iMjYiIHk9IjY4IiB3aWR0aD0iNjgiIGhlaWdodD0iMyIgZmlsbD0iIzFlM2E4YSIgb3BhY2l0eT0iLjUiLz4KPHJlY3QgeD0iNTQiIHk9IjYyIiB3aWR0aD0iMTIiIGhlaWdodD0iMTUiIHJ4PSIzIiBmaWxsPSIjOTNjNWZkIiBvcGFjaXR5PSIuOCIvPgo8cmVjdCB4PSI1NyIgeT0iNjYiIHdpZHRoPSI2IiBoZWlnaHQ9IjciIHJ4PSIxLjUiIGZpbGw9IiMxZDRlZDgiLz4KPCEtLSBIYW5kbGU6IHR3byBhcmNzIGNvbm5lY3RpbmcgdG8gdG9wIC0tPgo8cmVjdCB4PSI0MiIgeT0iMzQiIHdpZHRoPSI4IiBoZWlnaHQ9IjEyIiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTNjNWZkIiBzdHJva2Utd2lkdGg9IjQiLz4KPHJlY3QgeD0iNzAiIHk9IjM0IiB3aWR0aD0iOCIgaGVpZ2h0PSIxMiIgcng9IjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzkzYzVmZCIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxyZWN0IHg9IjQ2IiB5PSIzNCIgd2lkdGg9IjI4IiBoZWlnaHQ9IjUiIHJ4PSIyLjUiIGZpbGw9IiM5M2M1ZmQiLz4KPCEtLSBTaGluZSBoaWdobGlnaHQgLS0+CjxyZWN0IHg9IjI2IiB5PSI1MiIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iLjE1Ii8+Cjwvc3ZnPg==',color:'#1d4ed8',light:'#3b82f6',dark:'#1e3a8a',kw:['مدير','مديرة']},
-          {label:tr('hr_job_ws'),icon:'📦',imgSrc:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KPGRlZnM+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzIyZDNlZSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBlNzQ5MCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyNCIgZmlsbD0idXJsKCNiZykiLz4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI1NiIgcng9IjI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iLjA3Ii8+CjxlbGxpcHNlIGN4PSI2MCIgY3k9Ijk2IiByeD0iMzUiIHJ5PSI1IiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjUiLz4KPCEtLSBCb3ggdG9wIGZhY2UgLS0+Cjxwb2x5Z29uIHBvaW50cz0iMjQsNTIgNzIsNTIgOTYsMzAgNDgsMzAiIGZpbGw9IiNBNUYzRkMiLz4KPCEtLSBCb3ggZnJvbnQgZmFjZSAtLT4KPHJlY3QgeD0iMjQiIHk9IjUyIiB3aWR0aD0iNDgiIGhlaWdodD0iMzgiIHJ4PSIyIiBmaWxsPSIjMDg5MWIyIi8+CjwhLS0gQm94IHJpZ2h0IGZhY2UgLS0+Cjxwb2x5Z29uIHBvaW50cz0iNzIsNTIgOTYsMzAgOTYsNjggNzIsOTAiIGZpbGw9IiMxNTVlNzUiLz4KPCEtLSBCb3ggdGFwZSAtIHRvcCBob3Jpem9udGFsIC0tPgo8cG9seWdvbiBwb2ludHM9IjU2LDMwIDY0LDMwIDYwLDUyIDUyLDUyIiBmaWxsPSIjRkVGMDhBIiBvcGFjaXR5PSIuOSIvPgo8IS0tIEJveCB0YXBlIC0gZnJvbnQgdmVydGljYWwgLS0+CjxyZWN0IHg9IjQ0IiB5PSI1MiIgd2lkdGg9IjgiIGhlaWdodD0iMzgiIGZpbGw9IiNGRUYwOEEiIG9wYWNpdHk9Ii44NSIvPgo8IS0tIEJveCBmbGFwIGxlZnQgLS0+Cjxwb2x5Z29uIHBvaW50cz0iMjQsNTIgNDgsMzAgNTYsMzAgMzIsNTIiIGZpbGw9IiM2N0U4RjkiIG9wYWNpdHk9Ii42Ii8+CjwhLS0gQm94IGZsYXAgcmlnaHQgLS0+Cjxwb2x5Z29uIHBvaW50cz0iNzIsNTIgNjQsMzAgODAsMzAgODAsNTIiIGZpbGw9IiNBNUYzRkMiIG9wYWNpdHk9Ii42Ii8+CjwhLS0gU2hpbmUgLS0+Cjxwb2x5Z29uIHBvaW50cz0iMjQsNTIgNDgsMzAgNTIsMzAgMjgsNTIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuMTUiLz4KPC9zdmc+',color:'#0891b2',light:'#22d3ee',dark:'#155e75',kw:['أمين','امين']},
-          {label:tr('hr_job_dr'),icon:'🚜',imgSrc:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzI5NzlGRiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNTY1QzAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InlUb3AiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZGRTg0QyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGOUE4MjUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InlSaWdodCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRjU3RjE3Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0U2NTEwMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYlRvcCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjQkNBQUE0Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzhENkU2MyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgCiAgPCEtLSBCYWNrZ3JvdW5kIHJvdW5kZWQgc3F1YXJlIC0tPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMjQiIGZpbGw9InVybCgjYmcpIi8+CiAgPCEtLSBJbm5lciBsaWdodCB0b3AtbGVmdCBnbG93IC0tPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iNjAiIHJ4PSIyNCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuMDYiLz4KICAKICA8IS0tIFNIQURPVyAtLT4KICA8ZWxsaXBzZSBjeD0iNjgiIGN5PSI5OCIgcng9IjM4IiByeT0iNiIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iMC4yNSIvPgogIAogIDwhLS0gPT09IEZPUktMSUZUID09PSAtLT4KICAKICA8IS0tIE1BU1QgKGxlZnQgdmVydGljYWwgcG9zdCkgLS0+CiAgPHJlY3QgeD0iMjIiIHk9IjI4IiB3aWR0aD0iOCIgaGVpZ2h0PSI2MCIgcng9IjIiIGZpbGw9IiNGOUE4MjUiLz4KICA8cmVjdCB4PSIyMiIgeT0iMjgiIHdpZHRoPSI4IiBoZWlnaHQ9IjYwIiByeD0iMiIgZmlsbD0idXJsKCN5VG9wKSIgb3BhY2l0eT0iMC45Ii8+CiAgPCEtLSBNYXN0IHJpZ2h0IHNoYWRpbmcgLS0+CiAgPHJlY3QgeD0iMjgiIHk9IjI4IiB3aWR0aD0iNCIgaGVpZ2h0PSI2MCIgcng9IjEiIGZpbGw9IiNFNjUxMDAiIG9wYWNpdHk9IjAuNyIvPgogIAogIDwhLS0gRk9SS1MgLS0+CiAgPHJlY3QgeD0iMTAiIHk9IjcyIiB3aWR0aD0iMjIiIGhlaWdodD0iNSIgcng9IjEuNSIgZmlsbD0iI0U2NTEwMCIvPgogIDxyZWN0IHg9IjEwIiB5PSI4MiIgd2lkdGg9IjIyIiBoZWlnaHQ9IjUiIHJ4PSIxLjUiIGZpbGw9IiNFNjUxMDAiLz4KICA8IS0tIEZvcmsgdGlwcyAtLT4KICA8cmVjdCB4PSIxMCIgeT0iNzIiIHdpZHRoPSI0IiBoZWlnaHQ9IjUiIHJ4PSIxIiBmaWxsPSIjQkYzNjBDIi8+CiAgPHJlY3QgeD0iMTAiIHk9IjgyIiB3aWR0aD0iNCIgaGVpZ2h0PSI1IiByeD0iMSIgZmlsbD0iI0JGMzYwQyIvPgogIAogIDwhLS0gQk9YRVMgb24gZm9ya3MgLS0+CiAgPCEtLSBCb3R0b20gYm94IC0gZnJvbnQgZmFjZSAtLT4KICA8cmVjdCB4PSIxNCIgeT0iNTUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIxNyIgcng9IjIiIGZpbGw9InVybCgjYlRvcCkiLz4KICA8IS0tIEJvdHRvbSBib3ggLSB0b3AgZmFjZSAtLT4KICA8cG9seWdvbiBwb2ludHM9IjE0LDU1IDM0LDU1IDM4LDUxIDE4LDUxIiBmaWxsPSIjRDdDQ0M4Ii8+CiAgPCEtLSBCb3R0b20gYm94IC0gcmlnaHQgZmFjZSAtLT4KICA8cG9seWdvbiBwb2ludHM9IjM0LDU1IDM4LDUxIDM4LDY4IDM0LDcyIiBmaWxsPSIjNkQ0QzQxIi8+CiAgPCEtLSBCb3ggc3RyYXBzIC0tPgogIDxsaW5lIHgxPSIyNCIgeTE9IjUxIiB4Mj0iMjQiIHkyPSI3MiIgc3Ryb2tlPSIjRkZDQzAyIiBzdHJva2Utd2lkdGg9IjEuNSIgb3BhY2l0eT0iMC44Ii8+CiAgPGxpbmUgeDE9IjE0IiB5MT0iNjMiIHgyPSIzNCIgeTI9IjYzIiBzdHJva2U9IiNGRkNDMDIiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjgiLz4KICAKICA8IS0tIFRvcCBib3ggLSBmcm9udCBmYWNlIC0tPgogIDxyZWN0IHg9IjE1IiB5PSI0MSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0idXJsKCNiVG9wKSIvPgogIDwhLS0gVG9wIGJveCAtIHRvcCBmYWNlIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iMTUsNDEgMzMsNDEgMzcsMzcgMTksMzciIGZpbGw9IiNEN0NDQzgiLz4KICA8IS0tIFRvcCBib3ggLSByaWdodCBmYWNlIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iMzMsNDEgMzcsMzcgMzcsNTEgMzMsNTUiIGZpbGw9IiM2RDRDNDEiLz4KICA8IS0tIEJveCBzdHJhcHMgLS0+CiAgPGxpbmUgeDE9IjI0IiB5MT0iMzciIHgyPSIyNCIgeTI9IjU1IiBzdHJva2U9IiNGRkNDMDIiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjgiLz4KICAKICA8IS0tIE1BSU4gQk9EWSAtIGZyb250IGZhY2UgLS0+CiAgPHJlY3QgeD0iMzQiIHk9IjU1IiB3aWR0aD0iNjAiIGhlaWdodD0iMzMiIHJ4PSIzIiBmaWxsPSJ1cmwoI3lUb3ApIi8+CiAgPCEtLSBCb2R5IHRvcCBmYWNlIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iMzQsNTUgOTQsNTUgMTAwLDQ4IDQwLDQ4IiBmaWxsPSIjRkZFNTdGIi8+CiAgPCEtLSBCb2R5IHJpZ2h0IGZhY2UgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSI5NCw1NSAxMDAsNDggMTAwLDg1IDk0LDg4IiBmaWxsPSJ1cmwoI3lSaWdodCkiLz4KICAKICA8IS0tIENBQiAvIE9QRVJBVE9SIEFSRUEgLS0+CiAgPHJlY3QgeD0iNjYiIHk9IjM0IiB3aWR0aD0iMjgiIGhlaWdodD0iMjIiIHJ4PSIzIiBmaWxsPSIjRkZENjAwIi8+CiAgPCEtLSBDYWIgdG9wIGZhY2UgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSI2NiwzNCA5NCwzNCAxMDAsMjcgNzIsMjciIGZpbGw9IiNGRkU1N0YiLz4KICA8IS0tIENhYiByaWdodCBmYWNlIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iOTQsMzQgMTAwLDI3IDEwMCw0OSA5NCw1NiIgZmlsbD0iI0U2NTEwMCIvPgogIDwhLS0gQ2FiIHdpbmRvdyAoZnJvbnQpIC0tPgogIDxyZWN0IHg9IjcwIiB5PSIzOCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0iIzgwRDhGRiIgb3BhY2l0eT0iMC43NSIvPgogIDwhLS0gV2luZG93IGZyYW1lIC0tPgogIDxyZWN0IHg9IjcwIiB5PSIzOCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjE0IiByeD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZENjAwIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDwhLS0gV2luZG93IHJlZmxlY3Rpb24gLS0+CiAgPGxpbmUgeDE9IjczIiB5MT0iNDAiIHgyPSI3MyIgeTI9IjUwIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEuNSIgb3BhY2l0eT0iMC40NSIvPgogIDxsaW5lIHgxPSI3NyIgeTE9IjM5IiB4Mj0iNzMiIHkyPSI0NCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz4KICAKICA8IS0tIENPVU5URVJXRUlHSFQgYmFjayBsZWZ0IC0tPgogIDxyZWN0IHg9IjM0IiB5PSI2MiIgd2lkdGg9IjEwIiBoZWlnaHQ9IjE4IiByeD0iMiIgZmlsbD0iI0U2NTEwMCIvPgogIDwhLS0gQ291bnRlcndlaWdodCB0b3AgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIzNCw2MiA0NCw2MiA0MCw1OCAzMCw1OCIgZmlsbD0iI0ZGOEYwMCIvPgogIAogIDwhLS0gRVhIQVVTVCBQSVBFIC0tPgogIDxyZWN0IHg9IjkyIiB5PSIyMiIgd2lkdGg9IjUiIGhlaWdodD0iMTIiIHJ4PSIyIiBmaWxsPSIjOUU5RTlFIi8+CiAgPGVsbGlwc2UgY3g9Ijk0LjUiIGN5PSIyMiIgcng9IjMiIHJ5PSIxLjUiIGZpbGw9IiM3NTc1NzUiLz4KICA8IS0tIEV4aGF1c3QgcHVmZiAtLT4KICA8Y2lyY2xlIGN4PSI5NCIgY3k9IjE4IiByPSIzIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4zIi8+CiAgPGNpcmNsZSBjeD0iOTIiIGN5PSIxNCIgcj0iMiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuMiIvPgogIAogIDwhLS0gV0hFRUxTIC0tPgogIDwhLS0gUmVhciB3aGVlbCAtLT4KICA8Y2lyY2xlIGN4PSI4MiIgY3k9IjkxIiByPSIxMSIgZmlsbD0iIzFBMUExQSIvPgogIDxjaXJjbGUgY3g9IjgyIiBjeT0iOTEiIHI9IjgiIGZpbGw9IiMzMzMiLz4KICA8Y2lyY2xlIGN4PSI4MiIgY3k9IjkxIiByPSI0IiBmaWxsPSIjNTU1Ii8+CiAgPGNpcmNsZSBjeD0iODIiIGN5PSI5MSIgcj0iMiIgZmlsbD0iIzg4OCIvPgogIDwhLS0gUmVhciB3aGVlbCBodWIgYm9sdHMgLS0+CiAgPGNpcmNsZSBjeD0iODIiIGN5PSI4NCIgcj0iMS41IiBmaWxsPSIjNjY2Ii8+CiAgPGNpcmNsZSBjeD0iNzUiIGN5PSI5MSIgcj0iMS41IiBmaWxsPSIjNjY2Ii8+CiAgPGNpcmNsZSBjeD0iODIiIGN5PSI5OCIgcj0iMS41IiBmaWxsPSIjNjY2Ii8+CiAgPGNpcmNsZSBjeD0iODkiIGN5PSI5MSIgcj0iMS41IiBmaWxsPSIjNjY2Ii8+CiAgCiAgPCEtLSBGcm9udCB3aGVlbCAtLT4KICA8Y2lyY2xlIGN4PSI0OCIgY3k9IjkxIiByPSIxMSIgZmlsbD0iIzFBMUExQSIvPgogIDxjaXJjbGUgY3g9IjQ4IiBjeT0iOTEiIHI9IjgiIGZpbGw9IiMzMzMiLz4KICA8Y2lyY2xlIGN4PSI0OCIgY3k9IjkxIiByPSI0IiBmaWxsPSIjNTU1Ii8+CiAgPGNpcmNsZSBjeD0iNDgiIGN5PSI5MSIgcj0iMiIgZmlsbD0iIzg4OCIvPgogIDwhLS0gRnJvbnQgd2hlZWwgaHViIGJvbHRzIC0tPgogIDxjaXJjbGUgY3g9IjQ4IiBjeT0iODQiIHI9IjEuNSIgZmlsbD0iIzY2NiIvPgogIDxjaXJjbGUgY3g9IjQxIiBjeT0iOTEiIHI9IjEuNSIgZmlsbD0iIzY2NiIvPgogIDxjaXJjbGUgY3g9IjQ4IiBjeT0iOTgiIHI9IjEuNSIgZmlsbD0iIzY2NiIvPgogIDxjaXJjbGUgY3g9IjU1IiBjeT0iOTEiIHI9IjEuNSIgZmlsbD0iIzY2NiIvPgogIAogIDwhLS0gV2hlZWwgc2hpbmUgaGlnaGxpZ2h0cyAtLT4KICA8cGF0aCBkPSJNNzggODMgUTgyIDgwIDg2IDgzIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMyIvPgogIDxwYXRoIGQ9Ik00NCA4MyBRNDggODAgNTIgODMiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgb3BhY2l0eT0iMC4zIi8+CiAgCiAgPCEtLSBPVkVSSEVBRCBHVUFSRCBiYXJzIC0tPgogIDxyZWN0IHg9IjYwIiB5PSIyNyIgd2lkdGg9IjMiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiNFMEUwRTAiIG9wYWNpdHk9IjAuNyIvPgogIDxyZWN0IHg9IjcwIiB5PSIyNyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjIiIHJ4PSIxIiBmaWxsPSIjRTBFMEUwIiBvcGFjaXR5PSIwLjciLz4KPC9zdmc+',color:'#d97706',light:'#fbbf24',dark:'#92400e',kw:['سائق','سايق']},
-          {label:tr('hr_job_lb'),icon:'🦺',imgSrc:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KPGRlZnM+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzRhZGU4MCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzE1ODAzZCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJoYXRUb3AiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM4NmVmYWMiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyMmM1NWUiLz4KICA8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMjQiIGZpbGw9InVybCgjYmcpIi8+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iNTYiIHJ4PSIyNCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9Ii4wNyIvPgo8ZWxsaXBzZSBjeD0iNjAiIGN5PSI5NyIgcng9IjM2IiByeT0iNSIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iLjI1Ii8+CjwhLS0gSGFyZCBoYXQgZG9tZSAtLT4KPGVsbGlwc2UgY3g9IjYwIiBjeT0iNTIiIHJ4PSIzOCIgcnk9IjI4IiBmaWxsPSJ1cmwoI2hhdFRvcCkiLz4KPCEtLSBEb21lIHNpZGUgc2hhZGluZyAtLT4KPGVsbGlwc2UgY3g9IjcwIiBjeT0iNTQiIHJ4PSIyOCIgcnk9IjIyIiBmaWxsPSIjMTZhMzRhIiBvcGFjaXR5PSIuNCIvPgo8IS0tIEJyaW0gKHdpZGVyIGZsYXQgYnJpbSBhdCBib3R0b20gb2YgZG9tZSkgLS0+CjxyZWN0IHg9IjIwIiB5PSI3MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjgiIHJ4PSI0IiBmaWxsPSIjMTU4MDNkIi8+CjwhLS0gQnJpbSByaWdodCAzRCBmYWNlIC0tPgo8cG9seWdvbiBwb2ludHM9IjEwMCw3MCAxMDAsNzggMTA0LDc0IDEwNCw2NiIgZmlsbD0iIzE0NTMyZCIvPgo8IS0tIEJyaW0gdG9wIGZhY2UgLS0+Cjxwb2x5Z29uIHBvaW50cz0iMjAsNzAgMTAwLDcwIDEwNCw2NiAxNiw2NiIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iLjYiLz4KPCEtLSBJbm5lciBiYW5kIHN0cmlwZSAtLT4KPHBhdGggZD0iTTI4IDY4IFE2MCA3MiA5MiA2OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkVGMDhBIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8IS0tIFN1c3BlbnNpb24gY3Jvc3Mgb24gZG9tZSAtLT4KPGxpbmUgeDE9IjYwIiB5MT0iMzIiIHgyPSI2MCIgeTI9IjY4IiBzdHJva2U9IiMxNmEzNGEiIHN0cm9rZS13aWR0aD0iMiIgb3BhY2l0eT0iLjUiLz4KPGxpbmUgeDE9IjI2IiB5MT0iNTQiIHgyPSI5NCIgeTI9IjU0IiBzdHJva2U9IiMxNmEzNGEiIHN0cm9rZS13aWR0aD0iMiIgb3BhY2l0eT0iLjUiLz4KPCEtLSBTaGluZSAtLT4KPGVsbGlwc2UgY3g9IjQ2IiBjeT0iNDQiIHJ4PSIxNCIgcnk9IjgiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuMiIgdHJhbnNmb3JtPSJyb3RhdGUoLTIwIDQ2IDQ0KSIvPgo8L3N2Zz4=',color:'#16a34a',light:'#4ade80',dark:'#14532d',kw:['عامل','عمال']},
-          {label:tr('hr_job_sp'),icon:'📋',imgSrc:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KPGRlZnM+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2E3OGJmYSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzZkMjhkOSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyNCIgZmlsbD0idXJsKCNiZykiLz4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI1NiIgcng9IjI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iLjA3Ii8+CjxlbGxpcHNlIGN4PSI2MiIgY3k9Ijk3IiByeD0iMzIiIHJ5PSI1IiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjUiLz4KPCEtLSBCb2FyZCB0b3AgZmFjZSAtLT4KPHBvbHlnb24gcG9pbnRzPSIyOCw0MCA4OCw0MCA5NiwzMiAzNiwzMiIgZmlsbD0iI2M0YjVmZCIvPgo8IS0tIEJvYXJkIGZyb250IGZhY2UgLS0+CjxyZWN0IHg9IjI4IiB5PSI0MCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjU2IiByeD0iMyIgZmlsbD0iIzdjM2FlZCIvPgo8IS0tIEJvYXJkIHJpZ2h0IGZhY2UgLS0+Cjxwb2x5Z29uIHBvaW50cz0iODgsNDAgOTYsMzIgOTYsODggODgsOTYiIGZpbGw9IiM0YzFkOTUiLz4KPCEtLSBDbGlwIHRvcCBmYWNlIC0tPgo8cG9seWdvbiBwb2ludHM9IjQ4LDMyIDcyLDMyIDc2LDI4IDUyLDI4IiBmaWxsPSIjZGRkNmZlIi8+CjwhLS0gQ2xpcCBmcm9udCAtLT4KPHJlY3QgeD0iNDgiIHk9IjMyIiB3aWR0aD0iMjQiIGhlaWdodD0iMTIiIHJ4PSIyIiBmaWxsPSIjYTc4YmZhIi8+CjxyZWN0IHg9IjU0IiB5PSIzNSIgd2lkdGg9IjEyIiBoZWlnaHQ9IjYiIHJ4PSIxLjUiIGZpbGw9IiM0YzFkOTUiLz4KPCEtLSBDaGVja2xpc3QgbGluZXMgb24gZnJvbnQgLS0+CjxyZWN0IHg9IjM2IiB5PSI1NiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSIjZGRkNmZlIiBvcGFjaXR5PSIuOSIvPgo8cmVjdCB4PSI1MiIgeT0iNTYiIHdpZHRoPSIyNiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iI2RkZDZmZSIgb3BhY2l0eT0iLjYiLz4KPHJlY3QgeD0iMzYiIHk9IjY2IiB3aWR0aD0iMTIiIGhlaWdodD0iNCIgcng9IjIiIGZpbGw9IiNkZGQ2ZmUiIG9wYWNpdHk9Ii45Ii8+CjxyZWN0IHg9IjUyIiB5PSI2NiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSIjZGRkNmZlIiBvcGFjaXR5PSIuNiIvPgo8cmVjdCB4PSIzNiIgeT0iNzYiIHdpZHRoPSIxMiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iI2RkZDZmZSIgb3BhY2l0eT0iLjkiLz4KPHJlY3QgeD0iNTIiIHk9Ijc2IiB3aWR0aD0iMjQiIGhlaWdodD0iNCIgcng9IjIiIGZpbGw9IiNkZGQ2ZmUiIG9wYWNpdHk9Ii42Ii8+CjwhLS0gQ2hlY2ttYXJrcyAtLT4KPHBvbHlsaW5lIHBvaW50cz0iMzgsNTggNDEsNjIgNDcsNTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBvbHlsaW5lIHBvaW50cz0iMzgsNjggNDEsNzIgNDcsNjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBvbHlsaW5lIHBvaW50cz0iMzgsNzggNDEsODIgNDcsNzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZiYmYyNCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPCEtLSBTaGluZSAtLT4KPHJlY3QgeD0iMjgiIHk9IjQwIiB3aWR0aD0iNjAiIGhlaWdodD0iNSIgcng9IjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuMTUiLz4KPC9zdmc+',color:'#7c3aed',light:'#a78bfa',dark:'#4c1d95',kw:['مشرف']},
-          {label:tr('hr_job_tc'),icon:'🔧',imgSrc:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KPGRlZnM+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y4NzE3MSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2I5MWMxYyIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJ3R3JhZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Q0ZDRkNCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzczNzM3MyIvPgogIDwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyNCIgZmlsbD0idXJsKCNiZykiLz4KPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI1NiIgcng9IjI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iLjA3Ii8+CjwhLS0gTGFyZ2Ugd3JlbmNoIHNoYXBlIChyb3RhdGVkIH40NWRlZykgLS0+CjwhLS0gV3JlbmNoIGhhbmRsZSAtLT4KPHJlY3QgeD0iNTYiIHk9IjMwIiB3aWR0aD0iMTQiIGhlaWdodD0iNjIiIHJ4PSI3IiBmaWxsPSJ1cmwoI3dHcmFkKSIgdHJhbnNmb3JtPSJyb3RhdGUoLTQwIDYzIDYxKSIvPgo8IS0tIFdyZW5jaCBoZWFkIHRvcCBvcGVuIGVuZCAtLT4KPGNpcmNsZSBjeD0iMzgiIGN5PSIzNiIgcj0iMTYiIGZpbGw9InVybCgjd0dyYWQpIi8+CjxjaXJjbGUgY3g9IjM4IiBjeT0iMzYiIHI9IjkiIGZpbGw9IiNkYzI2MjYiLz4KPCEtLSBXcmVuY2ggaGVhZCBjdXRvdXQgKG9wZW4gZW5kIGdhcCkgLS0+CjxyZWN0IHg9IjMwIiB5PSIyMCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiByeD0iMiIgZmlsbD0iI2RjMjYyNiIgdHJhbnNmb3JtPSJyb3RhdGUoLTQwIDM4IDM2KSIvPgo8IS0tIFdyZW5jaCBoZWFkIGJvdHRvbSAtLT4KPGNpcmNsZSBjeD0iODQiIGN5PSI4OCIgcj0iMTIiIGZpbGw9InVybCgjd0dyYWQpIi8+CjxjaXJjbGUgY3g9Ijg0IiBjeT0iODgiIHI9IjYiIGZpbGw9IiNkYzI2MjYiLz4KPCEtLSBIYW5kbGUgc2hpbmUgLS0+CjxyZWN0IHg9IjYyIiB5PSIzOCIgd2lkdGg9IjUiIGhlaWdodD0iMzYiIHJ4PSIyLjUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuMiIgdHJhbnNmb3JtPSJyb3RhdGUoLTQwIDY0IDU2KSIvPgo8IS0tIFdyZW5jaCB0b3AgY2lyY2xlIGhpZ2hsaWdodCAtLT4KPHBhdGggZD0iTTMwIDI4IFEzNiAyMiA0NCAyOCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBvcGFjaXR5PSIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==',color:'#dc2626',light:'#f87171',dark:'#7f1d1d',kw:['فني']},
-          {label:tr('hr_job_ad'),icon:'🗂️',imgSrc:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KPGRlZnM+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJkZDRiZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBmNzY2ZSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJzY3JlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZTNhNWYiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZjE3MmEiLz4KICA8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMjQiIGZpbGw9InVybCgjYmcpIi8+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iNTYiIHJ4PSIyNCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9Ii4wNyIvPgo8ZWxsaXBzZSBjeD0iNjAiIGN5PSI5NyIgcng9IjM2IiByeT0iNSIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iLjI1Ii8+CjwhLS0gTGFwdG9wIGJhc2UgdG9wIGZhY2UgKGtleWJvYXJkKSAtLT4KPHBvbHlnb24gcG9pbnRzPSIxOCw3MiAxMDIsNzIgMTA4LDY0IDI0LDY0IiBmaWxsPSIjMTM0ZTRhIi8+CjwhLS0gTGFwdG9wIGJhc2UgZnJvbnQgZmFjZSAtLT4KPHJlY3QgeD0iMTgiIHk9IjcyIiB3aWR0aD0iODQiIGhlaWdodD0iMTAiIHJ4PSIyIiBmaWxsPSIjMGY3NjZlIi8+CjwhLS0gTGFwdG9wIGJhc2UgcmlnaHQgZmFjZSAtLT4KPHBvbHlnb24gcG9pbnRzPSIxMDIsNzIgMTA4LDY0IDEwOCw3NCAxMDIsODIiIGZpbGw9IiMwZDRmNDciLz4KPCEtLSBUcmFja3BhZCAtLT4KPHBvbHlnb24gcG9pbnRzPSI1MCw2NCA3MCw2NCA3Miw2OCA0OCw2OCIgZmlsbD0iIzBkM2QzYSIgb3BhY2l0eT0iLjgiLz4KPCEtLSBTY3JlZW4gKG9wZW4gYXQgYW5nbGUgLSBpc29tZXRyaWMpIC0tPgo8IS0tIFNjcmVlbiBiYWNrL3RvcCAtLT4KPHBvbHlnb24gcG9pbnRzPSIyNCw2NCA5Niw2NCA5NiwyNCAyNCwyNCIgZmlsbD0iIzFlM2E1ZiIvPgo8IS0tIFNjcmVlbiBmcm9udCBmYWNlICh0aGUgZGlzcGxheSkgLS0+CjxyZWN0IHg9IjI2IiB5PSIyNiIgd2lkdGg9IjY4IiBoZWlnaHQ9IjM2IiByeD0iMiIgZmlsbD0idXJsKCNzY3JlZW4pIi8+CjwhLS0gU2NyZWVuIGJlemVsIC0tPgo8cmVjdCB4PSIyOCIgeT0iMjgiIHdpZHRoPSI2NCIgaGVpZ2h0PSIzMiIgcng9IjEiIGZpbGw9IiMwZjE3MmEiLz4KPCEtLSBTY3JlZW4gY29udGVudDogY29kZSBsaW5lcyAtLT4KPHJlY3QgeD0iMzIiIHk9IjMyIiB3aWR0aD0iMzAiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzJkZDRiZiIgb3BhY2l0eT0iLjgiLz4KPHJlY3QgeD0iMzIiIHk9IjM4IiB3aWR0aD0iNDQiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzgxOGNmOCIgb3BhY2l0eT0iLjciLz4KPHJlY3QgeD0iMzIiIHk9IjQ0IiB3aWR0aD0iMjQiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzJkZDRiZiIgb3BhY2l0eT0iLjYiLz4KPHJlY3QgeD0iMzIiIHk9IjUwIiB3aWR0aD0iMzYiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iI2Y0NzJiNiIgb3BhY2l0eT0iLjYiLz4KPCEtLSBTY3JlZW4gc2hpbmUgLS0+Cjxwb2x5Z29uIHBvaW50cz0iMjgsMjggOTIsMjggODgsMzIgMjgsMzIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuMDgiLz4KPCEtLSBIaW5nZSAtLT4KPHJlY3QgeD0iMjQiIHk9IjYyIiB3aWR0aD0iNzIiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzBkNGY0NyIvPgo8L3N2Zz4=',color:'#0f766e',light:'#2dd4bf',dark:'#134e4a',kw:['إداري','اداري','موظف','منسق']}
-        ];
-        document.getElementById('hr-kpi-jobs').innerHTML = jobKeywords.map(function(jk){
-          var c = count(d,function(r){return jk.kw.some(function(kw){return r.actual_job&&r.actual_job.includes(kw);});});
-          var iconInner = jk.imgSrc
-            ? '<img src="'+jk.imgSrc+'" style="width:100%;height:100%;display:block;object-fit:cover;border-radius:14px" />'
-            : jk.icon;
-          var iconBg = jk.imgSrc ? 'none' : 'linear-gradient(145deg,'+jk.light+','+jk.color+')';
-          var iconPad = jk.imgSrc ? '0' : '4px';
-          var shadowExtra = jk.imgSrc ? '' : '<div class="hr-3d-face" style="background:'+jk.color+'"></div><div class="hr-3d-side" style="background:'+jk.color+'"></div>';
-          return '<div class="hr-kpi hr-job-kpi">'+
-            '<div class="hr-3d-wrap">'+
-              '<div class="hr-3d-icon" style="background:'+iconBg+';box-shadow:0 6px 0 '+jk.dark+',0 8px 16px rgba(0,0,0,.18);overflow:hidden;padding:'+iconPad+'">'+iconInner+'</div>'+
-              shadowExtra+
-            '</div>'+
-            '<div class="hk-val" style="color:'+jk.color+'">'+c+'</div>'+
-            '<div class="hk-label">'+jk.label+'</div>'+
-            '</div>';
-        }).join('');
-
-        // Row 4 — Gauges
-        var saudPct = total ? Math.round(saudis/total*100) : 0;
-        var leasePct = total ? Math.round(leasing/total*100) : 0;
-        var over50 = count(d,function(r){return r.age>=50;});
-        var over50Pct = total ? Math.round(over50/total*100) : 0;
-        var noIqama = count(d,function(r){return !r.iqama||r.iqama==='';});
-        var noIqamaPct = total ? Math.round(noIqama/total*100) : 0;
-        document.getElementById('hr-gauges-row').innerHTML =
-          gaugeHtml(tr('hr_gauge_saudi'), saudPct, '#1f9d57')+
-          gaugeHtml(tr('hr_gauge_leasing'), leasePct, '#e05c2a')+
-          gaugeHtml(tr('hr_gauge_over50'), over50Pct, '#e0a32e')+
-          gaugeHtml(tr('hr_gauge_nores'), noIqamaPct, '#dc2626');
-
-        // Chart 2: Nationality (doughnut)
-        var byNat = grpBy(d,function(r){return r.nationality;});
-        var natEntries = topN(byNat,8);
-        drawChart('hr-chart-nat','doughnut',natEntries.map(function(x){return x[0];}),natEntries.map(function(x){return x[1];}),PALETTE);
-        // Chart 3: Age distribution (bar)
-        var ageBands = {[tr('hr_age_u25')]:0,'25-34':0,'35-44':0,'45-54':0,'55+':0};
-        var ageBandKeys = [tr('hr_age_u25'),'25-34','35-44','45-54','55+'];
-        d.forEach(function(r){
-          var a=Number(r.age)||0; if(!a) return;
-          if(a<25) ageBands[ageBandKeys[0]]++;
-          else if(a<35) ageBands[ageBandKeys[1]]++;
-          else if(a<45) ageBands[ageBandKeys[2]]++;
-          else if(a<55) ageBands[ageBandKeys[3]]++;
-          else ageBands[ageBandKeys[4]]++;
-        });
-        drawChart('hr-chart-age','bar',ageBandKeys,ageBandKeys.map(function(k){return ageBands[k];}),PALETTE.slice(2));
-
-        // Row 6 — Alerts
-        var iqamaExpired = d.filter(function(r){return !r.iqama||r.iqama==='';});
-                var over60       = d.filter(function(r){return r.age>=60;});
-        var inactive     = d.filter(function(r){return r.status&&!r.status.includes('على راس')&&!r.status.includes('نشط');});
-
-        function mkAlert(label, items, color){
-          var n = Array.isArray(items) ? items.length : items;
-          var arr = Array.isArray(items) ? items : [];
-          var empty = n===0;
-          var preview = arr.slice(0,3).map(function(r){return r.name||r.emp_id||'';}).join(' · ');
-          if(arr.length>3) preview += tr('hr_and')+(arr.length-3)+tr('hr_others');
-          return '<div class="hr-alert-card" style="border-top-color:'+(empty?'#22c55e':color)+'">'+'<div class="ha-head">'+'<span class="ha-label">'+label+'</span>'+'<span class="ha-count" style="color:'+(empty?'#22c55e':color)+'">'+n+'</span></div>'+(empty?'<div class="ha-ok">'+tr('hr_empty')+'</div>':'<div class="ha-preview">'+preview+'</div>')+'</div>';
-        }
-
-        var ag = document.getElementById('hr-alerts-grid');
-        if(ag) ag.innerHTML =
-          mkAlert(tr('hr_alert_noid'),     iqamaExpired, '#dc2626')+
-          mkAlert(tr('hr_alert_retire'), over60,       '#e0a32e')+
-          mkAlert(tr('hr_alert_inactive'), inactive,   '#94a3b8');
-
-        // Quick table
-        var tbody = document.getElementById('hr-quick-tbody');
-        if(tbody){
-          tbody.innerHTML = d.slice(0,50).map(function(r){
-            var statusColor = r.status&&(r.status.includes('على راس')||r.status.includes('نشط'))?'#22c55e':'#94a3b8';
-            return '<tr><td>'+r.emp_id+'</td><td style="font-weight:600">'+r.name+'</td><td>'+r.actual_job+'</td><td>'+r.region+'</td><td>'+r.nationality+'</td>'+
-              '<td><span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;background:'+statusColor+'22;color:'+statusColor+'">'+r.status+'</span></td>'+
-              '<td>'+r.age+'</td><td>'+r.hire_date+'</td></tr>';
-          }).join('');
-        }
-      };
-
-      /* ══ Summary Table ══ */
-      window.hrRefreshEmp = function(){
-        var d = HR.data;
-        var nodata = document.getElementById('hr-emp-nodata');
-        var content = document.getElementById('hr-emp-content');
-        if(!d||!d.length){ nodata.style.display=''; content.style.display='none'; return; }
-        nodata.style.display='none'; content.style.display='';
-        // Populate filter selects
-        function fillSelect(id, fn){
-          var sel = document.getElementById(id); if(!sel) return;
-          var vals = [...new Set(d.map(fn).filter(Boolean))].sort();
-          var cur = sel.value;
-          sel.innerHTML = '<option value="">'+tr('hr_all')+'</option>'+vals.map(function(v){return '<option value="'+v+'"'+(v===cur?' selected':'')+'>'+v+'</option>';}).join('');
-        }
-        fillSelect('hr-f-region',function(r){return r.region;});
-        fillSelect('hr-f-entity',function(r){return r.work_entity;});
-        fillSelect('hr-f-nat',function(r){return r.nationality;});
-        fillSelect('hr-f-status',function(r){return r.status;});
-        fillSelect('hr-f-contract',function(r){return r.contract_type;});
-        fillSelect('hr-f-storage',function(r){return r.storage_type;});
-        fillSelect('hr-f-leasing',function(r){return r.leasing_co;});
-        hrEmpFilter();
-      };
-
-      window.hrEmpFilter = function(){
-        var d = HR.data; if(!d||!d.length) return;
-        var search = (document.getElementById('hr-f-search')||{}).value||'';
-        var region = (document.getElementById('hr-f-region')||{}).value||'';
-        var entity = (document.getElementById('hr-f-entity')||{}).value||'';
-        var nat = (document.getElementById('hr-f-nat')||{}).value||'';
-        var status = (document.getElementById('hr-f-status')||{}).value||'';
-        var contract = (document.getElementById('hr-f-contract')||{}).value||'';
-        var storage = (document.getElementById('hr-f-storage')||{}).value||'';
-        var leasing = (document.getElementById('hr-f-leasing')||{}).value||'';
-        var sl = search.toLowerCase();
-        var filtered = d.filter(function(r){
-          return (!sl || r.name.toLowerCase().includes(sl)||String(r.emp_id).includes(sl)) &&
-            (!region || r.region===region) && (!entity || r.work_entity===entity) &&
-            (!nat || r.nationality===nat) && (!status || r.status===status) &&
-            (!contract || r.contract_type===contract) && (!storage || r.storage_type===storage) &&
-            (!leasing || r.leasing_co===leasing);
-        });
-        if(HR.sortKey){
-          filtered.sort(function(a,b){
-            var av=a[HR.sortKey]||'', bv=b[HR.sortKey]||'';
-            return (av>bv?1:av<bv?-1:0)*HR.sortDir;
-          });
-        }
-        var el = document.getElementById('hr-emp-count'); if(el) el.textContent='عدد: '+filtered.length;
-        var tbody = document.getElementById('hr-emp-tbody'); if(!tbody) return;
-        tbody.innerHTML = filtered.map(function(r){
-          var now=new Date(), hd=new Date(r.hire_date_raw);
-          var svc=isNaN(hd)?'—':Math.floor((now-hd)/(365.25*24*3600*1000))+' سنة';
-          return '<tr><td>'+r.emp_id+'</td><td style="font-weight:600;white-space:nowrap">'+r.name+'</td>'+
-            '<td>'+r.actual_job+'</td><td>'+r.system_job+'</td><td>'+r.work_entity+'</td><td>'+r.region+'</td>'+
-            '<td>'+r.storage_type+'</td><td>'+r.nationality+'</td>'+
-            '<td><span style="padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;background:'+(r.status.includes('على راس')||r.status.includes('نشط')?'#dcfce7':'#f1f5f9')+';color:'+(r.status.includes('على راس')||r.status.includes('نشط')?'#166534':'#475569')+'">'+r.status+'</span></td>'+
-            '<td>'+r.age+'</td><td>'+r.hire_date+'</td><td>'+svc+'</td>'+
-            '<td>'+r.contract_type+'</td><td>'+r.leasing_co+'</td>'+
-            '<td style="font-family:monospace;font-size:11px">'+r.iqama+'</td>'+
-            '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+r.notes+'">'+r.notes+'</td></tr>';
-        }).join('');
-      };
-      window.hrEmpSort = function(key){
-        HR.sortDir = (HR.sortKey===key) ? -HR.sortDir : 1;
-        HR.sortKey = key; hrEmpFilter();
-      };
-      window.hrEmpClearFilters = function(){
-        ['hr-f-search','hr-f-region','hr-f-entity','hr-f-nat','hr-f-status','hr-f-contract','hr-f-storage','hr-f-leasing'].forEach(function(id){
-          var el=document.getElementById(id);if(el) el.tagName==='INPUT'?el.value='':el.value='';
-        }); hrEmpFilter();
-      };
-      window.hrEmpExportXLSX = function(){
-        var d = HR.data; if(!d||!d.length) return;
-        var ws = XLSX.utils.json_to_sheet(d);
-        var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'HR');
-        XLSX.writeFile(wb,'HR_Export_'+new Date().toISOString().slice(0,10)+'.xlsx');
-      };
-
-      /* ══ Pending Items ══ */
-      window.hrRefreshPending = function(){
-        var d = HR.data;
-        var nodata = document.getElementById('hr-pending-nodata');
-        var content = document.getElementById('hr-pending-content');
-        if(!d||!d.length){ nodata.style.display=''; content.style.display='none'; return; }
-        nodata.style.display='none'; content.style.display='';
-        var noIqama = d.filter(function(r){return !r.iqama||r.iqama==='';});
-        var hasNotes = d.filter(function(r){return r.notes&&r.notes!='';});
-        var over60 = d.filter(function(r){return r.age>=60;});
-        var over50 = d.filter(function(r){return r.age>=50&&r.age<60;});
-        var allAlerts = [
-          {label:'بدون رقم إقامة', items:noIqama, icon:'🪪', color:'#dc2626'},
-          {label:'فوق سن التقاعد (60+)', items:over60, icon:'👴', color:'#e0a32e'},
-          {label:'اقتربوا من سن التقاعد (50-59)', items:over50, icon:'⏰', color:'#f2974a'},
-          {label:'لديهم ملاحظات', items:hasNotes, icon:'📝', color:'#4a93f2'}
-        ];
-        var kpis = document.getElementById('hr-pending-kpis');
-        kpis.innerHTML = allAlerts.map(function(a){
-          return hrKpiHtml(a.label, a.items.length, a.icon, a.items.length>0?'t-g90':'t-60');
-        }).join('');
-        var sections = document.getElementById('hr-pending-sections');
-        sections.innerHTML = allAlerts.map(function(a){
-          return '<div class="card" style="margin-bottom:16px;border-top:3px solid '+(a.items.length?a.color:'#22c55e')+'">'+
-            '<div class="ch"><h5>'+a.icon+' '+a.label+'</h5><span style="font-size:18px;font-weight:800;color:'+(a.items.length?a.color:'#22c55e')+'">'+a.items.length+'</span></div>'+
-            (a.items.length===0 ? '<div style="color:#22c55e;font-size:13px">✅ لا توجد بنود معلّقة</div>' :
-              '<div style="overflow:auto;max-height:220px"><table class="utable" style="font-size:12px"><thead><tr><th>الرقم</th><th>الاسم</th><th>الوظيفة</th><th>جهة العمل</th><th>المنطقة</th><th data-i18n="hr_tbl_notes">الملاحظات</th></tr></thead><tbody>'+
-              a.items.map(function(r){return '<tr><td>'+r.emp_id+'</td><td style="font-weight:600">'+r.name+'</td><td>'+r.actual_job+'</td><td>'+r.work_entity+'</td><td>'+r.region+'</td><td>'+r.notes+'</td></tr>';}).join('')+
-              '</tbody></table></div>')+
-          '</div>';
-        }).join('');
-      };
-
-      /* ══ ربط مباشر عبر onclick في أزرار القائمة — لا حاجة لـ observer ══ */
-    })();
-    </script>
-
     <!-- ════════ القارورة والفرشة — Advanced Analytics ════════ -->
     <div class="page" id="page-btl-dash"><div class="wrap" id="btl-dash-root"></div></div>
     <div class="page" id="page-btl-compare"><div class="wrap" id="btl-compare-root"></div></div>
@@ -4488,8 +3701,7 @@ const T={
   ch_classify:'Inventory Classifying',ch_sizeitem:'SKU Inventory — Size Item',sub_sizeitem:'CTN / SHR',
   center_total:'TOTAL QTY',gsearch_ph:'Search anything…',login_sub:'Inventory Dashboard',nav_home:'Home',login_welcome:'Welcome back',login_form_sub:'Sign in to access your reporting workspace',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'Warehouse aging, coverage and analytics — unified in one workspace.',login_stat_wh:'Warehouses',login_stat_br:'Brands',login_stat_rp:'Reports',home_hero_title:'Reporting Center',home_hero_sub:'Select a report to open — everything in one place.',home_open:'Open',back_btn:'Back',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'Tania • Warehouse',desc_dash:'KPIs, charts and aging breakdown',desc_sum:'Totals by brand, month and branch',desc_sku:'Item-level totals and top SKUs',desc_rspace:'Warehouse space utilisation',desc_rfgbal:'Finished-goods balance by branch',desc_roldid:'Slow-moving / old identity stock',desc_rtransit:'Goods in transit between sites',desc_rbottle:'Bottle stock coverage',desc_imp:'Upload an Excel file to refresh data',desc_cloud:'Sync and back up to Firebase',desc_records:'Edit any cell, add, duplicate or delete records',desc_designer:'Customise table columns and methods',desc_users:'Manage accounts and permissions',desc_dailyup:'Upload the daily coverage files',login_user:'Username',login_pass:'Password',login_btn:'Login',col_new_manual:'New manual column',col_new_calc:'New calculated column',colm_title:'Column Manager',colm_sub:'Add custom columns (manual or calculated) to any table.',colm_screen:'Table',colm_add_calc:'+ Calculated column',colm_add_manual:'+ Manual column',colm_name:'Column name',colm_formula:'Formula e.g. {total} * 0.15',colm_type:'Type',colm_t_calc:'Calculated',colm_t_manual:'Manual',colm_avail:'Available variables',colm_hbg:'Header color',colm_cbg:'Cell color',colm_del:'Delete',colm_none:'No custom columns yet.',colm_help_calc:'Use variables in braces. Supports + - * / ( ) and Math.round/abs/min/max.',colm_help_manual:'Manual columns let you type a value into each row directly.',colm_existing:'Existing columns (click to show/hide)',colm_custom:'Custom columns',colm_hide:'Hide column',colm_show:'Show column',forgot_pwd:'Forgot password?',login_remember:'Remind me',login_bio:'Sign in with fingerprint / Face ID',bio_or:'or',bio_setup_title:'Quick sign-in',bio_setup_q:'Enable fingerprint / Face ID for faster sign-in next time?',bio_enable:'Enable',bio_later:'Not now',bio_enabled:'Quick sign-in enabled on this device.',bio_failed:'Biometric sign-in failed. Use your password.',bio_unsupported:'This device does not support biometric sign-in.',bio_none:'No saved quick sign-in on this device.',bio_disable:'Disable quick sign-in',bio_disabled:'Quick sign-in disabled on this device.',fpc_title:'Password change required',fpc_sub:'To protect your account, set a new password before continuing.',fpc_new:'New password',fpc_confirm:'Confirm password',fpc_save:'Save & continue',fpc_r_len:'At least 8 characters',fpc_r_upper:'Uppercase (A-Z)',fpc_r_lower:'Lowercase (a-z)',fpc_r_digit:'Number (0-9)',fpc_r_symbol:'Symbol (!@#$...)',pwd_reset_forced:'Password reset. User must set a new one at next login.',fp_title:'Reset Password',fp_desc1:'Enter your username. A verification code will be sent to your registered email.',fp_desc2:'Enter the code sent to',fp_send:'Send code',fp_reset:'Reset password',fp_resend:'Resend code',fp_need_user:'Please enter your username.',fp_checking:'Checking…',fp_no_user:'No account found with this username.',fp_no_email:'No email is registered for this account. Contact your admin.',fp_email_unavail:'Email service is not configured. Contact your admin.',fp_sent_ok:'Code sent. Check your inbox.',fp_send_fail:'Could not send the code. Try again later.',fp_restart:'Please restart the reset process.',fp_expired:'The code has expired. Request a new one.',fp_bad_code:'Incorrect code.',fp_pwd_short:'Password must be at least 4 characters.',fp_pwd_mismatch:'Passwords do not match.',fp_reset_ok:'Password reset successfully.',sec_title:'Security & Email Settings',sec_sub:'Configure the email service used to send password-reset codes to users.',sec_pub:'EmailJS Public Key',sec_svc:'Service ID',sec_tpl:'Template ID',sec_save:'Save settings',sec_test:'Send test email',sec_note:'Tip: create a free account at emailjs.com, add an email service and a template containing the variable {{passcode}}, then paste the keys above.',sec_saved:'Settings saved.',sec_need_all:'Please fill all three fields.',sec_admin_only:'Admins only.',sec_bad_cfg:'Invalid or missing settings.',sec_no_admin_email:'Your account has no email set.',sec_sending:'Sending…',sec_test_ok:'Test email sent to',sec_test_fail:'Test failed. Check your settings.',log_title:'Login Activity Log',log_refresh:'Refresh',log_clear:'Clear log',log_user:'User',log_event:'Event',log_time:'Time',log_empty:'No activity yet.',log_k_login:'Signed in',log_k_reset:'Password reset',log_k_failed:'Failed attempt',login_bad:'Invalid username or password',login_empty_user:'Please enter your username',login_empty_pass:'Please enter your password',login_empty_both:'Please enter your username and password',login_nouser:'No account found with this username',login_wrongpass:'Incorrect password — please try again',login_temp_expired:'Temporary password expired. Please request a new one.',fp_temp_sent:'Temporary password sent to your email.',fp_temp_done1:'A temporary password (valid 24 hours) has been sent to',fp_temp_done2:"Sign in with it — you'll be asked to set a new password.",fp_done_ok:'Got it',temp_show_title:'Temporary password generated',temp_show_for:'For user',temp_show_valid:'Valid until',temp_show_hint:'Password change will be required after signing in with it.',temp_copy:'Copy code',login_locked:'Account temporarily locked. Try again in {n}s',nav_users:'Users',nav_records:'Data Editor',rec_title:'Data Editor — Edit & Add Records',rec_add:'Add Record',rec_search:'Search records',rec_del:'Delete',rec_dup:'Duplicate',rec_edit_hint:'Click any cell in the table to edit it directly. Changes are saved and synced to all devices automatically.',rec_save:'Save to Cloud',rec_qty:'Quantity',rec_cat2:'Category 2',rec_logo:'Logo',rec_need:'Enter Identity and Branch at least',logout:'Logout',changepwd_btn:'Change password',users_title:'User Management',users_sub:'Manage accounts, permissions and security',utab_users:'Users',utab_security:'Security & Email',utab_log:'Login Log',ce_title:'Card title',ce_calc:'Calculation',ce_cls:'Age class',ce_month:'Month',ce_color:'Color',ce_save:'Save card',ce_cancel:'Cancel',ce_sum:'Sum of quantity',ce_avg:'Average quantity',ce_count:'Item count',ce_max:'Max quantity',ce_min:'Min quantity',ce_all:'All',u_add_title:'Add new user',u_list_title:'Users list',u_perms_modal:'Permissions',u_user:'Username',u_pass:'Password',u_role:'Role',u_add:'Add User',u_admin:'Admin',u_userrole:'User',u_actions:'Actions',u_delete:'Delete',u_exists:'Username already exists',u_need:'Enter username and password',u_perms:'Screen permissions',u_temp:'Temporary',u_all:'All',u_email:'Email',u_mobile:'Mobile',u_password:'Password',u_resetpwd:'Reset Password',set_new_pwd:'Enter a new password for the user:',pwd_changed:'Password updated successfully.',u_pwd_help:'🔑 Password: send a reset link (permanent) or set a 24-hour temporary password · ⚙️ Edit permissions for screen access.',temp_prompt:'Your password is temporary. Please enter a new password:',cols_btn:'Columns',cols_title:'Show / hide columns',cols_hint:'Check a branch to show its column, uncheck to hide it. Changes are saved automatically and apply to both tables.',nav_designer:'Designer',nav_cardbuilder:'Card Builder',nav_pagebuilder:'Page Builder',cb_title:'Card Builder',cb_sub:'Create custom KPI cards that appear on the dashboard',cb_new:'New card',cb_f_title:'Card title',cb_f_calc:'Calculation',cb_f_age:'Age class',cb_f_month:'Month',cb_f_icon:'Icon',cb_f_color:'Color',cb_calc_sum:'Sum of quantity',cb_calc_avg:'Average quantity',cb_calc_count:'Item count',cb_calc_max:'Max value',cb_calc_min:'Min value',cb_age_all:'All classes',cb_month_all:'All months',cb_save:'Save card',cb_cancel:'Cancel',cb_preview:'Live preview',cb_preview_hint:'The value is computed from current data and reflects dashboard filters.',cb_list:'Created cards',cb_empty:'No cards yet. Create your first card above.',designer_title:'Table Designer',designer_sub:'Rename columns, choose the calculation method, reorder and show/hide columns.',calc_method:'Calculation method',calc_sum:'Sum',calc_avg:'Average',calc_count:'Count',calc_max:'Max',calc_min:'Min',calc_hint:'Applies to all value cells in the Summary and SKU tables.',appearance:'Appearance',colors:'Colors',c_primary:'Primary',c_teal:'Teal',c_blue:'Blue',c_orange:'Orange',st_color:'Color',st_font:'Font',st_size:'Font size (px)',st_align:'Text align',dz_al_def:'Default',dz_al_l:'Left',dz_al_c:'Center',dz_al_r:'Right',font_family:'Font',font_default:'Default',display_size:'Display size',card_titles:'Card titles & labels',dz_pick:'Choose screen to edit',dz_pick_hint:'Each screen is edited independently — changes here do not affect other screens.',dz_scr_dash:'Dashboard',dz_scr_sum:'Summary table',dz_scr_sku:'SKU table',dz_scr_fgbal:'FG Balance report',dz_scr_oldid:'OLD Identity report',dz_scr_transit:'FG Transit report',rpt_cols_title:'Report columns',rpt_cols_hint:'Rename headers, set colors and add conditional formatting. Changes apply to this report only.',rpt_no_data:'Upload this report first to load its columns.',dz_scr_appear:'General appearance',chart_order:'Chart cards order / position',dz_branch_order:'Branch column order',dz_col:'Column',dz_name:'Display name',dz_show:'Show',dz_calc:'Calc',calc_default:'Default',dz_reset:'Reset',dz_collapse_all:'Collapse all',dz_expand_all:'Expand all',dz_sum_title:'Summary columns',dz_sku_title:'SKU columns',set_date_label:'Report update date',set_btn:'Set date',saved_date:'\u2713 Update date saved.',dz_color:'Color',dz_cf:'Cond. format',cc_hbg:'Header background',cc_cbg:'Cell background',cc_cfg:'Cell text',cc_clear:'Clear colors',cf_title:'Conditional formatting',cf_sub:'Add rules: when the cell value meets a condition, apply colors. "Whole row" colors the entire row.',cf_if:'If value',cf_and:'and',cf_between:'between',cf_outside:'outside',cf_bg:'Fill',cf_fg:'Text',cf_bold:'Bold',cf_scope:'Apply to',cf_cell:'This cell',cf_row:'Whole row',cf_addrule:'Add rule',cf_done:'Done',cust_title:'Custom calculated columns',cust_help:'Create a new column from a formula. Use column tokens and arithmetic ( + - * / and % ).',cust_avail:'Available tokens',cust_name:'Column name',cust_formula_ph:'e.g.  {total} * 0.15   or   {br_RYD} + {br_HIT}',cust_add:'Add column',em_edit:'Edit titles',em_done:'Finish editing',em_banner:'Edit mode — click any title to rename it. Changes sync to everyone.',portal_titles:'Login portal & platform titles',portal_titles_hint:'Edit the external login page and platform brand wording. Changes sync to everyone and appear on the login screen.',
   sum_title:'Finished Product — Totals Summary',c_year:'Year',c_month:'Month',c_cat:'Category',c_total:'Total',c_pct:'%',sum_grand:'Grand Total',
-  ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',hr_nodata_title:'No HR Data Yet',hr_nodata_desc:'Upload an Excel file from Upload Center to view the dashboard',hr_no_upload:'No data uploaded yet',hr_refresh:'Refresh',hr_upload_btn:'Upload Data',hr_upload_hr:'Upload HR File',hr_alerts_title:'🔔 Smart Alerts',hr_chart_region:'Distribution by Region',hr_chart_entity:'Distribution by Entity',hr_chart_storage:'Distribution by Storage Type',hr_chart_job:'Actual Job Title',hr_chart_nat:'Employees by Nationality',hr_chart_contract:'Marital Status',hr_chart_age:'Age Distribution',hr_chart_leasing:'Leasing Company Employees',hr_total_emp:'Total Employees',hr_saudi:'Saudis',hr_non_saudi:'Non-Saudis',hr_leasing_emp:'Leasing Employees',hr_company_emp:'Company Employees',hr_avg_age:'Avg Age',hr_avg_service:'Avg Service',hr_year:'yrs',hr_job_wm:'Warehouse Managers',hr_job_ws:'Warehouse Keepers',hr_job_dr:'Drivers',hr_job_lb:'Workers',hr_job_sp:'Supervisors',hr_job_tc:'Technicians',hr_job_ad:'Admins',hr_gauge_saudi:'Saudization Rate',hr_gauge_leasing:'Leasing Rate',hr_gauge_over50:'Employees Over 50',hr_gauge_nores:'No Residence Registered',hr_age_u25:'Under 25',hr_alert_noid:'No ID Number',hr_alert_retire:'Retirement Age 60+',hr_alert_notes:'Have Remarks',hr_alert_inactive:'Inactive',hr_empty:'✅ No items',hr_unknown:'Unknown',hr_all:'All',hr_and:' and ',hr_others:' others',hr_tbl_no:'#',hr_tbl_name:'Name',hr_tbl_job:'Job Title',hr_tbl_entity:'Entity',hr_tbl_region:'Region',hr_tbl_nat:'Nationality',hr_tbl_status:'Status',hr_tbl_age:'Age',hr_tbl_hire:'Hire Date',hr_tbl_service:'Service',hr_tbl_contract:'Contract',hr_tbl_leasing_co:'Leasing Co.',hr_tbl_iqama:'ID No.',hr_tbl_notes:'Remarks',hr_emp_list:'Employee List — Quick View',hr_filters:'Filters',hr_search_ph:'Name or ID…',hr_region:'Region',hr_entity:'Entity',hr_nationality:'Nationality',hr_status_col:'Status',hr_contract_col:'Contract Type',hr_storage_col:'Storage Type',hr_leasing_col:'Leasing Company',hr_view_all:'View All ↗',hr_nodata_simple:'No data',hr_print:'Print',hr_pending_title:'HR Pending Items',hr_emp_details:'Employee Details',hr_upd_suffix:'Alerts & Pending Items',
-  map:{identity:{'1- New Identity':'New Identity','2- OLD Identity':'Old Identity','3- Mai':'Mai','4- Mokabat':'Mokabat','5- SAR':'SAR','6- TG Sparkling':'TG Sparkling'}},grp_daily:'Daily Coverage Report',grp_data:'Data & Tools',grp_admintools:'Admin Tools',u_selall:'Select all',u_selnone:'Clear',nav_masterdata:'Master Data',nav_spaceact:'Space Actuals',nav_rspace:'Space in Warehouses',nav_rfgbal:'FG Balance',nav_roldid:'OLD Identity',nav_rtransit:'FG Transit',nav_rbottle:'FG Bottle Stock',nav_dailyup:'Daily Reports Upload',cloud_title:'\u2601\ufe0f Cloud Sync',cloud_sub:'Store and sync the report data in your chosen cloud database.',cloud_cfg_label:'Firebase configuration',fb_apikey:'API Key',fb_project:'Project ID',fb_authdomain:'Auth Domain',fb_bucket:'Storage Bucket',fb_sender:'Messaging Sender ID',fb_appid:'App ID',fb_paste_toggle:'Or paste the full firebaseConfig',fb_fill:'Fill fields from config',popout_btn:'Window',full_btn:'Fullscreen',export_excel:'Export to Excel',cloud_connect:'Connect',cloud_save:'Save to Cloud',cloud_test:'Test Connection',cloud_load:'Load from Cloud',cloud_auto:'Auto-load on open & auto-save on every change',cloud_live:'Live two-way sync (recommended)',cloud_note_title:'Setup notes',cloud_st_idle:'Not connected',cloud_n1:'Create a Firebase project, enable <b>Firestore Database</b>, then copy the <span class=\"tag\">firebaseConfig</span> from Project settings.',cloud_n2:'For testing, set Firestore rules to test mode. For production, secure your rules.',cloud_n3:'Data is stored in collection <span class=\"tag\">inventory_dashboard</span>, document <span class=\"tag\">latest</span>.',cloud_n4:'All data &amp; settings are stored in the cloud only (no browser storage).',cloud_provider_label:'Cloud database provider',cloud_provider_hint:'Choose where your data is stored. Each device remembers its choice.',cloud_sb_cfg_label:'Supabase configuration',sb_url:'Project URL',sb_anon:'Anon public key',cloud_sb_n1:'Supabase: create a table <span class="tag">cloud_docs</span> with columns col text, doc text, data jsonb, updated_at int8, primary key (col, doc), and enable Realtime on it.',cyl_storage:'Storage area',cyl_used:'Used balance',cyl_transit:'Transit',cyl_empty:'Empty (available)',cyl_branch_title:'Branches',cyl_fact_title:'Factories',sp_lbl_actual:'Actual Spaces',sp_lbl_used:'Used Spaces',sp_lbl_transit:'Transit Spaces',sp_lbl_empty:'Empty Space',bt_rpt_title:'Current Bottle Stock &amp; Branch Transit Report',btl_dash_title:'Bottle & Brushing Dashboard',btl_dash_sub:'Production, sales, brushing &amp; damage analytics — from actual file data',btl_kpi_prod:'Production',btl_kpi_sales:'Sales',btl_kpi_brush:'Brushing',btl_kpi_dmg:'Damaged',btl_kpi_brushpct:'Brushing %',btl_kpi_dmgpct:'Damaged %',btl_ch_trend:'Monthly Sales Trend',btl_ch_prodsales:'Production vs Sales',btl_ch_branch:'Brushing by Branch',btl_ch_bd:'Brushing vs Damaged',
+  ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',map:{identity:{'1- New Identity':'New Identity','2- OLD Identity':'Old Identity','3- Mai':'Mai','4- Mokabat':'Mokabat','5- SAR':'SAR','6- TG Sparkling':'TG Sparkling'}},grp_daily:'Daily Coverage Report',grp_data:'Data & Tools',grp_admintools:'Admin Tools',u_selall:'Select all',u_selnone:'Clear',nav_masterdata:'Master Data',nav_spaceact:'Space Actuals',nav_rspace:'Space in Warehouses',nav_rfgbal:'FG Balance',nav_roldid:'OLD Identity',nav_rtransit:'FG Transit',nav_rbottle:'FG Bottle Stock',nav_dailyup:'Daily Reports Upload',cloud_title:'\u2601\ufe0f Cloud Sync',cloud_sub:'Store and sync the report data in your chosen cloud database.',cloud_cfg_label:'Firebase configuration',fb_apikey:'API Key',fb_project:'Project ID',fb_authdomain:'Auth Domain',fb_bucket:'Storage Bucket',fb_sender:'Messaging Sender ID',fb_appid:'App ID',fb_paste_toggle:'Or paste the full firebaseConfig',fb_fill:'Fill fields from config',popout_btn:'Window',full_btn:'Fullscreen',export_excel:'Export to Excel',cloud_connect:'Connect',cloud_save:'Save to Cloud',cloud_test:'Test Connection',cloud_load:'Load from Cloud',cloud_auto:'Auto-load on open & auto-save on every change',cloud_live:'Live two-way sync (recommended)',cloud_note_title:'Setup notes',cloud_st_idle:'Not connected',cloud_n1:'Create a Firebase project, enable <b>Firestore Database</b>, then copy the <span class=\"tag\">firebaseConfig</span> from Project settings.',cloud_n2:'For testing, set Firestore rules to test mode. For production, secure your rules.',cloud_n3:'Data is stored in collection <span class=\"tag\">inventory_dashboard</span>, document <span class=\"tag\">latest</span>.',cloud_n4:'All data &amp; settings are stored in the cloud only (no browser storage).',cloud_provider_label:'Cloud database provider',cloud_provider_hint:'Choose where your data is stored. Each device remembers its choice.',cloud_sb_cfg_label:'Supabase configuration',sb_url:'Project URL',sb_anon:'Anon public key',cloud_sb_n1:'Supabase: create a table <span class="tag">cloud_docs</span> with columns col text, doc text, data jsonb, updated_at int8, primary key (col, doc), and enable Realtime on it.',cyl_storage:'Storage area',cyl_used:'Used balance',cyl_transit:'Transit',cyl_empty:'Empty (available)',cyl_branch_title:'Branches',cyl_fact_title:'Factories',sp_lbl_actual:'Actual Spaces',sp_lbl_used:'Used Spaces',sp_lbl_transit:'Transit Spaces',sp_lbl_empty:'Empty Space',bt_rpt_title:'Current Bottle Stock &amp; Branch Transit Report',btl_dash_title:'Bottle & Brushing Dashboard',btl_dash_sub:'Production, sales, brushing &amp; damage analytics — from actual file data',btl_kpi_prod:'Production',btl_kpi_sales:'Sales',btl_kpi_brush:'Brushing',btl_kpi_dmg:'Damaged',btl_kpi_brushpct:'Brushing %',btl_kpi_dmgpct:'Damaged %',btl_ch_trend:'Monthly Sales Trend',btl_ch_prodsales:'Production vs Sales',btl_ch_branch:'Brushing by Branch',btl_ch_bd:'Brushing vs Damaged',
   foot:(s,t,q)=>'Showing '+s+' of '+t+' records  •  Total qty '+q+'  •  Click filters to slice',
   imp_title:'&#128228; Import Data — Auto Update',
   imp_sub:'Upload your inventory file and the dashboard refreshes automatically. Supported: <span class="tag">.xlsb</span> <span class="tag">.xlsx</span> <span class="tag">.xls</span> <span class="tag">.csv</span>',
@@ -4523,7 +3735,7 @@ const T={
   imp_n4:'يُؤخذ تاريخ التحديث من اسم الملف (بنمط <span class="tag">dd-mm-yyyy</span>) عند توفّره.',
   reading:f=>'جارٍ قراءة '+f+' ...',
   loaded:(f,sh,n,q)=>'&#9989; تم تحميل <b>'+f+'</b> — الشيت "<b>'+sh+'</b>"، '+n+' صف، إجمالي الكمية <b>'+q+'</b>. تم تحديث اللوحة. <a href="#" onclick="go(\'dash\');return false;">فتح اللوحة →</a>',
-  readerr:'تعذّرت قراءة الملف.',all:'الكل',clear_data:'تفريغ البيانات',update_data:'تحديث ببيانات جديدة',cleared:'&#10003; تم تفريغ البيانات. استورد ملفاً جديداً لتحديث التقرير.',confirm_clear:'هل تريد تفريغ كل بيانات التقرير الحالية؟ لا يمكن التراجع عن هذا الإجراء.',hr_nodata_title:'لا توجد بيانات HR بعد',hr_nodata_desc:'ارفع ملف Excel من Upload Center لعرض الداشبورد',hr_no_upload:'لم يتم رفع بيانات بعد',hr_refresh:'تحديث',hr_upload_btn:'رفع بيانات',hr_upload_hr:'رفع ملف HR',hr_alerts_title:'🔔 تنبيهات تلقائية',hr_chart_region:'توزيع حسب المنطقة',hr_chart_entity:'توزيع حسب جهة العمل',hr_chart_storage:'توزيع حسب نوع التخزين',hr_chart_job:'الوظيفة الفعلية',hr_chart_nat:'الموظفون حسب الجنسية',hr_chart_contract:'الحالة الاجتماعية',hr_chart_age:'توزيع الأعمار',hr_chart_leasing:'موظفو شركات الإيجار',hr_total_emp:'إجمالي الموظفين',hr_saudi:'السعوديون',hr_non_saudi:'غير السعوديين',hr_leasing_emp:'موظفو شركات الإيجار',hr_company_emp:'موظفو الشركة',hr_avg_age:'متوسط العمر',hr_avg_service:'متوسط الخدمة',hr_year:'سنة',hr_job_wm:'مديرو مستودعات',hr_job_ws:'أمناء مستودعات',hr_job_dr:'سائقون',hr_job_lb:'عمال',hr_job_sp:'مشرفون',hr_job_tc:'فنيون',hr_job_ad:'إداريون',hr_gauge_saudi:'نسبة السعودة',hr_gauge_leasing:'نسبة موظفي الإيجار',hr_gauge_over50:'موظفون فوق 50 سنة',hr_gauge_nores:'بدون إقامة مسجّلة',hr_age_u25:'أقل من 25',hr_alert_noid:'بدون رقم إقامة',hr_alert_retire:'فوق سن التقاعد 60+',hr_alert_notes:'لديهم ملاحظات',hr_alert_inactive:'غير نشطين',hr_empty:'✅ لا توجد بنود',hr_unknown:'غير محدد',hr_all:'الكل',hr_and:' و ',hr_others:' آخرون',hr_tbl_no:'الرقم',hr_tbl_name:'الاسم',hr_tbl_job:'الوظيفة',hr_tbl_entity:'جهة العمل',hr_tbl_region:'المنطقة',hr_tbl_nat:'الجنسية',hr_tbl_status:'الحالة',hr_tbl_age:'العمر',hr_tbl_hire:'تاريخ التعيين',hr_tbl_service:'مدة الخدمة',hr_tbl_contract:'نوع العقد',hr_tbl_leasing_co:'شركة الإيجار',hr_tbl_iqama:'رقم الإقامة',hr_tbl_notes:'الملاحظات',hr_emp_list:'قائمة الموظفين — عرض سريع',hr_filters:'الفلاتر',hr_search_ph:'اسم أو رقم…',hr_region:'المنطقة',hr_entity:'جهة العمل',hr_nationality:'الجنسية',hr_status_col:'الحالة',hr_contract_col:'نوع العقد',hr_storage_col:'نوع التخزين',hr_leasing_col:'شركة الإيجار',hr_view_all:'عرض الكل ↗',hr_nodata_simple:'لا توجد بيانات',hr_print:'طباعة',hr_pending_title:'بنود HR المعلّقة',hr_emp_details:'تفصيلي بيانات الموظفين',hr_upd_suffix:'التنبيهات والبنود المعلّقة',
+  readerr:'تعذّرت قراءة الملف.',all:'الكل',clear_data:'تفريغ البيانات',update_data:'تحديث ببيانات جديدة',cleared:'&#10003; تم تفريغ البيانات. استورد ملفاً جديداً لتحديث التقرير.',confirm_clear:'هل تريد تفريغ كل بيانات التقرير الحالية؟ لا يمكن التراجع عن هذا الإجراء.',
   map:{identity:{'1- New Identity':'New Identity','2- OLD Identity':'Old Identity','3- Mai':'Mai','4- Mokabat':'Mokabat','5- SAR':'SAR','6- TG Sparkling':'TG Sparkling'},
    branch:BRANCH_AR,cat2:{'CTN':'كرتون','SHR':'شرنك','Pac':'حزمة','Carton':'كرتون'},month:MONTH_AR,branchSum:BRANCH_SUM_AR}}
 };
@@ -4675,8 +3887,7 @@ function go(p){
   /* تبديل إظهار الصفحات بأمان: حارس على كل عنصر حتى لا يمنع غياب عنصرٍ إظهارَ بقية الصفحات */
   ['users','home','dash','sum','sku','imp','cloud','designer','cardbuilder','records',
    'rspace','rfgbal','roldid','rtransit','rbottle','dailyup','masterdata','spaceact','pagebuilder',
-   'btl-dash','btl-compare','btl-table','btl-manage',
-   'hr-dash','hr-emp','hr-pending','hr-upload'].forEach(function(_p){
+   'btl-dash','btl-compare','btl-table','btl-manage'].forEach(function(_p){
     var _e=document.getElementById('page-'+_p);
     if(_e)_e.classList.toggle('show',p===_p);
   });
@@ -4933,7 +4144,7 @@ function initCardBuilder(){
         +'<div><label style="'+lbl+'">'+L.fcalc+'</label><select id="cbs-calc" onchange="cbPreview()" style="'+fld+'">'
           +opt('sum',L.csum,1)+opt('avg',L.cavg)+opt('count',L.ccount)+opt('max',L.cmax)+opt('min',L.cmin)+'</select></div>'
         +'<div><label style="'+lbl+'">'+L.fage+'</label><select id="cbs-cls" onchange="cbPreview()" style="'+fld+'">'
-          +opt('all',L.aall,1)+opt('c1',_clsLabel('c1'))+opt('c2',_clsLabel('c2'))+opt('c3',_clsLabel('c3'))+opt('c4',_clsLabel('c4'))+opt('c5',_clsLabel('c5'))+opt('c6',_clsLabel('c6'))+'</select></div>'
+          +opt('all',L.aall,1)+opt('A&lt;60','A&lt;60')+opt('B&lt;90','B&lt;90')+opt('C&gt;90','C&gt;90')+opt('91to180','91-180 '+(ar?'يوم':'days'))+'</select></div>'
         +'<div><label style="'+lbl+'">'+L.fmonth+'</label><select id="cbs-month" onchange="cbPreview()" style="'+fld+'">'+opt('all',L.mall,1)+'</select></div>'
       +'</div>'
       +'<div style="margin-bottom:12px"><label style="'+lbl+'">'+L.ficon+'</label><div id="cbs-icons" style="display:flex;flex-wrap:wrap;gap:7px"></div></div>'
@@ -6121,21 +5332,19 @@ function _pwMatch(stored,typed){stored=String(stored==null?'':stored);typed=Stri
   return false;}
 function seedUsers(){if(!getUsers())saveUsers([{u:'admin',p:_pwHash('admin123'),r:'admin'}]);}
 function isAdmin(){return !!(CURRENT_USER&&CURRENT_USER.r==='admin');}
-const ALL_PAGES=['rspace','rfgbal','roldid','rtransit','rbottle','dash','sum','sku','masterdata','spaceact','dailyup','imp','cloud','records','designer','cardbuilder','users','hr-dash','hr-emp','hr-pending','hr-upload'];
-const PAGE_LABEL={dash:'nav_dash',sum:'nav_sum',sku:'nav_sku',records:'nav_records',imp:'nav_imp',cloud:'nav_cloud',designer:'nav_designer',rspace:'nav_rspace',rfgbal:'nav_rfgbal',roldid:'nav_roldid',rtransit:'nav_rtransit',rbottle:'nav_rbottle',masterdata:'nav_masterdata',spaceact:'nav_spaceact',dailyup:'nav_dailyup',users:'nav_users','hr-dash':'HR Dashboard','hr-emp':'HR Summary Table','hr-pending':'HR Pending','hr-upload':'HR Upload'};
+const ALL_PAGES=['rspace','rfgbal','roldid','rtransit','rbottle','dash','sum','sku','masterdata','spaceact','dailyup','imp','cloud','records','designer','cardbuilder','users'];
+const PAGE_LABEL={dash:'nav_dash',sum:'nav_sum',sku:'nav_sku',records:'nav_records',imp:'nav_imp',cloud:'nav_cloud',designer:'nav_designer',rspace:'nav_rspace',rfgbal:'nav_rfgbal',roldid:'nav_roldid',rtransit:'nav_rtransit',rbottle:'nav_rbottle',masterdata:'nav_masterdata',spaceact:'nav_spaceact',dailyup:'nav_dailyup',users:'nav_users'};
 /* مجموعات الصلاحيات المنظّمة (للعرض الاحترافي) */
 const PERM_GROUPS=[
   {key:'daily',label:'grp_daily',pages:['rspace','rfgbal','roldid','rtransit','rbottle']},
   {key:'aging',label:'grp_aging',pages:['dash','sum','sku']},
   {key:'data',label:'grp_data',pages:['masterdata','spaceact','dailyup','imp','records']},
-  {key:'admin',label:'grp_admintools',pages:['cloud','designer','users']},
-  {key:'hr',label:'HR',pages:['hr-dash','hr-emp','hr-pending','hr-upload']}
+  {key:'admin',label:'grp_admintools',pages:['cloud','designer','users']}
 ];
 function canView(p){
   /* يجب تسجيل الدخول أولاً — لا يوجد وصول بدون مستخدم */
   if(!CURRENT_USER)return false;
   if(p==='home')return true;            /* الرئيسية متاحة دائماً للجميع */
-  if(p==='hr-dash'||p==='hr-emp'||p==='hr-pending'||p==='hr-upload')return true; /* صفحات HR متاحة لجميع المستخدمين */
   if(isAdmin())return true;             /* المدير يرى كل شيء */
   if(p==='cardbuilder')return false;  /* منشئ البطاقات للمدير فقط */
   if(p==='users')return !!(CURRENT_USER.perms&&CURRENT_USER.perms.indexOf('users')>=0);  /* إدارة المستخدمين بصلاحية ممنوحة */
@@ -6167,50 +5376,6 @@ function doLogin(){
   if(!u&&!p){_loginShowErr(tr('login_empty_both'));if(uEl){uEl.classList.add('login-input-err');uEl.focus();}return;}
   if(!u){_loginShowErr(tr('login_empty_user'));if(uEl){uEl.classList.add('login-input-err');uEl.focus();}return;}
   if(!p){_loginShowErr(tr('login_empty_pass'));if(pEl){pEl.classList.add('login-input-err');pEl.focus();}return;}
-  /* ── إن كان window.doLogin قد أُعيد تعريفه بواسطة Firebase، استخدمه ── */
-  if(window.doLogin && window.doLogin !== doLogin){window.doLogin();return;}
-  /* ── إن كان الإدخال بريد إلكتروني، انتظر Firebase Auth وادخل به ── */
-  var _isEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u);
-  if(_isEmail){
-    /* حاول تهيئة Firebase Auth إن لم يكن جاهزاً */
-    if(!window._auth){
-      try{
-        if(typeof firebase!=='undefined'&&firebase.auth&&typeof EMBEDDED_FB_CONFIG!=='undefined'&&EMBEDDED_FB_CONFIG&&EMBEDDED_FB_CONFIG.apiKey){
-          var _authAppName='tania_auth';var _ex2=null;
-          try{(firebase.apps||[]).forEach(function(a){if(a&&a.name===_authAppName)_ex2=a;});}catch(e2){}
-          var _authApp=_ex2||firebase.initializeApp(EMBEDDED_FB_CONFIG,_authAppName);
-          window._auth=firebase.auth(_authApp);
-          window._auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(function(){});
-        }
-      }catch(e){}
-    }
-  }
-  if(_isEmail && window._auth){
-    var _errEl=document.getElementById('login-err');
-    if(_errEl)_errEl.textContent=tr('Signing in…')||'جارٍ تسجيل الدخول…';
-    try{if(typeof _markLiveSession==='function')_markLiveSession();}catch(e){}
-    window._auth.signInWithEmailAndPassword(u.toLowerCase(),p)
-      .then(function(){
-        var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';
-        if(_errEl)_errEl.textContent='';
-        if(document.getElementById('login-pass'))document.getElementById('login-pass').value='';
-        try{logLogin(u,'login');}catch(e){}
-        try{applyRole();}catch(e){}
-        try{go('home');}catch(e){}
-      })
-      .catch(function(err){
-        try{sessionStorage.removeItem('tania_live_session');}catch(_){}
-        var c=(err&&err.code)||'';
-        var msg=/wrong-password|invalid-credential|invalid-login/.test(c)?
-          tr('login_wrongpass')||'كلمة المرور غير صحيحة':
-          /user-not-found/.test(c)?tr('login_nouser')||'لا يوجد حساب':
-          (err&&err.message)||tr('login_bad')||'فشل تسجيل الدخول';
-        _loginShowErr(msg);
-        if(pEl){pEl.classList.add('login-input-err');pEl.value='';pEl.focus();}
-        try{logLogin(u,'failed');}catch(e){}
-      });
-    return;
-  }
   try{
     if(typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined'){
       var done=false;var to=setTimeout(function(){if(done)return;done=true;_loginProceed(u,p);},2500);
@@ -6880,22 +6045,10 @@ function _pruneLoginLog(log){
 }
 function logLogin(uname,kind){
   try{
-    var dev=_detectDeviceType();
-    var now=Date.now();
     var log=JSON.parse(LS.getItem('login_log')||'[]');
-    log.unshift({u:uname,k:kind||'login',t:now,dev:dev});
+    log.unshift({u:uname,k:kind||'login',t:Date.now(),dev:_detectDeviceType()});
     log=_pruneLoginLog(log);
     LS.setItem('login_log',JSON.stringify(log));
-    /* حفظ آخر دخول والجهاز في سجل المستخدم المحلي */
-    if((kind||'login')==='login' && uname){
-      try{
-        var us=getUsers()||[];
-        var idx=us.findIndex(function(x){return x.u&&x.u.toLowerCase()===String(uname).toLowerCase();});
-        if(idx>=0){us[idx].lastLoginAt=now;us[idx].lastDevice=dev;saveUsers(us);}
-      }catch(e){}
-      try{LS.setItem('dash_session_start',String(now));}catch(e){}
-      try{LS.setItem('dash_session_device',dev);}catch(e){}
-    }
   }catch(e){}
 }
 
@@ -6947,8 +6100,7 @@ function _loginProceed(u,p){
   var us=getUsers()||[];
   var uEl=document.getElementById('login-user'),pEl=document.getElementById('login-pass');
   /* نبحث أولاً عن المستخدم بالاسم فقط لتمييز نوع الخطأ */
-  /* بحث بالاسم أو البريد الإلكتروني */
-  var byName=us.find(function(x){return x.u.toLowerCase()===u.toLowerCase()||(x.email&&x.email.toLowerCase()===u.toLowerCase());});
+  var byName=us.find(function(x){return x.u.toLowerCase()===u.toLowerCase();});
   if(!byName){
     /* اسم المستخدم غير موجود */
     _loginShowErr(tr('login_nouser'));
@@ -7210,13 +6362,9 @@ function closeChangePwd(){
   var cc=document.getElementById('fpc-cur');if(cc)cc.value='';}catch(e){}
 }
 try{if(typeof window!=='undefined'){window.openChangePwd=openChangePwd;window.closeChangePwd=closeChangePwd;window.cancelChangePwd=cancelChangePwd;}}catch(e){}
-function logout(){CURRENT_USER=null;try{sessionStorage.removeItem('dash_session');LS.removeItem('dash_session');LS.removeItem(REMEMBER_SESSION_KEY);LS.removeItem('dash_session_start');LS.removeItem('dash_session_device');_rememberWrite(false);}catch(e){}if(EDITMODE){EDITMODE=false;document.body.classList.remove('editmode');unbindEditables();const _f=document.getElementById('edit-fab');if(_f)_f.classList.remove('on');}document.body.classList.remove('is-admin');go('dash');document.getElementById('login-ov').style.display='flex';try{_bioAutoTried=false;}catch(e){}try{setTimeout(initLoginExtras,40);}catch(e){}}
+function logout(){CURRENT_USER=null;try{sessionStorage.removeItem('dash_session');LS.removeItem('dash_session');LS.removeItem(REMEMBER_SESSION_KEY);_rememberWrite(false);}catch(e){}if(EDITMODE){EDITMODE=false;document.body.classList.remove('editmode');unbindEditables();const _f=document.getElementById('edit-fab');if(_f)_f.classList.remove('on');}document.body.classList.remove('is-admin');go('dash');document.getElementById('login-ov').style.display='flex';try{_bioAutoTried=false;}catch(e){}try{setTimeout(initLoginExtras,40);}catch(e){}}
 function renderUsers(){
   const us=getUsers()||[];const ar=drIsAr&&drIsAr();
-  var _now=Date.now();
-  var _myStart=0;try{_myStart=parseInt(LS.getItem('dash_session_start')||'0',10)||0;}catch(e){}
-  function _localDevHtml(dv,isAr){var map={'desktop':{ic:'💻',lbl:isAr?'كمبيوتر':'Desktop'},'mobile':{ic:'📱',lbl:isAr?'جوال':'Mobile'},'tablet':{ic:'📲',lbl:isAr?'لوحي':'Tablet'}};var d=map[dv]||{ic:'❔',lbl:isAr?'غير معروف':'Unknown'};return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px">'+d.ic+' '+d.lbl+'</span>';}
-  function _localFmtDur(ms){if(!ms||ms<0)return '—';var s=Math.floor(ms/1000);var h=Math.floor(s/3600);var m=Math.floor((s%3600)/60);var ss=s%60;if(h>0)return h+'س '+m+'د';if(m>0)return m+'د '+ss+'ث';return ss+'ث';}
   let html='<thead><tr>'
     +'<th>'+tr('u_user')+'</th>'
     +'<th>'+tr('u_email')+'</th>'
@@ -7224,9 +6372,6 @@ function renderUsers(){
     +'<th>'+tr('u_role')+'</th>'
     +'<th>'+tr('u_password')+'</th>'
     +'<th>'+tr('u_perms')+'</th>'
-    +'<th>'+(ar?'آخر دخول':'Last Login')+'</th>'
-    +'<th>'+(ar?'الجهاز':'Device')+'</th>'
-    +'<th>'+(ar?'مدة التشغيل':'Session')+'</th>'
     +'<th>'+tr('u_actions')+'</th>'
     +'</tr></thead><tbody>';
   us.forEach((x,i)=>{const me=CURRENT_USER&&x.u===CURRENT_USER.u;
@@ -7264,17 +6409,6 @@ function renderUsers(){
         +'<button class="u-act-btn u-btn-perm" onclick="openPermsModal('+i+')">&#9881;&#65039; <span>'+(ar?'تعديل الصلاحيات':'Edit permissions')+'</span></button>'
         +'</div></td>';
     }
-    /* آخر دخول */
-    var _lat=x.lastLoginAt||0;
-    var _latTxt=_lat?new Date(_lat).toLocaleString(ar?'ar-EG':'en-GB'):'—';
-    html+='<td style="font-size:12px;color:#374151">'+_latTxt+'</td>';
-    /* الجهاز */
-    var _ldev=x.lastDevice||'';
-    html+='<td>'+(_ldev?_localDevHtml(_ldev,ar):'—')+'</td>';
-    /* مدة التشغيل */
-    var _sesHtml='—';
-    if(me && _myStart>0){_sesHtml='<span id="usr-session-dur" style="color:#15803d;font-weight:700">🟢 '+_localFmtDur(_now-_myStart)+'</span>';}
-    html+='<td>'+_sesHtml+'</td>';
     /* الإجراءات */
     html+='<td>'+(me?'<span class="u-self">'+(ar?'أنت':'You')+'</span>':'<button class="del-btn" onclick="delUser('+i+')">&#128465;&#65039; '+tr('u_delete')+'</button>')+'</td>';
     html+='</tr>';
@@ -9073,8 +8207,8 @@ function drUploadMain(input){
     /* تحديث حقول اسم الملف لـ Transit و Bottle إذا رُفعا من الملف الموحّد */
     if(done.indexOf('transit')>=0){try{drSetFileName('transit',f.name,'ok');}catch(e){}}
     if(done.indexOf('bottle')>=0){try{drSetFileName('bottle',f.name,'ok');}catch(e){}}
-    if(done.length&&!fail.length){drSetSt('main','✅ تم تحديث: '+done.join(' / '),'ok');try{drSetFileName('main',f.name,'ok');}catch(e){}try{var _us=document.getElementById('dr-st-unified');if(_us){_us.textContent='✅ تم تحديث: '+done.join(' / ');_us.style.color='#0f766e';}}catch(e){}}
-    else if(done.length){drSetSt('main','✅ تم تحديث: '+done.join(' / ')+' — ⚠️ تعذّر قراءة: '+fail.join(' / '),'err');try{drSetFileName('main',f.name,'err');}catch(e){}try{var _us2=document.getElementById('dr-st-unified');if(_us2){_us2.textContent='✅ '+done.join(' / ')+' — ⚠️ '+fail.join(' / ');_us2.style.color='#c0392b';}}catch(e){}}
+    if(done.length&&!fail.length){drSetSt('main','✅ تم تحديث: '+done.join(' / '),'ok');try{drSetFileName('main',f.name,'ok');}catch(e){}}
+    else if(done.length){drSetSt('main','✅ تم تحديث: '+done.join(' / ')+' — ⚠️ تعذّر قراءة: '+fail.join(' / '),'err');try{drSetFileName('main',f.name,'err');}catch(e){}}
     else if(fail.length){drSetSt('main','تعذّرت قراءة بيانات: '+fail.join(' / ')+' — نزّل القالب وعبّئ أوراق البيانات (أوراق Example للتوضيح فقط)','err');try{drSetFileName('main',f.name,'err');}catch(e){}}
     else {drSetSt('main','لم يتم العثور على أوراق مطابقة (Space / FG Balance / OLD Identity)','err');try{drSetFileName('main',f.name,'err');}catch(e){}}
     try{if(done.length)wmShowUploadAlert('main',['fgbal','oldid','transit','bottle']);}catch(e){}
@@ -12774,8 +11908,6 @@ function renderBottleReport(rep){
       try{applyRole();}catch(e){}
       try{ window._fbForce=false; /* (مُلغى) نظام تغيير الرقم الإجباري */ }catch(e){}
       try{if(typeof logLogin==='function')logLogin(email,'login');}catch(e){}
-      /* حفظ وقت بداية الجلسة إن لم يكن محفوظاً بعد */
-      try{if(!LS.getItem('dash_session_start'))LS.setItem('dash_session_start',String(Date.now()));}catch(e){}
     }).catch(function(){ /* keep provisional access; sync already running */ });
   }
 
@@ -12872,17 +12004,9 @@ function renderBottleReport(rep){
     function _fbDB(){return (typeof fbDB!=='undefined'&&fbDB)?fbDB:null;}
     function _dev(){try{return typeof _detectDeviceType==='function'?_detectDeviceType():'desktop';}catch(e){return 'desktop';}}
     window.logLogin=function(uname,kind){
-      var dev=_dev();
-      var now=Date.now();
-      var entry={u:String(uname||''),k:kind||'login',t:now,dev:dev};
+      var entry={u:String(uname||''),k:kind||'login',t:Date.now(),dev:_dev()};
       try{var loc=JSON.parse(LS.getItem('login_log')||'[]');loc.unshift(entry);if(loc.length>500)loc=loc.slice(0,500);LS.setItem('login_log',JSON.stringify(loc));}catch(e){}
       try{var db=_fbDB();if(db)db.collection(LOG_COL).add(entry).catch(function(){});}catch(e){}
-      /* حفظ بيانات الجلسة في ملف المستخدم عند الدخول */
-      if((kind||'login')==='login' && uname){
-        try{var db2=_fbDB();if(db2){db2.collection(PROF_COL).doc(String(uname).toLowerCase()).set({lastLoginAt:now,lastDevice:dev},{merge:true}).catch(function(){});}}catch(e){}
-        try{LS.setItem('dash_session_start',String(now));}catch(e){}
-        try{LS.setItem('dash_session_device',dev);}catch(e){}
-      }
     };
     window.renderLoginLog=function(){
       var t=document.getElementById('loglog');if(!t)return;
@@ -12917,105 +12041,33 @@ function renderBottleReport(rep){
   /* ===================== admin: user management ===================== */
   function listProfiles(){return fbDB.collection(PROF_COL).get().then(function(qs){var a=[];qs.forEach(function(d){var x=d.data()||{};x.email=x.email||d.id;a.push(x);});return a;}).catch(function(){return [];});}
 
-  /* ── دالة مساعدة: تحويل ميلي ثانية إلى نص مدة ── */
-  function _fmtDuration(ms){
-    if(!ms||ms<0)return '—';
-    var s=Math.floor(ms/1000);
-    var h=Math.floor(s/3600);var m=Math.floor((s%3600)/60);var ss=s%60;
-    if(h>0)return h+'س '+m+'د';
-    if(m>0)return m+'د '+ss+'ث';
-    return ss+'ث';
-  }
-  /* ── دالة مساعدة: نص الجهاز مع أيقونة ── */
-  function _devHtml(dv,ar){
-    var map={'desktop':{ic:'💻',lbl:ar?'كمبيوتر':'Desktop'},'mobile':{ic:'📱',lbl:ar?'جوال':'Mobile'},'tablet':{ic:'📲',lbl:ar?'لوحي':'Tablet'}};
-    var d=map[dv]||{ic:'❔',lbl:ar?'غير معروف':'Unknown'};
-    return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:13px">'+d.ic+' '+d.lbl+'</span>';
-  }
   window.renderUsers=function(){
     var tbl=document.getElementById('utable'); if(!tbl)return;
     var ar=isAr();
-    var COLS=8;
-    tbl.innerHTML='<thead><tr>'
-      +'<th>'+T('Email','البريد')+'</th>'
-      +'<th>'+T('Name','الاسم')+'</th>'
-      +'<th>'+T('Role','الدور')+'</th>'
-      +'<th>'+T('Permissions','الصلاحيات')+'</th>'
-      +'<th>'+(ar?'آخر دخول':'Last Login')+'</th>'
-      +'<th>'+(ar?'الجهاز':'Device')+'</th>'
-      +'<th>'+(ar?'مدة التشغيل':'Session')+'</th>'
-      +'<th>'+T('Actions','إجراءات')+'</th>'
-      +'</tr></thead><tbody><tr><td colspan="'+COLS+'" style="padding:14px;color:#94a3b8">'+T('Loading…','جارٍ التحميل…')+'</td></tr></tbody>';
-    /* دمج مستخدمي Firestore مع المستخدمين المحليين (localStorage) */
+    tbl.innerHTML='<thead><tr><th>'+T('Email','البريد')+'</th><th>'+T('Name','الاسم')+'</th><th>'+T('Role','الدور')+'</th><th>'+T('Permissions','الصلاحيات')+'</th><th>'+T('Actions','إجراءات')+'</th></tr></thead><tbody><tr><td colspan="5" style="padding:14px;color:#94a3b8">'+T('Loading…','جارٍ التحميل…')+'</td></tr></tbody>';
     listProfiles().then(function(list){
-      /* أضف أي مستخدم محلي غير موجود في قائمة Firestore */
-      try{
-        var localUsers=[];
-        try{localUsers=(typeof getUsers==='function'?getUsers():[])||[];}catch(e){}
-        var fbEmails={};
-        list.forEach(function(p){if(p.email)fbEmails[String(p.email).toLowerCase()]=1;});
-        localUsers.forEach(function(lu){
-          var luEmail=String(lu.email||lu.u||'').toLowerCase();
-          if(!luEmail)return;
-          if(fbEmails[luEmail])return; /* موجود بالفعل في Firebase */
-          list.push({
-            email:luEmail,
-            name:lu.name||lu.u||luEmail,
-            role:lu.r||'user',
-            perms:lu.perms||[],
-            lastLoginAt:lu.lastLoginAt||0,
-            lastDevice:lu.lastDevice||'',
-            _local:true
-          });
-        });
-      }catch(e){}
       list.sort(function(a,b){return (a.role==='admin'?0:1)-(b.role==='admin'?0:1)||String(a.email).localeCompare(String(b.email));});
-      var now=Date.now();
-      var mySessionStart=0;
-      try{mySessionStart=parseInt(LS.getItem('dash_session_start')||'0',10)||0;}catch(e){}
       var rows=list.map(function(p){
         var canMng=(window.isAdmin&&window.isAdmin());
-        var email=p.email, isAdminRole=(p.role==='admin');
+        var email=p.email, isAdmin=(p.role==='admin');
         var permCount=(p.perms&&p.perms.length)||0;
-        var permTxt=isAdminRole?T('All','الكل'):(permCount+' '+T('screens','شاشة'));
+        var permTxt=isAdmin?T('All','الكل'):(permCount+' '+T('screens','شاشة'));
         var me=(window.CURRENT_USER&&CURRENT_USER.email===String(email).toLowerCase());
-        /* ── بيانات الجلسة ── */
-        var lastAt=p.lastLoginAt||0;
-        var lastDev=p.lastDevice||'';
-        var loginTxt=lastAt?new Date(lastAt).toLocaleString(ar?'ar-EG':'en-GB'):'—';
-        var devHtml=lastDev?_devHtml(lastDev,ar):'—';
-        var sessionHtml='—';
-        if(me && mySessionStart>0){
-          sessionHtml='<span id="usr-session-dur" style="color:#15803d;font-weight:700">🟢 '+_fmtDuration(now-mySessionStart)+'</span>';
-        }
-        return '<tr'+(me?' style="background:#f0f9ff"':'')+'>'
-          +'<td style="font-weight:700">'+esc(email)+(me?' <span class="fa-note" style="display:inline">('+T('you','أنت')+')</span>':'')+(p._local?' <span style="font-size:10px;color:#e07b39;font-weight:700;padding:1px 5px;background:#fff7f0;border-radius:4px">[محلي]</span>':'')+' </td>'
+        return '<tr>'
+          +'<td style="font-weight:700">'+esc(email)+(me?' <span class="fa-note" style="display:inline">('+T('you','أنت')+')</span>':'')+'</td>'
           +'<td style="font-weight:600;color:#243349">'+esc(p.name||'—')+'</td>'
-          +'<td><span class="fa-badge '+(isAdminRole?'admin':'user')+'">'+(isAdminRole?T('Admin','الأدمن'):T('User','مستخدم'))+'</span></td>'
+          +'<td><span class="fa-badge '+(isAdmin?'admin':'user')+'">'+(isAdmin?T('Admin','الأدمن'):T('User','مستخدم'))+'</span></td>'
           +'<td>'+esc(permTxt)+'</td>'
-          +'<td style="color:#374151;font-size:13px">'+loginTxt+'</td>'
-          +'<td>'+devHtml+'</td>'
-          +'<td>'+sessionHtml+'</td>'
           +'<td><div class="fa-row">'
-            +(canMng?'<button class="fa-act" onclick="faToggleRole(\x27'+jss(email)+'\x27)">'+(isAdminRole?T('Make user','اجعله مستخدم'):T('Make admin','اجعله أدمن'))+'</button>':'')
-            +((canMng&&!isAdminRole)?'<button class="fa-act" onclick="faPerms(\x27'+jss(email)+'\x27)">'+T('Permissions','الصلاحيات')+'</button>':'')
-            +'<button class="fa-act" onclick="faPwMgr(\x27'+jss(email)+'\x27)">'+T('Password','كلمة المرور')+'</button>'
-            +((canMng||me)?'<button class="fa-act" onclick="faEdit(\x27'+jss(email)+'\x27)">'+T('Edit','تعديل')+'</button>':'')
-            +(me?'':'<button class="fa-act danger" onclick="faRemove(\x27'+jss(email)+'\x27)">'+T('Remove','إزالة')+'</button>')
+            +(canMng?'<button class="fa-act" onclick="faToggleRole(\''+jss(email)+'\')">'+(isAdmin?T('Make user','اجعله مستخدم'):T('Make admin','اجعله أدمن'))+'</button>':'')
+            +((canMng&&!isAdmin)?'<button class="fa-act" onclick="faPerms(\''+jss(email)+'\')">'+T('Permissions','الصلاحيات')+'</button>':'')
+            +'<button class="fa-act" onclick="faPwMgr(\''+jss(email)+'\')">'+T('Password','كلمة المرور')+'</button>'
+            +((canMng||me)?'<button class="fa-act" onclick="faEdit(\''+jss(email)+'\')">'+T('Edit','تعديل')+'</button>':'')
+            +(me?'':'<button class="fa-act danger" onclick="faRemove(\''+jss(email)+'\')">'+T('Remove','إزالة')+'</button>')
           +'</div></td></tr>';
       }).join('');
-      tbl.querySelector('tbody').innerHTML=rows||'<tr><td colspan="'+COLS+'" style="padding:14px;color:#94a3b8">'+T('No users yet.','لا يوجد مستخدمون بعد.')+'</td></tr>';
+      tbl.querySelector('tbody').innerHTML=rows||'<tr><td colspan="5" style="padding:14px;color:#94a3b8">'+T('No users yet.','لا يوجد مستخدمون بعد.')+'</td></tr>';
       try{faRenderStats(list);}catch(e){}
-      /* تحديث عداد مدة الجلسة كل دقيقة */
-      try{
-        if(window._sessionDurTimer)clearInterval(window._sessionDurTimer);
-        window._sessionDurTimer=setInterval(function(){
-          var el=document.getElementById('usr-session-dur');
-          if(!el){clearInterval(window._sessionDurTimer);return;}
-          var s0=parseInt(LS.getItem('dash_session_start')||'0',10)||0;
-          if(s0>0)el.textContent='🟢 '+_fmtDuration(Date.now()-s0);
-        },60000);
-      }catch(e){}
     });
   };
   /* بطاقات الإحصاء العلوية — تُحسب من قائمة Firebase نفسها (لا من المخزن المحلي) */
@@ -14001,52 +13053,6 @@ function renderBottleReport(rep){
       {key:'bottle',label:a?'القارورة — FG Bottle':'FG Bottle Stock'}
     ];
     grid.innerHTML='';
-    /* ═══ بطاقة الملف الموحّد ═══ */
-    (function(){
-      var uslot=document.createElement('div');
-      uslot.className='dr-slot';
-      uslot.style.cssText='border:2px solid var(--teal,#0f9b8e);background:linear-gradient(135deg,#f0fdf9,#ffffff)';
-      var uh=document.createElement('h4');
-      uh.style.cssText='font-size:14px;font-weight:800;color:var(--teal,#0f9b8e);margin-bottom:4px';
-      uh.innerHTML='&#128230; '+(a?'الملف الموحّد — رفع جميع التقارير (ملف واحد)':'All-in-One Upload — All Reports (One File)');
-      uslot.appendChild(uh);
-      var up=document.createElement('p');
-      up.style.cssText='font-size:11.5px;color:var(--muted,#7c8aa0);margin-bottom:10px';
-      up.innerHTML=a?'ملف Excel واحد يحتوي <b>5 شيتات</b> — أسماء الشيتات تُطابَق تلقائياً (Balance / Space / Identity / Transit / Bottle). يمكنك تضمين شيت واحد أو أكثر.':'One Excel file with <b>up to 5 sheets</b> — sheet names are matched automatically (Balance / Space / Identity / Transit / Bottle). Include one or more sheets.';
-      uslot.appendChild(up);
-      var urow=document.createElement('div'); urow.className='dr-row';
-      var uinp=document.createElement('input'); uinp.className='dr-file'; uinp.type='file'; uinp.accept='.xlsx,.xls';
-      uinp.addEventListener('change',function(){if(typeof drUploadMain==='function')drUploadMain(this);});
-      var ubt=document.createElement('button'); ubt.className='btn-soft sm';
-      ubt.innerHTML='&#11015;&#65039; '+(a?'تنزيل القالب الموحّد':'Download Unified Template');
-      ubt.addEventListener('click',function(){if(typeof drTemplateMain==='function')drTemplateMain();});
-      var ubc=document.createElement('button'); ubc.className='btn-soft sm dr-clear-btn';
-      ubc.style.cssText='background:#fef2f2;border-color:#fecaca;color:#dc2626';
-      ubc.innerHTML='&#128465;&#65039; '+(a?'تفريغ الكل':'Clear All');
-      ubc.addEventListener('click',function(){if(typeof drClearMain==='function')drClearMain();});
-      urow.appendChild(uinp); urow.appendChild(ubt); urow.appendChild(ubc);
-      uslot.appendChild(urow);
-      var ust=document.createElement('div'); ust.className='dr-st'; ust.id='dr-st-unified'; uslot.appendChild(ust);
-      var ufn=document.createElement('div'); ufn.className='dr-fname'; ufn.id='dr-fname-main';
-      ufn.style.cssText='display:none;font-size:12px;font-weight:700;color:#0f766e;margin-top:4px';
-      uslot.appendChild(ufn);
-      /* شريط حالة 4 تقارير */
-      var umeta=document.createElement('div'); umeta.className='dr-tpl';
-      umeta.innerHTML='<span class="dr-meta">FG Bal: <b id="dr-info-fgbal">—</b></span>'
-        +'<span class="dr-meta">OLD ID: <b id="dr-info-oldid">—</b></span>'
-        +'<span class="dr-meta">Transit: <b id="dr-info-transit">—</b></span>'
-        +'<span class="dr-meta">Bottle: <b id="dr-info-bottle">—</b></span>'
-        +'<span class="dr-meta">Space: <b id="dr-info-space">—</b></span>';
-      uslot.appendChild(umeta);
-      grid.appendChild(uslot);
-    })();
-    /* فاصل مرئي */
-    (function(){
-      var sep=document.createElement('div');
-      sep.style.cssText='text-align:center;font-size:11px;color:var(--muted,#7c8aa0);padding:2px 0;letter-spacing:.5px';
-      sep.textContent='── '+(a?'أو ارفع كل تقرير بملف منفصل':'or upload each report separately')+' ──';
-      grid.appendChild(sep);
-    })();
     (function(){
       var sslot=document.createElement('div'); sslot.className='dr-slot';
       var sh=document.createElement('h4'); sh.style.cssText='font-size:14px;font-weight:800;color:var(--ink,#16233b);margin-bottom:4px'; sh.textContent=a?'\u0627\u0644\u0645\u0633\u0627\u062d\u0627\u062a \u0641\u064a \u0627\u0644\u0645\u0633\u062a\u0648\u062f\u0639\u0627\u062a \u2014 \u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u062d\u062f\u064a\u062b':'Space in Warehouses — Update date'; sslot.appendChild(sh);
@@ -14389,7 +13395,7 @@ function renderBottleReport(rep){
   'use strict';
   function ar(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
   function mob(){try{return window.matchMedia('(max-width:860px)').matches;}catch(e){return false;}}
-  var PAGES=['home','rspace','rfgbal','roldid','rtransit','rbottle','dash','sum','sku','records','imp','cloud','designer','masterdata','spaceact','dailyup','users','hr-dash','hr-emp','hr-pending','hr-upload'];
+  var PAGES=['home','rspace','rfgbal','roldid','rtransit','rbottle','dash','sum','sku','records','imp','cloud','designer','masterdata','spaceact','dailyup','users'];
   var REPS=['rspace','rfgbal','roldid','rtransit','rbottle'];
   function curPage(){var e=document.querySelector('.page.show');return e?e.id.replace('page-',''):'home';}
   function can(p){try{return (typeof canView!=='function')||canView(p);}catch(e){return true;}}
@@ -17552,236 +16558,6 @@ var BottleAnalytics=(function(){
     L:L, esc:esc, fmt:fmt, pct:pct, persist:persist, charts:_charts, state:_state};
 })();
 window.BottleAnalytics=BottleAnalytics;
-/* ===== Bottle & Brushing — 4-File Upload Management ===== */
-(function(){
-  'use strict';
-  var LS=window.localStorage;
-  var KEYS={production:'btl5g_production',sales:'btl5g_sales',brushing:'btl5g_brushing',damaged:'btl5g_damaged',log:'btl5g_log'};
-  var FILE_TYPES=[
-    {key:'production',icon:'🏭',ar:'إنتاج عبوات 5 جالون فارغة',en:'Empty 5-Gallon Bottle Production'},
-    {key:'sales',     icon:'💰',ar:'مبيعات 5 جالون معبأ',       en:'Filled 5-Gallon Bottle Sales'},
-    {key:'brushing',  icon:'🪣',ar:'الفرشة للقارورة الفارغة',  en:'Empty Bottle Brushing'},
-    {key:'damaged',   icon:'⚠️',ar:'التالف للقارورة الفارغة',  en:'Empty Bottle Damaged'}
-  ];
-  function isAr(){try{return typeof LANG!=='undefined'&&LANG==='ar';}catch(e){return document.documentElement.dir==='rtl';}}
-  function L(ar,en){return isAr()?ar:en;}
-  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-  function fmtNum(n){try{return Math.round(n).toLocaleString('en-US');}catch(e){return n||0;}}
-  function $(id){return document.getElementById(id);}
-  function loadData(key){try{return JSON.parse(LS.getItem(KEYS[key])||'null');}catch(e){return null;}}
-  function saveData(key,data){try{LS.setItem(KEYS[key],JSON.stringify(data));}catch(e){}}
-  function loadLog(){try{return JSON.parse(LS.getItem(KEYS.log)||'[]');}catch(e){return[];}}
-  function addLog(action,key,records){
-    var log=loadLog();
-    var user='—';try{if(typeof CURRENT_USER!=='undefined'&&CURRENT_USER)user=CURRENT_USER.u||CURRENT_USER.n||'—';}catch(e){}
-    log.unshift({date:new Date().toLocaleString('en-GB'),action:action,key:key,records:records,user:user});
-    if(log.length>100)log=log.slice(0,100);
-    try{LS.setItem(KEYS.log,JSON.stringify(log));}catch(e){}
-  }
-  function hasAnyData(){return FILE_TYPES.some(function(t){return !!loadData(t.key);});}
-  function toast(msg,type){
-    var t=document.createElement('div');
-    t.style.cssText='position:fixed;bottom:24px;inset-inline-end:24px;background:'+(type==='ok'?'#16a34a':'#dc2626')+';color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.2);font-family:inherit';
-    t.textContent=msg;document.body.appendChild(t);
-    setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){try{t.remove();}catch(e){}},400);},2800);
-  }
-  function parseExcelFile(wb){
-    if(typeof XLSX==='undefined'){toast(L('مكتبة قراءة Excel غير محمّلة','XLSX library not loaded'),'err');return null;}
-    var sheetName=wb.SheetNames[0];
-    var aoa=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,raw:true,defval:''});
-    function toNum(v){if(v===''||v==null)return 0;var n=parseFloat(String(v).replace(/[, ،]/g,''));return isNaN(n)?0:Math.round(n);}
-    var AR_MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-    var EN_MONTHS=['january','february','march','april','may','june','july','august','september','october','november','december'];
-    function isMonth(v){var s=String(v||'').trim();if(!s)return false;var sl=s.toLowerCase();return AR_MONTHS.some(function(m){return s.indexOf(m)>=0;})||EN_MONTHS.some(function(m){return sl.indexOf(m)>=0;});}
-    var records=[];var curYear=null;
-    aoa.forEach(function(row){
-      if(!row||!row.length)return;
-      for(var ci=0;ci<Math.min(3,row.length);ci++){
-        var cv=row[ci];
-        if(typeof cv==='number'&&cv>=2000&&cv<2100){curYear=cv;break;}
-        if(typeof cv==='string'&&/^20\d\d$/.test(cv.trim())){curYear=parseInt(cv.trim(),10);break;}
-      }
-      var cell0=String(row[0]||'').trim(),cell1=String(row[1]||'').trim();
-      var monthLabel=isMonth(cell0)?cell0:isMonth(cell1)?cell1:null;
-      if(monthLabel&&curYear){
-        var startCol=isMonth(cell0)?1:2;
-        for(var ci2=startCol;ci2<row.length;ci2++){
-          var val=toNum(row[ci2]);
-          if(val>0){records.push({year:curYear,month:monthLabel,value:val});break;}
-        }
-      }
-    });
-    return records.length?records:null;
-  }
-  function getMergedData(){
-    var map={};
-    FILE_TYPES.forEach(function(t){
-      var d=loadData(t.key);
-      if(d&&d.records){d.records.forEach(function(r){
-        var k=r.year+'||'+r.month;
-        if(!map[k])map[k]={year:r.year,month:r.month,production:0,sales:0,brushing:0,damaged:0};
-        map[k][t.key]=(map[k][t.key]||0)+r.value;
-      });}
-    });
-    var arr=[];for(var k in map)arr.push(map[k]);
-    arr.sort(function(a,b){return a.year!==b.year?a.year-b.year:0;});
-    return arr;
-  }
-  function renderManage(){
-    var root=$('btl-manage-root');if(!root)return;
-    var dir=isAr()?'rtl':'ltr';
-    var log=loadLog();
-    var logHTML=log.length
-      ?log.map(function(e,i){return '<tr style="background:'+(i%2===0?'#fff':'#f8fafc')+'"><td style="padding:9px 12px;font-size:11.5px;color:#64748b;white-space:nowrap">'+esc(e.date)+'</td><td style="padding:9px 12px;font-size:11.5px">'+esc(e.action)+'</td><td style="padding:9px 12px;font-size:11.5px;font-weight:700;color:#0891b2;text-align:center">'+esc(String(e.records||0))+'</td><td style="padding:9px 12px;font-size:11.5px;color:#64748b">'+esc(e.user||'—')+'</td></tr>';}).join('')
-      :'<tr><td colspan="4" style="padding:24px;text-align:center;color:#94a3b8;font-size:13px">'+L('لا توجد عمليات بعد','No operations yet')+'</td></tr>';
-    var cards=FILE_TYPES.map(function(t){
-      var d=loadData(t.key);
-      var statusHTML=d
-        ?'<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 12px;margin-bottom:12px"><div style="color:#16a34a;font-size:11.5px;font-weight:700">✓ '+L('تم الرفع','Uploaded')+'</div><div style="color:#15803d;font-size:11px;margin-top:2px">'+esc(String(d.records.length))+' '+L('سجل','records')+' · '+esc(d.updated)+'</div><div style="color:#6b7280;font-size:10.5px;margin-top:2px">📄 '+esc(d.filename||'')+'</div></div>'
-        :'<div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;text-align:center;color:#94a3b8;font-size:11.5px">'+L('لم يُرفع بعد','Not uploaded yet')+'</div>';
-      return '<div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;flex-direction:column;box-shadow:0 2px 12px rgba(16,40,80,.06)">'
-        +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:28px">'+t.icon+'</span><div style="font-weight:800;font-size:13px;color:#1e3a5f;line-height:1.4">'+esc(isAr()?t.ar:t.en)+'</div></div>'
-        +statusHTML
-        +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
-          +'<button onclick="window._btl5g.upload(\''+t.key+'\')" style="flex:1;background:linear-gradient(135deg,#2f7ed8,#1e5398);color:#fff;border:none;border-radius:9px;padding:9px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;min-width:80px">📤 '+L('رفع ملف','Upload File')+'</button>'
-          +(d?'<button onclick="window._btl5g.clear(\''+t.key+'\')" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🗑</button>':'')
-        +'</div>'
-      +'</div>';
-    }).join('');
-    root.innerHTML='<div style="padding:20px 20px 40px;max-width:1300px;margin:0 auto;direction:'+dir+'">'
-      +'<div style="background:linear-gradient(90deg,#0c7d7b,#0891b2);color:#fff;padding:13px 20px;border-radius:13px;margin-bottom:20px;display:flex;align-items:center;gap:10px"><span style="font-size:18px">⚙️</span><span style="font-weight:700;font-size:15px">'+L('إدارة البيانات — رفع ملفات القارورة والفرشة','Data Management — Bottle & Brushing File Uploads')+'</span></div>'
-      +'<p style="color:#64748b;font-size:13px;margin:0 0 20px;line-height:1.6">'+L('ارفع ملف Excel لكل نوع من البيانات. بعد الرفع، تُبنى لوحة المؤشرات والجداول تلقائياً.','Upload an Excel file for each data type. After uploading, the dashboard and tables populate automatically.')+'</p>'
-      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:28px">'+cards+'</div>'
-      +'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden">'
-        +'<div style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:12px 18px;font-weight:800;font-size:13px;color:#1e3a5f;display:flex;align-items:center;gap:8px"><span>📋</span><span>'+L('سجل العمليات','Operations Log')+'</span><span style="font-size:11px;color:#94a3b8;font-weight:400;margin-inline-start:auto">'+log.length+' '+L('عملية','entries')+'</span></div>'
-        +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f1f5f9">'
-          +'<th style="padding:10px 12px;text-align:start;font-size:11.5px;font-weight:700;color:#475569">'+L('التاريخ','Date')+'</th>'
-          +'<th style="padding:10px 12px;text-align:start;font-size:11.5px;font-weight:700;color:#475569">'+L('العملية','Action')+'</th>'
-          +'<th style="padding:10px 12px;text-align:center;font-size:11.5px;font-weight:700;color:#475569">'+L('السجلات','Records')+'</th>'
-          +'<th style="padding:10px 12px;text-align:start;font-size:11.5px;font-weight:700;color:#475569">'+L('المستخدم','User')+'</th>'
-        +'</tr></thead><tbody>'+logHTML+'</tbody></table></div>'
-      +'</div>'
-    +'</div>';
-  }
-  function renderDash(){
-    var root=$('btl-dash-root');if(!root)return;
-    var dir=isAr()?'rtl':'ltr';
-    if(!hasAnyData()){
-      root.innerHTML='<div style="padding:80px 20px;text-align:center;direction:'+dir+'">'
-        +'<div style="font-size:56px;margin-bottom:16px">📊</div>'
-        +'<h2 style="color:#1e3a5f;margin:0 0 10px;font-size:20px">'+L('لا توجد بيانات بعد','No Data Yet')+'</h2>'
-        +'<p style="color:#64748b;font-size:14px;margin:0 0 20px;max-width:400px;margin-inline:auto">'+L('ارفع الملفات من شاشة إدارة البيانات لعرض لوحة المؤشرات','Upload files from Data Management to view the dashboard')+'</p>'
-        +(typeof isAdmin==='function'&&isAdmin()?'<button onclick="go(\'btl-manage\')" style="background:linear-gradient(135deg,#0c7d7b,#0891b2);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⚙️ '+L('إدارة البيانات','Go to Data Management')+'</button>':'')
-      +'</div>';return;
-    }
-    var rows=getMergedData();
-    var totP=0,totS=0,totB=0,totD=0;
-    rows.forEach(function(r){totP+=r.production;totS+=r.sales;totB+=r.brushing;totD+=r.damaged;});
-    var bPct=totS>0?(totB/totS*100).toFixed(1)+'%':'—';
-    var dPct=totP>0?(totD/totP*100).toFixed(1)+'%':'—';
-    var kpis=[
-      {icon:'🏭',label:L('الإنتاج','Production'),val:fmtNum(totP),color:'#2563eb'},
-      {icon:'💰',label:L('المبيعات','Sales'),val:fmtNum(totS),color:'#16a34a'},
-      {icon:'🪣',label:L('الفرشة','Brushing'),val:fmtNum(totB),color:'#0891b2'},
-      {icon:'⚠️',label:L('التالف','Damaged'),val:fmtNum(totD),color:'#dc2626'},
-      {icon:'📊',label:L('نسبة الفرشة','Brush%'),val:bPct,color:'#9333ea'},
-      {icon:'📉',label:L('نسبة التالف','Damaged%'),val:dPct,color:'#ea580c'}
-    ].map(function(k){return '<div style="background:#fff;border:1px solid #e2e8f0;border-top:3px solid '+k.color+';border-radius:14px;padding:16px 18px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px">'+k.label+'</span><span style="font-size:20px">'+k.icon+'</span></div><div style="font-size:26px;font-weight:800;color:#1e293b;margin-top:10px">'+k.val+'</div></div>';}).join('');
-    var tRows=rows.map(function(r,i){
-      var bpct=r.sales>0?(r.brushing/r.sales*100).toFixed(1)+'%':'—';
-      var dpct=r.production>0?(r.damaged/r.production*100).toFixed(1)+'%':'—';
-      return '<tr style="background:'+(i%2===0?'#fff':'#f8fafc')+'">'
-        +'<td style="padding:9px 12px;font-size:12px;font-weight:700;color:#475569">'+esc(r.year)+'</td>'
-        +'<td style="padding:9px 12px;font-size:12px">'+esc(r.month)+'</td>'
-        +'<td style="padding:9px 12px;font-size:12px;text-align:end;color:#2563eb;font-weight:700">'+fmtNum(r.production)+'</td>'
-        +'<td style="padding:9px 12px;font-size:12px;text-align:end;color:#16a34a;font-weight:700">'+fmtNum(r.sales)+'</td>'
-        +'<td style="padding:9px 12px;font-size:12px;text-align:end;color:#0891b2;font-weight:700">'+fmtNum(r.brushing)+'</td>'
-        +'<td style="padding:9px 12px;font-size:12px;text-align:end;color:#0891b2">'+bpct+'</td>'
-        +'<td style="padding:9px 12px;font-size:12px;text-align:end;color:#dc2626;font-weight:700">'+fmtNum(r.damaged)+'</td>'
-        +'<td style="padding:9px 12px;font-size:12px;text-align:end;color:#dc2626">'+dpct+'</td>'
-      +'</tr>';
-    }).join('');
-    root.innerHTML='<div style="padding:20px;max-width:1400px;margin:0 auto;direction:'+dir+'">'
-      +'<div style="background:linear-gradient(90deg,#0c7d7b,#0891b2);color:#fff;padding:13px 20px;border-radius:13px;margin-bottom:20px;font-weight:700;font-size:15px">📊 '+L('لوحة مؤشرات القارورة والفرشة — 5 جالون','Bottle & Brushing Dashboard — 5 Gallon')+'</div>'
-      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;margin-bottom:24px">'+kpis+'</div>'
-      +'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden">'
-        +'<div style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:12px 18px;font-weight:800;font-size:13px;color:#1e3a5f">'+L('البيانات الشهرية','Monthly Data')+'</div>'
-        +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f1f5f9">'
-          +'<th style="padding:10px 12px;text-align:start;font-size:11.5px;font-weight:700;color:#475569">'+L('العام','Year')+'</th>'
-          +'<th style="padding:10px 12px;text-align:start;font-size:11.5px;font-weight:700;color:#475569">'+L('الشهر','Month')+'</th>'
-          +'<th style="padding:10px 12px;text-align:end;font-size:11.5px;font-weight:700;color:#2563eb">'+L('إنتاج','Production')+'</th>'
-          +'<th style="padding:10px 12px;text-align:end;font-size:11.5px;font-weight:700;color:#16a34a">'+L('مبيعات','Sales')+'</th>'
-          +'<th style="padding:10px 12px;text-align:end;font-size:11.5px;font-weight:700;color:#0891b2">'+L('فرشة','Brushing')+'</th>'
-          +'<th style="padding:10px 12px;text-align:end;font-size:11.5px;font-weight:700;color:#0891b2">'+L('%فرشة','Brush%')+'</th>'
-          +'<th style="padding:10px 12px;text-align:end;font-size:11.5px;font-weight:700;color:#dc2626">'+L('تالف','Damaged')+'</th>'
-          +'<th style="padding:10px 12px;text-align:end;font-size:11.5px;font-weight:700;color:#dc2626">'+L('%تالف','Dmg%')+'</th>'
-        +'</tr></thead><tbody>'+tRows+'</tbody></table></div>'
-      +'</div>'
-    +'</div>';
-  }
-  function renderCompare(){renderDash();}
-  function renderTable(){renderDash();}
-  window._btl5g={
-    upload:function(key){
-      var type=FILE_TYPES.filter(function(t){return t.key===key;})[0];if(!type)return;
-      if(typeof XLSX==='undefined'){toast(L('مكتبة قراءة Excel غير محمّلة','XLSX library not loaded'),'err');return;}
-      var inp=document.createElement('input');inp.type='file';inp.accept='.xlsx,.xls,.csv';
-      inp.onchange=function(){
-        var f=inp.files&&inp.files[0];if(!f)return;
-        var fr=new FileReader();
-        fr.onload=function(ev){
-          try{
-            var wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
-            var records=parseExcelFile(wb);
-            if(!records||!records.length){toast(L('لم يتم العثور على بيانات. تأكّد من بنية الملف.','No data found. Check file structure.'),'err');return;}
-            saveData(key,{records:records,updated:new Date().toLocaleString('en-GB'),filename:f.name,count:records.length});
-            addLog(L('رفع: ','Upload: ')+(isAr()?type.ar:type.en),key,records.length);
-            toast(L('✓ تم الرفع: ','✓ Uploaded: ')+records.length+' '+L('سجل','records'),'ok');
-            renderManage();
-          }catch(err){console.error('btl5g upload',err);toast(L('خطأ في الملف: ','File error: ')+String(err.message||err),'err');}
-        };
-        fr.readAsArrayBuffer(f);
-      };
-      inp.click();
-    },
-    clear:function(key){
-      var type=FILE_TYPES.filter(function(t){return t.key===key;})[0];if(!type)return;
-      if(!confirm(L('مسح بيانات: ','Clear data: ')+(isAr()?type.ar:type.en)+'?'))return;
-      try{LS.removeItem(KEYS[key]);}catch(e){}
-      addLog(L('مسح: ','Clear: ')+(isAr()?type.ar:type.en),key,0);
-      toast(L('تم المسح','Cleared'),'ok');
-      renderManage();
-    }
-  };
-  function overrideGo(){
-    if(window.go&&window.go.__btl5gWrapped)return;
-    var prev=window.go||function(){};
-    window.go=function(p){
-      if(p==='btl-manage'||p==='btl-dash'||p==='btl-compare'||p==='btl-table'){
-        try{[].slice.call(document.querySelectorAll('.page')).forEach(function(el){el.classList.toggle('show',el.id==='page-'+p);});}catch(e){}
-        try{document.querySelectorAll('.navbtn').forEach(function(b){b.classList.toggle('active',b.dataset&&b.dataset.page===p);});}catch(e){}
-        try{var ct=document.querySelector('.content');if(ct)ct.scrollTop=0;window.scrollTo(0,0);}catch(e){}
-        try{if(typeof updateTopnav==='function')updateTopnav(p);}catch(e){}
-        try{if(typeof closeNav==='function')closeNav();}catch(e){}
-        try{LS&&LS.setItem('dr_last_page',p);}catch(e){}
-        if(p==='btl-manage')renderManage();
-        else if(p==='btl-dash')renderDash();
-        else if(p==='btl-compare')renderCompare();
-        else if(p==='btl-table')renderTable();
-        return;
-      }
-      try{['btl-dash','btl-compare','btl-table','btl-manage'].forEach(function(id){var el=document.getElementById('page-'+id);if(el)el.classList.remove('show');});}catch(e){}
-      return prev.apply(this,arguments);
-    };
-    window.go.__btl5gWrapped=true;
-  }
-  if(document.readyState!=='loading'){setTimeout(overrideGo,500);}
-  else{document.addEventListener('DOMContentLoaded',function(){setTimeout(overrideGo,500);});}
-  /* تفريغ الجذور فوراً */
-  ['btl-dash-root','btl-compare-root','btl-table-root','btl-manage-root'].forEach(function(id){
-    var el=document.getElementById(id);if(el)el.innerHTML='';
-  });
-})();
 </script>
 
 <style id="navorder-styles">
