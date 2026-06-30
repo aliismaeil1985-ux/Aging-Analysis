@@ -13994,9 +13994,9 @@ function renderBottleReport(rep){
     return ov;
   }
   var _permEmail=null;
-  var PLABELS={rspace:'Space in Warehouses',rfgbal:'FG Balance',roldid:'OLD Identity',rtransit:'FG Transit',rbottle:'FG Bottle',dash:'Dashboard',sum:'Summary',sku:'SKU',masterdata:'Master Data',spaceact:'Space Actuals',dailyup:'Daily Upload',imp:'Import',cloud:'Cloud',records:'Records',designer:'Designer',cardbuilder:'Card Builder',users:'Manage Users (add / delete)'};
-  var PGROUPS=[['daily',['rspace','rfgbal','roldid','rtransit','rbottle']],['aging',['dash','sum','sku']],['data',['masterdata','spaceact','dailyup','imp','records']],['admin',['cloud','designer','users','cardbuilder']]];
-  var GLAB={daily:[ 'Daily Reports','التقارير اليومية'],aging:['Aging','تحليل الأعمار'],data:['Data & Tools','البيانات والأدوات'],admin:['Admin Tools','أدوات الإدارة']};
+  var PLABELS={rspace:'Space in Warehouses',rfgbal:'FG Balance',roldid:'OLD Identity',rtransit:'FG Transit',rbottle:'FG Bottle',dash:'Dashboard',sum:'Summary',sku:'SKU',masterdata:'Master Data',spaceact:'Space Actuals',dailyup:'Daily Upload',imp:'Import',cloud:'Cloud',records:'Records',designer:'Designer',cardbuilder:'Card Builder',pagebuilder:'Page Builder',users:'Manage Users (add / delete)','btl-dash':'Bottle Dashboard','btl-table':'Detailed Tables','btl-manage':'Data Management','btl-compare':'Yearly Comparison','hr-dash':'Executive Dashboard','hr-emp':'HR Summary Table','hr-pending':'HR Pending Items','hr-upload':'Upload Center'};
+  var PGROUPS=[['daily',['rspace','rfgbal','roldid','rtransit','rbottle']],['bottle',['btl-dash','btl-table','btl-manage','btl-compare']],['aging',['dash','sum','sku']],['data',['masterdata','spaceact','dailyup','imp','records']],['hr',['hr-dash','hr-emp','hr-pending','hr-upload']],['admin',['cloud','designer','cardbuilder','pagebuilder','users']]];
+  var GLAB={daily:['Daily Reports','التقارير اليومية'],bottle:['Bottle & Brushing','القارورة والفرشة'],aging:['Aging','تحليل الأعمار'],data:['Data & Tools','البيانات والأدوات'],hr:['Human Resources','الموارد البشرية'],admin:['Admin Tools','أدوات الإدارة']};
   window.faPerms=function(email){
     _permEmail=String(email).toLowerCase();
     var ov=ensurePermOv();
