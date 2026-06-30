@@ -1211,6 +1211,9 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-count{font-size:12.5px;font-weight:800;color:var(--navy);margin-inline-start:auto}
 .fg-table{min-width:1120px;width:100%}.fg-table.fg-cols-fit{min-width:0;width:100%}.fg-table.fg-cols-fit th,.fg-table.fg-cols-fit td{min-width:80px;white-space:nowrap}.fg-table.fg-cols-fit th:first-child,.fg-table.fg-cols-fit td:first-child{min-width:130px}
 .fg-table thead th{position:sticky;top:0;z-index:3}
+.fg-table thead th.rr-sortable{cursor:pointer;user-select:none;}
+.fg-table thead th.rr-sortable:hover{opacity:.82;}
+.rr-sort-ind{font-size:9px;margin-inline-start:3px;opacity:.8;font-weight:normal;}
 .fg-table tbody tr.fg-hl td:not(.fg-vsep){background:#dbe8f7 !important;font-weight:700;color:#1e3a5f}
 .fg-cards{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}
 .fg-card{flex:1 1 150px;min-width:140px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px 12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
@@ -4775,7 +4778,7 @@ const BRANCH_SUM_EN={'1. Riyadh':'Riyadh','2. Kharj':'Kharj','3. Heet':'Heet','4
 const BRANCH_SUM_AR={'1. Riyadh':'مصنع الرياض','2. Kharj':'الخرج','3. Heet':'هيت','4. Jeddah (W)':'جدة','5. Jeddah (F)':'مصنع جدة','6. Dammam':'الدمام','7. Qassim':'القصيم','8. Ahsa':'الأحساء'};
 
 const T={
- en:{grp_aging:'Inventory Aging',grp_btl:'Bottle & Brushing',nav_btl_dash:'Dashboard',nav_btl_compare:'Yearly Comparison',nav_btl_table:'Detailed Tables',nav_btl_manage:'Data Management',grp_settings:'Settings',nav_dash:'Dashboard',nav_sum:'Summary',nav_imp:'Import Data',title:'Smart Inventory Analytics\n&\nAging Dashboard',lastupdate:'Last update',
+ en:{grp_aging:'Inventory Aging',grp_btl:'Bottle & Brushing',grp_hr:'Human Resources',nav_hr_dash:'Executive Dashboard',nav_hr_emp:'HR Summary Table',nav_hr_pending:'HR Pending Items',nav_hr_upload:'Upload Center',nav_btl_dash:'Dashboard',nav_btl_compare:'Yearly Comparison',nav_btl_table:'Detailed Tables',nav_btl_manage:'Data Management',grp_settings:'Settings',nav_dash:'Dashboard',nav_sum:'Summary',nav_imp:'Import Data',title:'Smart Inventory Analytics\n&\nAging Dashboard',lastupdate:'Last update',
   kpi_total:'Total Quantity',kpi_60:'Less than 60 days',kpi_90:'Less than 90 days',kpi_g90:'Greater than 90 days',kpi_c1:'Up to 30 days',kpi_c2:'31 – 60 days',kpi_c3:'61 – 90 days',kpi_c4:'91 – 180 days',kpi_c5:'181 – 240 days',kpi_c6:'Greater than 240 days',
   f_identity:'Identity',f_branch:'Branch',f_classify:'Classify',clear:'Clear',
   ch_identity:'Identity Inventory Weight',ch_month:'Inventory Aging Pattern',sub_month:'monthly qty',
@@ -4798,7 +4801,7 @@ const T={
   loaded:(f,sh,n,q)=>'&#9989; Loaded <b>'+f+'</b> — sheet "<b>'+sh+'</b>", '+n+' rows, total qty <b>'+q+'</b>. Dashboard updated. <a href="#" onclick="go(\'dash\');return false;">Open Dashboard →</a>',
   readerr:'Could not read the file.',all:'All',clear_data:'Clear Data',update_data:'Update with New Data',cleared:'&#10003; Data cleared. Import a new file to update the report.',confirm_clear:'Clear all current data from the report? This cannot be undone.',
   map:{month:{},branchSum:BRANCH_SUM_EN}},
- ar:{grp_aging:'أعمار المخزون',grp_btl:'القارورة والفرشة',nav_btl_dash:'لوحة المؤشرات',nav_btl_compare:'المقارنات السنوية',nav_btl_table:'الجداول التفصيلية',nav_btl_manage:'إدارة البيانات',grp_settings:'الإعدادات',nav_dash:'لوحة المعلومات',nav_sum:'ملخص الإجماليات',nav_imp:'استيراد البيانات',title:'Smart Inventory Analytics\n&\nAging Dashboard',lastupdate:'آخر تحديث',
+ ar:{grp_aging:'أعمار المخزون',grp_btl:'القارورة والفرشة',grp_hr:'الموارد البشرية',nav_hr_dash:'لوحة المدير التنفيذي',nav_hr_emp:'جدول الموظفين',nav_hr_pending:'الطلبات المعلقة',nav_hr_upload:'مركز الرفع',nav_btl_dash:'لوحة المؤشرات',nav_btl_compare:'المقارنات السنوية',nav_btl_table:'الجداول التفصيلية',nav_btl_manage:'إدارة البيانات',grp_settings:'الإعدادات',nav_dash:'لوحة المعلومات',nav_sum:'ملخص الإجماليات',nav_imp:'استيراد البيانات',title:'Smart Inventory Analytics\n&\nAging Dashboard',lastupdate:'آخر تحديث',
   kpi_total:'إجمالي الكمية',kpi_60:'أقل من 60 يوم',kpi_90:'أقل من 90 يوم',kpi_g90:'أكثر من 90 يوم',kpi_c1:'حتى 30 يوم',kpi_c2:'31 – 60 يوم',kpi_c3:'61 – 90 يوم',kpi_c4:'91 – 180 يوم',kpi_c5:'181 – 240 يوم',kpi_c6:'أكثر من 240 يوم',
   f_identity:'الهوية',f_branch:'الفرع',f_classify:'التصنيف',clear:'مسح',
   ch_identity:'وزن المخزون حسب الهوية',ch_month:'نمط أعمار المخزون',sub_month:'الكمية الشهرية',
@@ -6417,14 +6420,14 @@ function _pwMatch(stored,typed){stored=String(stored==null?'':stored);typed=Stri
 function seedUsers(){if(!getUsers())saveUsers([{u:'admin',p:_pwHash('admin123'),r:'admin'}]);}
 function isAdmin(){return !!(CURRENT_USER&&CURRENT_USER.r==='admin');}
 const ALL_PAGES=['rspace','rfgbal','roldid','rtransit','rbottle','btl-dash','btl-table','btl-manage','btl-compare','dash','sum','sku','masterdata','spaceact','dailyup','imp','cloud','records','designer','cardbuilder','pagebuilder','users','hr-dash','hr-emp','hr-pending','hr-upload'];
-const PAGE_LABEL={dash:'nav_dash',sum:'nav_sum',sku:'nav_sku',records:'nav_records',imp:'nav_imp',cloud:'nav_cloud',designer:'nav_designer',rspace:'nav_rspace',rfgbal:'nav_rfgbal',roldid:'nav_roldid',rtransit:'nav_rtransit',rbottle:'nav_rbottle',masterdata:'nav_masterdata',spaceact:'nav_spaceact',dailyup:'nav_dailyup',users:'nav_users','hr-dash':'HR Dashboard','hr-emp':'HR Summary Table','hr-pending':'HR Pending','hr-upload':'HR Upload','btl-dash':'Bottle Dashboard','btl-table':'Bottle Table','btl-manage':'Bottle Manage','btl-compare':'Bottle Compare',cardbuilder:'Card Builder',pagebuilder:'Page Builder'};
+const PAGE_LABEL={dash:'nav_dash',sum:'nav_sum',sku:'nav_sku',records:'nav_records',imp:'nav_imp',cloud:'nav_cloud',designer:'nav_designer',rspace:'nav_rspace',rfgbal:'nav_rfgbal',roldid:'nav_roldid',rtransit:'nav_rtransit',rbottle:'nav_rbottle',masterdata:'nav_masterdata',spaceact:'nav_spaceact',dailyup:'nav_dailyup',users:'nav_users','btl-dash':'nav_btl_dash','btl-table':'nav_btl_table','btl-manage':'nav_btl_manage','btl-compare':'nav_btl_compare',cardbuilder:'Card Builder',pagebuilder:'Page Builder','hr-dash':'nav_hr_dash','hr-emp':'nav_hr_emp','hr-pending':'nav_hr_pending','hr-upload':'nav_hr_upload'};
 /* مجموعات الصلاحيات المنظّمة (للعرض الاحترافي) */
 const PERM_GROUPS=[
   {key:'daily',label:'grp_daily',pages:['rspace','rfgbal','roldid','rtransit','rbottle']},
-  {key:'bottle',label:'Bottle Reports',pages:['btl-dash','btl-table','btl-manage','btl-compare']},
+  {key:'bottle',label:'grp_btl',pages:['btl-dash','btl-table','btl-manage','btl-compare']},
   {key:'aging',label:'grp_aging',pages:['dash','sum','sku']},
   {key:'data',label:'grp_data',pages:['masterdata','spaceact','dailyup','imp','records']},
-  {key:'hr',label:'HR',pages:['hr-dash','hr-emp','hr-pending','hr-upload']},
+  {key:'hr',label:'grp_hr',pages:['hr-dash','hr-emp','hr-pending','hr-upload']},
   {key:'admin',label:'grp_admintools',pages:['cloud','designer','cardbuilder','pagebuilder','users']}
 ];
 function canView(p){
@@ -7242,6 +7245,7 @@ function _renderLoginLogRows(log,t){
   }
   h+='</tbody>';
   t.innerHTML=h;
+  try{makeSortable(t);}catch(e){}
 }
 function renderLoginLog(){
   var t=document.getElementById('loglog');
@@ -7622,6 +7626,7 @@ function renderUsers(){
     html+='</tr>';
   });
   html+='</tbody>';document.getElementById('utable').innerHTML=html;
+  try{makeSortable(document.getElementById('utable'));}catch(e){}
   try{renderUserStats();}catch(e){}
 }
 /* نافذة تعديل صلاحيات مستخدم */
@@ -11823,6 +11828,7 @@ function renderSpaceActuals(){
   act.branches.forEach(function(r,i){html+=rowHtml(r,i,'branch');});
   act.factories.forEach(function(r,i){html+=rowHtml(r,i,'factory');});
   wrap.innerHTML=html;
+  try{var _sat=wrap.closest('table');if(_sat)makeSortable(_sat);}catch(e){}
 }
 var _spActPending=JSON.parse(JSON.stringify(SPACE_ACT_DEFAULTS));
 function _spActLoad(){_spActPending=getSpaceActuals();}
@@ -12497,6 +12503,7 @@ try{drInit();}catch(e){}
 
 /* ===== Rich report (FG Balance / OLD Identity / FG Transit): cards + slicers + search + split totals ===== */
 var _rr={key:null,rep:null,brand:{},size:{},query:'',hideZero:true,cols:{}};
+var _rrSort={col:-1,dir:1,_key:''};
 var RR_HL_CODES=['30000000'];
 function drIsAr(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
 function fgColIdx(h,name){for(var i=0;i<h.length;i++){if(String(h[i]).toLowerCase().trim()===name)return i;}return -1;}
@@ -12617,7 +12624,7 @@ function renderRichReport(key,rep){
     }
   })();
   html+='<div class="pivot-wrap fg-wrap"><table class="pivot fg-table"><thead><tr>';
-  h.forEach(function(col,i){if(HIDDEN.has(P+':col:'+i))return;if(i===c.transit&&c.transit>=0)html+='<th class="fg-vsep"></th>';var thc=(i===c.total?' class="fg-toth"':(i===c.transit?' class="fg-trth"':''));html+='<th'+thc+'>'+drEsc(col)+'</th>';});
+  h.forEach(function(col,i){if(HIDDEN.has(P+':col:'+i))return;if(i===c.transit&&c.transit>=0)html+='<th class="fg-vsep"></th>';var _tc=(i===c.total?'fg-toth rr-sortable':(i===c.transit?'fg-trth rr-sortable':'rr-sortable'));html+='<th class="'+_tc+'" data-col="'+i+'" onclick="rrSortBy('+i+')">'+drEsc(col)+'<span class="rr-sort-ind"></span></th>';});
   /* رؤوس الأعمدة المخصصة */
   (COLDEF[P]||[]).forEach(function(cc){html+='<th style="background:'+(cc.hbg||'#0f9b8e')+'">'+drEsc(cc.name||'')+'</th>';});
   html+='</tr></thead><tbody id="'+P+'-tbody"></tbody></table></div>';
@@ -12661,6 +12668,36 @@ function rrFilteredRows(){
     if(q){var hit=false;for(var k=0;k<r.length;k++){if(String(r[k]==null?'':r[k]).toLowerCase().indexOf(q)>=0){hit=true;break;}}if(!hit)return false;}
     return true;
   });
+}
+/* ═══ الترتيب العام للجداول الثابتة ═══ */
+function makeSortable(tbl){
+  if(!tbl||tbl._msBound)return;tbl._msBound=true;
+  var thead=tbl.tHead;if(!thead)return;
+  var ths=[].slice.call(thead.querySelectorAll('th'));
+  var _origHtml=ths.map(function(th){return th.innerHTML;});
+  var _sc=-1,_sd=1;
+  function _val(td){if(!td)return '';var t=(td.getAttribute&&td.getAttribute('data-sort'))||td.textContent.trim();var n=parseFloat(t.replace(/[^\d.\-]/g,''));return isNaN(n)?t.toLowerCase():n;}
+  function _updHdr(){ths.forEach(function(th,hi){th.innerHTML=_origHtml[hi];if(_sc===hi){var sp=document.createElement('span');sp.className='rr-sort-ind';sp.textContent=(_sd===1?' ▲':' ▼');th.appendChild(sp);}});}
+  ths.forEach(function(th,ci){
+    th.style.cursor='pointer';th.style.userSelect='none';
+    th.addEventListener('click',function(){
+      if(_sc===ci){if(_sd===1){_sd=-1;}else{_sc=-1;_sd=1;}}else{_sc=ci;_sd=1;}
+      _updHdr();
+      var tbody=tbl.tBodies[0];if(!tbody)return;
+      var rows=[].slice.call(tbody.querySelectorAll('tr'));
+      if(_sc<0){rows.sort(function(a,b){return (parseInt(a.dataset.origIdx)||0)-(parseInt(b.dataset.origIdx)||0);});}
+      else{var sc=_sc,sd=_sd;rows.sort(function(a,b){var av=_val(a.querySelectorAll('td')[sc]),bv=_val(b.querySelectorAll('td')[sc]);if(typeof av==='number'&&typeof bv==='number')return sd*(av-bv);return sd*(av<bv?-1:av>bv?1:0);});}
+      rows.forEach(function(r){tbody.appendChild(r);});
+    });
+  });
+  var tbody=tbl.tBodies[0];
+  if(tbody)[].slice.call(tbody.querySelectorAll('tr')).forEach(function(r,i){if(!r.dataset.origIdx)r.dataset.origIdx=i;});
+}
+/* ═══ ترتيب جدول FG Balance الرئيسي ═══ */
+function rrSortBy(colIdx){
+  if(_rrSort.col===colIdx){if(_rrSort.dir===1){_rrSort.dir=-1;}else{_rrSort.col=-1;_rrSort.dir=1;}}
+  else{_rrSort.col=colIdx;_rrSort.dir=1;}
+  rrRefresh();
 }
 function rrShowCovFilter(band){
   var P=_rr.key;var rep=_rr.rep;if(!rep)return;
@@ -12829,6 +12866,17 @@ function rrShowCovFilter(band){
 function rrRefresh(){
   var rep=_rr.rep; if(!rep)return;var P=_rr.key,c=_rr.cols,h=rep.headers||[];var nf=(rep.numFrom!=null?rep.numFrom:1);
   var rows=rrFilteredRows();var tb=document.getElementById(P+'-tbody'); if(!tb)return;
+  /* إعادة ضبط الترتيب عند تغيير التقرير */
+  if(_rrSort._key&&_rrSort._key!==P){_rrSort.col=-1;_rrSort.dir=1;}_rrSort._key=P;
+  /* تطبيق الترتيب */
+  if(_rrSort.col>=0){
+    var _sc2=_rrSort.col,_sd2=_rrSort.dir;
+    rows=rows.slice().sort(function(a,b){
+      var av=(a[_sc2]==null?'':a[_sc2]),bv=(b[_sc2]==null?'':b[_sc2]);
+      if(typeof av==='number'&&typeof bv==='number')return _sd2*(av-bv);
+      return _sd2*String(av).localeCompare(String(bv));
+    });
+  }
   var ti=c.total,tri=c.transit,cati=c.cat;
   var html='',sumA=[],sumB=[],hasNum=[];var card={carton:0,shrink:0,pack:0,bottle:0,transit:0,other:0};
   for(var z=0;z<h.length;z++){sumA[z]=0;sumB[z]=0;hasNum[z]=false;}
@@ -12895,6 +12943,8 @@ function rrRefresh(){
     if(_bHas){html+=grand(sumA,drIsAr()?'كرتون + شرنك':'Carton + Shrink','fg-gA');html+=grand(sumB,drIsAr()?'القارورة':'Bottle','fg-gB');}
     else{var sAll=[];for(var z2=0;z2<h.length;z2++)sAll[z2]=sumA[z2]+sumB[z2];html+=grand(sAll,drIsAr()?'الإجمالي':'Total','fg-gA');}}
   tb.innerHTML=html;
+  /* تحديث مؤشرات ترتيب الأعمدة */
+  try{[].slice.call(tb.closest('table').querySelectorAll('thead th[data-col]')).forEach(function(th){var ci=parseInt(th.getAttribute('data-col'));var ind=th.querySelector('.rr-sort-ind');if(!ind){ind=document.createElement('span');ind.className='rr-sort-ind';th.appendChild(ind);}ind.textContent=(_rrSort.col===ci)?(_rrSort.dir===1?' ▲':' ▼'):'';});}catch(e){}
   /* تأجيل decorateRich بعد إتمام الرسم لمنع layout thrash */
   if(typeof requestAnimationFrame!=='undefined'){
     requestAnimationFrame(function(){try{decorateRich();}catch(e){}});
