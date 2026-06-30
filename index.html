@@ -12877,6 +12877,12 @@ function rrRefresh(){
       return _sd2*String(av).localeCompare(String(bv));
     });
   }
+  /* تثبيت الأكواد المميزة دائماً في مقدمة الجدول بغض النظر عن الترتيب */
+  (function(){
+    var _pin=rows.filter(function(r){return RR_HL_CODES.indexOf(String(r[0]==null?'':r[0]).trim())>=0;});
+    var _rest=rows.filter(function(r){return RR_HL_CODES.indexOf(String(r[0]==null?'':r[0]).trim())<0;});
+    if(_pin.length)rows=_pin.concat(_rest);
+  })();
   var ti=c.total,tri=c.transit,cati=c.cat;
   var html='',sumA=[],sumB=[],hasNum=[];var card={carton:0,shrink:0,pack:0,bottle:0,transit:0,other:0};
   for(var z=0;z<h.length;z++){sumA[z]=0;sumB[z]=0;hasNum[z]=false;}
