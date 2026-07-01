@@ -12896,6 +12896,10 @@ function rrRefresh(){
       if(ga!==gb)return ga-gb;
       var av=(a[_sc2]==null?'':a[_sc2]),bv=(b[_sc2]==null?'':b[_sc2]);
       if(typeof av==='number'&&typeof bv==='number')return _sd2*(av-bv);
+      /* ترتيب عمود الحجم بالحجم الفعلي (drSizeVol) لتفادي اختلافات التنسيق في البيانات الخام */
+      if(_sc2===c.size){var _va=drSizeVol(av),_vb=drSizeVol(bv);if(_va!==_vb)return _sd2*(_va-_vb);}
+      /* ترتيب عمود العلامة بالاسم المعياري */
+      if(c.brand>=0&&_sc2===c.brand)return _sd2*String(drBrandLabel(av)).localeCompare(String(drBrandLabel(bv)));
       return _sd2*String(av).localeCompare(String(bv));
     });
   }else{
