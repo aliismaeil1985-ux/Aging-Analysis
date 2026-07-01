@@ -14935,7 +14935,7 @@ function renderBottleReport(rep){
   /* collect unique items (code + current values) from FG Balance + OLD Identity */
   function collect(){
     var out={}; var d=(typeof getDR==='function'?getDR():{})||{};
-    ['fgbal','oldid'].forEach(function(k){
+    ['fgbal','oldid','transit'].forEach(function(k){
       var rep=d[k]; if(!rep||!rep.rows)return; var cm=colmap(rep.headers||[]);
       rep.rows.forEach(function(row){
         var code=String(row[cm.code]==null?'':row[cm.code]).trim(); if(!code||/total|الاجمال|الإجمال/i.test(code))return;
@@ -14954,14 +14954,29 @@ function renderBottleReport(rep){
         FIELDS.forEach(function(f){ if(cm[f]>=0 && m[f]!=null && m[f]!=='')row[cm[f]]=m[f]; }); });
     }catch(e){}
   }
+  /* تطبيق Brand من MD على مصفوفة DATA حتى تعكسه شاشات الأعمار والتلخيص و SKU */
+  function applyMDtoDATA(){
+    try{
+      load();
+      if(typeof DATA==='undefined'||!Array.isArray(DATA))return;
+      DATA.forEach(function(d){
+        if(!d.item_code)return;
+        if(d._origIdentity==null)d._origIdentity=d.identity;
+        var m=MD[String(d.item_code).trim()];
+        d.identity=(m&&m.Brand)?m.Brand:d._origIdentity;
+      });
+      if(typeof render==='function')try{render();}catch(e){}
+      if(typeof rebuildTables==='function')try{rebuildTables();}catch(e){}
+    }catch(e){}
+  }
   function hookRender(){
     if(typeof window.renderRichReport==='function' && !window.renderRichReport.__mdi){
       var o=window.renderRichReport;
-      window.renderRichReport=function(key,rep){ try{ if(key==='fgbal'||key==='oldid')overlay(rep); }catch(e){} return o.apply(this,arguments); };
+      window.renderRichReport=function(key,rep){ try{ if(key==='fgbal'||key==='oldid'||key==='transit')overlay(rep); }catch(e){} return o.apply(this,arguments); };
       window.renderRichReport.__mdi=true;
     }
   }
-  function rerender(){ try{['fgbal','oldid'].forEach(function(k){if(typeof renderDailyReport==='function')renderDailyReport(k);});}catch(e){} }
+  function rerender(){ try{['fgbal','oldid','transit'].forEach(function(k){if(typeof renderDailyReport==='function')renderDailyReport(k);});}catch(e){} try{applyMDtoDATA();}catch(e){} }
 
   function inject(){
     var page=document.getElementById('page-masterdata'); if(!page)return;
