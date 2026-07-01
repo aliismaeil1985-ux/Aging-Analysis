@@ -3061,9 +3061,30 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <div class="u-pane" id="upane-log">
         <div class="card sec-card">
           <h2 class="sec-h"><span>&#128203;</span> <span data-i18n="log_title">Login Activity Log</span></h2>
-          <div class="sec-actions" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
             <button class="btn-cols" onclick="renderLoginLog()"><span>&#128260;</span> <span data-i18n="log_refresh">Refresh</span></button>
             <button class="btn-cols" onclick="clearLoginLog()"><span>&#128465;</span> <span data-i18n="log_clear">Clear log</span></button>
+            <select id="log-filter-user" onchange="renderLoginLog()" style="border:1px solid #cbd5e1;border-radius:8px;padding:5px 10px;font-size:12px;background:#f8fafc;color:#334155">
+              <option value="">— All Users —</option>
+            </select>
+            <select id="log-filter-kind" onchange="renderLoginLog()" style="border:1px solid #cbd5e1;border-radius:8px;padding:5px 10px;font-size:12px;background:#f8fafc;color:#334155">
+              <option value="">— All Events —</option>
+              <option value="login">✅ Sign-in only</option>
+              <option value="nav">🖥 Screen visits</option>
+              <option value="failed">❌ Failed only</option>
+            </select>
+            <span id="log-count" style="font-size:11px;color:#94a3b8;margin-inline-start:4px"></span>
+            <span id="log-cloud-badge" style="display:none;font-size:11px;padding:3px 10px;background:#dbeafe;color:#1d4ed8;border-radius:10px;font-weight:600">☁ Cloud log</span>
+          </div>
+          <!-- ══ Live Presence Panel ══ -->
+          <div id="live-users-panel" style="margin-bottom:14px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(90deg,#f0fdf4,#f8fafc);border-bottom:1px solid #e2e8f0">
+              <span style="font-size:12px;font-weight:700;color:#15803d">👥 Live Users — من على المنصة الآن</span>
+              <button onclick="renderPresencePanel()" style="font-size:11px;padding:3px 10px;border:1px solid #86efac;background:#dcfce7;color:#166534;border-radius:8px;cursor:pointer">↺ Refresh</button>
+            </div>
+            <div data-pres-body style="display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;min-height:44px">
+              <span style="color:#94a3b8;font-size:12px">جارٍ التحميل…</span>
+            </div>
           </div>
           <div style="overflow:auto"><table class="utable" id="loglog"></table></div>
         </div>
@@ -4951,6 +4972,29 @@ function _navFabSync(){var f=document.getElementById('nav-fab');if(!f)return;var
 let NAV_HIST=[];let _navBack=false;
 function goBack(){if(NAV_HIST.length){var prev=NAV_HIST.pop();_navBack=true;go(prev);}else{go('home');}}
 function updateTopnav(p){var tn=document.getElementById('topnav');if(!tn)return;tn.style.display=(p==='home')?'none':'flex';var lbl='';var b=document.querySelector('.navbtn[data-page="'+p+'"] .lbl');if(b)lbl=b.textContent;if(!lbl){var pg=document.getElementById('page-'+p);var h1=pg?pg.querySelector('h1'):null;lbl=h1?h1.textContent.trim():'';}var cc=document.getElementById('crumb-current');if(cc)cc.textContent=lbl;}
+/* ─── تتبع التنقل بين الشاشات ─── */
+var _lastNavLog={};
+var PAGE_NAV_LABEL={
+  home:'Home',dash:'Dashboard',sum:'Summary',sku:'SKU Table',
+  records:'Data Editor',imp:'Import Data',cloud:'Cloud Sync',
+  designer:'Designer',cardbuilder:'Card Builder',pagebuilder:'Page Builder',
+  rspace:'Space Report',rfgbal:'FG Balance',roldid:'OLD Identity',
+  rtransit:'FG Transit',rbottle:'Bottle Stock',
+  masterdata:'Master Data',spaceact:'Space Actuals',dailyup:'Daily Upload',
+  users:'User Management','btl-dash':'Bottle Dashboard','btl-compare':'Btl Comparison',
+  'btl-table':'Bottle Tables','btl-manage':'Btl Management',
+  'hr-dash':'HR Dashboard','hr-emp':'HR Summary','hr-pending':'HR Pending','hr-upload':'HR Upload'
+};
+function logNav(page){
+  try{
+    if(!CURRENT_USER||page==='home')return;
+    var u=CURRENT_USER.u||'';var now=Date.now();
+    /* throttle: don't log same page twice within 10 seconds */
+    if(_lastNavLog[u]&&_lastNavLog[u].pg===page&&now-_lastNavLog[u].t<10000)return;
+    _lastNavLog[u]={pg:page,t:now};
+    logLogin(u,'nav',page);
+  }catch(e){}
+}
 function go(p){
   if(!CURRENT_USER){
     /* لا يوجد مستخدم مسجل — أظهر شاشة الدخول */
@@ -4993,6 +5037,7 @@ function go(p){
   setTimeout(()=>{applyChartHeights();addResizers();},30);
   if(typeof EDITMODE!=='undefined'&&EDITMODE&&typeof bindEditables==='function'){setTimeout(bindEditables,120);}
   if(p==='sku')buildSku();
+  try{logNav(p);}catch(e){}
 }
 function grad(ctx,a,c1,c2){const g=ctx.createLinearGradient(0,a.bottom,0,a.top);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
 function hgrad(ctx,a,c1,c2){const g=ctx.createLinearGradient(a.left,0,a.right,0);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
@@ -7181,11 +7226,12 @@ function _pruneLoginLog(log){
     return log;
   }catch(e){return Array.isArray(log)?log:[];}
 }
-function logLogin(uname,kind){
+function logLogin(uname,kind,page){
   try{
     var dev=_detectDeviceType();
     var now=Date.now();
     var entry={u:uname,k:kind||'login',t:now,dev:dev};
+    if(page)entry.pg=page;
     /* --- حفظ محلي --- */
     var log=JSON.parse(LS.getItem('login_log')||'[]');
     log.unshift(entry);log=_pruneLoginLog(log);
@@ -7229,23 +7275,56 @@ function clearLoginLog(){
 }
 
 function _renderLoginLogRows(log,t){
-  var kindLbl={'login':tr('log_k_login'),'password-reset':tr('log_k_reset'),'failed':tr('log_k_failed')};
   var ar=(LANG==='ar');
-  var devMap={
-    'desktop':{ic:'💻',lbl:ar?'كمبيوتر':'Desktop'},
-    'mobile':{ic:'📱',lbl:ar?'جوال':'Mobile'},
-    'tablet':{ic:'📲',lbl:ar?'لوحي':'Tablet'}
-  };
-  function devCell(dv){var d=devMap[dv]||{ic:'❔',lbl:ar?'غير معروف':'Unknown'};return '<span style="display:inline-flex;align-items:center;gap:5px;font-weight:600;color:#475569"><span style="font-size:14px">'+d.ic+'</span>'+d.lbl+'</span>';}
-  var h='<thead><tr><th>'+tr('log_user')+'</th><th>'+tr('log_event')+'</th><th>'+(ar?'الجهاز':'Device')+'</th><th>'+tr('log_time')+'</th></tr></thead><tbody>';
-  if(!log.length){
-    h+='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:18px">'+tr('log_empty')+'</td></tr>';
+  /* تطبيق الفلاتر */
+  var fUser=(document.getElementById('log-filter-user')||{}).value||'';
+  var fKind=(document.getElementById('log-filter-kind')||{}).value||'';
+  var visible=log.filter(function(e){
+    if(fUser&&e.u!==fUser)return false;
+    if(fKind&&e.k!==fKind)return false;
+    return true;
+  });
+  /* تحديث قائمة المستخدمين */
+  var uSel=document.getElementById('log-filter-user');
+  if(uSel){
+    var allUsers=[...new Set(log.map(function(e){return e.u||'';}).filter(Boolean))].sort();
+    var curVal=uSel.value;
+    uSel.innerHTML='<option value="">'+(ar?'— جميع المستخدمين —':'— All Users —')+'</option>'
+      +allUsers.map(function(u){return '<option value="'+escHtml(u)+'"'+(u===curVal?' selected':'')+'>'+escHtml(u)+'</option>';}).join('');
+  }
+  /* count badge */
+  var cnt=document.getElementById('log-count');
+  if(cnt)cnt.textContent=visible.length+' '+(ar?'حدث':'events');
+  var kindLbl={'login':ar?'تسجيل دخول':'Signed in','password-reset':ar?'إعادة تعيين':'Pwd Reset','failed':ar?'محاولة فاشلة':'Failed','nav':ar?'زيارة شاشة':'Screen visit'};
+  var devMap={'desktop':{ic:'💻',lbl:ar?'كمبيوتر':'Desktop'},'mobile':{ic:'📱',lbl:ar?'جوال':'Mobile'},'tablet':{ic:'📲',lbl:ar?'لوحي':'Tablet'}};
+  function devCell(dv){var d=devMap[dv]||{ic:'❔',lbl:ar?'غير معروف':'Unknown'};return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#475569">'+d.ic+' '+d.lbl+'</span>';}
+  function pageLabel(pg){return (typeof PAGE_NAV_LABEL!=='undefined'&&PAGE_NAV_LABEL[pg])||pg||'—';}
+  var h='<thead><tr>'
+    +'<th style="min-width:160px">'+(ar?'المستخدم':'User')+'</th>'
+    +'<th style="min-width:120px">'+(ar?'الحدث':'Event')+'</th>'
+    +'<th style="min-width:120px">'+(ar?'الشاشة':'Screen')+'</th>'
+    +'<th>'+(ar?'الجهاز':'Device')+'</th>'
+    +'<th style="min-width:150px">'+(ar?'التوقيت':'Time')+'</th>'
+    +'</tr></thead><tbody>';
+  if(!visible.length){
+    h+='<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:18px">'+(ar?'لا يوجد نشاط بعد.':'No activity yet.')+'</td></tr>';
   }else{
-    log.forEach(function(e){
+    visible.forEach(function(e){
       var d=new Date(e.t);
-      var ds=d.toLocaleString(LANG==='ar'?'ar-EG':'en-GB');
-      var badge=e.k==='failed'?'#c4452a':(e.k==='password-reset'?'#b45309':'#15803d');
-      h+='<tr><td><b>'+escHtml(e.u||'')+'</b></td><td><span style="color:'+badge+';font-weight:600">'+escHtml(kindLbl[e.k]||e.k)+'</span></td><td>'+devCell(e.dev)+'</td><td style="color:#64748b">'+escHtml(ds)+'</td></tr>';
+      var ds=d.toLocaleString(ar?'ar-EG':'en-GB');
+      var isNav=(e.k==='nav');
+      var isFail=(e.k==='failed');
+      var isLogin=(e.k==='login');
+      var rowBg=isNav?'#f8fafc':(isFail?'#fff5f5':'#fff');
+      var badge=isFail?'#dc2626':(e.k==='password-reset'?'#b45309':(isNav?'#64748b':'#15803d'));
+      var icon=isLogin?'✅':(isFail?'❌':(e.k==='password-reset'?'🔑':(isNav?'🖥':'◉')));
+      h+='<tr style="background:'+rowBg+(isNav?';opacity:.85':'')+';">'
+        +'<td style="font-weight:'+(isNav?'400':'700')+';font-size:'+(isNav?'12':'13')+'px;color:#1e293b">'+escHtml(e.u||'')+'</td>'
+        +'<td><span style="color:'+badge+';font-weight:600;font-size:12px">'+icon+' '+escHtml(kindLbl[e.k]||e.k)+'</span></td>'
+        +'<td style="font-size:12px;color:#475569">'+(e.pg?('<b>'+escHtml(pageLabel(e.pg))+'</b>'):'—')+'</td>'
+        +'<td>'+devCell(e.dev)+'</td>'
+        +'<td style="color:#64748b;font-size:12px">'+escHtml(ds)+'</td>'
+        +'</tr>';
     });
   }
   h+='</tbody>';
@@ -7276,6 +7355,7 @@ function renderLoginLog(){
             /* ترتيب تنازلي حسب الوقت */
             cLog.sort(function(a,b){return (b.t||0)-(a.t||0);});
             _renderLoginLogRows(cLog,t);
+            var cb=document.getElementById('log-cloud-badge');if(cb)cb.style.display='';
           }else{
             /* لا يوجد سجل سحابي — اكتفِ بالمحلي */
             var lr=document.getElementById('loglog-loading');
@@ -13623,15 +13703,79 @@ function renderBottleReport(rep){
   window.seedUsers=function(){};
   window.initAuth=function(){ var ov=document.getElementById('login-ov'); if(ov)ov.style.display='flex'; tryInitAuth(); };
 
-  /* ===== Login Log: Firestore Sync ===== */
+  /* ===== Login Log: Firestore Sync + Live Presence ===== */
   (function(){
     var LOG_COL='login_logs';
+    var PRES_COL='user_presence';
+    var _presStart=Date.now();
     function _fbDB(){return (typeof fbDB!=='undefined'&&fbDB)?fbDB:null;}
     function _dev(){try{return typeof _detectDeviceType==='function'?_detectDeviceType():'desktop';}catch(e){return 'desktop';}}
-    window.logLogin=function(uname,kind){
+    function _fmtDur(ms){if(!ms||ms<=0)return'<1m';var m=Math.floor(ms/60000);var h=Math.floor(m/60);m=m%60;return h>0?h+'h '+m+'m':m+'m';}
+    function _fmtAgo(ts){var ago=Date.now()-ts;if(ago<60000)return'Just now';if(ago<3600000)return Math.floor(ago/60000)+'m ago';if(ago<86400000)return Math.floor(ago/3600000)+'h ago';return Math.floor(ago/86400000)+'d ago';}
+
+    /* ── Presence write ── */
+    function _writePresence(online){
+      try{
+        var u=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER)?(CURRENT_USER.u||''):'';
+        if(!u)return;
+        var db=_fbDB();if(!db)return;
+        var now=Date.now();
+        var doc={u:u,online:online,lastSeen:now,dev:_dev()};
+        if(online){doc.loginAt=_presStart;}
+        else{doc.online=false;doc.sessionMs=now-_presStart;}
+        db.collection(PRES_COL).doc(u.toLowerCase()).set(doc,{merge:true}).catch(function(){});
+      }catch(e){}
+    }
+    setTimeout(function(){_writePresence(true);},2000);
+    setInterval(function(){_writePresence(true);},60000);
+    try{window.addEventListener('beforeunload',function(){_writePresence(false);});}catch(e){}
+
+    /* ── Render presence panel ── */
+    window.renderPresencePanel=function(){
+      var panel=document.getElementById('live-users-panel');if(!panel)return;
+      var body=panel.querySelector('[data-pres-body]');if(!body)return;
+      var db=_fbDB();
+      if(!db){body.innerHTML='<span style="color:#94a3b8;font-size:12px">Firebase غير متصل</span>';return;}
+      body.innerHTML='<span style="color:#94a3b8;font-size:12px">جارٍ التحميل…</span>';
+      db.collection(PRES_COL).get().then(function(qs){
+        var now=Date.now();
+        var online=[],offline=[];
+        qs.forEach(function(d){
+          var x=d.data();
+          var isOn=x.online&&(now-x.lastSeen)<120000;
+          if(isOn)online.push(x);else offline.push(x);
+        });
+        var h='';
+        online.forEach(function(d){
+          var dur=d.loginAt?_fmtDur(now-d.loginAt):'—';
+          h+='<div style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:20px">'
+            +'<span style="color:#16a34a;font-size:14px">●</span>'
+            +'<b style="font-size:12px;color:#166534">'+d.u+'</b>'
+            +'<span style="font-size:11px;color:#fff;background:#16a34a;padding:1px 7px;border-radius:8px">Online</span>'
+            +'<span style="font-size:11px;color:#15803d;font-weight:600">⏱ '+dur+'</span>'
+            +'</div>';
+        });
+        offline.forEach(function(d){
+          var ago=d.lastSeen?_fmtAgo(d.lastSeen):'—';
+          var sess=d.sessionMs?'⏱ '+_fmtDur(d.sessionMs):'';
+          h+='<div style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px">'
+            +'<span style="color:#cbd5e1;font-size:14px">●</span>'
+            +'<span style="font-size:12px;color:#64748b">'+d.u+'</span>'
+            +'<span style="font-size:11px;color:#94a3b8;background:#f1f5f9;padding:1px 7px;border-radius:8px">Offline</span>'
+            +(sess?'<span style="font-size:11px;color:#94a3b8">'+sess+'</span>':'')
+            +'<span style="font-size:10px;color:#cbd5e1">'+ago+'</span>'
+            +'</div>';
+        });
+        if(!h)h='<span style="color:#94a3b8;font-size:12px">لا توجد بيانات حضور بعد — سيظهر المستخدمون بعد فتح المنصة</span>';
+        body.innerHTML=h;
+      }).catch(function(){body.innerHTML='<span style="color:#ef4444;font-size:12px">تعذّر تحميل بيانات الحضور</span>';});
+    };
+
+    window.logLogin=function(uname,kind,page){
       var dev=_dev();
       var now=Date.now();
       var entry={u:String(uname||''),k:kind||'login',t:now,dev:dev};
+      if(page)entry.pg=page;
       try{var loc=JSON.parse(LS.getItem('login_log')||'[]');loc.unshift(entry);if(loc.length>500)loc=loc.slice(0,500);LS.setItem('login_log',JSON.stringify(loc));}catch(e){}
       try{var db=_fbDB();if(db)db.collection(LOG_COL).add(entry).catch(function(){});}catch(e){}
       /* حفظ بيانات الجلسة في ملف المستخدم عند الدخول */
@@ -13641,22 +13785,29 @@ function renderBottleReport(rep){
         try{LS.setItem('dash_session_device',dev);}catch(e){}
       }
     };
+    var PAGE_NAV_LABEL_LL={home:'Home',dash:'Dashboard',sum:'Summary',sku:'SKU Table',records:'Data Editor',imp:'Import Data',cloud:'Cloud Sync',rfgbal:'FG Balance',roldid:'OLD Identity',rtransit:'FG Transit',rbottle:'Bottle Stock',masterdata:'Master Data',spaceact:'Space Actuals',dailyup:'Daily Upload',users:'User Management',designer:'Designer',cardbuilder:'Card Builder',pagebuilder:'Page Builder',rspace:'Space Report'};
     window.renderLoginLog=function(){
+      try{window.renderPresencePanel();}catch(e){}
       var t=document.getElementById('loglog');if(!t)return;
       var ar=(typeof LANG!=='undefined'&&LANG==='ar');
-      var kindLbl={'login':ar?'دخول':'Login','password-reset':ar?'إعادة كلمة مرور':'Password Reset','failed':ar?'محاولة فاشلة':'Failed','local':ar?'دخول محلي':'Local Login'};
+      var kindLbl={'login':ar?'دخول':'Login','password-reset':ar?'إعادة كلمة مرور':'Password Reset','failed':ar?'محاولة فاشلة':'Failed','local':ar?'دخول محلي':'Local Login','nav':ar?'تصفح':'Nav'};
       var devMap={'desktop':{ic:'💻',lbl:ar?'كمبيوتر':'Desktop'},'mobile':{ic:'📱',lbl:ar?'جوال':'Mobile'},'tablet':{ic:'📲',lbl:ar?'لوحي':'Tablet'}};
       function devCell(dv){var d=devMap[dv]||{ic:'❔',lbl:ar?'غير معروف':'Unknown'};return '<span style="display:inline-flex;align-items:center;gap:5px;font-weight:600;color:#475569"><span style="font-size:14px">'+d.ic+'</span>'+d.lbl+'</span>';}
       function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
       function buildTable(log){
-        var h='<thead><tr><th>'+(ar?'المستخدم':'User')+'</th><th>'+(ar?'الحدث':'Event')+'</th><th>'+(ar?'الجهاز':'Device')+'</th><th>'+(ar?'الوقت':'Time')+'</th></tr></thead><tbody>';
-        if(!log||!log.length){h+='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:18px">'+(ar?'لا توجد سجلات':'No login entries yet')+'</td></tr>';}
-        else{log.forEach(function(e){var d=new Date(e.t);var ds=d.toLocaleString(ar?'ar-EG':'en-GB');var badge=e.k==='failed'?'#c4452a':(e.k==='password-reset'?'#b45309':'#15803d');h+='<tr><td><b>'+esc(e.u||'')+'</b></td><td><span style="color:'+badge+';font-weight:600">'+esc(kindLbl[e.k]||e.k)+'</span></td><td>'+devCell(e.dev)+'</td><td style="color:#64748b">'+esc(ds)+'</td></tr>';});}
+        var h='<thead><tr><th>'+(ar?'المستخدم':'User')+'</th><th>'+(ar?'الحدث':'Event')+'</th><th>'+(ar?'الشاشة':'Screen')+'</th><th>'+(ar?'الجهاز':'Device')+'</th><th>'+(ar?'الوقت':'Time')+'</th></tr></thead><tbody>';
+        if(!log||!log.length){h+='<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:18px">'+(ar?'لا توجد سجلات':'No login entries yet')+'</td></tr>';}
+        else{log.forEach(function(e){
+          var d=new Date(e.t);var ds=d.toLocaleString(ar?'ar-EG':'en-GB');
+          var badge=e.k==='failed'?'#c4452a':(e.k==='nav'?'#6366f1':(e.k==='password-reset'?'#b45309':'#15803d'));
+          var pgLbl=e.pg?(PAGE_NAV_LABEL_LL[e.pg]||e.pg):'—';
+          h+='<tr><td><b>'+esc(e.u||'')+'</b></td><td><span style="color:'+badge+';font-weight:600">'+esc(kindLbl[e.k]||e.k)+'</span></td><td style="color:#475569;font-size:12px">'+esc(pgLbl)+'</td><td>'+devCell(e.dev)+'</td><td style="color:#64748b">'+esc(ds)+'</td></tr>';
+        });}
         h+='</tbody>';t.innerHTML=h;
       }
       var db=_fbDB();
       if(db){
-        t.innerHTML='<tbody><tr><td colspan="4" style="padding:14px;color:#94a3b8">'+(ar?'جارٍ التحميل…':'Loading...')+'</td></tr></tbody>';
+        t.innerHTML='<tbody><tr><td colspan="5" style="padding:14px;color:#94a3b8">'+(ar?'جارٍ التحميل…':'Loading...')+'</td></tr></tbody>';
         db.collection(LOG_COL).orderBy('t','desc').limit(500).get()
           .then(function(qs){var log=[];qs.forEach(function(d){log.push(d.data());});buildTable(log);})
           .catch(function(){var loc=[];try{loc=JSON.parse(LS.getItem('login_log')||'[]');}catch(e){}buildTable(loc);});
@@ -14985,7 +15136,7 @@ function renderBottleReport(rep){
   var MD={};
   function load(){try{MD=JSON.parse(store().getItem('md_items_v1')||'{}')||{};}catch(e){MD={};}}
   function save(){try{store().setItem('md_items_v1',JSON.stringify(MD));}catch(e){}}
-  var FIELDS=['Brand','Size','Category','Pack'];
+  var FIELDS=['Brand','Size','Category','Pack','Identity'];
   function hidx(h,n){for(var i=0;i<h.length;i++){if(String(h[i]).toLowerCase().trim()===n)return i;}return -1;}
   function colmap(h){return {code:(hidx(h,'product code')>=0?hidx(h,'product code'):0),Brand:hidx(h,'brand'),Size:hidx(h,'size'),Category:hidx(h,'category'),Pack:hidx(h,'pack')};}
 
@@ -15020,7 +15171,7 @@ function renderBottleReport(rep){
         if(!d.item_code)return;
         if(d._origIdentity==null)d._origIdentity=d.identity;
         var m=MD[String(d.item_code).trim()];
-        d.identity=(m&&m.Brand)?m.Brand:d._origIdentity;
+        d.identity=(m&&m.Identity)?m.Identity:((m&&m.Brand)?m.Brand:d._origIdentity);
       });
       if(typeof render==='function')try{render();}catch(e){}
       if(typeof rebuildTables==='function')try{rebuildTables();}catch(e){}
@@ -15043,7 +15194,7 @@ function renderBottleReport(rep){
     card.innerHTML='<h2 class="sec-h"><span>🗂️</span> <span>'+(a?'بيانات الأصناف (Master Data)':'Item master data')+'</span><button type="button" class="sec-collapse-btn" id="mdi-collapse-btn" onclick="event.stopPropagation();window.toggleMdItemsCard&&window.toggleMdItemsCard()">&#9662; '+(a?'طي':'Collapse')+'</button></h2>'
       +'<p style="font-size:12px;color:var(--muted,#7c8aa0);margin:2px 0 4px">'+(a?'عدّل Brand / Size / Category / Pack لكل كود صنف — تُوحَّد تلقائياً في تقارير الأرصدة والهوية.':'Edit Brand / Size / Category / Pack per item code — unified across FG Balance & OLD Identity.')+'</p>'
       +'<div id="mdi-add-bar">'+'<span class="mdi-add-lbl">'+(a?'➕ إضافة صنف جديد:':'➕ Add new item:')  +'</span>'+'<input id="mdi-new-code" class="mdi-add-inp" placeholder="'+(a?'كود الصنف':'Item Code')+'…" autocomplete="off">'+'<input id="mdi-new-brand" class="mdi-add-inp req" placeholder="'+(a?'الهوية':'Brand')+' '+(a?'(أساسي)':'(required)')+'…">'+'<input id="mdi-new-size"  class="mdi-add-inp req" placeholder="'+(a?'الحجم':'Size')+' '+(a?'(أساسي)':'(required)')+'…">'+'<input id="mdi-new-cat"   class="mdi-add-inp" placeholder="Category…">'+'<input id="mdi-new-pack"  class="mdi-add-inp req" placeholder="'+(a?'المقاس':'Pack')+' '+(a?'(أساسي)':'(required)')+'…">'+'<button id="mdi-add-btn" onclick="window.mdiAddNewItem&&window.mdiAddNewItem()">'+(a?'حفظ':'Save')+'</button>'+'<span id="mdi-add-msg"></span>'+'</div>'+'<div class="mdi-tools"><input class="mdi-search" id="mdi-search" placeholder="'+(a?'بحث بالكود أو الاسم…':'Search code or name…')+'"><span class="dr-meta" id="mdi-count"></span></div>'
-      +'<div class="mdi-scroll"><table class="mdi-table"><thead><tr><th>'+(a?'كود الصنف':'Item Code')+'</th><th>Brand</th><th>Size</th><th>Category</th><th>Pack</th></tr></thead><tbody id="mdi-body"></tbody></table></div>';
+      +'<div class="mdi-scroll"><table class="mdi-table"><thead><tr><th>'+(a?'كود الصنف':'Item Code')+'</th><th>Brand</th><th>Size</th><th>Category</th><th>Pack</th><th>'+(a?'الهوية':'Identity')+'</th></tr></thead><tbody id="mdi-body"></tbody></table></div>';
     wrap.insertBefore(card, wrap.querySelector('.card')||null);
     document.getElementById('mdi-search').addEventListener('input',function(){renderBody(this.value);});
     renderBody('');
