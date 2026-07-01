@@ -1211,9 +1211,12 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .fg-count{font-size:12.5px;font-weight:800;color:var(--navy);margin-inline-start:auto}
 .fg-table{min-width:1120px;width:100%}.fg-table.fg-cols-fit{min-width:0;width:100%}.fg-table.fg-cols-fit th,.fg-table.fg-cols-fit td{min-width:80px;white-space:nowrap}.fg-table.fg-cols-fit th:first-child,.fg-table.fg-cols-fit td:first-child{min-width:130px}
 .fg-table thead th{position:sticky;top:0;z-index:3}
-.fg-table thead th.rr-sortable{cursor:pointer;user-select:none;}
+.fg-table thead th.rr-sortable{cursor:pointer;user-select:none;vertical-align:bottom;padding-top:4px;}
 .fg-table thead th.rr-sortable:hover{opacity:.82;}
 .rr-sort-ind{font-size:9px;margin-inline-start:3px;opacity:.8;font-weight:normal;}
+.rr-pin-dot{display:block;text-align:center;font-size:7px;line-height:9px;color:transparent;cursor:pointer;margin-bottom:1px;transition:color .15s;user-select:none;}
+.rr-pin-dot:hover{color:rgba(255,255,255,.5);}
+th.rr-col-pinned .rr-pin-dot{color:#ffd700;}
 .fg-table tbody tr.fg-hl td:not(.fg-vsep){background:#dbe8f7 !important;font-weight:700;color:#1e3a5f}
 .fg-cards{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}
 .fg-card{flex:1 1 150px;min-width:140px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px 12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
@@ -12504,6 +12507,15 @@ try{drInit();}catch(e){}
 /* ===== Rich report (FG Balance / OLD Identity / FG Transit): cards + slicers + search + split totals ===== */
 var _rr={key:null,rep:null,brand:{},size:{},query:'',hideZero:true,cols:{}};
 var _rrSort={col:-1,dir:1,_key:''};
+/* ترتيب المجموعات الثابت في شاشة الأرصدة */
+var RR_GROUP_ORDER=['5 Gal','New Identity','Old Identity','Mokabat','TG Sparkling','Mai'];
+function rrGetGroup(r){
+  var c=_rr.cols;
+  if(c.size>=0){var sz=String(r[c.size]||'').toLowerCase();if(sz.indexOf('gal')>=0)return '5 Gal';}
+  if(c.brand>=0){return drBrandLabel(String(r[c.brand]||''));}
+  return '';
+}
+function rrGroupRank(r){var g=rrGetGroup(r);var i=RR_GROUP_ORDER.indexOf(g);return i<0?RR_GROUP_ORDER.length:i;}
 var RR_HL_CODES=['30000000'];
 function drIsAr(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
 function fgColIdx(h,name){for(var i=0;i<h.length;i++){if(String(h[i]).toLowerCase().trim()===name)return i;}return -1;}
@@ -12624,7 +12636,7 @@ function renderRichReport(key,rep){
     }
   })();
   html+='<div class="pivot-wrap fg-wrap"><table class="pivot fg-table"><thead><tr>';
-  h.forEach(function(col,i){if(HIDDEN.has(P+':col:'+i))return;if(i===c.transit&&c.transit>=0)html+='<th class="fg-vsep"></th>';var _tc=(i===c.total?'fg-toth rr-sortable':(i===c.transit?'fg-trth rr-sortable':'rr-sortable'));html+='<th class="'+_tc+'" data-col="'+i+'" onclick="rrSortBy('+i+')">'+drEsc(col)+'<span class="rr-sort-ind"></span></th>';});
+  h.forEach(function(col,i){if(HIDDEN.has(P+':col:'+i))return;if(i===c.transit&&c.transit>=0)html+='<th class="fg-vsep"></th>';var _tc=(i===c.total?'fg-toth rr-sortable':(i===c.transit?'fg-trth rr-sortable':'rr-sortable'));html+='<th class="'+_tc+'" data-col="'+i+'" onclick="rrSortBy('+i+')">'+'<span class="rr-pin-dot" onclick="rrPinToggle('+i+',event)">&#9679;</span>'+drEsc(col)+'<span class="rr-sort-ind"></span></th>';});
   /* رؤوس الأعمدة المخصصة */
   (COLDEF[P]||[]).forEach(function(cc){html+='<th style="background:'+(cc.hbg||'#0f9b8e')+'">'+drEsc(cc.name||'')+'</th>';});
   html+='</tr></thead><tbody id="'+P+'-tbody"></tbody></table></div>';
@@ -12696,6 +12708,12 @@ function makeSortable(tbl){
 /* ═══ ترتيب جدول FG Balance الرئيسي ═══ */
 function rrSortBy(colIdx){
   if(_rrSort.col===colIdx){if(_rrSort.dir===1){_rrSort.dir=-1;}else{_rrSort.col=-1;_rrSort.dir=1;}}
+  else{_rrSort.col=colIdx;_rrSort.dir=1;}
+  rrRefresh();
+}
+function rrPinToggle(colIdx,e){
+  if(e)e.stopPropagation();
+  if(_rrSort.col===colIdx){_rrSort.col=-1;_rrSort.dir=1;}
   else{_rrSort.col=colIdx;_rrSort.dir=1;}
   rrRefresh();
 }
@@ -12868,14 +12886,18 @@ function rrRefresh(){
   var rows=rrFilteredRows();var tb=document.getElementById(P+'-tbody'); if(!tb)return;
   /* إعادة ضبط الترتيب عند تغيير التقرير */
   if(_rrSort._key&&_rrSort._key!==P){_rrSort.col=-1;_rrSort.dir=1;}_rrSort._key=P;
-  /* تطبيق الترتيب */
+  /* تطبيق الترتيب — المجموعات ثابتة، الترتيب يعمل داخل كل مجموعة */
   if(_rrSort.col>=0){
     var _sc2=_rrSort.col,_sd2=_rrSort.dir;
     rows=rows.slice().sort(function(a,b){
+      var ga=rrGroupRank(a),gb=rrGroupRank(b);
+      if(ga!==gb)return ga-gb;
       var av=(a[_sc2]==null?'':a[_sc2]),bv=(b[_sc2]==null?'':b[_sc2]);
       if(typeof av==='number'&&typeof bv==='number')return _sd2*(av-bv);
       return _sd2*String(av).localeCompare(String(bv));
     });
+  }else{
+    rows=rows.slice().sort(function(a,b){return rrGroupRank(a)-rrGroupRank(b);});
   }
   /* تثبيت الأكواد المميزة دائماً في مقدمة الجدول بغض النظر عن الترتيب */
   (function(){
@@ -12950,7 +12972,7 @@ function rrRefresh(){
     else{var sAll=[];for(var z2=0;z2<h.length;z2++)sAll[z2]=sumA[z2]+sumB[z2];html+=grand(sAll,drIsAr()?'الإجمالي':'Total','fg-gA');}}
   tb.innerHTML=html;
   /* تحديث مؤشرات ترتيب الأعمدة */
-  try{[].slice.call(tb.closest('table').querySelectorAll('thead th[data-col]')).forEach(function(th){var ci=parseInt(th.getAttribute('data-col'));var ind=th.querySelector('.rr-sort-ind');if(!ind){ind=document.createElement('span');ind.className='rr-sort-ind';th.appendChild(ind);}ind.textContent=(_rrSort.col===ci)?(_rrSort.dir===1?' ▲':' ▼'):'';});}catch(e){}
+  try{[].slice.call(tb.closest('table').querySelectorAll('thead th[data-col]')).forEach(function(th){var ci=parseInt(th.getAttribute('data-col'));var ind=th.querySelector('.rr-sort-ind');if(!ind){ind=document.createElement('span');ind.className='rr-sort-ind';th.appendChild(ind);}ind.textContent=(_rrSort.col===ci)?(_rrSort.dir===1?' ▲':' ▼'):'';th.classList.toggle('rr-col-pinned',_rrSort.col===ci);});}catch(e){}
   /* تأجيل decorateRich بعد إتمام الرسم لمنع layout thrash */
   if(typeof requestAnimationFrame!=='undefined'){
     requestAnimationFrame(function(){try{decorateRich();}catch(e){}});
