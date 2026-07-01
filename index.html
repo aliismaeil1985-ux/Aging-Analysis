@@ -5992,14 +5992,16 @@ function decorateRich(){
     var labels=st.labels||{},colcol=st.colcol||{},cf=st.cf||{};
     var wrap=document.getElementById('rep-'+key+'-wrap');if(!wrap)return;
     var table=wrap.querySelector('table.fg-table');if(!table)return;
-    var ths=[].slice.call(table.querySelectorAll('thead th')),hi=0;
-    ths.forEach(function(th){if(th.classList.contains('fg-vsep'))return;var hdr=headers[hi];if(hdr!=null){if(labels[hdr])th.textContent=labels[hdr];var cc=colcol[hdr];if(cc){if(cc.hbg)th.style.cssText+=';background:'+cc.hbg+' !important';if(cc.hfg)th.style.cssText+=';color:'+cc.hfg+' !important';}}hi++;});
+    /* رؤوس الأعمدة — استخدام data-col لتفادي الإزاحة عند إخفاء أعمدة صفرية */
+    var ths=[].slice.call(table.querySelectorAll('thead th'));
+    ths.forEach(function(th){if(th.classList.contains('fg-vsep'))return;var colIdx=parseInt(th.getAttribute('data-col'));if(isNaN(colIdx))return;var hdr=headers[colIdx];if(hdr!=null){if(labels[hdr])th.textContent=labels[hdr];var cc=colcol[hdr];if(cc){if(cc.hbg)th.style.cssText+=';background:'+cc.hbg+' !important';if(cc.hfg)th.style.cssText+=';color:'+cc.hfg+' !important';}}});
+    /* بناء خريطة الأعمدة المرئية (موضع مرئي → فهرس أصلي) لتطبيق ألوان الخلايا بشكل صحيح */
+    var _visibleCols=[];for(var _vi=0;_vi<headers.length;_vi++){if(!HIDDEN.has(key+':col:'+_vi))_visibleCols.push(_vi);}
     [].slice.call(table.querySelectorAll('tbody tr')).forEach(function(tr){
       if(tr.classList.contains('grand'))return;
       var tds=[].slice.call(tr.children).filter(function(td){return !td.classList.contains('fg-vsep');});
-      if(tds.length!==headers.length)return;
       var rowStyle='';
-      tds.forEach(function(td,i){var hdr=headers[i];var cc=colcol[hdr];if(cc){if(cc.cbg)td.style.cssText+=';background:'+cc.cbg;if(cc.cfg)td.style.cssText+=';color:'+cc.cfg;}
+      tds.forEach(function(td,i){var origIdx=_visibleCols[i];if(origIdx==null)return;var hdr=headers[origIdx];var cc=colcol[hdr];if(cc){if(cc.cbg)td.style.cssText+=';background:'+cc.cbg;if(cc.cfg)td.style.cssText+=';color:'+cc.cfg;}
         var rules=cf[hdr];if(rules&&rules.length){var v=_numFromCell(td.textContent);rules.forEach(function(r){if(cfMatch(r,v)){var s='';if(r.bg)s+='background:'+r.bg+' !important;';if(r.fg)s+='color:'+r.fg+' !important;';if(r.bold)s+='font-weight:800 !important;';if(r.target==='row')rowStyle+=s;else td.style.cssText+=';'+s;}});}
       });
       if(rowStyle){tds.forEach(function(td){td.style.cssText+=';'+rowStyle;});}
