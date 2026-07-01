@@ -12829,7 +12829,47 @@ function rrShowCovFilter(band){
     updateTog();
     rebuildBody();
   });
-  tb.appendChild(modeBadge);tb.appendChild(modeNote);tb.appendChild(togBtn);
+  /* زر Excel */
+  var xlsBtn=document.createElement('button');
+  xlsBtn.style.cssText='background:#1d6f42;color:#fff;border:none;border-radius:18px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px';
+  xlsBtn.innerHTML='<span>&#128229;</span> Excel';
+  xlsBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var modeLabel=mo._showDays?(ar?'أيام التغطية':'Coverage Days'):(ar?'الكميات':'Quantities');
+    var today=new Date().toISOString().slice(0,10);
+    if(typeof tableToStyledExcel==='function'){
+      tableToStyledExcel(tbl,{
+        title:(labMap[band]||band),
+        subtitle:(descMap[band]||'')+' | '+modeLabel,
+        sheet:(labMap[band]||band).slice(0,31),
+        file:(labMap[band]||band)+'_'+today
+      });
+    }else if(window.XLSX){
+      /* fallback: plain AOA */
+      var aoa=[[]];
+      tbl.querySelectorAll('thead tr').forEach(function(tr){var row=[];tr.querySelectorAll('th').forEach(function(th){row.push(th.textContent.trim());});aoa[0]=row;});
+      tbl.querySelectorAll('tbody tr').forEach(function(tr){var row=[];tr.querySelectorAll('td').forEach(function(td){var t=td.textContent.trim();var n=parseFloat(t.replace(/,/g,''));row.push(isNaN(n)?t:n);});aoa.push(row);});
+      tbl.querySelectorAll('tfoot tr').forEach(function(tr){var row=[];tr.querySelectorAll('td').forEach(function(td){var t=td.textContent.trim();var n=parseFloat(t.replace(/,/g,''));row.push(isNaN(n)?t:n);});aoa.push(row);});
+      var ws=XLSX.utils.aoa_to_sheet(aoa);var wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,(labMap[band]||band).slice(0,31));
+      XLSX.writeFile(wb,(labMap[band]||band)+'_'+today+'.xlsx');
+    }
+  });
+  /* زر الطباعة */
+  var prnBtn=document.createElement('button');
+  prnBtn.style.cssText='background:#334155;color:#fff;border:none;border-radius:18px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px';
+  prnBtn.innerHTML='<span>&#128438;</span> '+(ar?'طباعة':'Print');
+  prnBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var pw=window.open('','_blank','width=1100,height=750');
+    if(!pw)return;
+    var tblHTML=tbl.outerHTML;
+    var title=(labMap[band]||band)+' — '+(descMap[band]||'');
+    pw.document.write('<!DOCTYPE html><html dir="'+(ar?'rtl':'ltr')+'"><head><meta charset="UTF-8"><title>'+title+'</title><style>body{font-family:Segoe UI,Arial,sans-serif;margin:14px;color:#1e293b}table{border-collapse:collapse;width:100%;font-size:12px}th{background:#214e7d;color:#fff;padding:8px 10px;text-align:start;white-space:nowrap}td{padding:7px 10px;border-bottom:1px solid #e2e8f0;white-space:nowrap}tr:nth-child(even) td{background:#f6f9fd}tfoot td{background:#1e3a5f !important;color:#fff !important;font-weight:800}h2{margin:0 0 8px;font-size:15px;color:#214e7d}p{margin:0 0 10px;font-size:11px;color:#64748b}@media print{@page{margin:10mm;size:landscape}button{display:none}}</style></head><body><h2>'+title+'</h2><p>'+(matchedRows.length)+' '+(ar?'منتج':'products')+' &nbsp;|&nbsp; '+(mo._showDays?(ar?'عرض بالأيام':'Days View'):(ar?'عرض بالكميات':'Quantity View'))+'</p>'+tblHTML+'</body></html>');
+    pw.document.close();
+    setTimeout(function(){try{pw.print();}catch(ex){}},450);
+  });
+  tb.appendChild(modeBadge);tb.appendChild(modeNote);tb.appendChild(togBtn);tb.appendChild(xlsBtn);tb.appendChild(prnBtn);
   /* TABLE */
   var sc=document.createElement('div');sc.style.cssText='overflow:auto;flex:1;min-height:0';
   var tbl=document.createElement('table');tbl.className='pivot';tbl.style.cssText='width:100%;border-collapse:collapse;font-size:13px;background:#fff';
@@ -12868,12 +12908,29 @@ function rrShowCovFilter(band){
       bhtml+='</tr>';
     });
     tbodEl.innerHTML=bhtml;
-    /* tfoot — always qty */
+    /* tfoot: وضع الكميات = مجموع | وضع الأيام = إجمالي الرصيد ÷ إجمالي المتوسط اليومي */
+    var _isDays=mo._showDays;
+    var _rowLbl=_isDays?'Avg Coverage Days':(ar?'الإجمالي':'Grand Total');
     var fhtml='<tr style="background:linear-gradient(90deg,#1e3a5f,#1b4f8a);color:#fff;font-weight:800">';
-    textCols.forEach(function(i,ti2){fhtml+='<td style="padding:8px 10px;font-size:12px;font-weight:800;white-space:nowrap">'+(ti2===0?(ar?'الإجمالي':'TOTAL'):'')+'</td>';});
+    textCols.forEach(function(i,ti2){fhtml+='<td style="padding:8px 10px;font-size:12px;font-weight:800;white-space:nowrap">'+(ti2===0?_rowLbl:'')+'</td>';});
     covPlan.forEach(function(col){
-      var total=0;matchedRows.forEach(function(r){col.mIdxs.forEach(function(mi){if(typeof r[mi]==='number')total+=r[mi];});});
-      fhtml+='<td style="padding:8px 12px;font-size:13px;font-weight:800;text-align:center;font-family:monospace;'+(col.isTot?'border-inline-start:3px solid #5b9bd5;background:rgba(91,155,213,.15)':'')+'">'+drFmt(total)+'</td>';
+      var totalQty=0;
+      matchedRows.forEach(function(r){col.mIdxs.forEach(function(mi){if(typeof r[mi]==='number')totalQty+=r[mi];});});
+      var cellTxt;
+      if(_isDays){
+        /* إجمالي الأيام = مجموع الأرصدة ÷ مجموع المتوسطات اليومية (متوسط مرجّح) */
+        var totalAvg=0;
+        matchedRows.forEach(function(r){
+          var code=String(r[0]||'').trim();
+          var avg=col.isTot?(typeof dalTotalAvg==='function'?dalTotalAvg(code):0):(typeof dalGet==='function'?dalGet(code,col.dalBr,'avg'):0);
+          totalAvg+=avg;
+        });
+        var days=totalAvg>0?Math.round(totalQty/totalAvg):null;
+        cellTxt=days!==null?String(days):drFmt(totalQty);
+      }else{
+        cellTxt=drFmt(totalQty);
+      }
+      fhtml+='<td style="padding:8px 12px;font-size:13px;font-weight:800;text-align:center;font-family:monospace;'+(col.isTot?'border-inline-start:3px solid #5b9bd5;background:rgba(91,155,213,.15)':'')+'">'+cellTxt+'</td>';
     });
     fhtml+='</tr>';
     tfootEl.innerHTML=fhtml;
