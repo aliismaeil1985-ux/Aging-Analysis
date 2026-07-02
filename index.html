@@ -13609,7 +13609,7 @@ function rrShowCovFilter(band,_trigBtn){
           var isBand=hasBandCell(col,r);
           var bgStyle=col.isTot?'background:#eaf2fb;border-inline-start:3px solid #5b9bd5;':'';
           if(isBand)bgStyle='background:var(--dal-'+band+'-bg,'+cc.bg+');color:var(--dal-'+band+'-fg,'+cc.fg+');';
-          bhtml+='<td style="padding:7px 12px;border-bottom:1px solid #e8eef5;text-align:center;font-weight:'+(isBand?'800':'500')+';font-family:monospace;font-size:13px;'+bgStyle+'">'+cellVal(col,r,mo._showDays)+'</td>';
+          bhtml+='<td style="padding:7px 12px;border-bottom:1px solid #e8eef5;text-align:center;font-weight:'+(isBand?'800':'500')+';font-family:monospace;font-size:13px;'+bgStyle+'">'+(isBand?cellVal(col,r,mo._showDays):'<span style="color:#c8d5e8;font-size:11px">—</span>')+'</td>';
         });
         bhtml+='</tr>';
       });
