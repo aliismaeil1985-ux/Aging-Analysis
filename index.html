@@ -7516,6 +7516,11 @@ function initLoginExtras(){
    (1) Conditional UI (mediation:'conditional') — يعرض البصمة كاقتراح فور فتح الشاشة دون أي نقر، حيث يدعمه المتصفح.
    (2) محاولة مباشرة عند ظهور الشاشة (تعمل على المتصفحات التي تسمح بذلك).
    (3) إطلاق فوري عند أول لمسة/تفاعل من المستخدم على شاشة الدخول (لأن بعض المتصفحات تشترط تفاعلاً). */
+/* ═══ مفاتيح التخزين المحلي ═══ */
+var BIO_STORE_KEY='tania_bio_v1';
+var REMEMBER_KEY='tania_remember_v1';
+var REMEMBER_SESSION_KEY='tania_session_v1';
+/* ═══════════════════════════════ */
 function _bioGetAll(){try{return JSON.parse(LS.getItem(BIO_STORE_KEY)||'{}')||{};}catch(e){return {};}}
 function _bioSaveAll(o){try{LS.setItem(BIO_STORE_KEY,JSON.stringify(o||{}));}catch(e){}}
 function _b64uFromBuf(buf){var b=new Uint8Array(buf),s='';for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
