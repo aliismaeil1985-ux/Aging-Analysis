@@ -7730,7 +7730,9 @@ function _maybeOfferBio(user){
   try{
     if(!_bioSupported())return;
     var all=_bioGetAll();
-    if(all[String(user||'').toLowerCase()])return;   /* مُفعّل مسبقاً لهذا المستخدم */
+    var _ukey=String(user||'').toLowerCase();
+    if(all[_ukey])return;          /* مُفعّل مسبقاً لهذا المستخدم */
+    if(all[_ukey+'__no'])return;   /* رفض المستخدم سابقاً — لا تُعرض مجدداً */
     /* احفظ كلمة المرور المُدخلة مؤقتاً للتسجيل */
     var pwd=val('login-pass')||window._lastLoginPwd||'';
     if(!pwd)return;
@@ -7738,6 +7740,9 @@ function _maybeOfferBio(user){
     setTimeout(function(){
       if(confirm(tr('bio_setup_q'))){
         bioRegister(user,pwd).catch(function(){});
+      }else{
+        /* المستخدم رفض — احفظ القرار حتى لا تظهر الرسالة مجدداً */
+        try{var a=_bioGetAll();a[_ukey+'__no']=1;_bioSaveAll(a);}catch(e){}
       }
     },400);
   }catch(e){}
