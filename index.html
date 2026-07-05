@@ -4242,12 +4242,15 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
             <select id="dal-branch-sel" class="sp-conv-search" style="width:auto;min-width:160px;margin:0;font-weight:700" onchange="dalSelectBranch(this.value)"></select></div>
           <button class="btn-soft sm" id="dal-days-btn" onclick="dalToggleDays()" title="ضبط عتبات أيام التغطية">&#9881; عتبات الأيام</button>
           <label class="btn-soft sm" title="استيراد قالب Excel — ورقة لكل فرع">&#x1F4E4; استيراد القالب<input type="file" accept=".xlsx,.xls" onchange="importDAL(this)" style="display:none"></label>
+          <label class="btn-soft sm" style="background:linear-gradient(135deg,#0f4c81,#1565c0);color:#fff;border:none" title="رفع مباشر من تقرير SAP MB51 — عمود Name1 = الفرع، يحسب متوسط المبيعات اليومي تلقائياً">&#x1F4CA; رفع MB51 ساب<input type="file" accept=".xlsx,.xls" onchange="importMB51DAL(this)" style="display:none"></label>
           <button class="btn-soft sm" onclick="exportDAL()">&#x1F4E5; تصدير قالب + مثال</button>
           <button class="btn-soft sm" onclick="renderDALTable()">&#x1F504; تحديث</button>
           <button class="btn-soft sm" onclick="dalToggleColors()" title="تخصيص ألوان الفئات">&#127912; ألوان الفئات</button>
           <span id="dal-kpi" style="font-size:12px;color:var(--navy);font-weight:700"></span>
           <span id="dal-status" style="font-size:12px;color:var(--muted)"></span>
         </div>
+        <!-- مؤشر نتيجة رفع MB51 -->
+        <div id="dal-mb51-status" style="margin-bottom:4px"></div>
         <!-- محرّر عتبات أيام التغطية لكل (فرع × فئة) -->
         <div id="dal-days-box" class="dal-days-box">
           <div class="dal-days-head"><span>&#9881; عتبات أيام التغطية — الفرع: <b id="dal-days-branch" style="color:var(--blue)"></b></span>
@@ -11893,8 +11896,17 @@ var DAL_BRANCH_GROUPS=[
 ];
 /* خريطة أسماء أعمدة التقرير → اسم الفرع في DAL (للتعرف على الأسماء المختلفة لنفس الفرع) */
 var DAL_COL_ALIAS={
-  'Dammam Factory':'Dammam',
-  'Dammam':'Dammam'
+  'Dammam Factory':'Dammam Factory',
+  'Dammam':'Dammam Factory',
+  'Dammam Main Store':'Dammam Factory',
+  'Riyadh Main Store':'Riyadh',
+  'Jeddah Main Store':'Jeddah',
+  'Al Kharj Store':'Al-Kharj',
+  'Kharj Store':'Al-Kharj',
+  'Al Ahsa Store':'Al Ahsa',
+  'Ahsa Store':'Al Ahsa',
+  'Qassim Store':'Qassim',
+  'Heet Store':'Heet'
 };
 function dalResolveBranch(b){return (typeof DAL_COL_ALIAS!=='undefined'&&DAL_COL_ALIAS[b])||b;}
 /* الحدود الخمسة لكل (فرع×صنف) — كلها بأرقام كراتين:
@@ -12148,6 +12160,191 @@ function importDAL(input){
     try{rebuildAllTables&&rebuildAllTables();}catch(e){}
   });
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   importMB51DAL — رفع مباشر من تقرير SAP MB51
+   المنطق:
+     • يقرأ الأعمدة تلقائياً بالعنوان: Material, Quantity, Name 1, Posting Date, Movement Type
+     • يُصفّي حركات نوع 631 فقط (مبيعات / إصدار بضاعة)
+     • لكل (صنف × فرع): متوسط البيع الفعلي = إجمالي الكمية ÷ عدد أيام البيع المختلفة
+     • يخزّن الناتج في daily_avg[code][branch].avg
+     • يعرض مؤشر نجاح مفصَّل
+   ═══════════════════════════════════════════════════════════════════ */
+function importMB51DAL(input){
+  var f=input&&input.files&&input.files[0];if(!f)return;
+  var statusEl=document.getElementById('dal-mb51-status');
+  if(statusEl)statusEl.innerHTML='<span style="color:var(--blue)">&#x23F3; جارٍ معالجة ملف MB51…</span>';
+
+  drReadFile(f,function(wb){
+    input.value='';
+    if(!wb){
+      if(statusEl)statusEl.innerHTML='<span style="color:#dc2626">&#x274C; تعذّر قراءة الملف. تأكد أنه ملف Excel صالح.</span>';
+      return;
+    }
+    var sheetName=wb.SheetNames[0];
+    var aoa=sheetToAoa(wb.Sheets[sheetName]);
+    if(!aoa||aoa.length<2){
+      if(statusEl)statusEl.innerHTML='<span style="color:#dc2626">&#x274C; الملف فارغ أو لا يحتوي بيانات.</span>';
+      return;
+    }
+
+    /* ── أنواع الحركات المعتمدة ── */
+    /* حمولات وصرفيات (تزيد المبيعات): الكمية سالبة في SAP → نعكسها موجبة */
+    var MVT_SALES  ={'601':1,'631':1,'654':1,'901':1,'902':1,'903':1,'904':1,'905':1};
+    /* مرتجعات (تقلل المبيعات): الكمية موجبة في SAP → نعكسها سالبة */
+    var MVT_RETURN ={'602':1,'632':1,'653':1};
+
+    /* ── تحديد الأعمدة بالعنوان ── */
+    var hdr=(aoa[0]||[]).map(function(x){return String(x==null?'':x).trim();});
+    function findCol(syns){
+      for(var i=0;i<hdr.length;i++){
+        var h=hdr[i].toLowerCase().replace(/\s+/g,' ');
+        for(var j=0;j<syns.length;j++){if(h.indexOf(syns[j].toLowerCase())>=0)return i;}
+      }return -1;
+    }
+    var cMat =findCol(['material','كود','sku','مادة']);
+    var cQty =findCol(['quantity','qty','كمية']);
+    var cN1  =findCol(['name 1','name1','branch','فرع','اسم']);
+    var cDate=findCol(['posting date','postingdate','date','تاريخ']);
+    var cMvt =findCol(['movement type','movementtype','mvt','نوع الحركة','نوع']);
+
+    if(cMat<0||cQty<0||cN1<0){
+      if(statusEl)statusEl.innerHTML='<span style="color:#dc2626">&#x274C; لم يُعثر على الأعمدة: Material أو Quantity أو Name 1.</span>';
+      return;
+    }
+    if(cMvt<0){
+      if(statusEl)statusEl.innerHTML='<span style="color:#dc2626">&#x274C; لم يُعثر على عمود Movement Type. تأكد من تصدير الحقل من SAP.</span>';
+      return;
+    }
+
+    /* ── مطابقة الفرع بين Name1 وDAL_BRANCHES ── */
+    function normB(s){return String(s||'').toLowerCase().replace(/[^a-z0-9؀-ۿ]/g,'');}
+    var branchNorms=DAL_BRANCHES.map(function(b){return {b:b,n:normB(b)};});
+    function matchBranch(name1){
+      var n=normB(name1);if(!n)return null;
+      /* 1. خريطة الأسماء البديلة أولاً */
+      if(typeof DAL_COL_ALIAS!=='undefined'){
+        if(DAL_COL_ALIAS[name1])return DAL_COL_ALIAS[name1];
+        var ak=Object.keys(DAL_COL_ALIAS);
+        for(var k=0;k<ak.length;k++){if(normB(ak[k])===n)return DAL_COL_ALIAS[ak[k]];}
+      }
+      /* 2. مطابقة مباشرة أو جزئية */
+      for(var i=0;i<branchNorms.length;i++){
+        var nb=branchNorms[i].n;
+        if(n===nb||n.indexOf(nb)>=0||nb.indexOf(n)>=0)return branchNorms[i].b;
+      }
+      /* 3. مطابقة بالكلمة الأولى الرئيسية (>3 أحرف) */
+      for(var i=0;i<DAL_BRANCHES.length;i++){
+        var fw=DAL_BRANCHES[i].split(/[\s\-]+/)[0];
+        if(fw.length>3&&n.indexOf(normB(fw))>=0)return DAL_BRANCHES[i];
+      }
+      return null;
+    }
+
+    /* ── تجميع صافي المبيعات ──
+       صافي المبيعات = Σ الحمولات + Σ المرتجعات  (بالإشارة الأصلية من SAP)
+       في SAP: الحمولات/الصرفيات كميتها سالبة، المرتجعات موجبة
+       لذا: نجمع الكميات كما هي → الناتج سالب → نأخذ القيمة المطلقة
+       مثال: حمولة −320 + مرتجع +158 = −162 → صافي = 162 كرتون
+       التاريخ المعتمد لعدد أيام البيع = Posting Date ── */
+    /* aggr[code][branch] = { net, dates:{} } */
+    var aggr={};
+    var unmatched={};
+    var totalRows=0,relevantRows=0,salesRows=0,retRows=0;
+
+    for(var r=1;r<aoa.length;r++){
+      var row=aoa[r];if(!row)continue;
+      totalRows++;
+      var code=String(row[cMat]==null?'':row[cMat]).trim();if(!code)continue;
+      var qty=parseFloat(String(row[cQty]==null?'':row[cQty]).replace(/[,\s]/g,''));
+      if(!isFinite(qty))continue;
+      var mvt=String(row[cMvt]==null?'':row[cMvt]).trim();
+      var isSales =MVT_SALES[mvt] ===1;
+      var isReturn=MVT_RETURN[mvt]===1;
+      if(!isSales&&!isReturn)continue; /* حركة غير معنية — تُتجاهل */
+      relevantRows++;
+      if(isSales)salesRows++;else retRows++;
+
+      /* إسهام الصف في صافي المبيعات = −qty */
+      var contrib=qty; /* SAP: حمولات سالبة + مرتجعات موجبة */
+
+      var n1=String(row[cN1]==null?'':row[cN1]).trim();
+      var branch=matchBranch(n1);
+      if(!branch){unmatched[n1]=(unmatched[n1]||0)+1;continue;}
+
+      var dv=row[cDate];
+      var dk='';
+      if(dv instanceof Date){dk=dv.getFullYear()+'-'+String(dv.getMonth()+1).padStart(2,'0')+'-'+String(dv.getDate()).padStart(2,'0');}
+      else{dk=String(dv||'').substring(0,10);}
+
+      if(!aggr[code])aggr[code]={};
+      if(!aggr[code][branch])aggr[code][branch]={net:0,dates:{}};
+      aggr[code][branch].net+=contrib;
+      if(dk)aggr[code][branch].dates[dk]=1;
+    }
+
+    /* ── حساب المتوسط وحفظه في daily_avg ── */
+    var s=getDR();if(!s.daily_avg)s.daily_avg={};
+    var nRecs=0;var brSet={};
+
+    Object.keys(aggr).forEach(function(code){
+      Object.keys(aggr[code]).forEach(function(branch){
+        var d=aggr[code][branch];
+        var numDays=Object.keys(d.dates).length||1;
+        /* صافي المبيعات اليومي — لا يُسمح بالسالب (يعني المرتجعات تجاوزت المبيعات) */
+        /* صافي = |Σ حمولات + Σ مرتجعات| ÷ أيام البيع المختلفة */
+        var avg=Math.max(0,Math.round((Math.abs(d.net)/numDays)*100)/100);
+        if(!s.daily_avg[code])s.daily_avg[code]={};
+        var cur=s.daily_avg[code][branch];
+        if(typeof cur==='number')cur={avg:cur,min:0,safe:0,max:0,vmax:0};
+        if(!cur||typeof cur!=='object')cur={avg:0,min:0,safe:0,max:0,vmax:0};
+        cur.avg=avg;
+        s.daily_avg[code][branch]=cur;
+        nRecs++;brSet[branch]=1;
+      });
+    });
+
+    saveDR(s);
+    try{pushSettingsToCloud&&pushSettingsToCloud();}catch(e){}
+    try{renderDALTable();}catch(e){}
+    try{rebuildAllTables&&rebuildAllTables();}catch(e){}
+
+    /* ── مؤشر النجاح ── */
+    var nSkus=Object.keys(aggr).length;
+    var nBr=Object.keys(brSet).length;
+    var unmList=Object.keys(unmatched);
+
+    var mvtSummaryHTML=
+      '<div style="margin-top:6px;font-size:11px;color:#374151;display:flex;gap:8px;flex-wrap:wrap">'
+      +'<span style="background:#dbeafe;color:#1e40af;padding:1px 7px;border-radius:5px">&#x2197; حمولات/صرفيات: '+salesRows+' صف (601·631·654·901-905)</span>'
+      +'<span style="background:#fee2e2;color:#991b1b;padding:1px 7px;border-radius:5px">&#x2198; مرتجعات: '+retRows+' صف (602·632·653)</span>'
+      +'<span style="background:#f3f4f6;color:#374151;padding:1px 7px;border-radius:5px">إجمالي الملف: '+totalRows+' صف</span>'
+      +'</div>';
+
+    var unmHTML='';
+    if(unmList.length){
+      unmHTML='<div style="margin-top:6px;padding:6px 10px;background:#fef9c3;border:1px solid #fde047;border-radius:8px;font-size:11.5px;color:#92400e">'
+        +'<b>&#x26A0;&#xFE0F; فروع غير مطابقة ('+unmList.length+'):</b> '
+        +unmList.map(function(b){return '<b>'+b+'</b> ('+unmatched[b]+' صف)';}).join(' · ')
+        +'<br><span style="opacity:.75">أضف مطابقتها في DAL_COL_ALIAS</span></div>';
+    }
+
+    if(statusEl)statusEl.innerHTML=
+      '<div style="padding:10px 14px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;margin-top:8px">'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+      +'<span style="font-size:18px">&#x2705;</span>'
+      +'<span style="font-weight:800;color:#166534;font-size:13.5px">تم رفع MB51 — صافي المبيعات = Σ حمولات + Σ مرتجعات</span>'
+      +'<span style="background:#bbf7d0;color:#14532d;padding:2px 10px;border-radius:7px;font-size:12px;font-weight:700">&#x1F4E6; '+nSkus+' صنف</span>'
+      +'<span style="background:#a7f3d0;color:#065f46;padding:2px 10px;border-radius:7px;font-size:12px;font-weight:700">&#x1F3ED; '+nBr+' فرع</span>'
+      +'<span style="background:#d1fae5;color:#064e3b;padding:2px 10px;border-radius:7px;font-size:12px;font-weight:700">&#x1F4CA; '+nRecs+' سجل محدَّث</span>'
+      +'</div>'
+      +mvtSummaryHTML
+      +'</div>'
+      +unmHTML;
+  });
+}
+
 
 /* تصدير قالب Excel — ورقة لكل فرع، أعمدة: Code, Brand, Pack + الحقول الخمسة */
 function exportDAL(){
