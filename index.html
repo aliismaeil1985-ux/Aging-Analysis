@@ -1589,7 +1589,7 @@ h1[data-i18n="title"], .lb-title{white-space:pre-line;line-height:1.22;text-alig
 
 <style id="thome-css">
 #page-home{--navy:#1e4e8c;--teal:#0f9b8e;--blue:#2f7ed8;--orange:#e0792f;--purple:#7b5cd6;--pink:#b0379b;--rose:#ff4d97;--panel:#ffffff;--line:#e9eef6;--white:#141c2b;--soft:#5b6b82;--muted:#7c889b;--faint:#a7b2c3;}
-#page-home .d-home{max-width:980px;margin:0 auto;padding:30px 24px 42px}
+#page-home .d-home{max-width:1600px;margin:0 auto;padding:24px 34px 46px}
 #page-home .icn{display:inline-flex}
 #page-home .icn svg{display:block}
 #page-home .d-hero{text-align:center;max-width:600px;margin:0 auto}
@@ -1647,8 +1647,8 @@ body.is-admin #page-home .d-credit-foot .dcf-edit{display:inline-flex}
 #page-home .d-meta .mi{display:inline-flex;align-items:center;gap:7px}
 #page-home .d-meta .dot{width:7px;height:7px;border-radius:50%;background:#19b36b;box-shadow:0 0 0 3px rgba(25,179,107,.18)}
 #page-home .d-meta .sep{width:4px;height:4px;border-radius:50%;background:var(--line)}
-#page-home .d-body{margin-top:40px}
-#page-home .d-sec{margin-bottom:34px}
+#page-home .d-body{margin-top:30px}
+#page-home .d-sec{margin-bottom:30px}
 #page-home .d-sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 /* أيقونات عناوين الأقسام في الهوم */
 #page-home .d-sec-h{align-items:center}
@@ -1662,7 +1662,7 @@ body.is-admin #page-home .d-credit-foot .dcf-edit{display:inline-flex}
 #page-home .d-sec-h .cnt{font-size:12px;font-weight:700;color:var(--faint);background:color-mix(in srgb,var(--line) 55%,transparent);padding:2px 9px;border-radius:20px}
 #page-home .d-sec-h .upd{margin-inline-start:auto;font-size:11.5px;font-weight:400;color:var(--faint);display:inline-flex;align-items:center;gap:6px}
 #page-home .d-sec-h .upd::before{content:'';width:6px;height:6px;border-radius:50%;background:#19b36b;box-shadow:0 0 0 3px rgba(25,179,107,.16)}
-#page-home .d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+#page-home .d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
 /* أداة تحرير شاشة الهوم (مستوى البطاقات) */
 .hl-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px;padding:10px 14px;background:rgba(255,255,255,.55);border:1px solid rgba(15,40,70,.1);border-radius:13px}
 .hl-bar-info{font-size:12px;color:var(--muted);font-weight:600;flex:1;min-width:180px}
@@ -3044,7 +3044,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
     </div>
     <div class="login-form-side">
       <div class="login-box">
-        <div class="lf-mini"><img class="tania-logo" alt="Tania"></div>
+        <div class="lf-mini"><img class="tania-logo" alt="Tania"></div><script>(function(){try{var s=document.querySelector(".lb-logo .tania-logo");var src=s&&s.getAttribute("src");if(src&&src.length>200){var L=document.querySelectorAll("img.tania-logo,img.home-logo");for(var i=0;i<L.length;i++){if(!L[i].getAttribute("src"))L[i].setAttribute("src",src);}}}catch(e){}})();</script><style>img.tania-logo{font-size:0;color:transparent}.lf-mini{overflow:hidden}.lf-mini .tania-logo{width:110px!important;height:110px!important;object-fit:contain;display:block}@media (max-width:430px){.lf-mini .tania-logo{width:88px!important;height:88px!important}}</style>
 
         <!-- ═══ وضع PIN / البصمة ═══ -->
         <div id="login-quick-wrap">
@@ -3286,8 +3286,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
   <div class="nav-backdrop" id="nav-backdrop" onclick="closeNav()"></div>
   <div class="nav" id="nav">
     <button class="nav-close" onclick="closeNav()" aria-label="Close">&#10005;</button>
-    <div class="brand"><div class="logo-badge"><img class="tania-logo" alt="Tania"></div><div class="b-name">Tania</div><div class="b-sub" data-i18n="login_sub">Inventory Dashboard</div></div>
-    <div class="nav-collapse-row"><button class="nav-collapse-toggle" id="nav-collapse-btn-top" onclick="toggleNavCollapsed()" title="طي/توسيع القائمة · Collapse sidebar" aria-label="Collapse sidebar">&#171;</button></div>
+    <div class="brand"><button class="nav-collapse-toggle" id="nav-collapse-btn-top" onclick="toggleNavCollapsed()" title="طي/توسيع القائمة · Collapse sidebar" aria-label="Collapse sidebar">&#171;</button><div class="logo-badge"><img class="tania-logo" alt="Tania"></div><div class="b-name">Tania</div><div class="b-sub" data-i18n="login_sub">Inventory Dashboard</div></div>
     <button class="navbtn navbtn-home active" data-page="home" onclick="go('home')" style="--c:#3f6fd1"><span class="nico" data-icon="home"></span><span class="lbl" data-i18n="nav_home">Home</span></button>
     <div class="nav-group collapsed" data-grp="daily">
       <button class="nav-head" onclick="toggleGroup('daily')"><span class="gbar gbar-daily" style="--gc:#12b1a2"></span><span class="glbl" data-i18n="grp_daily">Daily Coverage Report</span><span class="gchev">▾</span></button>
@@ -3397,7 +3396,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <button class="logoutbtn" onclick="logout()"><span data-i18n="logout">Logout</span></button>
       
       <div style="text-align:center;color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:6px 0 2px">Version <span id="app-ver-side">v6.19.0</span></div>
-      <button class="logoutbtn nav-collapse-bottom" id="nav-collapse-btn-bottom" onclick="toggleNavCollapsed()" style="margin-top:9px"><span id="nav-collapse-arrow">&#8249;</span><span id="nav-collapse-lbl">&#160;طي · Collapse</span></button>
+      
     </div>
   </div>
 <script>
@@ -5861,7 +5860,7 @@ let LANG=localStorage.getItem('ui_lang')||'en';
 const DATA_SEED = DATA;            // built-in seed (used only on first ever load)
 const DATA_KEY = 'dash_data_v1';
 try{const _saved=JSON.parse(LS.getItem(DATA_KEY)||'null');if(Array.isArray(_saved))DATA=_saved;}catch(e){}
-function saveData(){try{LS.setItem(DATA_KEY,JSON.stringify(DATA));}catch(e){if(typeof cloudStatus==='function'){/* storage full */}console&&console.warn&&console.warn('saveData failed: '+e.message);}}
+function saveData(){try{LS.setItem(DATA_KEY,JSON.stringify(DATA));window._storageFull=false;return true;}catch(e){window._storageFull=true;try{console&&console.warn&&console.warn('saveData failed (storage quota?): '+e.message);}catch(_){}try{if(!window.__storageWarned){window.__storageWarned=true;if(typeof syncToast==='function')syncToast((typeof LANG!=='undefined'&&LANG==='ar')?'⚠️ تعذّر حفظ كل البيانات محلياً (تجاوز سعة المتصفّح). الاعتماد على السحابة.':'⚠️ Could not cache all data locally (browser storage full). Using cloud data.','err');}}catch(_){}return false;}}
 const IMPHIST_KEY='import_history_v1';
 function getImportHistory(){try{var h=JSON.parse(LS.getItem(IMPHIST_KEY)||'[]');return Array.isArray(h)?h:[];}catch(e){return [];}}
 function logImportHistory(entry){try{var h=getImportHistory();entry.ts=Date.now();h.unshift(entry);if(h.length>30)h=h.slice(0,30);LS.setItem(IMPHIST_KEY,JSON.stringify(h));}catch(e){}try{renderImportHistory();}catch(e){}}
@@ -6228,7 +6227,7 @@ function go(p){
     if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(function(){try{if(_ct)_ct.scrollTop=0;window.scrollTo(0,0);}catch(e){}});}catch(e){}
   if(typeof DR_PAGE2KEY!=='undefined'&&DR_PAGE2KEY[p]&&typeof renderDailyReport==='function')renderDailyReport(DR_PAGE2KEY[p]);
   if(p==='dailyup'&&typeof renderUploadStatus==='function')renderUploadStatus();
-  if(p==='users'){try{renderUsers();}catch(e){}try{renderUserStats();}catch(e){}try{_fillEmailCfgInputs();renderLoginLog();}catch(e){}try{var _ut=LS.getItem('users_tab')||'users';switchUserTab(_ut);}catch(e){}}
+  if(p==='users'){try{renderUsers();}catch(e){}try{renderUserStats();}catch(e){}try{_fillEmailCfgInputs();renderLoginLog();}catch(e){}try{var _ut=LS.getItem('users_tab')||'users';switchUserTab(_ut);}catch(e){}try{if(typeof refreshUsersFromCloud==='function')refreshUsersFromCloud();}catch(e){}}
   if(p==='records'){try{renderSapHub();}catch(e){console.warn('sapHub',e);}}
   if(p==='designer'){try{applyNumAlign();}catch(e){}try{if(window.logoDzSyncUI)window.logoDzSyncUI();}catch(e){}try{if(window.applyLogoDesign)window.applyLogoDesign();}catch(e){}renderDesigner();showDzScreen((document.getElementById('dz-screen')||{}).value||'dash');try{renderColManager();}catch(e){}try{dzRestoreCollapsed();}catch(e){}}
   if(p==='sum')buildSummary();
@@ -7891,7 +7890,7 @@ function _pinKey(k){
   }
   if(_pinBuffer.length===4){
     /* تأخير يسمح بعرض آخر رقم ثم تقديم الدخول */
-    setTimeout(_pinSubmit,420);
+    setTimeout(_pinSubmit,140);
   }
 }
 function _pinDel(){
@@ -7917,9 +7916,10 @@ function _pinOnInput(v){
       },380);
     }
   }
-  if(_pinBuffer.length===4)setTimeout(_pinSubmit,420);
+  if(_pinBuffer.length===4)setTimeout(_pinSubmit,140);
 }
 function _pinReset(isError){
+  window._pinSubmitting=false;
   _pinBuffer='';
   var inp=document.getElementById('pin-hidden-input');
   if(inp)inp.value='';
@@ -7946,6 +7946,8 @@ function _pinUpdateDots(isError){
 
 /* ── تقديم PIN ── */
 function _pinSubmit(){
+  if(window._pinSubmitting)return; window._pinSubmitting=true;
+  setTimeout(function(){window._pinSubmitting=false;},1500);
   var pin=_pinRead();
   if(!pin||!pin.h){
     _pinReset(true);
@@ -9668,22 +9670,28 @@ function renderUsers(){
     html+='<td>'+(me?'<span class="u-self">'+(ar?'أنت':'You')+'</span>':'<button class="del-btn" onclick="delUser('+i+')">&#128465;&#65039; '+tr('u_delete')+'</button>')+'</td>';
     html+='</tr>';
   });
-  html+='</tbody>';var _utbl=document.getElementById('utable');if(!_utbl)return;_utbl.innerHTML=html;
-  try{makeSortable(document.getElementById('utable'));}catch(e){}
+  html+='</tbody>';var _utbl=document.getElementById('utable');if(_utbl){_utbl.innerHTML=html;try{makeSortable(_utbl);}catch(e){}}
   try{renderUserStats();}catch(e){}
 }
+/* اعادة رسم كل واجهات المستخدمين: الجدول القديم (#utable) + لوحة المستخدمين الظاهرة (#um-table-body).
+   الخطأ سابقاً: البيانات القادمة من السحابة كانت تُرسم في الجدول القديم فقط فلا يظهر المستخدمون القدامى. */
+function _usersUIRefresh(){
+  try{renderUsers();}catch(e){}
+  try{if(typeof umRenderUsersTable==='function')umRenderUsersTable();}catch(e){}
+  try{if(typeof umRenderKPIs==='function')umRenderKPIs();}catch(e){}
+  try{if(typeof renderUserStats==='function')renderUserStats();}catch(e){}
+}
+try{window._usersUIRefresh=_usersUIRefresh;}catch(e){}
 
 /* ── تحديث قائمة المستخدمين مباشرةً من Firebase ── */
 function refreshUsersFromCloud(btn){
   try{
     if(btn){btn.disabled=true;var _orig=btn.innerHTML;btn.innerHTML='⏳';setTimeout(function(){btn.disabled=false;btn.innerHTML=_orig;},4000);}
     if(typeof fbDB==='undefined'||!fbDB||typeof FB_COL==='undefined'||typeof FB_USERS_DOC==='undefined'){
-      /* لا يوجد اتصال — اكتفِ بإعادة الرسم من الذاكرة */
-      try{renderUsers();}catch(e){}
-      if(btn){clearTimeout();btn.disabled=false;if(typeof _orig!=='undefined')btn.innerHTML=_orig;}
+      try{_usersUIRefresh();}catch(e){}
+      if(btn){btn.disabled=false;if(typeof _orig!=='undefined')btn.innerHTML=_orig;}
       return;
     }
-    /* أعِد ضبط حاجب الطوابع الزمنية لضمان قبول البيانات الواردة */
     _usersLastTs=0; _lastUsersJson=''; _pendingUsersJson='';
     fbDB.collection(FB_COL).doc(FB_USERS_DOC).get().then(function(doc){
       try{
@@ -9696,16 +9704,15 @@ function refreshUsersFromCloud(btn){
             _lastUsersJson=JSON.stringify(dd.users);
           }
         }
-        try{renderUsers();}catch(e2){}
-        try{renderUserStats();}catch(e2){}
+        try{_usersUIRefresh();}catch(e2){}
       }catch(e2){}
       if(btn){btn.disabled=false;if(typeof _orig!=='undefined')btn.innerHTML=_orig;}
     }).catch(function(){
-      try{renderUsers();}catch(e2){}
+      try{_usersUIRefresh();}catch(e2){}
       if(btn){btn.disabled=false;if(typeof _orig!=='undefined')btn.innerHTML=_orig;}
     });
   }catch(e){
-    try{renderUsers();}catch(e2){}
+    try{_usersUIRefresh();}catch(e2){}
     if(btn){btn.disabled=false;}
   }
 }
@@ -11076,7 +11083,7 @@ function fbUsersSync(){
       try{
         if(CURRENT_USER){var fnd=dd.users.find(function(x){return x.u===CURRENT_USER.u;});if(fnd){CURRENT_USER=Object.assign({},fnd);if(!Array.isArray(CURRENT_USER.perms))CURRENT_USER.perms=[];applyRole();}}
         var pu=document.getElementById('page-users');
-        if(pu&&pu.classList.contains('show'))renderUsers();
+        if(pu&&pu.classList.contains('show'))_usersUIRefresh();
       }catch(e){}
     },function(e){_fbReadErr(e,'users');});
   }catch(e){}
@@ -11372,7 +11379,9 @@ function toggleLive(){
       if(ts&&ts<_lastAppliedTs)return; // only reject STRICTLY older docs (never block first load)
       _lastAppliedTs=ts;
       _cloudSynced=true; // cloud has taken over from local cache; safe to auto-push edits now
-      applyCloudData(dd);
+      window.__applyCloudLatest=dd;
+      if(window.__applyCloudT)clearTimeout(window.__applyCloudT);
+      window.__applyCloudT=setTimeout(function(){try{applyCloudData(window.__applyCloudLatest);}catch(e){}},180);
     },e=>cloudStatus('err',fbMsg('Live sync error: ','خطأ المزامنة: ')+e.message));
     cloudStatus('ok',fbMsg('Live sync enabled.','المزامنة اللحظية مفعّلة.'));
   }
@@ -28338,6 +28347,37 @@ var _bootIv=setInterval(function(){
 .nav.np-pro::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14)!important}
 .nav.np-pro::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.26)!important}
 </style>
+<style id="compact-sidebar">
+/* ===== Compact sidebar — reduce vertical size so more items fit ===== */
+#nav .brand{padding:6px 6px 9px;margin-bottom:6px;gap:5px}
+#nav .brand .logo-badge{width:50px;height:50px;border-radius:15px}
+#nav .brand .logo-badge .tania-logo{height:36px}
+#nav .brand .b-name{font-size:16px}
+#nav .brand .b-sub{font-size:9px;letter-spacing:1.6px;margin-top:2px}
+#nav .navbtn-home{padding:7px 10px;margin:0 2px 7px;border-radius:11px;gap:10px}
+#nav .nav-group{margin-bottom:6px}
+#nav .nav-head{padding:8px 11px;gap:9px;border-radius:11px}
+#nav .nav-head .glbl{font-size:11px}
+#nav .nav-head .gbar-aging{width:20px!important;height:20px!important}
+#nav .nav-head .gbar-daily{width:24px!important;height:24px!important}
+#nav .nav-head .gbar-btl{width:22px!important;height:22px!important}
+#nav .nav-head .gbar-settings{width:22px!important;height:22px!important}
+#nav .nav-head .gchev{width:20px;height:20px}
+#nav .navbtn .nico{width:26px;height:26px;border-radius:8px}
+#nav .navbtn .nico svg{width:14px;height:14px}
+#nav .nav-sub .navbtn{padding:6px 9px;font-size:12px}
+#nav .userbox{gap:5px;padding-top:9px}
+#nav .userbox .logoutbtn{padding:6px 10px;font-size:11.5px;margin-bottom:5px!important}
+#nav #ens-bell-btn{padding:5px 10px}
+#nav .nav-reorder-btn{padding:6px 10px}
+#nav .brand{position:relative}
+#nav .brand .nav-collapse-toggle{position:absolute;top:2px;right:4px;left:auto;inset-inline-start:auto;margin:0;width:28px;height:28px;z-index:4}
+/* keep collapse toggle visible in collapsed (icons-only) mode: place it below the logo, centered, no overlap */
+#nav .brand .nav-collapse-toggle{display:flex!important}
+#nav.icons-only .brand{padding-top:8px}
+#nav.icons-only .brand .nav-collapse-toggle{position:static!important;inset:auto!important;margin:8px auto 0!important;width:32px;height:32px}
+</style>
+
 <script id="dz-pro-themes-js">
 /* ═══════════════════════════════════════════════════════════════════════════
    DZ-THEME v1 — سمات ألوان احترافية في Designer (بقرار المدير)
