@@ -7797,7 +7797,7 @@ var LOGIN_MODE_KEY = 'tania_login_mode';
 var _pinBuffer     = '';
 
 function _pinRead(){try{return JSON.parse(LS.getItem(PIN_KEY)||'null');}catch(e){return null;}}
-function _pinSave(u,pinHash){try{LS.setItem(PIN_KEY,JSON.stringify({u:u,h:pinHash}));}catch(e){}}
+function _pinSave(u,pinHash){try{LS.setItem(PIN_KEY,JSON.stringify({u:u,h:pinHash}));var _c=_pinRead();return !!(_c&&_c.h&&String(_c.u||'')===String(u||''));}catch(e){return false;}}
 function _pinClear(){try{LS.removeItem(PIN_KEY);}catch(e){}}
 function _pinIsSet(){var d=_pinRead();return !!(d&&d.h&&d.u);}
 
@@ -7890,7 +7890,7 @@ function _pinKey(k){
   }
   if(_pinBuffer.length===4){
     /* تأخير يسمح بعرض آخر رقم ثم تقديم الدخول */
-    setTimeout(_pinSubmit,140);
+    setTimeout(_pinSubmit,60);
   }
 }
 function _pinDel(){
@@ -7916,7 +7916,7 @@ function _pinOnInput(v){
       },380);
     }
   }
-  if(_pinBuffer.length===4)setTimeout(_pinSubmit,140);
+  if(_pinBuffer.length===4)setTimeout(_pinSubmit,60);
 }
 function _pinReset(isError){
   window._pinSubmitting=false;
@@ -7959,9 +7959,7 @@ function _pinSubmit(){
   /* hash the buffer and compare */
   try{
     var input=_pinBuffer;
-    /* استخدام نفس دالة الهاش الموجودة */
-    var hashed=_pwHash(input);
-    /* مقارنة مرنة: SHA-256 أو bcrypt */
+    /* مقارنة مرنة: SHA-256 أو bcrypt (أُزيلت عملية هاش زائدة لتسريع الدخول) */
     if(!_pwMatch(pin.h,input)){
       _pinReset(true);
       setTimeout(function(){_pinReset();},600);
@@ -8111,7 +8109,18 @@ function _pinSetupModal(username){
       }else{
         /* تحقق من التطابق */
         if(buf1===buf2){
-          _pinSave(username,_pwHash(buf1));
+          var _saved=_pinSave(username,_pwHash(buf1));
+          if(!_saved){
+            var cardF=modal.querySelector('.psm-card');
+            cardF.innerHTML='<div style="text-align:center;padding:16px 0">'
+              +'<div style="font-size:48px;margin-bottom:12px">⚠️</div>'
+              +'<div style="font-size:16px;font-weight:800;color:#b91c1c;margin-bottom:6px">'+(ar?'تعذّر حفظ رقم PIN':'Could not save PIN')+'</div>'
+              +'<div style="font-size:13px;color:#64748b">'+(ar?'ذاكرة المتصفّح ممتلئة — فرّغ بيانات وأعد المحاولة.':'Browser storage full — free space and retry.')+'</div>'
+              +'</div>';
+            try{if(typeof syncToast==='function')syncToast(ar?'⚠️ تعذّر حفظ رقم PIN (الذاكرة ممتلئة)':'⚠️ Could not save PIN (storage full)','err');}catch(e){}
+            setTimeout(_psmClose,2600);
+            return;
+          }
           /* رسالة نجاح */
           var card=modal.querySelector('.psm-card');
           card.innerHTML='<div style="text-align:center;padding:16px 0">'
@@ -8232,7 +8241,7 @@ function doLogin(){
         _loginProceed(u,p);return;
       }
       var done=false;
-      var to=setTimeout(function(){if(done)return;done=true;_loginProceed(u,p);},600);
+      var to=setTimeout(function(){if(done)return;done=true;_loginProceed(u,p);},300);
       fbDB.collection(FB_COL).doc(FB_USERS_DOC).get().then(function(doc){
         if(done)return;done=true;clearTimeout(to);
         try{
@@ -15793,7 +15802,7 @@ function rrUniq(rows,ci){var seen={},out=[];if(ci<0)return out;rows.forEach(func
 function rrCards(){var c=_rr.cols,a=[{g:'grand',ar:'الإجمالي الكلي',en:'Grand Total'}];if(c.cat>=0){a.push({g:'carton',ar:'إجمالي الكرتون',en:'Total Carton'});a.push({g:'shrink',ar:'إجمالي الشرنك',en:'Total Shrink'});a.push({g:'pack',ar:'إجمالي الباك',en:'Total Pack'});a.push({g:'bottle',ar:'إجمالي القارورة',en:'Total Bottle'});}if(c.transit>=0)a.push({g:'transit',ar:'إجمالي الترانزيت',en:'Total Transit'});return a;}
 function renderRichReport(key,rep){
   var wrap=document.getElementById('rep-'+key+'-wrap'); if(!wrap)return;
-  _rr.key=key;_rr.rep=rep;_rr.query='';_rr.brand={};_rr.size={};_rr.hideZero=true;
+  _rr.key=key;_rr.rep=rep;_rr.query='';_rr.brand={};_rr.size={};_rr.hideZero=true;_rr.covSel={};
   var h=rep.headers||[];
   var c=_rr.cols={brand:fgColIdx(h,'brand'),size:fgColIdx(h,'size'),total:fgColIdx(h,'total'),cat:fgColIdx(h,'category'),transit:fgColIdx(h,'transit'),pack:fgColIdx(h,'pack')};
   if(c.total<0)c.total=h.length-1;
@@ -15805,7 +15814,7 @@ function renderRichReport(key,rep){
   if(P==='fgbal'){
     var _covAr2=drIsAr&&drIsAr();
     var _covLbl={c1:(_covAr2?'نقص حاد':'Critical'),c2:(_covAr2?'منخفض':'Low'),c3:(_covAr2?'مثالي':'Ideal'),c4:(_covAr2?'عالٍ':'High'),c5:(_covAr2?'فائض':'Excess')};
-    html+='<div style="display:flex;gap:6px;align-items:center;margin-inline-start:auto;flex-shrink:0">';
+    html+='<div class="fg-cov-row" style="display:flex;gap:6px;align-items:center;margin-inline-start:auto;flex-shrink:0">';
     ['c1','c2','c3','c4','c5'].forEach(function(k){
       html+='<button class="fg-cov-btn dal-sw dal-'+k+'" data-band="'+k+'" onclick="rrToggleCovFilter(this)" style="border:none;padding:14px 28px;border-radius:30px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;min-width:100px;display:inline-flex;align-items:center;justify-content:center;line-height:1;letter-spacing:.3px;text-transform:uppercase">'+_covLbl[k]+'</button>';
     });
@@ -15925,6 +15934,7 @@ function rrFilteredRows(){
 }
     if(sSel.length&&c.size>=0&&sSel.indexOf(String(r[c.size]==null?'':r[c.size]).trim())<0)return false;
     if(q){var hit=false;for(var k=0;k<r.length;k++){if(String(r[k]==null?'':r[k]).toLowerCase().indexOf(q)>=0){hit=true;break;}}if(!hit)return false;}
+    if(_rr.covSel){var _cb=Object.keys(_rr.covSel);if(_cb.length&&c.total>=0){var _bd=(typeof dalColorClassTotal==='function')?dalColorClassTotal(String(r[0]==null?'':r[0]).trim(),r[c.total]):'';_bd=_bd?String(_bd).replace('dal-',''):'';if(_cb.indexOf(_bd)<0)return false;}}
     return true;
   });
 }
@@ -16388,23 +16398,17 @@ function rrToggleColors(btn){
 }
 function rrToggleCovFilter(btn){
   var band=btn.dataset.band;
-  var moId='dal-cov-modal-'+band;
-  var existing=document.getElementById(moId);
-  if(existing&&existing.style.display!=='none'){
-    /* already open → close & deselect */
-    existing.style.display='none';
-    btn.classList.remove('dal-sw-selected');
-    btn.style.outline='';btn.style.outlineOffset='';btn.style.transform='';
-    _dalHideOverlay();
-    return;
-  }
-  /* mark badge as selected */
-  btn.classList.add('dal-sw-selected');
-  btn.style.outline='3px solid rgba(0,0,0,.35)';
-  btn.style.outlineOffset='3px';
-  btn.style.transform='scale(1.06)';
-  _dalShowOverlay();
-  rrShowCovFilter(band,btn);
+  if(!_rr.covSel)_rr.covSel={};
+  var on=!_rr.covSel[band];
+  if(on)_rr.covSel[band]=1; else delete _rr.covSel[band];
+  btn.classList.toggle('dal-sw-selected',on);
+  btn.style.outline=on?'3px solid rgba(0,0,0,.35)':'';
+  btn.style.outlineOffset=on?'3px':'';
+  btn.style.transform=on?'scale(1.06)':'';
+  /* both together: ensure coverage colors are visible while filtering */
+  try{var _w=document.getElementById('rep-fgbal-wrap');if(_w&&on)_w.classList.remove('dal-colors-off');}catch(e){}
+  try{if(typeof _dalHideOverlay==='function')_dalHideOverlay();}catch(e){}
+  rrRefresh();
 }
 function rrShowCovFilter(band,_trigBtn){
   var P=_rr.key;var rep=_rr.rep;if(!rep)return;
@@ -28376,6 +28380,16 @@ var _bootIv=setInterval(function(){
 #nav .brand .nav-collapse-toggle{display:flex!important}
 #nav.icons-only .brand{padding-top:8px}
 #nav.icons-only .brand .nav-collapse-toggle{position:static!important;inset:auto!important;margin:8px auto 0!important;width:32px;height:32px}
+</style>
+<style id="fg-cov-fix">
+/* ===== FG Balance — coverage indicators: MOBILE ONLY (no overflow, compact) ===== */
+@media (max-width:760px){
+  .fg-cov-row{flex-wrap:wrap!important;margin-inline-start:0!important;width:100%;gap:5px!important;justify-content:flex-start!important}
+  .fg-cov-btn{padding:6px 10px!important;min-width:0!important;font-size:10px!important;border-radius:20px!important;flex:1 1 auto;letter-spacing:0!important}
+  #dal-color-toggle-btn,#dal-list-btn{padding:6px 10px!important;font-size:10px!important}
+  .fg-cards{flex-wrap:wrap!important;overflow:visible!important;padding-bottom:0!important}
+  .fg-card{flex:1 1 46%!important;width:auto!important;min-width:0!important;max-width:none!important}
+}
 </style>
 
 <script id="dz-pro-themes-js">
