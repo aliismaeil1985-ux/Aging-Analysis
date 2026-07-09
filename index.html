@@ -7968,36 +7968,41 @@ function _pinSubmit(){
     }
     /* PIN صحيح — دخول */
     _loginShowErr('');
-    /* ملء الحقول وتشغيل doLogin */
+    /* ترقية سرعة: إن كان هاش الـ PIN بصيغة bcrypt البطيئة، أعِد حفظه بصيغة SHA السريعة
+       حتى تصبح عمليات الدخول التالية فورية (المقارنة اللاحقة تدعم الصيغتين). PIN رقم محلي
+       سريع للوصول — SHA كافٍ له، ولا حاجة لبطء bcrypt المتعمّد. */
+    try{if(/^\$2[aby]\$/.test(String(pin.h||''))&&typeof _sha256Hex==='function'){_pinSave(pin.u,'h$'+_sha256Hex(input));}}catch(e){}
+    /* ملء اسم المستخدم في حقول النموذج (للاتساق) */
     var vis=document.getElementById('login-user-vis');
     var hid=document.getElementById('login-user');
     var pEl=document.getElementById('login-pass');
     if(vis)vis.value=pin.u;
     if(hid)hid.value=pin.u;
-    /* نحتاج كلمة المرور المخزّنة — مخزّنة في bio أو نستخدم PIN كمفتاح وصول */
+    /* الدخول مباشرة من السجل المحلي بلا إعادة تحقق كلمة المرور (الـ PIN وثّق المستخدم بالفعل)
+       — هذا يزيل عمليات bcrypt المكرّرة وانتظار الشبكة، وهي مصدر التأخير. */
     var all=_bioGetAll();
     var ukey=String(pin.u||'').toLowerCase();
-    if(all[ukey]&&all[ukey].p){
-      /* استخدام كلمة المرور المخزّنة من bio */
-      var pwd=_bioUnwrap(all[ukey].p);
-      if(pEl)pEl.value=pwd;
-      doLogin();
-    }else{
-      /* لا توجد كلمة مرور مخزّنة — الدخول مباشرة عبر CURRENT_USER من الذاكرة */
-      _pinDirectLogin(pin.u);
-    }
+    var pwd=(all[ukey]&&all[ukey].p)?_bioUnwrap(all[ukey].p):'';
+    if(pEl&&pwd)pEl.value=pwd;
+    _pinDirectLogin(pin.u,pwd);
   }catch(e){_pinReset(true);setTimeout(function(){_pinReset();},600);}
 }
 
-/* ── دخول مباشر بعد التحقق من PIN (بدون كلمة مرور) ── */
-function _pinDirectLogin(username){
+/* ── دخول مباشر بعد التحقق من PIN (بدون إعادة تحقق كلمة المرور) ──
+   pwd اختياري: يُمرَّر عند توفّر كلمة المرور المخزّنة لتفعيل توثيق المدير السحابي فقط
+   (لا يُعاد تشفيرها ولا التحقق منها — الـ PIN هو من وثّق المستخدم). */
+function _pinDirectLogin(username,pwd){
   try{
     var us=getUsers()||[];
     var fnd=us.find(function(x){return x.u.toLowerCase()===String(username||'').toLowerCase();});
     if(!fnd){_pinReset(true);setTimeout(function(){_pinReset();},600);_loginShowErr(LANG==='ar'?'خطأ في البيانات، ادخل بالحساب':'Data error, use account login');return;}
     CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku','notifications']};
     try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
+    if(pwd){try{window._lastLoginPwd=pwd;}catch(e){}}
     _onLoginSuccess(fnd.u);
+    /* توثيق المدير في السحابة (غير متزامن — لا يؤخّر الدخول) */
+    if(pwd&&fnd.r==='admin'){try{_fbAdminAuth(pwd);}catch(e){}}
+    try{logLogin(fnd.u,'login');}catch(e){}
     document.getElementById('login-err').textContent='';
     document.getElementById('login-ov').style.display='none';
     try{applyRole();}catch(e){}
@@ -8109,7 +8114,8 @@ function _pinSetupModal(username){
       }else{
         /* تحقق من التطابق */
         if(buf1===buf2){
-          var _saved=_pinSave(username,_pwHash(buf1));
+          /* PIN رقم محلي سريع — نخزّنه بصيغة SHA السريعة (لا bcrypt البطيء) ليكون الدخول فورياً */
+          var _saved=_pinSave(username,(typeof _sha256Hex==='function')?('h$'+_sha256Hex(buf1)):_pwHash(buf1));
           if(!_saved){
             var cardF=modal.querySelector('.psm-card');
             cardF.innerHTML='<div style="text-align:center;padding:16px 0">'
@@ -24868,6 +24874,14 @@ window.__qrcodeLib=(typeof qrcode!=='undefined')?qrcode:null;
     var lay=getLayout();if(!body())return;
     var hidden=(lay&&lay.hidden)||[];
     var order=(lay&&lay.order)||{};
+    /* احترم صلاحيات المستخدم: لا تُعِد إظهار بطاقة غير مسموح بها (كانت تتعارض مع applyRole) */
+    var canV=(typeof window.canView==='function')?window.canView:function(){return true;};
+    var adminNow=isAdmin_();
+    function allowedTile(t){
+      var pg=pageOf(t);
+      if(t.classList.contains('admin-only')&&!adminNow)return false;
+      try{return !!canV(pg);}catch(e){return true;}
+    }
     secs().forEach(function(sec){
       var key=sec.getAttribute('data-sec');var g=grid(sec);if(!g)return;
       var byPage={};tiles(sec).forEach(function(t){byPage[pageOf(t)]=t;});
@@ -24876,11 +24890,24 @@ window.__qrcodeLib=(typeof qrcode!=='undefined')?qrcode:null;
         ord.forEach(function(pg){if(byPage[pg])g.appendChild(byPage[pg]);});
         tiles(sec).forEach(function(t){if(ord.indexOf(pageOf(t))<0)g.appendChild(t);});
       }
+      var anyShown=false;
       tiles(sec).forEach(function(t){
         var hide=hidden.indexOf(pageOf(t))>=0;
-        if(EDITING){t.style.display='';t.classList.toggle('hl-hidden-mark',hide);}
-        else{t.style.display=hide?'none':'';t.classList.remove('hl-hidden-mark');}
+        var allowed=allowedTile(t);
+        if(EDITING){
+          /* وضع تحرير المدير: أظهر كل ما هو مسموح مع علامة المخفي */
+          t.style.display=allowed?'':'none';
+          t.classList.toggle('hl-hidden-mark',hide);
+          if(allowed)anyShown=true;
+        }else{
+          var show=allowed&&!hide;
+          t.style.display=show?'':'none';
+          t.classList.remove('hl-hidden-mark');
+          if(show)anyShown=true;
+        }
       });
+      /* أخفِ القسم كاملاً إن لم تبقَ فيه أي بطاقة ظاهرة (توحيد مصدر القرار) */
+      sec.style.display=(EDITING?true:anyShown)?'':'none';
     });
   }
   window.__applyHomeLayout=applyLayout;
