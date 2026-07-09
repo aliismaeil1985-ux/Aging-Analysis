@@ -7978,13 +7978,37 @@ function _pinSubmit(){
     var pEl=document.getElementById('login-pass');
     if(vis)vis.value=pin.u;
     if(hid)hid.value=pin.u;
-    /* الدخول مباشرة من السجل المحلي بلا إعادة تحقق كلمة المرور (الـ PIN وثّق المستخدم بالفعل)
-       — هذا يزيل عمليات bcrypt المكرّرة وانتظار الشبكة، وهي مصدر التأخير. */
+    /* كلمة المرور المخزّنة (بصمة) إن وُجدت */
     var all=_bioGetAll();
     var ukey=String(pin.u||'').toLowerCase();
     var pwd=(all[ukey]&&all[ukey].p)?_bioUnwrap(all[ukey].p):'';
     if(pEl&&pwd)pEl.value=pwd;
-    _pinDirectLogin(pin.u,pwd);
+    /* هل الحساب محفوظ محلياً (بالاسم أو بالبريد)؟ */
+    var _us=getUsers()||[];
+    var _local=_us.find(function(x){
+      return (x.u&&x.u.toLowerCase()===ukey)||(x.email&&String(x.email).toLowerCase()===ukey);
+    });
+    if(_local){
+      /* حساب محلي: دخول فوري بلا شبكة ولا bcrypt (الـ PIN وثّق المستخدم) */
+      _pinDirectLogin(_local.u,pwd);
+    }else if(pwd){
+      /* حساب Firebase (بريد إلكتروني): إن وُجدت جلسة مخزّنة من دخول سابق ناجح → دخول فوري
+         مع تجديد مصادقة Firebase في الخلفية (لا انتظار للشبكة). وإلا نصادق عبر السحابة. */
+      var _fbSess=null;
+      try{_fbSess=JSON.parse(LS.getItem('tania_fbsess_'+ukey)||'null');}catch(e){}
+      if(_fbSess&&_fbSess.u){
+        _pinFbInstantLogin(_fbSess,pwd);
+      }else{
+        /* أول دخول بالـ PIN لهذا الحساب (لا جلسة مخزّنة): صادق عبر السحابة، وسيُخزَّن للمرة القادمة */
+        window._pinFastLogin=true;
+        doLogin();
+      }
+    }else{
+      /* لا حساب محلي ولا كلمة مرور مخزّنة — لا يكفي الـ PIN وحده لهذا الحساب */
+      _pinReset(true);setTimeout(function(){_pinReset();},600);
+      _loginShowErr(LANG==='ar'?'يتعذّر الدخول بالـ PIN لهذا الحساب — سجّل دخولك بالحساب مرة واحدة أولاً':'Cannot sign in with PIN for this account — sign in with your account once first');
+      setTimeout(function(){_loginSetMode('password');},900);
+    }
   }catch(e){_pinReset(true);setTimeout(function(){_pinReset();},600);}
 }
 
@@ -7994,7 +8018,8 @@ function _pinSubmit(){
 function _pinDirectLogin(username,pwd){
   try{
     var us=getUsers()||[];
-    var fnd=us.find(function(x){return x.u.toLowerCase()===String(username||'').toLowerCase();});
+    var _t=String(username||'').toLowerCase();
+    var fnd=us.find(function(x){return (x.u&&x.u.toLowerCase()===_t)||(x.email&&String(x.email).toLowerCase()===_t);});
     if(!fnd){_pinReset(true);setTimeout(function(){_pinReset();},600);_loginShowErr(LANG==='ar'?'خطأ في البيانات، ادخل بالحساب':'Data error, use account login');return;}
     CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku','notifications']};
     try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
@@ -8008,6 +8033,31 @@ function _pinDirectLogin(username,pwd){
     try{applyRole();}catch(e){}
     go('home');
   }catch(e){_pinReset(true);}
+}
+
+/* ── دخول فوري لحساب Firebase من جلسة مخزّنة، مع تجديد مصادقة Firebase في الخلفية ──
+   يزيل تأخير الشبكة تماماً: تُبنى الجلسة محلياً ويدخل المستخدم فوراً، وتُجدَّد المصادقة
+   السحابية بالخلفية (للكتابة/القراءة الموثّقة) دون تعطيل الواجهة. */
+function _pinFbInstantLogin(sess,pwd){
+  try{
+    CURRENT_USER={u:sess.u,r:sess.r||'user',perms:Array.isArray(sess.perms)?sess.perms:['dash','sum','sku','notifications'],email:sess.email||sess.u,name:sess.name||sess.u};
+    try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
+    if(pwd){try{window._lastLoginPwd=pwd;}catch(e){}}
+    try{_onLoginSuccess(sess.u);}catch(e){}
+    try{logLogin(sess.u,'login');}catch(e){}
+    var le=document.getElementById('login-err');if(le)le.textContent='';
+    var lp=document.getElementById('login-pass');if(lp)lp.value='';
+    var ov=document.getElementById('login-ov');if(ov)ov.style.display='none';
+    try{applyRole();}catch(e){}
+    go('home');
+    /* تجديد مصادقة Firebase في الخلفية (غير متزامن — لا يؤخّر الدخول) */
+    setTimeout(function(){
+      try{
+        var a=(typeof firebase!=='undefined'&&firebase.auth&&typeof fbApp!=='undefined'&&fbApp)?firebase.auth(fbApp):null;
+        if(a&&pwd)a.signInWithEmailAndPassword(sess.email||sess.u,pwd).catch(function(){});
+      }catch(e){}
+    },50);
+  }catch(e){window._pinFastLogin=true;doLogin();}
 }
 
 /* ── عرض إعداد PIN بعد الدخول الناجح ── */
@@ -8241,6 +8291,8 @@ function doLogin(){
      - إذا كانت البيانات محمّلة بالفعل (_usersCloudReady) → تقدّم فوراً بلا انتظار
      - إذا لم تكن محمّلة → انتظر Firebase بحد أقصى 600ms ثم تقدّم */
   try{
+    /* دخول عبر PIN لحساب Firebase: تخطَّ انتظار وثيقة المستخدمين — المصادقة تتم عبر _tryFbAuthLogin */
+    if(window._pinFastLogin){window._pinFastLogin=false;_loginProceed(u,p);return;}
     if(typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined'){
       /* البيانات محمّلة → لا حاجة لانتظار Firebase */
       if(typeof _usersCloudReady!=='undefined'&&_usersCloudReady){
@@ -9286,6 +9338,8 @@ function _loginProceed(u,p){
 function _fbAuthCompleteLogin(fnd){
   CURRENT_USER={u:fnd.u,r:fnd.r,perms:(fnd.perms&&fnd.perms.length)?fnd.perms:['dash','sum','sku','notifications'],email:fnd.email||'',name:fnd.name||fnd.u};
   try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
+  /* خزّن جلسة حساب Firebase محلياً ليصبح الدخول بالـ PIN لاحقاً فورياً (مع تجديد المصادقة بالخلفية) */
+  try{LS.setItem('tania_fbsess_'+String(fnd.u||'').toLowerCase(),JSON.stringify(CURRENT_USER));}catch(e){}
   try{window._lastLoginPwd=fnd._pw||'';}catch(e){}
   try{_onLoginSuccess(fnd.u);}catch(e){}
   try{logLogin(fnd.u,'login');}catch(e){}
