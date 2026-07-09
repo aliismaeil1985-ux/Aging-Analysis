@@ -6207,7 +6207,7 @@ function go(p){
   updateTopnav(p);
   closeNav();
   if(p!=='home'){try{homeSearch('');var _hsi=document.getElementById('home-search-inp');if(_hsi)_hsi.value='';}catch(e){}}
-  if(p==='dash'){setTimeout(function(){try{renderCustomCards();}catch(e){}},30);}
+  if(p==='dash'){try{render();}catch(e){}setTimeout(function(){try{renderCustomCards();}catch(e){}},30);}
   if(p==='cardbuilder'){setTimeout(function(){try{initCardBuilder();}catch(e){console.warn('initCardBuilder',e);}},40);setTimeout(function(){try{initCardBuilder();}catch(e){}},120);}
   if(p==='masterdata'){setTimeout(function(){try{applyNumAlign();}catch(e){}try{renderMasterTable();}catch(e){}try{renderDALTable();}catch(e){}try{applyDALColors();}catch(e){}try{renderSpaceConvStatus();}catch(e){}try{renderCppAvgTable();}catch(e){}try{var _dc=LS.getItem('dal_collapsed')==='1';var _card=document.getElementById('dal-card');if(_card){_card.classList.toggle('dal-collapsed',_dc);_dalSyncToggleUI(_dc);}}catch(e){}try{var _mdc=LS.getItem('md_collapsed')==='1';var _mcard=document.getElementById('md-card');if(_mcard){_mcard.classList.toggle('md-collapsed',_mdc);_mdSyncToggleUI(_mdc);}}catch(e){}},50);}
   if(p==='spaceact'){setTimeout(function(){try{_spActLoad();}catch(e){}try{renderSpaceActuals();}catch(e){}try{renderSpaceCalc();}catch(e){}},50);}
@@ -11356,11 +11356,19 @@ function fbTest(){
 }
 function applyCloudData(d){
   if(!d||!Array.isArray(d.records)){cloudStatus('err',fbMsg('No data found in cloud.','لا توجد بيانات في السحابة.'));return;}
-  DATA=d.records;saveData();buildFilters(true);render();
-  try{var _s=getDR(),_dirty=false;['fgbal','oldid','transit'].forEach(function(k){if(_s[k]&&_s[k].headers){var _u=(_s[k]._unmatchedWarehouses||[]).join('|');try{wmCanonicalizeReport(_s[k]);}catch(e){}var _u2=(_s[k]._unmatchedWarehouses||[]).join('|');if(_u!==_u2)_dirty=true;}});if(_dirty)saveDR(_s);try{['fgbal','oldid','transit'].forEach(function(k){renderDailyReport(k);try{wmInjectBanner(k);}catch(e){}});}catch(e){}}catch(e){}
+  DATA=d.records;saveData();buildFilters(true);
+  try{recomputeAging();}catch(e){}
+  /* تحضير بيانات التقارير اليومية (مرة واحدة) دون بناء DOM ثقيل */
+  try{var _s=getDR(),_dirty=false;['fgbal','oldid','transit'].forEach(function(k){if(_s[k]&&_s[k].headers){var _u=(_s[k]._unmatchedWarehouses||[]).join('|');try{wmCanonicalizeReport(_s[k]);}catch(e){}var _u2=(_s[k]._unmatchedWarehouses||[]).join('|');if(_u!==_u2)_dirty=true;}});if(_dirty)saveDR(_s);}catch(e){}
+  /* أداء: ابنِ فقط الصفحة المعروضة حالياً — بقية الصفحات تُبنى عند فتحها عبر go() */
+  try{
+    var _cur=((document.querySelector('.page.show')||{}).id||'').replace('page-','');
+    if(_cur==='dash'){render();}
+    else if(_cur==='sum'){buildSummary();}
+    else if(_cur==='sku'){buildSku();}
+    else if(_cur==='rfgbal'||_cur==='roldid'||_cur==='rtransit'){var _kk={rfgbal:'fgbal',roldid:'oldid',rtransit:'transit'}[_cur];try{renderDailyReport(_kk);}catch(e){}try{wmInjectBanner(_kk);}catch(e){}}
+  }catch(e){}
   syncToast(fbMsg('\u2601\uFE0F Updated from cloud: '+DATA.length+' records','\u2601\uFE0F تم التحديث من السحابة: '+DATA.length+' سجل'),'ok');
-  if(document.getElementById('page-sum').classList.contains('show'))buildSummary();
-  if(document.getElementById('page-sku').classList.contains('show'))buildSku();
   if(d.updateDate){const v='&nbsp;'+d.updateDate.replace(/^\s+/,'');['upddate','upddate2','upddate3','upddate4'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=v;});}
   cloudStatus('ok',fbMsg('Loaded '+DATA.length+' records from cloud.','تم تحميل '+DATA.length+' سجل من السحابة.'));
 }
