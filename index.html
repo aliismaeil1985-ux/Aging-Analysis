@@ -11957,8 +11957,24 @@ function cloudInit(){
     if(s2&&s2.url&&s2.anonKey)fbConnect(true);
   }else{
     // If config is available, ALWAYS connect on startup so the cloud (source of truth) takes over.
-    if(saved && saved.projectId){fbConnect(true);}
+    // ملاحظة مهمة: Firebase SDK محمّل بـ defer، لذا قد لا يكون `firebase` معرّفاً بعد
+    // عند تنفيذ هذا السطر (السكربت الحاوي غير مؤجّل). ننتظر جاهزية SDK قبل الاتصال
+    // ونعيد المحاولة عدة مرات بدل الفشل الصامت (الذي كان يُظهر "Cloud connected: NO").
+    if(saved && saved.projectId){_cloudConnectWhenReady();}
   }
+}
+/* ينتظر تحميل Firebase SDK (المؤجّل بـ defer) ثم يتصل — مع إعادة محاولة موقوتة */
+function _cloudConnectWhenReady(tries){
+  tries=tries||0;
+  try{
+    if(typeof fbReady!=='undefined'&&fbReady)return; // متصل بالفعل
+    if(typeof firebase!=='undefined'&&firebase.firestore){fbConnect(true);
+      // إن فشل الاتصال لأي سبب عابر، أعد المحاولة مرة أخيرة
+      if(!(typeof fbReady!=='undefined'&&fbReady)&&tries<12){setTimeout(function(){_cloudConnectWhenReady(tries+1);},600);}
+      return;
+    }
+  }catch(e){}
+  if(tries<40){setTimeout(function(){_cloudConnectWhenReady(tries+1);},250);}
 }
 function fmtDate(iso){if(!iso)return '';const p=String(iso).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:iso;}
 
