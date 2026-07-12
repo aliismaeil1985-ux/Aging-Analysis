@@ -946,8 +946,8 @@ html[dir=rtl] .login-shell{font-family:'Cairo','Inter',sans-serif}
 .nav.open .brand .logo-badge .tania-logo{height:34px}
 /* home nav button accent */
 .navbtn-home{background:rgba(255,255,255,.05);margin-bottom:8px}
-/* sticky back-bar + breadcrumb */
-.topnav{display:none;align-items:center;gap:13px;position:sticky;top:0;z-index:20;margin:-4px -4px 16px;padding:11px 6px;background:#eef3f9;box-shadow:0 8px 16px -12px rgba(16,40,80,.45)}
+/* sticky back-bar + breadcrumb — ملتصق بأعلى الصفحة وجوانبها (يلغي padding الحاوية 16px/18px) */
+.topnav{display:none;align-items:center;gap:13px;position:sticky;top:-16px;z-index:20;margin:-16px -18px 16px;padding:11px 18px;background:#eef3f9;box-shadow:0 8px 16px -12px rgba(16,40,80,.45)}
 .back-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;color:#1e4e8c;font-family:inherit;font-weight:700;font-size:13px;padding:9px 16px;border-radius:11px;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s,box-shadow .2s,background .15s}
 .back-btn:hover{background:#f3f8ff;transform:translateY(-1px);box-shadow:var(--shadow-h)}
 .back-btn .bk-ico{font-size:16px;line-height:1}
@@ -957,6 +957,9 @@ html[dir=rtl] .back-btn .bk-ico{transform:scaleX(-1)}
 .crumb .ch:hover{text-decoration:underline}
 .crumb .cc{color:#1e293b;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:600px){.crumb .ch,.crumb .cs{display:none}}
+/* على الجوال padding الحاوية مختلف (64px أعلى للشريط الثابت) — نلغي الجوانب فقط */
+@media (max-width:860px){.topnav{top:0;margin:-4px -12px 14px;padding:11px 12px}}
+@media (max-width:540px){.topnav{top:0;margin:-4px -10px 14px;padding:11px 10px}}
 .ktrend{font-size:12px;font-weight:800;margin-inline-start:8px}
 .csize{position:absolute;bottom:4px;inset-inline-end:6px;display:flex;gap:4px;z-index:6;opacity:0;transition:.15s}
 .cat2tabs{display:flex;gap:5px;margin:-2px 0 9px;flex-wrap:wrap}
@@ -3640,8 +3643,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="navbtn admin-only" data-page="dailyup" onclick="go('dailyup')" style="--c:#e85ec8"><span class="nico" data-icon="upload"></span><span class="lbl" data-i18n="nav_dailyup">Daily Reports Upload</span></button>
         <button class="navbtn admin-only" data-page="masterdata" onclick="go('masterdata')" style="--c:#7c5cbf"><span class="nico" data-icon="database"></span><span class="lbl">Master Data</span></button>
         <button class="navbtn admin-only" data-page="spaceact" onclick="go('spaceact')" style="--c:#12b1a2"><span class="nico" data-icon="building"></span><span class="lbl">Space Actuals</span></button>
-        <button class="navbtn admin-only" id="ens-perm-open-btn" onclick="ENSPerm.open()" style="--c:#0e9f6e"><span class="nico" style="background:none;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1">📋</span><span class="lbl">سجل صلاحيات الإشعارات</span></button>
-        <button class="navbtn admin-only" id="ens-admin-open-btn" onclick="ENSAdmin.open()" style="--c:#eab308"><span class="nico" style="background:none;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1">🔔</span><span class="lbl" data-i18n="notifadmin_btn">Notifications</span></button>
+        <!-- زر موحّد: يفتح إعدادات الإشعارات وبداخلها مركز الإرسال (ENSAdmin) وسجل الصلاحيات (ENSPerm) -->
         <button class="navbtn admin-only" id="ens-cfg-open-btn" onclick="if(window.ENSCfg)ENSCfg.open()" style="--c:#6366f1"><span class="nico" style="background:none;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1">⚙️</span><span class="lbl">إعدادات الإشعارات · Notification Settings</span></button>
       </div>
     </div>
@@ -3668,6 +3670,16 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
 
 <!-- Toast Container (global) -->
 <div id="ens-toasts" aria-live="assertive" aria-atomic="false"></div>
+<script>
+/* حاويات الإشعارات الثابتة يجب أن تكون أبناء body مباشرة —
+   وجودها داخل #nav يكسر position:fixed على الجوال لأن القائمة تتحرك بـ transform
+   فتنسحب الإشعارات ومركزها خارج الشاشة مع القائمة المخفية */
+(function(){
+  function mv(){['ens-toasts','ens-center-ov'].forEach(function(id){var el=document.getElementById(id);if(el&&el.parentElement!==document.body)document.body.appendChild(el);});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mv);else mv();
+  setTimeout(mv,800);
+})();
+</script>
 
 <!-- Notification Center Overlay -->
 <div id="ens-center-ov" onclick="if(event.target===this)ENS.closeCenter()" role="dialog" aria-modal="true">
@@ -4224,6 +4236,7 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
             <span>&#10133;</span> مستخدم جديد
           </button>
           <button class="btn-cols admin-only" id="um-import-log-btn" onclick="umImportUsersFromLog(this)" title="استدعاء المستخدمين الظاهرين في سجل الزائرين وإضافتهم للقائمة" style="white-space:nowrap;gap:5px">&#128229; <span>استدعاء من سجل الزائرين</span></button>
+          <button class="btn-cols admin-only" id="um-import-prof-btn" onclick="umImportUsersFromProfiles(this)" title="استدعاء الحسابات القديمة المسجّلة في Firebase (user_profiles) بأسمائها وأدوارها وصلاحياتها" style="white-space:nowrap;gap:5px">&#9729;&#65039; <span>استدعاء حسابات Firebase القديمة</span></button>
           <button class="btn-cols" onclick="umRenderUsersTable()">&#128260;</button>
         </div>
         <!-- Users table — click any row to open full panel -->
@@ -4568,6 +4581,67 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
           <button type="button" class="btn-clear" onclick="restoreLogoImage()"><span>&#8635;</span> استعادة الصورة الأصلية · Restore original</button>
         </div>
         <div class="logo-dz-tip">&#128161; فعّل «تحريك بالسحب» ثم اسحب الشعار مباشرةً على الشاشة. شعار صفحة الدخول يظهر عند تسجيل الخروج. · Enable Drag mode, then drag the logo right on the screen. The login logo appears on the sign-in screen.</div>
+      </div>
+
+      <!-- ═══ تصميم مظهر الشعار (خلفية · ألوان · كتابة) بمعاينة قبل النشر ═══ -->
+      <div class="dz-card full logo-dz-card" id="lt-card">
+        <h4 class="dz-h4-toggle" onclick="dzToggleCard(this)"><span class="dz-h4-arrow">&#9650;</span>&#127912; <span>تصميم مظهر الشعار · Logo appearance</span> <span id="lt-dirty" style="display:none;background:#fef3c7;color:#92400e;font-size:10.5px;font-weight:800;padding:2px 10px;border-radius:999px;margin-inline-start:8px">&#9998; تعديلات غير منشورة · Unpublished changes</span></h4>
+        <div class="dz-hint">عدّل الخلفية وألوان الكتابة ونوع الخط وشاهد النتيجة في <b>المعاينة</b> أولاً — لا يُطبَّق أي تغيير على المنصة أو المستخدمين إلا بعد الضغط على «تطبيق ونشر». · Adjust background, text colors &amp; font weight and check the <b>preview</b> first — nothing is applied or published until you press “Apply &amp; Publish”.</div>
+        <div class="logo-dz-grid">
+          <div class="logo-dz-fld">
+            <label>الخلفية · Background</label>
+            <select id="lt-bgmode" class="dz-agg" onchange="ltSet('bgmode',this.value)">
+              <option value="default">افتراضي · Default</option>
+              <option value="transparent">شفافة · Transparent</option>
+              <option value="white">أبيض فقط · White only</option>
+              <option value="custom">لون مخصص · Custom color</option>
+            </select>
+            <div class="logo-dz-row">
+              <input type="color" id="lt-bgcolor" value="#ffffff" oninput="ltSet('bgcolor',this.value)" title="لون الخلفية">
+              <input type="range" id="lt-bgop" min="0" max="1" step="0.05" value="1" oninput="ltSet('bgop',this.value)" title="الشفافية">
+              <b id="lt-bgopval">100%</b>
+            </div>
+          </div>
+          <div class="logo-dz-fld">
+            <label>ألوان الكتابة · Text colors</label>
+            <select id="lt-mode" class="dz-agg" onchange="ltSet('mode',this.value)">
+              <option value="default">افتراضي · Default</option>
+              <option value="white">أبيض فقط · White only</option>
+              <option value="custom">لون واحد · Single color</option>
+              <option value="duo">ثنائي اللون (جزء بلون وجزء بلون آخر) · Two-tone</option>
+            </select>
+            <div class="logo-dz-row">
+              <input type="color" id="lt-c1" value="#ffffff" oninput="ltSet('c1',this.value)" title="اللون الأول · First color">
+              <input type="color" id="lt-c2" value="#d4a017" oninput="ltSet('c2',this.value)" title="اللون الثاني · Second color">
+            </div>
+          </div>
+          <div class="logo-dz-fld">
+            <label>نقطة فصل اللونين · Two-tone split <b id="lt-splitval">50%</b></label>
+            <input type="range" id="lt-split" min="10" max="90" step="5" value="50" oninput="ltSet('split',this.value)">
+          </div>
+          <div class="logo-dz-fld">
+            <label>نوع الخط · Font weight</label>
+            <select id="lt-weight" class="dz-agg" onchange="ltSet('weight',this.value)">
+              <option value="default">افتراضي · Default</option>
+              <option value="light">خفيف · Light</option>
+              <option value="normal">عادي · Normal</option>
+              <option value="bold">عريض · Bold</option>
+              <option value="heavy">ثقيل · Heavy</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <label style="font-size:11.5px;font-weight:800;color:#64748b">&#128065; المعاينة قبل النشر · Preview before publishing</label>
+          <div class="lt-prev-row">
+            <div class="lt-prev lt-prev-dark" id="lt-prev-dark" title="كما يظهر في القائمة الجانبية · Sidebar look"></div>
+            <div class="lt-prev lt-prev-light" id="lt-prev-light" title="كما يظهر على خلفية فاتحة · Light background look"></div>
+          </div>
+        </div>
+        <div class="logo-dz-actions" style="margin-top:12px">
+          <button type="button" class="logo-dz-anim-toggle" id="lt-publish-btn" onclick="ltPublish()" style="background:#16a34a;color:#fff;border-color:#15803d">&#9989; تطبيق ونشر · Apply &amp; Publish</button>
+          <button type="button" class="btn-clear" onclick="ltRevert()"><span>&#8617;</span> إلغاء التعديلات · Discard changes</button>
+          <button type="button" class="btn-clear" onclick="ltResetDefault()"><span>&#8635;</span> الوضع الافتراضي · Reset to default</button>
+        </div>
       </div>
 
       <!-- ===== مصمم الشريط الجانبي · Sidebar Designer ===== -->
@@ -6189,6 +6263,11 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       /* ── ترتيب موحّد: 3 رسومات في الصف على الشاشات الكبيرة ── */
       #page-btl-dash .btlx-grid,#page-btl-dash .btlx-trendrow{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important}
       #page-btl-dash .btlx-halfrow{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}
+      /* الجوال: شريط فلاتر السنوات يتقلص داخل الشاشة بدل تجاوزها */
+      @media (max-width:860px){
+        .btlx-pslc{margin:0 -12px 16px!important;padding:8px 12px!important}
+        .btlx-pslc>div{flex:1 1 auto!important;min-width:0!important;max-width:100%}
+      }
       @media(max-width:640px){
         #page-btl-dash .btlx-grid,#page-btl-dash .btlx-trendrow,#page-btl-dash .btlx-halfrow{grid-template-columns:1fr!important}
       }
@@ -8106,6 +8185,20 @@ const PERM_GROUPS=[
   {key:'admin',label:'grp_admintools',pages:['cloud','designer','cardbuilder','pagebuilder','users']},
   {key:'features',label:'grp_features',pages:['notifications']}
 ];
+/* صلاحيات المستخدم مع القيمة الافتراضية:
+   - صلاحيات صريحة غير فارغة → تُستخدم كما هي
+   - حساب أُنشئ تلقائياً من سجل الدخول (importedFromLog) بصلاحيات فارغة → الافتراضية
+     (كان يفتح المنصة فيجدها فارغة تماماً — لا قوائم ولا بيانات)
+   - الضيف أو صلاحيات فُرِّغت عمداً من المدير → تبقى فارغة */
+function _permsOrDefault(f){
+  var d=['dash','sum','sku','notifications'];
+  if(!f)return d;
+  if(Array.isArray(f.perms)){
+    if(f.perms.length)return f.perms.slice();
+    return (f.importedFromLog&&f.r!=='guest')?d:[];
+  }
+  return (f.r==='guest')?[]:d;
+}
 function canView(p){
   /* يجب تسجيل الدخول أولاً */
   if(!CURRENT_USER)return false;
@@ -9672,6 +9765,9 @@ function _loginProceed(u,p){
   if(!_pwMatch(byName.p,p)&&!globalMatch){
     if(checkTempPassword(byName,p)){
       usedTemp=true;/* دخل برقم مؤقت — سيُجبر على التغيير */
+    }else if(!byName.p&&(byName.fbAuth||/@/.test(byName.email||byName.u||''))){
+      /* حساب قديم مستورد من Firebase بلا كلمة مرور محلية — مصادقته عبر Firebase Auth بكلمة مروره الأصلية */
+      _tryFbAuthLogin((/@/.test(byName.email||'')?byName.email:byName.u),p,uEl,pEl);return;
     }else{
       /* تحقق إن كان الرقم المؤقت منتهياً لإعطاء رسالة أدق */
       if(byName.tempCode&&byName.tempExpires&&Date.now()>byName.tempExpires&&_tempCodeMatch(byName.tempCode,p)){
@@ -9702,7 +9798,7 @@ function _loginProceed(u,p){
     fnd.mustChange=true;
     try{clearTempPassword(fnd.u);}catch(e){delete fnd.tempCode;delete fnd.tempExpires;saveUsers(us);}
   }
-  CURRENT_USER={u:fnd.u,r:fnd.r,perms:fnd.perms||['dash','sum','sku','notifications']};
+  CURRENT_USER={u:fnd.u,r:fnd.r,perms:_permsOrDefault(fnd)};
   try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
   try{window._lastLoginPwd=p;}catch(e){}
   try{_onLoginSuccess(fnd.u);}catch(e){}
@@ -9745,7 +9841,13 @@ function _tryFbAuthLogin(idInput,p,uEl,pEl){
     var a=null;try{a=(typeof firebase!=='undefined'&&firebase.auth&&typeof fbApp!=='undefined'&&fbApp)?firebase.auth(fbApp):null;}catch(e){}
     if(!a){noAccount();return;}
     a.signInWithEmailAndPassword(email,p).then(function(){
-      var proceed=function(prof){prof=prof||{};_fbAuthCompleteLogin({u:email,email:email,r:(prof.role||prof.r||'user'),name:prof.name||email,perms:Array.isArray(prof.perms)?prof.perms:[],_pw:p});};
+      var proceed=function(prof){prof=prof||{};
+        /* أولوية لبيانات قائمة المستخدمين (المدير يديرها من الشاشة) ثم user_profiles ثم الافتراضي */
+        var rec=null;try{var _lc=email.toLowerCase();rec=(getUsers()||[]).find(function(x){return String(x.u||'').toLowerCase()===_lc||String(x.email||'').toLowerCase()===_lc;});}catch(e){}
+        var role=(rec&&rec.r)||prof.role||prof.r||'user';
+        var perms=(rec&&Array.isArray(rec.perms)&&rec.perms.length)?rec.perms:(Array.isArray(prof.perms)?prof.perms:[]);
+        if(!perms.length&&typeof _permsOrDefault==='function')perms=_permsOrDefault(rec||{r:role,perms:perms,importedFromLog:true});
+        _fbAuthCompleteLogin({u:(rec&&rec.u)||email,email:email,r:role,name:(rec&&rec.name)||prof.name||email,perms:perms,_pw:p});};
       try{ if(typeof fbDB!=='undefined'&&fbDB){ fbDB.collection('user_profiles').doc(email).get().then(function(d){proceed(d&&d.exists?d.data():{});}).catch(function(){proceed({});}); } else proceed({}); }catch(e){proceed({});}
     }).catch(function(err){
       var code=(err&&err.code)||'';
@@ -11274,7 +11376,7 @@ function umImportUsersFromLog(btn){
       Object.keys(okUsers).forEach(function(key){
         if(have[key])return;
         var e=okUsers[key];var uname=String(e.u).trim();if(!uname)return;
-        us.push({u:uname,r:'user',perms:[],email:(e.email||e.mail||''),mobile:'',status:'active',
+        us.push({u:uname,r:'user',perms:['dash','sum','sku','notifications'],email:(e.email||e.mail||''),mobile:'',status:'active',
           lastLogin:e.t||0,lastLoginAt:(e.k==='logout'?0:(e.t||0)),lastDevice:e.dev||'',
           importedFromLog:true,createdAt:Date.now(),createdBy:(typeof CURRENT_USER!=='undefined'&&CURRENT_USER?CURRENT_USER.u:'system')});
         have[key]=true;added++;
@@ -11293,6 +11395,74 @@ function umImportUsersFromLog(btn){
   }catch(e){if(btn){btn.disabled=false;btn.innerHTML=_o;}}
 }
 try{window.umImportUsersFromLog=umImportUsersFromLog;}catch(e){}
+
+/* ── استدعاء الحسابات القديمة من Firebase (user_profiles) ──
+   الحسابات التي سُجّلت عبر نظام Firebase Auth السابق تُخزَّن أسماؤها وأدوارها
+   وصلاحياتها في مجموعة user_profiles (معرّف الوثيقة = البريد الإلكتروني).
+   هذه الأداة تجلبها وتضيف المفقود منها إلى قائمة المستخدمين بنفس بياناتها.
+   ملاحظة: كلمة مرور هذه الحسابات في Firebase Auth نفسه — الدخول بها يتم
+   عبر البريد وكلمة المرور الأصلية (يمرّ تلقائياً بمسار Firebase Auth). */
+function umImportUsersFromProfiles(btn){
+  var _o='';
+  var ar=(typeof LANG!=='undefined'&&LANG==='ar');
+  function done(msg,type){
+    if(btn){btn.disabled=false;btn.innerHTML=_o;}
+    try{if(typeof syncToast==='function')syncToast(msg,type||'ok');else alert(msg);}catch(e){try{alert(msg);}catch(_){}}
+  }
+  try{
+    if(typeof isAdmin==='function'&&!isAdmin()){try{alert('للمسؤولين فقط · Admins only');}catch(e){}return;}
+    if(!(typeof fbReady!=='undefined'&&fbReady&&fbDB)){done(ar?'اتصل بالسحابة أولاً.':'Connect to cloud first.','err');return;}
+    if(btn){_o=btn.innerHTML;btn.disabled=true;btn.innerHTML='⏳';}
+    fbDB.collection('user_profiles').get().then(function(snap){
+      var docs=[];
+      try{ if(snap&&snap.forEach){snap.forEach(function(d){docs.push({id:d.id,data:(d.data&&d.data())||{}});});} else if(snap&&snap.docs){snap.docs.forEach(function(d){docs.push({id:d.id,data:(d.data&&d.data())||{}});});} }catch(e){}
+      if(!docs.length){done(ar?'لا توجد حسابات قديمة في Firebase (user_profiles فارغة).':'No legacy accounts found in Firebase (user_profiles is empty).','info');return;}
+      var us=getUsers()||[];
+      var have={};us.forEach(function(x){if(x&&x.u)have[String(x.u).toLowerCase()]=true;if(x&&x.email)have[String(x.email).toLowerCase()]=true;});
+      var added=0,updated=0;
+      docs.forEach(function(doc){
+        var email=String(doc.id||'').trim();
+        var d=doc.data||{};
+        if(email.indexOf('@')<1)return; /* معرّف غير بريدي — تجاهل */
+        var key=email.toLowerCase();
+        var role=(d.role||d.r||'user');if(role!=='admin'&&role!=='user'&&role!=='guest')role='user';
+        var perms=Array.isArray(d.perms)?d.perms.slice():[];
+        if(have[key]){
+          /* موجود مسبقاً — أكمل البيانات الناقصة فقط (لا نكتب فوق تعديلات المدير) */
+          var ex=us.find(function(x){return String(x.u||'').toLowerCase()===key||String(x.email||'').toLowerCase()===key;});
+          if(ex){var ch=false;
+            if((!ex.perms||!ex.perms.length)&&perms.length){ex.perms=perms;ch=true;}
+            if(!ex.name&&d.name){ex.name=d.name;ch=true;}
+            if(!ex.mobile&&(d.mobile||d.phone)){ex.mobile=d.mobile||d.phone;ch=true;}
+            if(ch){ex.fbAuth=true;updated++;}
+          }
+          return;
+        }
+        us.push({u:email,email:email,name:d.name||'',r:role,
+          perms:perms.length?perms:['dash','sum','sku','notifications'],
+          mobile:d.mobile||d.phone||'',status:(d.disabled||d.status==='suspended')?'suspended':'active',
+          branchPerms:Array.isArray(d.branchPerms)?d.branchPerms:[],
+          warehousePerms:Array.isArray(d.warehousePerms)?d.warehousePerms:[],
+          lastLogin:d.lastLogin||d.lastLoginAt||0,lastLoginAt:d.lastLoginAt||d.lastLogin||0,
+          fbAuth:true,importedFromProfiles:true,createdAt:Date.now(),
+          createdBy:(typeof CURRENT_USER!=='undefined'&&CURRENT_USER?CURRENT_USER.u:'system')});
+        have[key]=true;added++;
+      });
+      if(added>0||updated>0)saveUsers(us);
+      try{umRenderUsersTable();umRenderKPIs();if(typeof renderUsers==='function')renderUsers();if(typeof renderUserStats==='function')renderUserStats();}catch(e){}
+      var m=(added>0||updated>0)
+        ?(ar?('✅ تم استدعاء '+added+' حساب جديد'+(updated?(' وتحديث '+updated):'')+' من Firebase'):('✅ Imported '+added+' account(s)'+(updated?(', updated '+updated):'')+' from Firebase'))
+        :(ar?'كل حسابات Firebase موجودة مسبقاً في القائمة.':'All Firebase accounts already exist in the list.');
+      done(m,(added>0||updated>0)?'ok':'info');
+    }).catch(function(e){
+      var perm=/(permission|insufficient|PERMISSION_DENIED)/i.test((e&&(e.code+' '+e.message))||'');
+      done(perm
+        ?(ar?'⛔ قواعد Firestore تمنع قراءة user_profiles — انشر القواعد المحدَّثة (ملف firestore.rules) من Firebase Console ثم أعد المحاولة.':'⛔ Firestore rules block reading user_profiles — publish the updated rules (firestore.rules) from the Firebase Console, then retry.')
+        :((ar?'فشل الاستدعاء: ':'Import failed: ')+((e&&e.message)||e)),'err');
+    });
+  }catch(e){done((ar?'فشل الاستدعاء: ':'Import failed: ')+((e&&e.message)||e),'err');}
+}
+try{window.umImportUsersFromProfiles=umImportUsersFromProfiles;}catch(e){}
 
 /* ── Panel Save ── */
 function umPanelSave(){
@@ -11399,7 +11569,7 @@ function initAuth(){
           },120);
           restored=true;
         }else{
-          CURRENT_USER={u:still.u,r:still.r,perms:still.perms||sess.perms||['dash','sum','sku','notifications']};
+          CURRENT_USER={u:still.u,r:still.r,perms:(still.perms&&still.perms.length)?still.perms:((sess.perms&&sess.perms.length)?sess.perms:_permsOrDefault(still))};
           try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
           var ovR=document.getElementById('login-ov');if(ovR)ovR.style.display='none';
           try{applyRole();}catch(e){}
@@ -11426,7 +11596,7 @@ function initAuth(){
               try{_loginSetMode('quick');}catch(e){}
               try{_loginRefreshQuickMode();}catch(e){}
             }else{
-              CURRENT_USER={u:still2.u,r:still2.r,perms:still2.perms||sess2.perms||['dash','sum','sku','notifications']};
+              CURRENT_USER={u:still2.u,r:still2.r,perms:(still2.perms&&still2.perms.length)?still2.perms:((sess2.perms&&sess2.perms.length)?sess2.perms:_permsOrDefault(still2))};
               try{sessionStorage.setItem('dash_session',JSON.stringify(CURRENT_USER));}catch(e){}
               var ovR2=document.getElementById('login-ov');if(ovR2)ovR2.style.display='none';
               try{applyRole();}catch(e){}
@@ -11579,7 +11749,7 @@ function fbUsersSync(){
       _lastUsersJson=json;
       try{LS.setItem('dash_users',json);}catch(e){}
       try{
-        if(CURRENT_USER){var fnd=dd.users.find(function(x){return x.u===CURRENT_USER.u;});if(fnd){CURRENT_USER=Object.assign({},fnd);if(!Array.isArray(CURRENT_USER.perms))CURRENT_USER.perms=[];applyRole();}}
+        if(CURRENT_USER){var fnd=dd.users.find(function(x){return x.u===CURRENT_USER.u;});if(fnd){CURRENT_USER=Object.assign({},fnd);CURRENT_USER.perms=_permsOrDefault(fnd);applyRole();}}
         var pu=document.getElementById('page-users');
         if(pu&&pu.classList.contains('show'))_usersUIRefresh();
       }catch(e){}
@@ -11749,7 +11919,10 @@ function fbConnect(silent){
       if(_fbAuth){
         if(!_fbAuth.currentUser){_fbAuth.signInAnonymously().catch(function(e){try{console.warn('anon sign-in:',e&&e.code);}catch(_){}});}
         /* عند جاهزية المصادقة (مجهولة أو المدير) أعد تشغيل الاستدعاء — يحل سباق تشغيل القراءة قبل اكتمال المصادقة */
-        if(!_fbAuthReSyncHooked){_fbAuthReSyncHooked=true;try{_fbAuth.onAuthStateChanged(function(user){try{if(user&&fbReady){fbUsersSync();fbSettingsSync();drSync();}}catch(e){}});}catch(e){}}
+        if(!_fbAuthReSyncHooked){_fbAuthReSyncHooked=true;try{_fbAuth.onAuthStateChanged(function(user){try{if(user&&fbReady){fbUsersSync();fbSettingsSync();drSync();try{btlSync();}catch(e){}
+          /* أعد تشغيل مستمع البيانات الرئيسي أيضاً — كان يُنسى فيبقى ميتاً بعد رفض القراءة قبل اكتمال المصادقة، فتفتح المنصة فارغة على الأجهزة الجديدة */
+          try{var _lc=document.getElementById('cloud-live');if(_lc&&_lc.checked)toggleLive();else if(!_cloudSynced)loadFromCloud(true);}catch(e){}
+        }}catch(e){}});}catch(e){}}
       }
     }catch(e){}
     fbReady=true;
@@ -11767,6 +11940,7 @@ function fbConnect(silent){
     try{fbUsersSync();}catch(e){}
     try{fbSettingsSync();}catch(e){}
     try{drSync();}catch(e){}
+    try{btlSync();}catch(e){}
     return true;
   }catch(e){fbReady=false;cloudStatus('err',fbMsg('Connection failed: ','فشل الاتصال: ')+e.message);setCloudBtns();return false;}
 }
@@ -11797,6 +11971,7 @@ function sbConnect(silent){
     try{fbUsersSync();}catch(e){}
     try{fbSettingsSync();}catch(e){}
     try{drSync();}catch(e){}
+    try{btlSync();}catch(e){}
     return true;
   }catch(e){fbReady=false;cloudStatus('err',fbMsg('Connection failed: ','فشل الاتصال: ')+((e&&e.message)||e));setCloudBtns();return false;}
 }
@@ -11888,7 +12063,14 @@ function toggleLive(){
       window.__applyCloudLatest=dd;
       if(window.__applyCloudT)clearTimeout(window.__applyCloudT);
       window.__applyCloudT=setTimeout(function(){try{applyCloudData(window.__applyCloudLatest);}catch(e){}},180);
-    },e=>cloudStatus('err',fbMsg('Live sync error: ','خطأ المزامنة: ')+e.message));
+    },e=>{cloudStatus('err',fbMsg('Live sync error: ','خطأ المزامنة: ')+e.message);
+      /* رفض القراءة يقتل المستمع نهائياً — غالباً لأن المصادقة المجهولة لم تكتمل بعد. أعد المحاولة بعد مهلة (بحد أقصى 5 مرات) */
+      try{if(/permission|insufficient/i.test((e&&(e.code+' '+e.message))||'')){
+        if(fbUnsub){fbUnsub();fbUnsub=null;}
+        window.__liveRetry=(window.__liveRetry||0)+1;
+        if(window.__liveRetry<=5)setTimeout(function(){try{var lc=document.getElementById('cloud-live');if(lc&&lc.checked&&!fbUnsub)toggleLive();}catch(_){}},1500);
+      }}catch(_){}
+    });
     cloudStatus('ok',fbMsg('Live sync enabled.','المزامنة اللحظية مفعّلة.'));
   }
 }
@@ -11926,8 +12108,10 @@ function setCloudProvider(p){
   try{if(fbUsersUnsub){fbUsersUnsub();fbUsersUnsub=null;}}catch(e){}
   try{if(fbSetUnsub){fbSetUnsub();fbSetUnsub=null;}}catch(e){}
   try{if(typeof fbDRUnsub!=='undefined'&&fbDRUnsub){fbDRUnsub();fbDRUnsub=null;}}catch(e){}
+  try{if(typeof fbBtlUnsub!=='undefined'&&fbBtlUnsub){fbBtlUnsub();fbBtlUnsub=null;}}catch(e){}
   fbReady=false;fbDB=null;_cloudSynced=false;_setCloudReady=false;_usersCloudReady=false;
   if(typeof _drCloudReady!=='undefined')_drCloudReady=false;
+  if(typeof _btlCloudReady!=='undefined')_btlCloudReady=false;
   CLOUD_PROVIDER=p;
   try{LS.setItem('cloud_provider',p);}catch(e){}
   syncProviderUI();
@@ -16253,6 +16437,77 @@ function drSync(){
     },function(e){_fbReadErr(e,'daily_reports');});
   }catch(e){}
 }
+
+/* ═══════════ BOTTLE & BRUSHING CLOUD SYNC ═══════════
+   بيانات شاشات القارورة والفرشة كانت محلية فقط (btl_data_v1 + btl5g_*)
+   فتظهر الشاشات فارغة على أي جهاز آخر أو بعد النشر على رابط جديد.
+   تُجمَع كل المفاتيح في وثيقة سحابية واحدة inventory_dashboard/bottle_5g
+   بنفس نمط مزامنة التقارير اليومية (daily_reports). */
+var _btlCloudReady=false,_btlPushT=null,_lastBtlJson='',fbBtlUnsub=null;
+var BTL_SYNC_TYPES=['production','sales','brushing','damaged'];
+function _btlGather(){
+  var o={};
+  try{
+    ['btl_data_v1','btl5g_years','btl5g_log'].forEach(function(k){var v=LS.getItem(k);if(v!=null)o[k]=v;});
+    for(var y=2020;y<=2035;y++){for(var mi=1;mi<=12;mi++){var mm=('0'+mi).slice(-2);
+      for(var t=0;t<BTL_SYNC_TYPES.length;t++){var k='btl5g_'+BTL_SYNC_TYPES[t]+'_'+y+'_'+mm;var v=LS.getItem(k);if(v!=null)o[k]=v;}
+    }}
+  }catch(e){}
+  return o;
+}
+function _btlApply(o){
+  if(!o)return;
+  try{
+    var incomingMonths=Object.keys(o).some(function(k){return /^btl5g_(production|sales|brushing|damaged)_\d{4}_\d{2}$/.test(k);});
+    for(var y=2020;y<=2035;y++){for(var mi=1;mi<=12;mi++){var mm=('0'+mi).slice(-2);
+      for(var t=0;t<BTL_SYNC_TYPES.length;t++){var k='btl5g_'+BTL_SYNC_TYPES[t]+'_'+y+'_'+mm;
+        if(o[k]!=null)LS.setItem(k,o[k]);
+        /* الحذف يُطبَّق فقط إذا كانت الوثيقة السحابية تحوي بيانات شهور فعلاً —
+           حماية من مسح النسخة الذهبية بوثيقة قديمة/فارغة */
+        else if(incomingMonths)LS.removeItem(k);
+      }
+    }}
+    ['btl_data_v1','btl5g_years','btl5g_log'].forEach(function(k){if(o[k]!=null)LS.setItem(k,o[k]);});
+  }catch(e){}
+  /* أعِد رسم شاشة القارورة إن كانت معروضة حالياً */
+  try{
+    var cur=((document.querySelector('.page.show')||{}).id||'').replace('page-','');
+    if(cur==='btl-dash'||cur==='btl-compare'||cur==='btl-table'||cur==='btl-manage')go(cur);
+  }catch(e){}
+  try{syncToast(fbMsg('☁️ Bottle & Brushing data updated','☁️ تم تحديث بيانات القارورة والفرشة'),'ok');}catch(e){}
+}
+function btl5gCloudPush(){
+  try{
+    if(!fbReady||!fbDB||!_btlCloudReady)return;
+    var json=JSON.stringify(_btlGather());
+    if(json===_lastBtlJson)return;_lastBtlJson=json;
+    if(_btlPushT)clearTimeout(_btlPushT);
+    _btlPushT=setTimeout(function(){try{fbDB.collection(FB_COL).doc('bottle_5g').set({json:json,updatedAt:Date.now(),clientId:FB_CLIENT_ID}).catch(function(e){_fbWriteErr(e,'bottle_5g');});}catch(e){}},600);
+  }catch(e){}
+}
+try{window.btl5gCloudPush=btl5gCloudPush;}catch(e){}
+function btlSync(){
+  try{
+    if(!fbReady||!fbDB)return;
+    if(fbBtlUnsub){fbBtlUnsub();fbBtlUnsub=null;}
+    fbBtlUnsub=fbDB.collection(FB_COL).doc('bottle_5g').onSnapshot({includeMetadataChanges:false},function(doc){
+      if(!doc.exists){ /* لا وثيقة بعد → ازرعها من بيانات هذا الجهاز إن وُجدت */
+        _btlCloudReady=true;
+        var o=_btlGather();
+        if(Object.keys(o).length){_lastBtlJson=JSON.stringify(o);try{fbDB.collection(FB_COL).doc('bottle_5g').set({json:_lastBtlJson,updatedAt:Date.now(),clientId:FB_CLIENT_ID}).catch(function(e){_fbWriteErr(e,'bottle_5g');});}catch(e){}}
+        return;
+      }
+      if(doc.metadata&&doc.metadata.hasPendingWrites)return;
+      var dd=doc.data();if(!dd||!dd.json)return;
+      if(dd.clientId&&dd.clientId===FB_CLIENT_ID){_btlCloudReady=true;return;}
+      if(dd.json===_lastBtlJson){_btlCloudReady=true;return;}
+      _lastBtlJson=dd.json;_btlCloudReady=true;
+      var o=null;try{o=JSON.parse(dd.json);}catch(e){}
+      _btlApply(o);
+    },function(e){_fbReadErr(e,'bottle_5g');});
+  }catch(e){}
+}
+try{window.btlSync=btlSync;}catch(e){}
 
 function drInit(){try{renderSpaceConvStatus();}catch(e){}
   try{if(typeof WarehouseMaster!=='undefined')WarehouseMaster.refresh();}catch(e){}try{var _rc=document.getElementById('dr-require-code');if(_rc)_rc.checked=wmRequireCode();}catch(e){}try{_spActPending=getSpaceActuals();renderSpaceActuals();_spApplyActuals(_spActPending);}catch(e){}
@@ -21782,7 +22037,7 @@ var BottleAnalytics=(function(){
     try{var s=JSON.parse((typeof LS!=='undefined'?LS.getItem(KEY):localStorage.getItem(KEY))||'null');if(s&&s.monthly)return s;}catch(e){}
     return SEED;
   }
-  function persist(d){try{var v=JSON.stringify(d);if(typeof LS!=='undefined')LS.setItem(KEY,v);else localStorage.setItem(KEY,v);}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}}
+  function persist(d){try{var v=JSON.stringify(d);if(typeof LS!=='undefined')LS.setItem(KEY,v);else localStorage.setItem(KEY,v);}catch(e){}try{if(typeof btl5gCloudPush==='function')btl5gCloudPush();}catch(e){}try{if(typeof pushSettingsToCloud==='function')pushSettingsToCloud();}catch(e){}}
   function years(){var ys={};load().monthly.forEach(function(r){ys[r.year]=1;});return Object.keys(ys).map(Number).sort();}
   function monthlyFor(y,mo){var m=load().monthly;var out=(y==='all'||y==null)?m:m.filter(function(r){return r.year===Number(y);});if(mo&&mo!=='all'){var mi=monthIdx(mo);out=out.filter(function(r){return monthIdx(r.month)===mi;});}return out;}
 
@@ -22166,7 +22421,7 @@ window.BottleAnalytics=BottleAnalytics;
     catch(e){}
     return BASE_YEARS.slice();
   }
-  function saveYears(arr){try{LS.setItem(YEARS_LS,JSON.stringify(arr.slice().sort(function(a,b){return a-b;})));}catch(e){}}
+  function saveYears(arr){try{LS.setItem(YEARS_LS,JSON.stringify(arr.slice().sort(function(a,b){return a-b;})));}catch(e){}try{if(typeof btl5gCloudPush==='function')btl5gCloudPush();}catch(e){}}
   function addYear(yr){var arr=getYears();if(arr.indexOf(yr)===-1){arr.push(yr);saveYears(arr);}}
   function removeYearFromList(yr){
     var arr=getYears().filter(function(y){return y!==yr;});
@@ -22176,8 +22431,8 @@ window.BottleAnalytics=BottleAnalytics;
   function isBaseYear(yr){return BASE_YEARS.indexOf(yr)!==-1;}
   function mKey(type,year,mi){return 'btl5g_'+type+'_'+year+'_'+('0'+(mi+1)).slice(-2);}
   function loadMonth(type,year,mi){try{return JSON.parse(LS.getItem(mKey(type,year,mi))||'null');}catch(e){return null;}}
-  function saveMonth(type,year,mi,data){try{LS.setItem(mKey(type,year,mi),JSON.stringify(data));}catch(e){}}
-  function clearMonth(type,year,mi){try{LS.removeItem(mKey(type,year,mi));}catch(e){}}
+  function saveMonth(type,year,mi,data){try{LS.setItem(mKey(type,year,mi),JSON.stringify(data));}catch(e){}try{if(typeof btl5gCloudPush==='function')btl5gCloudPush();}catch(e){}}
+  function clearMonth(type,year,mi){try{LS.removeItem(mKey(type,year,mi));}catch(e){}try{if(typeof btl5gCloudPush==='function')btl5gCloudPush();}catch(e){}}
   function isAr(){try{return typeof LANG!=='undefined'&&LANG==='ar';}catch(e){return document.documentElement.dir==='rtl';}}
   function L(ar,en){return isAr()?ar:en;}
   function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -26383,26 +26638,34 @@ window.__qrcodeLib=(typeof qrcode!=='undefined')?qrcode:null;
   0%,100%{transform:rotate(0)} 20%{transform:rotate(-12deg)}
   40%{transform:rotate(12deg)} 60%{transform:rotate(-8deg)} 80%{transform:rotate(6deg)}
 }
+/* شارة العدّاد: عائمة بأناقة على زاوية الزر بدل حشرها في نهايته */
 #ens-badge {
-  min-width:18px; height:18px; border-radius:999px;
-  background:linear-gradient(135deg,#ef4444,#dc2626);
-  color:#fff; font-size:10px; font-weight:800;
+  position:absolute; top:-7px; inset-inline-end:-6px;
+  min-width:19px; height:19px; border-radius:999px;
+  background:linear-gradient(135deg,#ff5f6d,#dc2626);
+  color:#fff; font-size:10.5px; font-weight:800; line-height:1;
   display:inline-flex; align-items:center; justify-content:center;
-  padding:0 4px; border:2px solid rgba(13,42,78,.8);
-  box-shadow:0 2px 6px rgba(239,68,68,.5); flex-shrink:0;
-  animation:ensBadgePop .3s cubic-bezier(.34,1.56,.64,1);
+  padding:0 5px; border:2px solid #0f2d55;
+  box-shadow:0 3px 10px rgba(220,38,38,.55), 0 0 0 3px rgba(239,68,68,.18);
+  animation:ensBadgePop .35s cubic-bezier(.34,1.56,.64,1), ensBadgeGlow 2.4s ease-in-out 1s infinite;
+  z-index:2; pointer-events:none;
 }
 #ens-badge:empty { display:none; }
-@keyframes ensBadgePop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+/* تبدأ من .5 لا من صفر — لو توقّف الأنيميشن (تبويب بالخلفية/تقليل الحركة) تبقى الشارة مرئية */
+@keyframes ensBadgePop { 0%{transform:scale(.5)} 60%{transform:scale(1.18)} 100%{transform:scale(1)} }
+@keyframes ensBadgeGlow {
+  0%,100%{box-shadow:0 3px 10px rgba(220,38,38,.55), 0 0 0 3px rgba(239,68,68,.18)}
+  50%{box-shadow:0 3px 12px rgba(220,38,38,.75), 0 0 0 5px rgba(239,68,68,.08)}
+}
 
 /* ══ TOASTS ══ */
 #ens-toasts {
-  position:fixed; top:16px; inset-inline-end:16px;
+  position:fixed; top:76px; inset-inline-end:16px;
   z-index:99990; display:flex; flex-direction:column; gap:7px;
   pointer-events:none; width:340px; max-width:calc(100vw - 32px);
 }
 @media(max-width:600px){
-  #ens-toasts { top:10px; left:50%; right:auto; transform:translateX(-50%); width:calc(100vw - 20px); }
+  #ens-toasts { top:72px; left:50%; right:auto; transform:translateX(-50%); width:calc(100vw - 20px); }
 }
 .ens-toast {
   pointer-events:all; display:flex; align-items:center; gap:10px;
@@ -26450,6 +26713,10 @@ window.__qrcodeLib=(typeof qrcode!=='undefined')?qrcode:null;
 .ens-toast-meta { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; align-items:center; }
 .ens-toast-chip { font-size:9px; font-weight:700; background:rgba(255,255,255,.09); color:#8aabcf; padding:1px 5px; border-radius:999px; }
 .ens-toast-time { font-size:9px; color:#4a6a8a; margin-inline-start:auto; }
+/* ── تصميم الإشعارات المخصص — متغيرات يضبطها ENSCfg (تبويب العرض) ── */
+#ens-toasts .ens-toast{background:var(--ens-toast-bg,rgba(12,24,52,.95))}
+#ens-toasts .ens-toast-title{color:var(--ens-toast-title-c,#e8f0fb);font-weight:var(--ens-toast-w,600)}
+#ens-toasts .ens-toast-desc{color:var(--ens-toast-desc-c,#7a9bbf);font-weight:var(--ens-toast-w2,400)}
 .ens-toast-close {
   width:18px; height:18px; flex-shrink:0; background:none; border:none;
   cursor:pointer; color:#3a5a7a; font-size:12px; border-radius:4px;
@@ -26476,7 +26743,8 @@ window.__qrcodeLib=(typeof qrcode!=='undefined')?qrcode:null;
   bottom:12px;
   left:246px;          /* nav(236px) + gap(10px) */
   width:360px;
-  max-height:calc(100vh - 24px);
+  /* أقصى ارتفاع يُبقي رأس القائمة أسفل الهيدر (شريط Back/التنقّل ≈74px) فلا يُقص */
+  max-height:calc(100vh - 100px);
   background:#fff; border-radius:16px;
   box-shadow:0 16px 48px -10px rgba(5,15,40,.42), 0 0 0 1px rgba(47,126,216,.12);
   display:flex; flex-direction:column; overflow:hidden;
@@ -26776,6 +27044,15 @@ body.logo-dz-grabbing .logo-dz-target-el{cursor:grabbing !important}
 @keyframes logoSwing{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
 @keyframes logoShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 0 rgba(47,126,216,0))}50%{filter:drop-shadow(0 0 11px rgba(47,126,216,.7))}}
+/* ── معاينة تصميم الشعار قبل النشر · logo appearance preview ── */
+.lt-prev-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.lt-prev{flex:1 1 240px;min-height:130px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:16px;border:1px solid #dbe4f0}
+.lt-prev-dark{background:linear-gradient(160deg,#143f74 0%,#0e2f59 56%,#0a2444 100%)}
+.lt-prev-light{background:#f4f6fb}
+.lt-prev .ltp-badge{width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.lt-prev .ltp-badge img{width:44px;height:auto;display:block}
+.lt-prev .ltp-name{font-size:19px;letter-spacing:.3px;line-height:1.1}
+.lt-prev .ltp-sub{font-size:9.5px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase}
 /* ── Ring vars & overrides ── */
 :root{--logo-ring-vis:1;--logo-ring-c1:#ff4d97;--logo-ring-c2:#2f7ed8;--logo-ring-c3:#12b5a3;--logo-ring-w:1.5px;--logo-ring-angle:140deg}
 .brand .logo-badge::after{opacity:var(--logo-ring-vis)!important;padding:var(--logo-ring-w)!important;background:linear-gradient(var(--logo-ring-angle),var(--logo-ring-c1),var(--logo-ring-c2) 55%,var(--logo-ring-c3))!important;transition:opacity .4s}
@@ -26796,6 +27073,8 @@ body.logo-dz-grabbing .logo-dz-target-el{cursor:grabbing !important}
     login:{s:1,x:0,y:0,a:'center',anim:'none',bgmode:'default',bgcolor:'#ffffff',op:1,shape:'default'}
   };
   var ORDER=['topbar','sidebar','login'];
+  /* تصميم كتابة الشعار (يُحفظ داخل نفس المفتاح فيتزامن سحابياً مع الإعدادات) */
+  DEF.text={mode:'default',c1:'#ffffff',c2:'#d4a017',split:50,weight:'default'};
   var ANIMS={
     none:'none',
     float:'logoFloat 3.2s ease-in-out infinite',
@@ -26810,7 +27089,7 @@ body.logo-dz-grabbing .logo-dz-target-el{cursor:grabbing !important}
   function clone(o){return JSON.parse(JSON.stringify(o));}
   var LOGOD=clone(DEF);
   function LSo(){return window.LS||window.localStorage;}
-  function load(){try{var raw=LSo().getItem(KEY);if(raw){var o=JSON.parse(raw)||{};ORDER.forEach(function(g){if(o[g])LOGOD[g]=Object.assign(clone(DEF[g]),o[g]);});}}catch(e){}}
+  function load(){try{var raw=LSo().getItem(KEY);if(raw){var o=JSON.parse(raw)||{};ORDER.forEach(function(g){if(o[g])LOGOD[g]=Object.assign(clone(DEF[g]),o[g]);});if(o.text)LOGOD.text=Object.assign(clone(DEF.text),o.text);}}catch(e){}}
   function save(){try{LSo().setItem(KEY,JSON.stringify(LOGOD));}catch(e){}try{if(typeof window.pushSettingsToCloud==='function')window.pushSettingsToCloud();}catch(e){}}
   function num(v){v=Number(v);return isNaN(v)?0:v;}
   function eachEl(g,fn){GROUPS[g].sels.forEach(function(sel){var list=document.querySelectorAll(sel);Array.prototype.forEach.call(list,fn);});}
@@ -26868,7 +27147,42 @@ body.logo-dz-grabbing .logo-dz-target-el{cursor:grabbing !important}
       applyBgShape(el,c);
     });
   }
-  function applyAll(){ORDER.forEach(applyGroup);}
+  /* ═══ تطبيق تصميم كتابة الشعار على الواجهة الحقيقية ═══ */
+  var LT_WEIGHTS={light:'300',normal:'600',bold:'800',heavy:'900'};
+  function ltStyledName(el,t){
+    if(!el)return;
+    if(!el.getAttribute('data-lt-orig'))el.setAttribute('data-lt-orig',el.textContent||'');
+    var orig=el.getAttribute('data-lt-orig')||'';
+    el.style.fontWeight=LT_WEIGHTS[t.weight]||'';
+    if(t.mode==='duo'&&orig){
+      var n=Math.max(1,Math.min(orig.length-1,Math.round(orig.length*(Number(t.split)||50)/100)));
+      el.textContent='';
+      var s1=document.createElement('span');s1.textContent=orig.slice(0,n);s1.style.color=t.c1;
+      var s2=document.createElement('span');s2.textContent=orig.slice(n);s2.style.color=t.c2;
+      el.appendChild(s1);el.appendChild(s2);
+      el.style.removeProperty('color');
+    }else{
+      if(el.textContent!==orig)el.textContent=orig;
+      if(t.mode==='white')el.style.setProperty('color','#ffffff','important');
+      else if(t.mode==='custom')el.style.setProperty('color',t.c1,'important');
+      else el.style.removeProperty('color');
+    }
+  }
+  function applyLogoText(){
+    var t=LOGOD.text||clone(DEF.text);
+    var name=document.querySelector('#nav .brand .b-name');
+    var sub=document.querySelector('#nav .brand .b-sub');
+    ltStyledName(name,t);
+    if(sub){
+      sub.style.fontWeight=LT_WEIGHTS[t.weight]||'';
+      if(t.mode==='white')sub.style.setProperty('color','rgba(255,255,255,.82)','important');
+      else if(t.mode==='custom')sub.style.setProperty('color',t.c1,'important');
+      else if(t.mode==='duo')sub.style.setProperty('color',t.c2,'important');
+      else sub.style.removeProperty('color');
+    }
+  }
+  window.applyLogoText=applyLogoText;
+  function applyAll(){ORDER.forEach(applyGroup);try{applyLogoText();}catch(e){}}
   window.applyLogoDesign=applyAll;
 
   /* ===== صورة الشعار · logo image replace ===== */
@@ -26936,8 +27250,106 @@ body.logo-dz-grabbing .logo-dz-target-el{cursor:grabbing !important}
     setVal('logo-dz-bgmode',c.bgmode||'default');
     setVal('logo-dz-bgcolor',c.bgcolor||'#ffffff');
     setVal('logo-dz-shape',c.shape||'default');
+    try{ltSyncUI();}catch(e){}
   }
   window.logoDzSyncUI=syncUI;
+
+  /* ═══════════ تصميم مظهر الشعار — مسودة + معاينة قبل النشر ═══════════
+     كل التعديلات تُخزَّن في مسودة (LTD) وتُعرض في بطاقتي المعاينة فقط.
+     لا تُطبَّق على الواجهة ولا تُنشر للمستخدمين إلا عند «تطبيق ونشر». */
+  var LTD=null;
+  function ltInitDraft(){
+    var t=LOGOD.text||clone(DEF.text);
+    var bg=LOGOD.sidebar||{};
+    LTD={mode:t.mode,c1:t.c1,c2:t.c2,split:t.split,weight:t.weight,
+         bgmode:bg.bgmode||'default',bgcolor:bg.bgcolor||'#ffffff',bgop:(bg.op==null?1:bg.op)};
+  }
+  function ltAppliedSnapshot(){
+    var t=LOGOD.text||clone(DEF.text);
+    var bg=LOGOD.sidebar||{};
+    return JSON.stringify({mode:t.mode,c1:t.c1,c2:t.c2,split:String(t.split),weight:t.weight,
+      bgmode:bg.bgmode||'default',bgcolor:bg.bgcolor||'#ffffff',bgop:String(bg.op==null?1:bg.op)});
+  }
+  function ltDraftSnapshot(){
+    return JSON.stringify({mode:LTD.mode,c1:LTD.c1,c2:LTD.c2,split:String(LTD.split),weight:LTD.weight,
+      bgmode:LTD.bgmode,bgcolor:LTD.bgcolor,bgop:String(LTD.bgop)});
+  }
+  function ltMarkDirty(){
+    var d=document.getElementById('lt-dirty');
+    if(d)d.style.display=(ltDraftSnapshot()!==ltAppliedSnapshot())?'':'none';
+  }
+  function ltBadgeBg(dark){
+    if(LTD.bgmode==='transparent')return 'transparent';
+    if(LTD.bgmode==='white')return hexToRgba('#ffffff',LTD.bgop);
+    if(LTD.bgmode==='custom')return hexToRgba(LTD.bgcolor,LTD.bgop);
+    return 'linear-gradient(155deg,#fff 0%,#eef4fb 100%)'; /* الافتراضي */
+  }
+  function ltPrevInto(box,dark){
+    if(!box)return;
+    var t=LTD;
+    var logoSrc='';try{var im=document.querySelector('img.tania-logo');logoSrc=im?im.src:'';}catch(e){}
+    box.innerHTML='';
+    var badge=document.createElement('div');badge.className='ltp-badge';
+    badge.style.background=ltBadgeBg(dark);
+    if(t.bgmode!=='transparent')badge.style.boxShadow='0 8px 20px rgba(6,20,44,'+(dark?'.45':'.15')+')';
+    if(logoSrc){var img=document.createElement('img');img.src=logoSrc;img.alt='logo';badge.appendChild(img);}
+    var name=document.createElement('div');name.className='ltp-name';
+    var orig='Tania';
+    name.style.fontWeight=LT_WEIGHTS[t.weight]||'800';
+    if(t.mode==='duo'){
+      var n=Math.max(1,Math.min(orig.length-1,Math.round(orig.length*(Number(t.split)||50)/100)));
+      var s1=document.createElement('span');s1.textContent=orig.slice(0,n);s1.style.color=t.c1;
+      var s2=document.createElement('span');s2.textContent=orig.slice(n);s2.style.color=t.c2;
+      name.appendChild(s1);name.appendChild(s2);
+    }else{
+      name.textContent=orig;
+      name.style.color=(t.mode==='white')?'#ffffff':(t.mode==='custom')?t.c1:(dark?'#ffffff':'#16233b');
+    }
+    var sub=document.createElement('div');sub.className='ltp-sub';sub.textContent='WAREHOUSE COMMAND CENTER';
+    sub.style.fontWeight=LT_WEIGHTS[t.weight]||'700';
+    sub.style.color=(t.mode==='white')?'rgba(255,255,255,.82)':(t.mode==='custom')?t.c1:(t.mode==='duo')?t.c2:(dark?'rgba(255,255,255,.55)':'#64748b');
+    box.appendChild(badge);box.appendChild(name);box.appendChild(sub);
+  }
+  function ltRenderPreview(){
+    if(!LTD)ltInitDraft();
+    ltPrevInto(document.getElementById('lt-prev-dark'),true);
+    ltPrevInto(document.getElementById('lt-prev-light'),false);
+    ltMarkDirty();
+  }
+  function ltSyncUI(){
+    if(!document.getElementById('lt-mode'))return;
+    if(!LTD)ltInitDraft();
+    setVal('lt-mode',LTD.mode);setVal('lt-c1',LTD.c1);setVal('lt-c2',LTD.c2);
+    setVal('lt-split',LTD.split);setTxt('lt-splitval',(LTD.split||50)+'%');
+    setVal('lt-weight',LTD.weight);
+    setVal('lt-bgmode',LTD.bgmode);setVal('lt-bgcolor',LTD.bgcolor);
+    setVal('lt-bgop',LTD.bgop);setTxt('lt-bgopval',Math.round(num(LTD.bgop)*100)+'%');
+    ltRenderPreview();
+  }
+  window.ltSet=function(prop,val){
+    if(!LTD)ltInitDraft();
+    if(prop==='split'||prop==='bgop')val=num(val);
+    LTD[prop]=val;
+    /* اختيار لون يحوّل الوضع تلقائياً للمنطق الأنسب */
+    if(prop==='bgcolor'&&LTD.bgmode!=='custom'){LTD.bgmode='custom';setVal('lt-bgmode','custom');}
+    if((prop==='c1')&&LTD.mode==='default'){LTD.mode='custom';setVal('lt-mode','custom');}
+    if((prop==='c2')&&LTD.mode!=='duo'){LTD.mode='duo';setVal('lt-mode','duo');}
+    setTxt('lt-splitval',(LTD.split||50)+'%');
+    setTxt('lt-bgopval',Math.round(num(LTD.bgop)*100)+'%');
+    ltRenderPreview();
+  };
+  window.ltPublish=function(){
+    if(!LTD)ltInitDraft();
+    LOGOD.text={mode:LTD.mode,c1:LTD.c1,c2:LTD.c2,split:LTD.split,weight:LTD.weight};
+    ORDER.forEach(function(g){LOGOD[g].bgmode=LTD.bgmode;LOGOD[g].bgcolor=LTD.bgcolor;LOGOD[g].op=LTD.bgop;});
+    applyAll();save();syncUI();ltMarkDirty();
+    try{if(typeof syncToast==='function')syncToast((typeof LANG!=='undefined'&&LANG==='ar')?'✅ تم نشر تصميم الشعار لجميع المستخدمين':'✅ Logo design published to all users','ok');}catch(e){}
+  };
+  window.ltRevert=function(){LTD=null;ltSyncUI();};
+  window.ltResetDefault=function(){
+    LTD={mode:'default',c1:'#ffffff',c2:'#d4a017',split:50,weight:'default',bgmode:'default',bgcolor:'#ffffff',bgop:1};
+    ltSyncUI();
+  };
 
   /* ---- وضع السحب · drag mode ---- */
   var dragOn=false,dragging=null,dgroups=null,sx=0,sy=0;
@@ -27514,6 +27926,15 @@ function updateBadge(){
   if(badge)badge.textContent=unread>99?'99+':unread||'';
   var cnt=document.getElementById('ens-center-hd-count');
   if(cnt)cnt.textContent=I18N.unread(unread);
+  /* شارة أيقونة التطبيق على سطح المكتب والجوال (App Badging API) —
+     تظهر فقط عندما تُثبَّت المنصة كتطبيق (Install / Add to Home Screen)
+     وعلى https. تفشل بهدوء إن لم تكن مدعومة. */
+  try{
+    if('setAppBadge' in navigator){
+      if(unread>0)navigator.setAppBadge(unread).catch(function(){});
+      else navigator.clearAppBadge&&navigator.clearAppBadge().catch(function(){});
+    }
+  }catch(e){}
 }
 function applyI18n(){
   /* Header */
@@ -27606,12 +28027,21 @@ window.ENS={
             panel.style.left=leftEdge+10+'px';
             panel.style.right='auto';
           }
-          /* Vertical: align bottom of panel to bottom of bell */
-          var bottomPos=window.innerHeight-br.bottom-4;
-          panel.style.bottom=Math.max(12,bottomPos)+'px';
-          panel.style.top='auto';
+          /* Vertical: افتح القائمة لأسفل من الجرس — دائماً أسفل الهيدر ولا تتجاوز أسفل الشاشة
+             (المحاذاة القديمة لأسفل الجرس كانت تمدّها لأعلى فتُقص خلف الهيدر) */
+          var minTop=76;
+          try{
+            var hdr=document.getElementById('topnav');
+            if(hdr&&getComputedStyle(hdr).display!=='none'){var hrr=hdr.getBoundingClientRect();if(hrr.bottom>0)minTop=Math.max(minTop,Math.round(hrr.bottom)+8);}
+          }catch(e){}
+          var topPos=(br.bottom>0&&br.top<window.innerHeight)?Math.round(br.bottom)+8:minTop;
+          if(topPos<minTop)topPos=minTop;
+          panel.style.top=topPos+'px';
+          panel.style.bottom='auto';
+          panel.style.maxHeight=Math.max(220,window.innerHeight-topPos-12)+'px';
         } else {
-          panel.style.left=''; panel.style.right=''; panel.style.bottom=''; panel.style.top='';
+          /* الجوال: ورقة سفلية بعرض الشاشة — امسح كل القيم المضبوطة من وضع سطح المكتب */
+          panel.style.left=''; panel.style.right=''; panel.style.bottom=''; panel.style.top=''; panel.style.maxHeight='';
         }
       }
     }
@@ -29180,11 +29610,40 @@ function detectPages(){
     return true;
   }
 
-  function renderPane(){ injectPane(); refreshAll(); try{if(typeof renderLoginLog==='function')renderLoginLog();}catch(e){} }
+  function renderPane(){ injectPane(); refreshAll(); try{if(typeof renderLoginLog==='function')renderLoginLog();}catch(e){} try{_fetchCloudLog();}catch(e){} }
+  /* ── السجل السحابي المشترك (نشاط جميع المستخدمين من كل الأجهزة) ──
+     النافذة كانت تقرأ السجل المحلي فقط، فتظهر «لا يوجد نشاط» لمن عمل من جهاز آخر. */
+  var _vlCloudLog=null,_vlCloudTs=0,_vlFetching=false,_vlCurUser='';
+  function _fetchCloudLog(cb){
+    try{
+      if(!(typeof fbReady!=='undefined'&&fbReady&&typeof fbDB!=='undefined'&&fbDB&&typeof FB_COL!=='undefined')){if(cb)cb(false);return;}
+      if(_vlFetching){if(cb)cb(false);return;}
+      _vlFetching=true;
+      fbDB.collection(FB_COL).doc('login_log').get().then(function(doc){
+        _vlFetching=false;
+        var dd=(doc&&doc.exists)?doc.data():null;
+        if(dd&&Array.isArray(dd.log)){_vlCloudLog=dd.log;_vlCloudTs=nowMs();if(cb)cb(true);}
+        else if(cb)cb(false);
+      }).catch(function(){_vlFetching=false;if(cb)cb(false);});
+    }catch(e){_vlFetching=false;if(cb)cb(false);}
+  }
+  function _mergedLog(){
+    var log=[]; try{log=JSON.parse(LS_().getItem('login_log')||'[]');}catch(e){}
+    try{
+      if(_vlCloudLog&&_vlCloudLog.length){
+        var seen={};log.forEach(function(e){seen[(e.u||'')+'|'+(e.t||0)+'|'+(e.k||'')+'|'+(e.pg||'')]=1;});
+        _vlCloudLog.forEach(function(e){if(!e)return;var k=(e.u||'')+'|'+(e.t||0)+'|'+(e.k||'')+'|'+(e.pg||'');if(!seen[k]){seen[k]=1;log.push(e);}});
+      }
+    }catch(e){}
+    return log;
+  }
   /* ── نافذة السجل الكامل لمستخدم/زائر ── */
   function openUserDetail(uname){
     if(!uname)return; var ar=isAr();
-    var log=[]; try{log=JSON.parse(LS_().getItem('login_log')||'[]');}catch(e){}
+    _vlCurUser=uname;
+    var log=_mergedLog();
+    /* حدّث السجل السحابي إن كان قديماً (>20 ثانية) ثم أعد بناء النافذة إن كانت لا تزال مفتوحة لنفس المستخدم */
+    try{if(nowMs()-_vlCloudTs>20000)_fetchCloudLog(function(ok){try{var b=document.getElementById('vld-ov');if(ok&&b&&b.classList.contains('show')&&_vlCurUser===uname)openUserDetail(uname);}catch(e){}});}catch(e){}
     var evts=log.filter(function(e){return e.u===uname;}).sort(function(a,b){return b.t-a.t;});
     var p=readPres(), pr=p[uname]||null, on=pr?isOnline(pr.t):false;
     var logins=0,navs=0,fails=0; var times=[]; var scr={};
@@ -29270,6 +29729,7 @@ function detectPages(){
     try{injectPane();}catch(e){}
     try{heartbeat();}catch(e){}
     try{subscribePresence();}catch(e){}
+    try{setTimeout(function(){_fetchCloudLog();},2500);}catch(e){} /* جلب مسبق لسجل السحابة بعد اكتمال الاتصال */
     setInterval(function(){try{heartbeat();}catch(e){}},30000);
     setInterval(function(){try{subscribePresence();refreshAll();}catch(e){}},15000);
     try{var pu=document.getElementById('page-users');if(pu&&pu.classList.contains('show'))decorateUsersTable();}catch(e){}
@@ -29636,7 +30096,7 @@ var _bootIv=setInterval(function(){
 .enscfg-hd h3{font-size:16px;font-weight:800;margin:0}
 .enscfg-hd p{font-size:11.5px;opacity:.85;margin:2px 0 0}
 .enscfg-x{margin-inline-start:auto;background:rgba(255,255,255,.16);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px}
-.enscfg-tabs{display:flex;gap:4px;padding:10px 14px 0;background:#eef2f9}
+.enscfg-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 14px 0;background:#eef2f9}
 .enscfg-tab{border:none;background:transparent;padding:9px 15px;border-radius:10px 10px 0 0;font-family:inherit;font-size:13px;font-weight:800;color:#64748b;cursor:pointer}
 .enscfg-tab.active{background:#f5f8fc;color:#4f46e5}
 .enscfg-body{padding:16px 18px;max-height:70vh;overflow:auto}
@@ -29675,10 +30135,13 @@ var _bootIv=setInterval(function(){
   function LSset(k,v){try{(typeof LS!=='undefined'?LS:localStorage).setItem(k,v);}catch(e){}}
   function esc(s){s=String(s==null?'':s);return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function uid(){return 'rl_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+  function _hexA(hex,a){hex=String(hex||'#0c1834').replace('#','');if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];var r=parseInt(hex.substr(0,2),16)||0,g=parseInt(hex.substr(2,2),16)||0,b=parseInt(hex.substr(4,2),16)||0;var al=(a==null?1:Number(a));if(isNaN(al))al=1;return 'rgba('+r+','+g+','+b+','+al+')';}
 
   var DEF={master:true, quietSec:12,
     events:{report:true, aging:true, version:true},
-    display:{position:'top-right', durationSec:6, size:'normal', sound:true, soundId:'chime', font:'inherit', colorTheme:'default', badge:true},
+    display:{position:'top-right', durationSec:6, size:'normal', sound:true, soundId:'chime', font:'inherit', colorTheme:'default', badge:true,
+      /* تصميم الإشعار: الخلفية والكتابة والخط — تُنشر بعد المعاينة */
+      bg:'navy', bgColor:'#0c1834', bgOp:0.95, textMode:'default', tc1:'#ffffff', tc2:'#8ab6ff', weight:'default'},
     rules:[]};
 
   /* ══ مكتبة الأصوات (مُولّدة عبر Web Audio — بلا ملفات خارجية) ══ */
@@ -29755,14 +30218,34 @@ var _bootIv=setInterval(function(){
       var ctr=document.getElementById('ens-toasts');
       if(ctr){
         var pos=d.position||'top-right';
-        var map={'top-right':['16px','auto','auto','16px','flex-end','none'],
-                 'top-center':['16px','auto','50%','auto','center','translateX(-50%)'],
+        /* المواضع العلوية تبدأ من 76px حتى لا تغطي الإشعارات الهيدر (شريط Back/التنقّل) */
+        var map={'top-right':['76px','auto','auto','16px','flex-end','none'],
+                 'top-center':['76px','auto','50%','auto','center','translateX(-50%)'],
+                 'top-left':['76px','auto','16px','auto','flex-start','none'],
                  'bottom-right':['auto','16px','auto','16px','flex-end','none'],
                  'bottom-left':['auto','16px','16px','auto','flex-start','none']};
         var m=map[pos]||map['top-right'];
         ctr.style.top=m[0];ctr.style.bottom=m[1];ctr.style.left=m[2];ctr.style.right=m[3];ctr.style.alignItems=m[4];ctr.style.transform=m[5];
         ctr.setAttribute('data-ens-size',d.size||'normal');
       }
+      /* ── تصميم الإشعار (خلفية/ألوان الكتابة/وزن الخط) عبر متغيرات CSS ── */
+      try{
+        var rt=document.documentElement.style;
+        var bgv='';
+        if(d.bg==='white')bgv=_hexA('#ffffff',d.bgOp==null?0.95:d.bgOp);
+        else if(d.bg==='transparent')bgv='transparent';
+        else if(d.bg==='custom')bgv=_hexA(d.bgColor||'#0c1834',d.bgOp==null?0.95:d.bgOp);
+        if(bgv)rt.setProperty('--ens-toast-bg',bgv);else rt.removeProperty('--ens-toast-bg');
+        var tm=d.textMode||'default',t1='',t2='';
+        if(tm==='white'){t1='#ffffff';t2='rgba(255,255,255,.85)';}
+        else if(tm==='custom'){t1=d.tc1||'#ffffff';t2=d.tc1||'#ffffff';}
+        else if(tm==='duo'){t1=d.tc1||'#ffffff';t2=d.tc2||'#8ab6ff';}
+        if(t1)rt.setProperty('--ens-toast-title-c',t1);else rt.removeProperty('--ens-toast-title-c');
+        if(t2)rt.setProperty('--ens-toast-desc-c',t2);else rt.removeProperty('--ens-toast-desc-c');
+        var W1={light:'300',normal:'600',bold:'800',heavy:'900'},W2={light:'300',normal:'500',bold:'600',heavy:'700'};
+        if(W1[d.weight]){rt.setProperty('--ens-toast-w',W1[d.weight]);rt.setProperty('--ens-toast-w2',W2[d.weight]);}
+        else{rt.removeProperty('--ens-toast-w');rt.removeProperty('--ens-toast-w2');}
+      }catch(e){}
       /* الخط: طبّقه على الإشعارات المنبثقة ومركز الإشعارات */
       var ff=(FONTS[d.font||'inherit']||FONTS.inherit).css||'';
       ['ens-toasts','ens-center','ensa-toastwrap'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.fontFamily=ff;});
@@ -29864,7 +30347,10 @@ var _bootIv=setInterval(function(){
     h+='<div class="enscfg-tabs">'+
        '<button class="enscfg-tab'+(_tab==='general'?' active':'')+'" onclick="ENSCfg._tab(\'general\')">'+L('طريقة العمل','Behavior')+'</button>'+
        '<button class="enscfg-tab'+(_tab==='display'?' active':'')+'" onclick="ENSCfg._tab(\'display\')">'+L('كيفية العرض','Display')+'</button>'+
-       '<button class="enscfg-tab'+(_tab==='rules'?' active':'')+'" onclick="ENSCfg._tab(\'rules\')">'+L('قواعد التقارير','Report Rules')+'</button></div>';
+       '<button class="enscfg-tab'+(_tab==='rules'?' active':'')+'" onclick="ENSCfg._tab(\'rules\')">'+L('قواعد التقارير','Report Rules')+'</button>'+
+       /* مجمّعة هنا بدل أزرار منفصلة في القائمة الجانبية */
+       '<button class="enscfg-tab" onclick="ENSCfg._openAdmin()">🔔 '+L('مركز الإرسال','Send center')+'</button>'+
+       '<button class="enscfg-tab" onclick="ENSCfg._openPerm()">📋 '+L('سجل الصلاحيات','Permissions log')+'</button></div>';
     h+='<div class="enscfg-body">';
     if(_tab==='general'){
       h+=row(L('تفعيل نظام الإشعارات','Enable notifications'),L('المفتاح الرئيسي لكل الإشعارات التلقائية','Master switch for all automatic notifications'),sw(_cfg.master!==false,'onchange="ENSCfg._set(\'master\',this.checked)"'));
@@ -29874,19 +30360,14 @@ var _bootIv=setInterval(function(){
       h+=row(L('استيراد بيانات الأعمار','Aging data import'),L('عند استيراد/مزامنة بيانات الأعمار','When aging data is imported/synced'),sw(_cfg.events.aging!==false,'onchange="ENSCfg._ev(\'aging\',this.checked)"'));
       h+=row(L('تحديث نسخة المنصة','Platform version update'),L('عند ترقية نسخة المنصة','When the platform version changes'),sw(_cfg.events.version!==false,'onchange="ENSCfg._ev(\'version\',this.checked)"'));
     } else if(_tab==='display'){
-      h+=row(L('موضع ظهور الإشعار','Toast position'),L('مكان ظهور الإشعارات المنبثقة','Where popup toasts appear'),
-        '<select class="enscfg-sel" onchange="ENSCfg._disp(\'position\',this.value)">'+opt('top-right',L('أعلى اليمين','Top right'),d.position)+opt('top-center',L('أعلى الوسط','Top center'),d.position)+opt('bottom-right',L('أسفل اليمين','Bottom right'),d.position)+opt('bottom-left',L('أسفل اليسار','Bottom left'),d.position)+'</select>');
       h+=row(L('مدة بقاء الإشعار (ثانية)','Toast duration (sec)'),L('كم يبقى الإشعار قبل الاختفاء','How long a toast stays'),'<input class="enscfg-inp" type="number" min="1" max="60" value="'+esc(d.durationSec)+'" onchange="ENSCfg._disp(\'durationSec\',+this.value)">');
-      h+=row(L('حجم الإشعار','Toast size'),'',
-        '<select class="enscfg-sel" onchange="ENSCfg._disp(\'size\',this.value)">'+opt('small',L('صغير','Small'),d.size)+opt('normal',L('عادي','Normal'),d.size)+opt('large',L('كبير','Large'),d.size)+'</select>');
       h+=row(L('الصوت','Sound'),L('تشغيل نغمة عند وصول إشعار','Play a tone on new notification'),sw(d.sound!==false,'onchange="ENSCfg._disp(\'sound\',this.checked)"'));
       h+=row(L('🔊 مكتبة الأصوات','🔊 Sound library'),L('اختر نغمة الإشعار — جرّبها بالزر ▶','Pick a tone — preview with ▶'),
         '<div style="display:flex;gap:6px;align-items:center"><select class="enscfg-sel" onchange="ENSCfg._sound(this.value)">'+Object.keys(SOUNDS).map(function(k){return opt(k,L(SOUNDS[k].ar,SOUNDS[k].en),d.soundId);}).join('')+'</select><button class="enscfg-add" style="width:auto;padding:8px 13px;margin:0" onclick="ENSCfg._play()">▶</button></div>');
-      h+=row(L('🅰 مكتبة الخطوط','🅰 Font library'),L('خط عرض الإشعارات','Font used for notifications'),
-        '<select class="enscfg-sel" style="font-family:'+((FONTS[d.font||'inherit']||FONTS.inherit).css||'inherit')+'" onchange="ENSCfg._disp(\'font\',this.value)">'+Object.keys(FONTS).map(function(k){return opt(k,L(FONTS[k].ar,FONTS[k].en),d.font);}).join('')+'</select>');
       h+=row(L('🎨 مكتبة الألوان','🎨 Color library'),L('سمة ألوان أولويات الإشعارات','Color theme for priorities'),
         '<div style="display:flex;gap:9px;align-items:center">'+themeDots(THEMES[d.colorTheme||'default']||THEMES['default'])+'<select class="enscfg-sel" onchange="ENSCfg._disp(\'colorTheme\',this.value)">'+Object.keys(THEMES).map(function(k){return opt(k,L(THEMES[k].ar,THEMES[k].en),d.colorTheme);}).join('')+'</select></div>');
       h+=row(L('شارة العدّاد','Count badge'),L('إظهار عدد غير المقروء على الجرس','Show unread count on the bell'),sw(d.badge!==false,'onchange="ENSCfg._disp(\'badge\',this.checked)"'));
+      h+=ddSection();
     } else {
       h+='<div class="enscfg-hint">'+L('حدّد حالات تُرسِل إشعاراً تلقائياً عند تحقّقها في بيانات التقرير (تُقيَّم عند تحديث البيانات). «حالة التغطية» تعمل مع أرصدة المنتجات.','Define conditions that auto-send a notification when met in report data (evaluated on data update). "Coverage state" works with FG Balance.')+'</div>';
       (_cfg.rules||[]).forEach(function(rule,i){h+=ruleHtml(rule,i);});
@@ -29919,6 +30400,85 @@ var _bootIv=setInterval(function(){
     return h;
   }
 
+  /* ═══════════ تصميم الإشعار — مسودة + معاينة قبل النشر ═══════════
+     كل تعديلات التصميم (الخلفية، ألوان الكتابة، وزن الخط، الحجم، الخط)
+     تُحفَظ في مسودة وتظهر في المعاينة فقط — لا تُطبَّق على المنصة ولا
+     تُنشر للمستخدمين إلا بالضغط على «تطبيق ونشر». */
+  var DD_KEYS=['bg','bgColor','bgOp','textMode','tc1','tc2','weight','size','font','position'];
+  var _dd=null;
+  function ddEnsure(){if(_dd)return;var d=_cfg.display;_dd={};DD_KEYS.forEach(function(k){_dd[k]=(d[k]==null?DEF.display[k]:d[k]);});}
+  function ddDirty(){if(!_dd)return false;var d=_cfg.display;return DD_KEYS.some(function(k){return String(_dd[k])!==String(d[k]==null?DEF.display[k]:d[k]);});}
+  function ddPrevHtml(dark){
+    var t=_dd;
+    var w={small:250,normal:310,large:370}[t.size]||310;
+    var bg='rgba(12,24,52,.95)',dashed='';
+    if(t.bg==='white')bg=_hexA('#ffffff',t.bgOp==null?0.95:t.bgOp);
+    else if(t.bg==='transparent'){bg='transparent';dashed='border:1.5px dashed rgba(128,150,180,.6);';}
+    else if(t.bg==='custom')bg=_hexA(t.bgColor||'#0c1834',t.bgOp==null?0.95:t.bgOp);
+    var tm=t.textMode||'default';
+    var t1=(tm==='white')?'#ffffff':(tm==='custom')?t.tc1:(tm==='duo')?t.tc1:'#e8f0fb';
+    var t2=(tm==='white')?'rgba(255,255,255,.85)':(tm==='custom')?t.tc1:(tm==='duo')?t.tc2:'#7a9bbf';
+    var W1={light:'300',normal:'600',bold:'800',heavy:'900'}[t.weight]||'600';
+    var W2={light:'300',normal:'500',bold:'600',heavy:'700'}[t.weight]||'400';
+    var ff=((FONTS[t.font||'inherit']||FONTS.inherit).css)||'inherit';
+    return '<div style="background:'+(dark?'linear-gradient(160deg,#22364f,#101c2e)':'#eef2f8')+';padding:12px;border-radius:12px;flex:1 1 240px;min-width:0;max-width:100%;overflow:hidden;display:flex;justify-content:center">'
+      +'<div style="width:'+w+'px;max-width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+bg+';'+dashed+'border-radius:12px;border-inline-start:3px solid #3b82f6;box-shadow:0 6px 20px rgba(0,0,0,.25);font-family:'+ff+'">'
+        +'<div style="font-size:17px">📊</div>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:9px;font-weight:800;letter-spacing:.9px;color:#3b82f6">MEDIUM</div>'
+          +'<div style="font-size:12.5px;font-weight:'+W1+';color:'+t1+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+L('تم تحديث التقرير: FG Balance','Report updated: FG Balance')+'</div>'
+          +'<div style="font-size:10.5px;font-weight:'+W2+';color:'+t2+'">Rows: 37 · 09:52</div>'
+        +'</div>'
+      +'</div></div>';
+  }
+  function ddRefresh(){
+    var pv=document.getElementById('enscfg-dprev');
+    if(pv)pv.innerHTML=ddPrevHtml(true)+ddPrevHtml(false);
+    var b=document.getElementById('enscfg-ddirty');
+    if(b)b.style.display=ddDirty()?'':'none';
+  }
+  function ddSection(){
+    ddEnsure();var t=_dd;
+    var h='<div style="margin-top:16px;border:1.5px solid #dbe4f0;border-radius:14px;padding:14px">';
+    h+='<div style="font-weight:800;color:#12325a;font-size:13.5px;margin-bottom:4px">🎨 '+L('تصميم الإشعار','Toast design')
+      +' <span id="enscfg-ddirty" style="display:'+(ddDirty()?'':'none')+';background:#fef3c7;color:#92400e;font-weight:800;padding:1px 9px;border-radius:999px;font-size:10px;margin-inline-start:6px">'+L('✎ غير منشور','✎ Unpublished')+'</span></div>';
+    h+='<div class="enscfg-hint" style="margin-top:0">'+L('عدّل وشاهد المعاينة أولاً — لا يُطبَّق أو يُنشر شيء إلا بالضغط على «تطبيق ونشر».','Tweak and check the preview first — nothing is applied or published until you press “Apply & Publish”.')+'</div>';
+    h+=row(L('خلفية الإشعار','Toast background'),L('كحلي (الافتراضي) أو أبيض أو شفاف أو لون مخصص','Navy (default), white, transparent or custom'),
+      '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
+      +'<select class="enscfg-sel" id="enscfg-dbg" style="width:auto" onchange="ENSCfg._dset(\'bg\',this.value)">'+opt('navy',L('كحلي (افتراضي)','Navy (default)'),t.bg)+opt('white',L('أبيض فقط','White only'),t.bg)+opt('transparent',L('شفافة','Transparent'),t.bg)+opt('custom',L('لون مخصص','Custom'),t.bg)+'</select>'
+      +'<input type="color" value="'+esc(t.bgColor)+'" oninput="ENSCfg._dset(\'bgColor\',this.value)" style="width:34px;height:34px;border:none;border-radius:8px;cursor:pointer;padding:0">'
+      +'<input type="range" min="0.1" max="1" step="0.05" value="'+esc(t.bgOp)+'" oninput="ENSCfg._dset(\'bgOp\',+this.value)" style="width:90px">'
+      +'</div>');
+    h+=row(L('ألوان الكتابة','Text colors'),L('أبيض فقط، لون واحد، أو ثنائي: العنوان بلون والتفاصيل بلون آخر','White only, single color, or two-tone: title vs details'),
+      '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
+      +'<select class="enscfg-sel" id="enscfg-dtext" style="width:auto" onchange="ENSCfg._dset(\'textMode\',this.value)">'+opt('default',L('افتراضي','Default'),t.textMode)+opt('white',L('أبيض فقط','White only'),t.textMode)+opt('custom',L('لون واحد','Single color'),t.textMode)+opt('duo',L('ثنائي اللون','Two-tone'),t.textMode)+'</select>'
+      +'<input type="color" value="'+esc(t.tc1)+'" oninput="ENSCfg._dset(\'tc1\',this.value)" title="'+L('لون العنوان','Title color')+'" style="width:34px;height:34px;border:none;border-radius:8px;cursor:pointer;padding:0">'
+      +'<input type="color" value="'+esc(t.tc2)+'" oninput="ENSCfg._dset(\'tc2\',this.value)" title="'+L('لون التفاصيل','Details color')+'" style="width:34px;height:34px;border:none;border-radius:8px;cursor:pointer;padding:0">'
+      +'</div>');
+    h+=row(L('وزن الخط','Font weight'),L('ثقيل أو خفيف','Heavy or light'),
+      '<select class="enscfg-sel" onchange="ENSCfg._dset(\'weight\',this.value)">'+opt('default',L('افتراضي','Default'),t.weight)+opt('light',L('خفيف','Light'),t.weight)+opt('normal',L('عادي','Normal'),t.weight)+opt('bold',L('عريض','Bold'),t.weight)+opt('heavy',L('ثقيل','Heavy'),t.weight)+'</select>');
+    h+=row(L('موقع العرض','Toast position'),L('أعلى الشاشة أو أسفلها — يمين، وسط، أو يسار','Top or bottom of the screen — right, center or left'),
+      '<select class="enscfg-sel" onchange="ENSCfg._dset(\'position\',this.value)">'
+      +opt('top-right',L('⬆ أعلى اليمين','⬆ Top right'),t.position)
+      +opt('top-center',L('⬆ أعلى الوسط','⬆ Top center'),t.position)
+      +opt('top-left',L('⬆ أعلى اليسار','⬆ Top left'),t.position)
+      +opt('bottom-right',L('⬇ أسفل اليمين','⬇ Bottom right'),t.position)
+      +opt('bottom-left',L('⬇ أسفل اليسار','⬇ Bottom left'),t.position)+'</select>');
+    h+=row(L('حجم الإشعار','Toast size'),'',
+      '<select class="enscfg-sel" onchange="ENSCfg._dset(\'size\',this.value)">'+opt('small',L('صغير','Small'),t.size)+opt('normal',L('عادي','Normal'),t.size)+opt('large',L('كبير','Large'),t.size)+'</select>');
+    h+=row(L('🅰 خط الإشعارات','🅰 Notification font'),'',
+      '<select class="enscfg-sel" onchange="ENSCfg._dset(\'font\',this.value)">'+Object.keys(FONTS).map(function(k){return opt(k,L(FONTS[k].ar,FONTS[k].en),t.font);}).join('')+'</select>');
+    h+='<div style="font-size:11px;font-weight:800;color:#64748b;margin:10px 0 6px">👁 '+L('المعاينة قبل النشر (خلفية داكنة وفاتحة)','Preview before publishing (dark & light backdrop)')+'</div>';
+    h+='<div id="enscfg-dprev" style="display:flex;gap:10px;flex-wrap:wrap">'+ddPrevHtml(true)+ddPrevHtml(false)+'</div>';
+    h+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
+      +'<button class="enscfg-add" style="width:auto;margin:0;background:#16a34a" onclick="ENSCfg._dpublish()">✅ '+L('تطبيق ونشر','Apply & Publish')+'</button>'
+      +'<button class="enscfg-add" style="width:auto;margin:0;background:#64748b" onclick="ENSCfg._drevert()">↩ '+L('إلغاء التعديلات','Discard changes')+'</button>'
+      +'<button class="enscfg-add" style="width:auto;margin:0;background:#94a3b8" onclick="ENSCfg._ddefault()">🔄 '+L('الوضع الافتراضي','Reset to default')+'</button>'
+      +'</div>';
+    h+='</div>';
+    return h;
+  }
+
   /* ── الواجهة العامة ── */
   window.ENSCfg={
     get:get, open:openCfg, _apply:apply, _close:closeCfg,
@@ -29928,6 +30488,25 @@ var _bootIv=setInterval(function(){
     _disp:function(k,v){_cfg.display[k]=v;save();if(k==='colorTheme'||k==='font')render();},
     _sound:function(v){_cfg.display.soundId=v;save();try{playSpec(v);}catch(e){}},
     _play:function(){try{playSpec(_cfg.display.soundId||'chime');}catch(e){}},
+    _dset:function(k,v){
+      ddEnsure();_dd[k]=v;
+      /* اختيار لون يحوّل الوضع تلقائياً للمنطق الأنسب */
+      if(k==='bgColor'&&_dd.bg!=='custom'){_dd.bg='custom';var s1=document.getElementById('enscfg-dbg');if(s1)s1.value='custom';}
+      if(k==='tc1'&&_dd.textMode==='default'){_dd.textMode='custom';var s2=document.getElementById('enscfg-dtext');if(s2)s2.value='custom';}
+      if(k==='tc2'&&_dd.textMode!=='duo'){_dd.textMode='duo';var s3=document.getElementById('enscfg-dtext');if(s3)s3.value='duo';}
+      ddRefresh();
+    },
+    _dpublish:function(){
+      ddEnsure();
+      DD_KEYS.forEach(function(k){_cfg.display[k]=_dd[k];});
+      save(); /* save() يستدعي apply() فيُطبَّق التصميم فوراً ويُنشر عبر مزامنة الإعدادات لكل المستخدمين */
+      ddRefresh();
+      try{if(window.ENS&&ENS.push)ENS.push({type:'system',priority:'medium',category:'system:design',icon:'🎨',title:L('تم نشر تصميم الإشعارات الجديد','New notification design published'),desc:L('هذا مثال حي على الشكل الجديد','A live sample of the new look')});}catch(e){}
+    },
+    _drevert:function(){_dd=null;render();},
+    _ddefault:function(){_dd={};DD_KEYS.forEach(function(k){_dd[k]=DEF.display[k];});render();},
+    _openAdmin:function(){closeCfg();try{if(window.ENSAdmin)ENSAdmin.open();}catch(e){}},
+    _openPerm:function(){closeCfg();try{if(window.ENSPerm)ENSPerm.open();}catch(e){}},
     _rule:function(i,k,v){if(!_cfg.rules[i])return;_cfg.rules[i][k]=v;save();if(k==='type'||k==='report'){_ruleSig={};render();}},
     _addRule:function(){_cfg.rules.push({id:uid(),enabled:true,report:'fgbal',type:'coverage',band:'c1',minCount:1,op:'>',value:0,priority:'critical',name:''});save();render();},
     _delRule:function(i){_cfg.rules.splice(i,1);save();_ruleSig={};render();}
