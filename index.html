@@ -3638,6 +3638,8 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
         <button class="navbtn" data-page="dash" onclick="go('dash')" style="--c:#3f6fd1"><span class="nico" data-icon="chart"></span><span class="lbl" data-i18n="nav_dash">Dashboard</span></button>
         <button class="navbtn" data-page="sum" onclick="go('sum')" style="--c:#12b1a2"><span class="nico" data-icon="list"></span><span class="lbl" data-i18n="nav_sum">Summary</span></button>
         <button class="navbtn" data-page="sku" onclick="go('sku')" style="--c:#4a93f2"><span class="nico" data-icon="tag"></span><span class="lbl" data-i18n="nav_sku">SKU Summary</span></button>
+        <button class="navbtn" data-page="datecmp" onclick="go('datecmp')" style="--c:#7c5cd6"><span class="nico" data-icon="clock"></span><span class="lbl" data-i18n="nav_datecmp">Comparison of Dates — Aging</span></button>
+        <button class="navbtn" data-page="datecmpfg" onclick="go('datecmpfg')" style="--c:#12b1a2"><span class="nico" data-icon="clock"></span><span class="lbl" data-i18n="nav_datecmpfg">Comparison of Dates — FG Balance</span></button>
       </div>
     </div>
     <div class="nav-group collapsed" data-grp="btl">
@@ -4013,11 +4015,13 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       </script>
       <div class="d-body">
       <div class="d-sec" data-sec="aging">
-        <div class="d-sec-h"><span class="sec-ic sec-ic-aging"></span><h2 data-i18n="grp_aging">Inventory Aging</h2><span class="cnt">03 reports</span><span class="upd" id="home-upd-aging">Updated 30 May 2026</span></div>
+        <div class="d-sec-h"><span class="sec-ic sec-ic-aging"></span><h2 data-i18n="grp_aging">Inventory Aging</h2><span class="cnt">05 reports</span><span class="upd" id="home-upd-aging">Updated 30 May 2026</span></div>
         <div class="d-grid">
         <button class="d-tile" data-page="dash" style="--c:var(--navy)" onclick="go('dash')"><div class="ti" data-icon="chart"></div><div><div class="tt" data-i18n="nav_dash">Dashboard</div><div class="td" data-i18n="desc_dash">KPIs, charts and full aging breakdown.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="sum" style="--c:var(--teal)" onclick="go('sum')"><div class="ti" data-icon="list"></div><div><div class="tt" data-i18n="nav_sum">Summary</div><div class="td" data-i18n="desc_sum">Totals by brand, month and branch.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         <button class="d-tile" data-page="sku" style="--c:var(--blue)" onclick="go('sku')"><div class="ti" data-icon="tag"></div><div><div class="tt" data-i18n="nav_sku">SKU Summary</div><div class="td" data-i18n="desc_sku">Item-level totals and top SKUs.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
+        <button class="d-tile" data-page="datecmp" style="--c:#7c5cd6" onclick="go('datecmp')"><div class="ti" data-icon="clock"></div><div><div class="tt" data-i18n="nav_datecmp">Comparison of Dates — Aging</div><div class="td" data-i18n="desc_datecmp">Compare item quantities across branches between two dates.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
+        <button class="d-tile" data-page="datecmpfg" style="--c:#12b1a2" onclick="go('datecmpfg')"><div class="ti" data-icon="clock"></div><div><div class="tt" data-i18n="nav_datecmpfg">Comparison of Dates — FG Balance</div><div class="td" data-i18n="desc_datecmpfg">Compare FG Balance figures between two dates.</div></div><div class="tgo"><span data-i18n="home_open">Open</span> <span class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span></div></button>
         </div>
       </div>
       <div class="d-sec" data-sec="daily">
@@ -4963,6 +4967,22 @@ html[dir=rtl] .dal-tip-pill{margin-inline-start:auto}
       <div id="snap-root"></div>
     </div></div>
     <div id="snap-modal" class="snap-modal" style="display:none"></div>
+    <div class="page dcmp-page" id="page-datecmp"><div class="wrap">
+      <div class="topbar"><div class="htext"><h1 data-i18n="nav_datecmp">Comparison of Dates</h1>
+        <span class="upd"><span class="dot"></span> <span id="dcmp-sub"></span></span></div>
+        <div class="spacer"></div>
+        <button class="btn-soft sm" id="dcmp-export" onclick="DATECMP.exportXlsx()" style="display:none">&#11015; <span data-i18n="dcmp_export">Export Excel</span></button>
+        <div class="whicon">&#128337;</div></div>
+      <div id="dcmp-root"></div>
+    </div></div>
+    <div class="page dcmp-page" id="page-datecmpfg"><div class="wrap">
+      <div class="topbar"><div class="htext"><h1 data-i18n="nav_datecmpfg">Comparison of Dates — FG Balance</h1>
+        <span class="upd"><span class="dot"></span> <span id="dcmpfg-sub"></span></span></div>
+        <div class="spacer"></div>
+        <button class="btn-soft sm" id="dcmpfg-export" onclick="DATECMP.exportXlsx()" style="display:none">&#11015; <span data-i18n="dcmp_export">Export Excel</span></button>
+        <div class="whicon">&#128337;</div></div>
+      <div id="dcmpfg-root"></div>
+    </div></div>
     <div class="page" id="page-roldid"><div class="wrap">
       <div class="topbar"><div class="htext"><h1 data-i18n="nav_roldid">OLD Identity</h1><span class="upd"><span class="dot"></span> <span id="rep-oldid-date"></span></span></div><div class="spacer"></div></div>
       <div class="card" style="padding:14px"><div class="pivot-wrap" id="rep-oldid-wrap"></div></div>
@@ -6495,7 +6515,7 @@ const T={
   ch_classify:'Inventory Classifying',ch_sizeitem:'SKU Inventory — Size Item',sub_sizeitem:'CTN / SHR',
   center_total:'TOTAL QTY',gsearch_ph:'Search anything…',aging_mode_label:'Aging calculation method',aging_mode_upload:'Fixed at upload day',aging_mode_dynamic:'Dynamic (daily)',aging_mode_hint:'Fixed = age computed once against the report date · Dynamic = recomputed against today every day.',login_sub:'Inventory Dashboard',nav_home:'Home',login_welcome:'Welcome back',login_form_sub:'Sign in to access your reporting workspace',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'Warehouse aging, coverage and analytics — unified in one workspace.',login_stat_wh:'Warehouses',login_stat_br:'Brands',login_stat_rp:'Reports',home_hero_title:'Inventory Control Center',home_hero_sub:'Real-time overview of your inventory ecosystem',home_open:'Open',back_btn:'Back',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'Tania • Warehouse',desc_dash:'KPIs, charts and aging breakdown',desc_sum:'Totals by brand, month and branch',desc_sku:'Item-level totals and top SKUs',desc_rspace:'Warehouse space utilisation',desc_rfgbal:'Finished-goods balance by branch',desc_roldid:'Slow-moving / old identity stock',desc_rtransit:'Goods in transit between sites',desc_rbottle:'Bottle stock coverage',desc_imp:'Upload an Excel file to refresh data',desc_cloud:'Sync and back up to Firebase',desc_records:'Edit any cell, add, duplicate or delete records',desc_designer:'Customise table columns and methods',desc_users:'Manage accounts and permissions',users_title:'User Management',users_sub:'Roles · Permissions · Security · Monitoring',um_new_user:'New User',desc_dailyup:'Upload the daily coverage files',login_user:'Email / Username',login_pass:'Password',login_btn:'Login',col_new_manual:'New manual column',col_new_calc:'New calculated column',colm_title:'Column Manager',colm_sub:'Add custom columns (manual or calculated) to any table.',colm_screen:'Table',colm_add_calc:'+ Calculated column',colm_add_manual:'+ Manual column',colm_name:'Column name',colm_formula:'Formula e.g. {total} * 0.15',colm_type:'Type',colm_t_calc:'Calculated',colm_t_manual:'Manual',colm_avail:'Available variables',colm_hbg:'Header color',colm_cbg:'Cell color',colm_del:'Delete',colm_none:'No custom columns yet.',colm_help_calc:'Use variables in braces. Supports + - * / ( ) and Math.round/abs/min/max.',colm_help_manual:'Manual columns let you type a value into each row directly.',colm_existing:'Existing columns (click to show/hide)',colm_custom:'Custom columns',colm_hide:'Hide column',colm_show:'Show column',forgot_pwd:'Forgot password?',login_remember:'Remind me',login_bio:'Sign in with fingerprint / Face ID',bio_or:'or',bio_setup_title:'Quick sign-in',bio_setup_q:'Enable fingerprint / Face ID for faster sign-in next time?',bio_enable:'Enable',bio_later:'Not now',bio_enabled:'Quick sign-in enabled on this device.',bio_failed:'Biometric sign-in failed. Use your password.',bio_unsupported:'This device does not support biometric sign-in.',bio_none:'No saved quick sign-in on this device.',bio_disable:'Disable quick sign-in',bio_disabled:'Quick sign-in disabled on this device.',fpc_title:'Password change required',fpc_sub:'To protect your account, set a new password before continuing.',fpc_new:'New password',fpc_confirm:'Confirm password',fpc_save:'Save & continue',fpc_r_len:'At least 8 characters',fpc_r_upper:'Uppercase (A-Z)',fpc_r_lower:'Lowercase (a-z)',fpc_r_digit:'Number (0-9)',fpc_r_symbol:'Symbol (!@#$...)',pwd_reset_forced:'Password reset. User must set a new one at next login.',fp_title:'Reset Password',fp_desc1:'Enter your username. A verification code will be sent to your registered email.',fp_desc2:'Enter the code sent to',fp_send:'Send code',fp_reset:'Reset password',fp_resend:'Resend code',fp_need_user:'Please enter your username.',fp_checking:'Checking…',fp_no_user:'No account found with this username.',fp_no_email:'No email is registered for this account. Contact your admin.',fp_email_unavail:'Email service is not configured. Contact your admin.',fp_sent_ok:'Code sent. Check your inbox.',fp_send_fail:'Could not send the code. Try again later.',fp_restart:'Please restart the reset process.',fp_expired:'The code has expired. Request a new one.',fp_bad_code:'Incorrect code.',fp_pwd_short:'Password must be at least 4 characters.',fp_pwd_mismatch:'Passwords do not match.',fp_reset_ok:'Password reset successfully.',sec_title:'Security & Email Settings',sec_sub:'Configure the email service used to send password-reset codes to users.',sec_pub:'EmailJS Public Key',sec_svc:'Service ID',sec_tpl:'Template ID',sec_save:'Save settings',sec_test:'Send test email',sec_note:'Tip: create a free account at emailjs.com, add an email service and a template containing the variable {{passcode}}, then paste the keys above.',sec_saved:'Settings saved.',sec_need_all:'Please fill all three fields.',sec_admin_only:'Admins only.',sec_bad_cfg:'Invalid or missing settings.',sec_no_admin_email:'Your account has no email set.',sec_sending:'Sending…',sec_test_ok:'Test email sent to',sec_test_fail:'Test failed. Check your settings.',log_title:'Login Activity Log',log_refresh:'Refresh',log_clear:'Clear log',log_user:'User',log_event:'Event',log_time:'Time',log_empty:'No activity yet.',log_k_login:'Signed in',log_k_reset:'Password reset',log_k_failed:'Failed attempt',login_bad:'Invalid username or password',login_empty_user:'Please enter your username',login_empty_pass:'Please enter your password',login_empty_both:'Please enter your username and password',login_nouser:'No account found with this username',login_wrongpass:'Incorrect password — please try again',login_temp_expired:'Temporary password expired. Please request a new one.',fp_temp_sent:'Temporary password sent to your email.',fp_temp_done1:'A temporary password (valid 24 hours) has been sent to',fp_temp_done2:"Sign in with it — you'll be asked to set a new password.",fp_done_ok:'Got it',temp_show_title:'Temporary password generated',temp_show_for:'For user',temp_show_valid:'Valid until',temp_show_hint:'Password change will be required after signing in with it.',temp_copy:'Copy code',login_locked:'Account temporarily locked. Try again in {n}s',nav_users:'Users',nav_records:'Data Editor',rec_title:'Data Editor — Edit & Add Records',rec_add:'Add Record',rec_search:'Search records',rec_del:'Delete',rec_dup:'Duplicate',rec_edit_hint:'Click any cell in the table to edit it directly. Changes are saved and synced to all devices automatically.',rec_save:'Save to Cloud',rec_qty:'Quantity',rec_cat2:'Category 2',rec_logo:'Logo',rec_need:'Enter Identity and Branch at least',logout:'Logout',changepwd_btn:'Change password',changepin_btn:'Change PIN',notifadmin_btn:'Notifications',users_title:'User Management',users_sub:'Manage accounts, permissions and security',utab_users:'Users',utab_security:'Security & Email',utab_log:'Login Log',ce_title:'Card title',ce_calc:'Calculation',ce_cls:'Age class',ce_month:'Month',ce_color:'Color',ce_save:'Save card',ce_cancel:'Cancel',ce_sum:'Sum of quantity',ce_avg:'Average quantity',ce_count:'Item count',ce_max:'Max quantity',ce_min:'Min quantity',ce_all:'All',u_add_title:'Add new user',u_list_title:'Users list',u_perms_modal:'Permissions',u_user:'Username',u_pass:'Password',u_role:'Role',u_add:'Add User',u_admin:'Admin',u_userrole:'User',u_actions:'Actions',u_delete:'Delete',u_exists:'Username already exists',u_need:'Enter username and password',u_perms:'Screen permissions',u_temp:'Temporary',u_all:'All',u_email:'Email',u_mobile:'Mobile',u_password:'Password',u_resetpwd:'Reset Password',set_new_pwd:'Enter a new password for the user:',pwd_changed:'Password updated successfully.',u_pwd_help:'🔑 Password: send a reset link (permanent) or set a 24-hour temporary password · ⚙️ Edit permissions for screen access.',temp_prompt:'Your password is temporary. Please enter a new password:',cols_btn:'Columns',cols_title:'Show / hide columns',cols_hint:'Check a branch to show its column, uncheck to hide it. Changes are saved automatically and apply to both tables.',nav_designer:'Designer',nav_cardbuilder:'Card Builder',nav_pagebuilder:'Page Builder',cb_title:'Card Builder',cb_sub:'Create custom KPI cards that appear on the dashboard',cb_new:'New card',cb_f_title:'Card title',cb_f_calc:'Calculation',cb_f_age:'Age class',cb_f_month:'Month',cb_f_icon:'Icon',cb_f_color:'Color',cb_calc_sum:'Sum of quantity',cb_calc_avg:'Average quantity',cb_calc_count:'Item count',cb_calc_max:'Max value',cb_calc_min:'Min value',cb_age_all:'All classes',cb_month_all:'All months',cb_save:'Save card',cb_cancel:'Cancel',cb_preview:'Live preview',cb_preview_hint:'The value is computed from current data and reflects dashboard filters.',cb_list:'Created cards',cb_empty:'No cards yet. Create your first card above.',designer_title:'Table Designer',designer_sub:'Rename columns, choose the calculation method, reorder and show/hide columns.',calc_method:'Calculation method',calc_sum:'Sum',calc_avg:'Average',calc_count:'Count',calc_max:'Max',calc_min:'Min',calc_hint:'Applies to all value cells in the Summary and SKU tables.',appearance:'Appearance',colors:'Colors',c_primary:'Primary',c_teal:'Teal',c_blue:'Blue',c_orange:'Orange',st_color:'Color',st_font:'Font',st_size:'Font size (px)',st_align:'Text align',dz_al_def:'Default',dz_al_l:'Left',dz_al_c:'Center',dz_al_r:'Right',font_family:'Font',font_default:'Default',display_size:'Display size',card_titles:'Card titles & labels',dz_pick:'Choose screen to edit',dz_pick_hint:'Each screen is edited independently — changes here do not affect other screens.',dz_scr_dash:'Dashboard',dz_scr_sum:'Summary table',dz_scr_sku:'SKU table',dz_scr_fgbal:'FG Balance report',dz_scr_oldid:'OLD Identity report',dz_scr_transit:'FG Transit report',rpt_cols_title:'Report columns',rpt_cols_hint:'Rename headers, set colors and add conditional formatting. Changes apply to this report only.',rpt_no_data:'Upload this report first to load its columns.',dz_scr_appear:'General appearance',chart_order:'Chart cards order / position',dz_branch_order:'Branch column order',dz_col:'Column',dz_name:'Display name',dz_show:'Show',dz_calc:'Calc',calc_default:'Default',dz_reset:'Reset',dz_collapse_all:'Collapse all',dz_expand_all:'Expand all',dz_sum_title:'Summary columns',dz_sku_title:'SKU columns',set_date_label:'Report update date',set_btn:'Set date',saved_date:'\u2713 Update date saved.',dz_color:'Color',dz_cf:'Cond. format',cc_hbg:'Header background',cc_cbg:'Cell background',cc_cfg:'Cell text',cc_clear:'Clear colors',cf_title:'Conditional formatting',cf_sub:'Add rules: when the cell value meets a condition, apply colors. "Whole row" colors the entire row.',cf_if:'If value',cf_and:'and',cf_between:'between',cf_outside:'outside',cf_bg:'Fill',cf_fg:'Text',cf_bold:'Bold',cf_scope:'Apply to',cf_cell:'This cell',cf_row:'Whole row',cf_addrule:'Add rule',cf_done:'Done',cust_title:'Custom calculated columns',cust_help:'Create a new column from a formula. Use column tokens and arithmetic ( + - * / and % ).',cust_avail:'Available tokens',cust_name:'Column name',cust_formula_ph:'e.g.  {total} * 0.15   or   {br_RYD} + {br_HIT}',cust_add:'Add column',em_edit:'Edit titles',em_done:'Finish editing',em_banner:'Edit mode — click any title to rename it. Changes sync to everyone.',portal_titles:'Login portal & platform titles',portal_titles_hint:'Edit the external login page and platform brand wording. Changes sync to everyone and appear on the login screen.',
   sum_title:'Finished Product — Totals Summary',c_year:'Year',c_month:'Month',c_cat:'Category',c_total:'Total',c_pct:'%',sum_grand:'Grand Total',
-  ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',hr_nodata_title:'No HR Data Yet',hr_nodata_desc:'Upload an Excel file from Upload Center to view the dashboard',hr_no_upload:'No data uploaded yet',hr_refresh:'Refresh',hr_upload_btn:'Upload Data',hr_upload_hr:'Upload HR File',hr_alerts_title:'🔔 Smart Alerts',hr_chart_region:'Distribution by Region',hr_chart_entity:'Distribution by Entity',hr_chart_storage:'Distribution by Storage Type',hr_chart_job:'Actual Job Title',hr_chart_nat:'Employees by Nationality',hr_chart_contract:'Marital Status',hr_chart_age:'Age Distribution',hr_chart_leasing:'Leasing Company Employees',hr_total_emp:'Total Employees',hr_saudi:'Saudis',hr_non_saudi:'Non-Saudis',hr_leasing_emp:'Leasing Employees',hr_company_emp:'Company Employees',hr_avg_age:'Avg Age',hr_avg_service:'Avg Service',hr_year:'yrs',hr_job_wm:'Warehouse Managers',hr_job_ws:'Warehouse Keepers',hr_job_dr:'Drivers',hr_job_lb:'Workers',hr_job_sp:'Supervisors',hr_job_tc:'Technicians',hr_job_ad:'Admins',hr_gauge_saudi:'Saudization Rate',hr_gauge_leasing:'Leasing Rate',hr_gauge_over50:'Employees Over 50',hr_gauge_nores:'No Residence Registered',hr_age_u25:'Under 25',hr_alert_noid:'No ID Number',hr_alert_retire:'Retirement Age 60+',hr_alert_notes:'Have Remarks',hr_alert_inactive:'Inactive',hr_empty:'✅ No items',hr_unknown:'Unknown',hr_all:'All',hr_and:' and ',hr_others:' others',hr_tbl_no:'#',hr_tbl_name:'Name',hr_tbl_job:'Job Title',hr_tbl_entity:'Entity',hr_tbl_region:'Region',hr_tbl_nat:'Nationality',hr_tbl_status:'Status',hr_tbl_age:'Age',hr_tbl_hire:'Hire Date',hr_tbl_service:'Service',hr_tbl_contract:'Contract',hr_tbl_leasing_co:'Leasing Co.',hr_tbl_iqama:'ID No.',hr_tbl_notes:'Remarks',hr_emp_list:'Employee List — Quick View',hr_filters:'Filters',hr_search_ph:'Name or ID…',hr_region:'Region',hr_entity:'Entity',hr_nationality:'Nationality',hr_status_col:'Status',hr_contract_col:'Contract Type',hr_storage_col:'Storage Type',hr_leasing_col:'Leasing Company',hr_view_all:'View All ↗',hr_nodata_simple:'No data',hr_print:'Print',hr_pending_title:'HR Pending Items',hr_emp_details:'Employee Details',hr_upd_suffix:'Alerts & Pending Items',
+  ch_brand:'Inventory by Category (Brand)',ch_monthly:'Monthly Totals',nav_sku:'SKU Summary',nav_datecmp:'Comparison of Dates — Aging',nav_datecmpfg:'Comparison of Dates — FG Balance',desc_datecmp:'Compare item quantities across branches between two dates.',desc_datecmpfg:'Compare FG Balance figures between two dates.',dcmp_export:'Export Excel',sku_title:'Item (SKU) Totals Summary',c_code:'Item Code',c_size:'Size',c_pack2:'Pack',c_dim:'Size / Pack',search_item:'Search Item Code',dimension:'Dimension',ch_topitems:'Top Items by Quantity',nav_cloud:'Cloud',hr_nodata_title:'No HR Data Yet',hr_nodata_desc:'Upload an Excel file from Upload Center to view the dashboard',hr_no_upload:'No data uploaded yet',hr_refresh:'Refresh',hr_upload_btn:'Upload Data',hr_upload_hr:'Upload HR File',hr_alerts_title:'🔔 Smart Alerts',hr_chart_region:'Distribution by Region',hr_chart_entity:'Distribution by Entity',hr_chart_storage:'Distribution by Storage Type',hr_chart_job:'Actual Job Title',hr_chart_nat:'Employees by Nationality',hr_chart_contract:'Marital Status',hr_chart_age:'Age Distribution',hr_chart_leasing:'Leasing Company Employees',hr_total_emp:'Total Employees',hr_saudi:'Saudis',hr_non_saudi:'Non-Saudis',hr_leasing_emp:'Leasing Employees',hr_company_emp:'Company Employees',hr_avg_age:'Avg Age',hr_avg_service:'Avg Service',hr_year:'yrs',hr_job_wm:'Warehouse Managers',hr_job_ws:'Warehouse Keepers',hr_job_dr:'Drivers',hr_job_lb:'Workers',hr_job_sp:'Supervisors',hr_job_tc:'Technicians',hr_job_ad:'Admins',hr_gauge_saudi:'Saudization Rate',hr_gauge_leasing:'Leasing Rate',hr_gauge_over50:'Employees Over 50',hr_gauge_nores:'No Residence Registered',hr_age_u25:'Under 25',hr_alert_noid:'No ID Number',hr_alert_retire:'Retirement Age 60+',hr_alert_notes:'Have Remarks',hr_alert_inactive:'Inactive',hr_empty:'✅ No items',hr_unknown:'Unknown',hr_all:'All',hr_and:' and ',hr_others:' others',hr_tbl_no:'#',hr_tbl_name:'Name',hr_tbl_job:'Job Title',hr_tbl_entity:'Entity',hr_tbl_region:'Region',hr_tbl_nat:'Nationality',hr_tbl_status:'Status',hr_tbl_age:'Age',hr_tbl_hire:'Hire Date',hr_tbl_service:'Service',hr_tbl_contract:'Contract',hr_tbl_leasing_co:'Leasing Co.',hr_tbl_iqama:'ID No.',hr_tbl_notes:'Remarks',hr_emp_list:'Employee List — Quick View',hr_filters:'Filters',hr_search_ph:'Name or ID…',hr_region:'Region',hr_entity:'Entity',hr_nationality:'Nationality',hr_status_col:'Status',hr_contract_col:'Contract Type',hr_storage_col:'Storage Type',hr_leasing_col:'Leasing Company',hr_view_all:'View All ↗',hr_nodata_simple:'No data',hr_print:'Print',hr_pending_title:'HR Pending Items',hr_emp_details:'Employee Details',hr_upd_suffix:'Alerts & Pending Items',
   map:{identity:{'1- New Identity':'New Identity','2- OLD Identity':'Old Identity','3- Mai':'Mai','4- Mokabat':'Mokabat','5- SAR':'SAR','6- TG Sparkling':'TG Sparkling'}},grp_daily:'Daily Coverage Report',grp_data:'Data & Tools',grp_admintools:'Admin Tools',u_selall:'Select all',u_selnone:'Clear',nav_masterdata:'Master Data',nav_spaceact:'Space Actuals',nav_rspace:'Space in Warehouses',nav_rfgbal:'FG Balance',nav_roldid:'OLD Identity',nav_rtransit:'FG Transit',nav_rbottle:'FG Bottle Stock',nav_dailyup:'Daily Reports Upload',cloud_title:'\u2601\ufe0f Cloud Sync',cloud_sub:'Store and sync the report data in your chosen cloud database.',cloud_cfg_label:'Firebase configuration',fb_apikey:'API Key',fb_project:'Project ID',fb_authdomain:'Auth Domain',fb_bucket:'Storage Bucket',fb_sender:'Messaging Sender ID',fb_appid:'App ID',fb_paste_toggle:'Or paste the full firebaseConfig',fb_fill:'Fill fields from config',popout_btn:'Window',full_btn:'Fullscreen',export_excel:'Export to Excel',cw_qty:'qty',cw_rows:'rows',cw_print:'Print',cloud_connect:'Connect',cloud_save:'Save to Cloud',cloud_test:'Test Connection',cloud_load:'Load from Cloud',cloud_auto:'Auto-load on open & auto-save on every change',cloud_live:'Live two-way sync (recommended)',cloud_note_title:'Setup notes',cloud_st_idle:'Not connected',cloud_n1:'Create a Firebase project, enable <b>Firestore Database</b>, then copy the <span class=\"tag\">firebaseConfig</span> from Project settings.',cloud_n2:'For testing, set Firestore rules to test mode. For production, secure your rules.',cloud_n3:'Data is stored in collection <span class=\"tag\">inventory_dashboard</span>, document <span class=\"tag\">latest</span>.',cloud_n4:'All data &amp; settings are stored in the cloud only (no browser storage).',cloud_provider_label:'Cloud database provider',cloud_provider_hint:'Choose where your data is stored. Each device remembers its choice.',cloud_sb_cfg_label:'Supabase configuration',sb_url:'Project URL',sb_anon:'Anon public key',cloud_sb_n1:'Supabase: create a table <span class="tag">cloud_docs</span> with columns col text, doc text, data jsonb, updated_at int8, primary key (col, doc), and enable Realtime on it.',cyl_storage:'Storage area',cyl_used:'Used balance',cyl_transit:'Transit',cyl_empty:'Empty (available)',cyl_branch_title:'Branches',cyl_fact_title:'Factories',sp_lbl_actual:'Actual Spaces',sp_lbl_used:'Used Spaces',sp_lbl_transit:'Transit Spaces',sp_lbl_empty:'Empty Space',bt_rpt_title:'Current Bottle Stock &amp; Branch Transit Report',btl_dash_title:'Bottle & Brushing Dashboard',btl_dash_sub:'Production, sales, brushing &amp; damage analytics — from actual file data',btl_kpi_prod:'Production',btl_kpi_sales:'Sales',btl_kpi_brush:'Brushing',btl_kpi_dmg:'Damaged',btl_kpi_brushpct:'Brushing %',btl_kpi_dmgpct:'Damaged %',btl_ch_trend:'Monthly Sales Trend',btl_ch_prodsales:'Production vs Sales',btl_ch_branch:'Brushing by Branch',btl_ch_bd:'Brushing vs Damaged',
   foot:(s,t,q)=>'Showing '+s+' of '+t+' records  •  Total qty '+q+'  •  Click filters to slice',
   imp_title:'&#128228; Import Data — Auto Update',
@@ -6521,7 +6541,7 @@ const T={
   ch_classify:'تصنيف المخزون',ch_sizeitem:'المخزون حسب الحجم والصنف',sub_sizeitem:'كرتون / شرنك',
   center_total:'إجمالي الكمية',gsearch_ph:'بحث شامل…',aging_mode_label:'طريقة حساب الأعمار',aging_mode_upload:'ثابت على يوم الرفع',aging_mode_dynamic:'ديناميكي (يومي)',aging_mode_hint:'الثابت = يُحسب العمر مرة واحدة بتاريخ الرفع · الديناميكي = يُعاد حسابه بتاريخ اليوم كل يوم.',login_sub:'لوحة تحليل المخزون',nav_home:'الرئيسية',login_welcome:'مرحباً بعودتك',login_form_sub:'سجّل الدخول للوصول إلى مساحة التقارير',login_brand_title:'Smart Inventory Analytics\n&\nAging Dashboard',login_brand_tag:'أعمار المخزون والتغطية والتحليلات في مساحة عمل واحدة.',login_stat_wh:'مستودعات',login_stat_br:'علامات',login_stat_rp:'تقارير',home_hero_title:'مركز التحكم بالمخزون',home_hero_sub:'نظرة لحظية على منظومة مخزونك',home_open:'فتح',back_btn:'رجوع',brand_name:'Smart Inventory Analytics & Aging Dashboard',brand_sub:'تانيا • المستودعات',desc_dash:'المؤشرات والرسوم وتحليل الأعمار',desc_sum:'الإجماليات حسب العلامة والشهر والفرع',desc_sku:'إجماليات الأصناف وأعلى المنتجات',desc_rspace:'استغلال مساحة المستودعات',desc_rfgbal:'رصيد المنتج التام حسب الفرع',desc_roldid:'المخزون الراكد / الهوية القديمة',desc_rtransit:'البضائع في الطريق بين المواقع',desc_rbottle:'تغطية مخزون العبوات',desc_imp:'ارفع ملف Excel لتحديث البيانات',desc_cloud:'المزامنة والنسخ الاحتياطي عبر Firebase',desc_records:'عدّل أي خلية، أضف، كرّر أو احذف السجلات',desc_designer:'تخصيص أعمدة الجداول وطرق الحساب',desc_users:'إدارة الحسابات والصلاحيات',users_title:'إدارة المستخدمين',users_sub:'الأدوار · الصلاحيات · الأمان · المراقبة',um_new_user:'New User',desc_dailyup:'رفع ملفات التغطية اليومية',login_user:'البريد أو اسم المستخدم',login_pass:'كلمة المرور',login_btn:'دخول',col_new_manual:'عمود يدوي جديد',col_new_calc:'عمود محسوب جديد',colm_title:'إدارة الأعمدة',colm_sub:'أضف أعمدة مخصصة (يدوية أو محسوبة) لأي جدول.',colm_screen:'الجدول',colm_add_calc:'+ عمود محسوب',colm_add_manual:'+ عمود يدوي',colm_name:'اسم العمود',colm_formula:'صيغة مثل {total} * 0.15',colm_type:'النوع',colm_t_calc:'محسوب',colm_t_manual:'يدوي',colm_avail:'المتغيرات المتاحة',colm_hbg:'لون الرأس',colm_cbg:'لون الخلية',colm_del:'حذف',colm_none:'لا توجد أعمدة مخصصة بعد.',colm_help_calc:'استخدم المتغيرات بين أقواس معقوفة. يدعم + - * / ( ) ودوال Math.round/abs/min/max.',colm_help_manual:'الأعمدة اليدوية تتيح إدخال قيمة لكل صف مباشرة.',colm_existing:'الأعمدة الموجودة (اضغط للإظهار/الإخفاء)',colm_custom:'الأعمدة المخصصة',colm_hide:'إخفاء العمود',colm_show:'إظهار العمود',forgot_pwd:'نسيت كلمة المرور؟',login_remember:'Remind me',login_bio:'الدخول ببصمة الإصبع / Face ID',bio_or:'أو',bio_setup_title:'دخول سريع',bio_setup_q:'تفعيل بصمة الإصبع / Face ID لتسجيل دخول أسرع في المرة القادمة؟',bio_enable:'Activate',bio_later:'ليس الآن',bio_enabled:'تم تفعيل الدخول السريع على هذا الجهاز.',bio_failed:'فشل الدخول البيومتري. استخدم كلمة المرور.',bio_unsupported:'هذا الجهاز لا يدعم الدخول البيومتري.',bio_none:'لا يوجد دخول سريع محفوظ على هذا الجهاز.',bio_disable:'إيقاف الدخول السريع',bio_disabled:'تم إيقاف الدخول السريع على هذا الجهاز.',fpc_title:'تغيير كلمة المرور مطلوب',fpc_sub:'لحماية حسابك، يجب تعيين كلمة مرور جديدة قبل المتابعة.',fpc_new:'New Password',fpc_confirm:'Confirm Password',fpc_save:'حفظ ومتابعة',fpc_r_len:'8 أحرف على الأقل',fpc_r_upper:'حرف كبير (A-Z)',fpc_r_lower:'حرف صغير (a-z)',fpc_r_digit:'رقم (0-9)',fpc_r_symbol:'رمز خاص (!@#$...)',pwd_reset_forced:'تمت إعادة التعيين. سيُطلب من المستخدم تعيين كلمة مرور جديدة عند الدخول.',fp_title:'إعادة تعيين كلمة المرور',fp_desc1:'أدخل اسم المستخدم وسيُرسل رمز تأكيد إلى بريدك المسجّل.',fp_desc2:'أدخل الرمز المُرسل إلى',fp_send:'إرسال الرمز',fp_reset:'إعادة التعيين',fp_resend:'إعادة إرسال الرمز',fp_need_user:'الرجاء إدخال اسم المستخدم.',fp_checking:'جارٍ التحقق…',fp_no_user:'لا يوجد حساب بهذا الاسم.',fp_no_email:'لا يوجد بريد مسجّل لهذا الحساب. تواصل مع المسؤول.',fp_email_unavail:'خدمة البريد غير مُعدّة. تواصل مع المسؤول.',fp_sent_ok:'تم إرسال الرمز. تحقق من بريدك.',fp_send_fail:'تعذّر إرسال الرمز. حاول لاحقاً.',fp_restart:'الرجاء إعادة بدء عملية الاستعادة.',fp_expired:'انتهت صلاحية الرمز. اطلب رمزاً جديداً.',fp_bad_code:'الرمز غير صحيح.',fp_pwd_short:'كلمة المرور يجب أن تكون 4 أحرف على الأقل.',fp_pwd_mismatch:'كلمتا المرور غير متطابقتين.',fp_reset_ok:'تم تغيير كلمة المرور بنجاح.',sec_title:'إعدادات الأمان والبريد',sec_sub:'إعداد خدمة البريد المُستخدمة لإرسال رموز إعادة تعيين كلمة المرور للمستخدمين.',sec_pub:'المفتاح العام EmailJS',sec_svc:'معرّف الخدمة',sec_tpl:'معرّف القالب',sec_save:'حفظ الإعدادات',sec_test:'إرسال بريد تجريبي',sec_note:'تلميح: أنشئ حساباً مجانياً على emailjs.com، أضف خدمة بريد وقالباً يحتوي المتغيّر {{passcode}}، ثم الصق المفاتيح أعلاه.',sec_saved:'تم حفظ الإعدادات.',sec_need_all:'الرجاء تعبئة الحقول الثلاثة.',sec_admin_only:'للمسؤولين فقط.',sec_bad_cfg:'الإعدادات غير صحيحة أو ناقصة.',sec_no_admin_email:'لا يوجد بريد مسجّل لحسابك.',sec_sending:'جارٍ الإرسال…',sec_test_ok:'تم إرسال بريد تجريبي إلى',sec_test_fail:'فشل الإرسال. تحقق من الإعدادات.',log_title:'سجل عمليات الدخول',log_refresh:'تحديث',log_clear:'مسح السجل',log_user:'المستخدم',log_event:'الحدث',log_time:'الوقت',log_empty:'لا يوجد نشاط بعد.',log_k_login:'تسجيل دخول',log_k_reset:'إعادة تعيين كلمة المرور',log_k_failed:'محاولة فاشلة',login_bad:'اسم المستخدم أو كلمة المرور غير صحيحة',login_empty_user:'الرجاء إدخال اسم المستخدم',login_empty_pass:'الرجاء إدخال كلمة المرور',login_empty_both:'الرجاء إدخال اسم المستخدم وكلمة المرور',login_nouser:'لا يوجد حساب بهذا الاسم',login_wrongpass:'كلمة المرور غير صحيحة — حاول مرة أخرى',login_temp_expired:'انتهت صلاحية الرقم المؤقت. الرجاء طلب رقم جديد.',fp_temp_sent:'تم إرسال رقم مؤقت إلى بريدك.',fp_temp_done1:'تم إرسال رقم مؤقت (صالح 24 ساعة) إلى',fp_temp_done2:'سجّل الدخول به — سيُطلب منك تعيين كلمة مرور جديدة.',fp_done_ok:'تم',temp_show_title:'تم توليد رقم مؤقت',temp_show_for:'للمستخدم',temp_show_valid:'صالح حتى',temp_show_hint:'سيُطلب تغيير كلمة المرور بعد الدخول به.',temp_copy:'نسخ الرقم',login_locked:'الحساب مقفل مؤقتاً. حاول بعد {n} ثانية',nav_users:'المستخدمون',nav_records:'محرّر البيانات',rec_title:'محرّر البيانات — تعديل وإضافة السجلات',rec_add:'إضافة سجل',rec_search:'بحث في السجلات',rec_del:'حذف',rec_dup:'تكرار',rec_edit_hint:'انقر أي خلية في الجدول لتعديلها مباشرةً. تُحفظ التغييرات وتُزامَن لكل الأجهزة تلقائياً.',rec_save:'حفظ في السحابة',rec_qty:'الكمية',rec_cat2:'الفئة 2',rec_logo:'الشعار',rec_need:'أدخل الهوية والفرع على الأقل',logout:'خروج',changepwd_btn:'تغيير كلمة المرور',changepin_btn:'تغيير رقم PIN',notifadmin_btn:'إدارة الإشعارات',users_title:'إدارة المستخدمين',users_sub:'إدارة الحسابات والصلاحيات والأمان',utab_users:'المستخدمون',utab_security:'الأمان والبريد',utab_log:'سجل الدخول',ce_title:'عنوان البطاقة',ce_calc:'نوع الحساب',ce_cls:'فئة العمر',ce_month:'الشهر',ce_color:'اللون',ce_save:'حفظ البطاقة',ce_cancel:'Cancel',ce_sum:'مجموع الكمية',ce_avg:'متوسط الكمية',ce_count:'عدد الأصناف',ce_max:'أعلى كمية',ce_min:'أدنى كمية',ce_all:'All',u_add_title:'إضافة مستخدم جديد',u_list_title:'قائمة المستخدمين',u_perms_modal:'الصلاحيات',u_user:'اسم المستخدم',u_pass:'كلمة المرور',u_role:'الصلاحية',u_add:'إضافة مستخدم',u_admin:'مسؤول',u_userrole:'مستخدم',u_actions:'إجراءات',u_delete:'حذف',u_exists:'اسم المستخدم موجود مسبقاً',u_need:'أدخل اسم المستخدم وكلمة المرور',u_perms:'صلاحيات الشاشات',u_temp:'مؤقتة',u_all:'All',u_email:'Email',u_mobile:'الجوال',u_password:'كلمة المرور',u_resetpwd:'إعادة تعيين كلمة المرور',set_new_pwd:'أدخل كلمة مرور جديدة للمستخدم:',pwd_changed:'تم تحديث كلمة المرور بنجاح.',u_pwd_help:'🔑 كلمة المرور: أرسل رابط إعادة تعيين (دائمة) أو عيّن كلمة مرور مؤقتة صالحة 24 ساعة · ⚙️ تعديل الصلاحيات للتحكم بالوصول للشاشات.',temp_prompt:'كلمة مرورك مؤقتة. الرجاء إدخال كلمة مرور جديدة:',cols_btn:'الأعمدة',cols_title:'إظهار / إخفاء الأعمدة',cols_hint:'فعّل الفرع لإظهار عموده، وألغِ التفعيل لإخفائه. تُحفظ التغييرات تلقائياً وتُطبّق على الجدولين.',nav_designer:'تصميم الجداول',nav_cardbuilder:'منشئ البطاقات',nav_pagebuilder:'إدارة الصفحات',cb_title:'منشئ البطاقات',cb_sub:'أنشئ بطاقات مؤشرات مخصّصة تظهر في لوحة المعلومات',cb_new:'بطاقة جديدة',cb_f_title:'عنوان البطاقة',cb_f_calc:'نوع الحساب',cb_f_age:'فئة العمر',cb_f_month:'الشهر',cb_f_icon:'الأيقونة',cb_f_color:'اللون',cb_calc_sum:'مجموع الكمية',cb_calc_avg:'متوسط الكمية',cb_calc_count:'عدد الأصناف',cb_calc_max:'أعلى قيمة',cb_calc_min:'أدنى قيمة',cb_age_all:'كل الفئات',cb_month_all:'كل الشهور',cb_save:'حفظ البطاقة',cb_cancel:'Cancel',cb_preview:'معاينة حية',cb_preview_hint:'القيمة محسوبة من البيانات الحالية وتتأثر بفلاتر لوحة المعلومات.',cb_list:'البطاقات المنشأة',cb_empty:'لا توجد بطاقات بعد. أنشئ بطاقتك الأولى أعلاه.',designer_title:'تصميم الجداول',designer_sub:'عدّل مسميات الأعمدة، اختر طريقة الحساب، ورتّب وأظهر/أخفِ الأعمدة.',calc_method:'طريقة الحساب',calc_sum:'المجموع',calc_avg:'المتوسط',calc_count:'العدد',calc_max:'الأعلى',calc_min:'الأدنى',calc_hint:'تُطبّق على كل خلايا القيم في جدولي الملخص والأصناف.',appearance:'المظهر',colors:'الألوان',c_primary:'الأساسي',c_teal:'التركواز',c_blue:'الأزرق',c_orange:'البرتقالي',st_color:'اللون',st_font:'الخط',st_size:'حجم الخط (px)',st_align:'محاذاة النص',dz_al_def:'افتراضي',dz_al_l:'يسار',dz_al_c:'وسط',dz_al_r:'يمين',font_family:'الخط',font_default:'افتراضي',display_size:'حجم العرض',card_titles:'عناوين ومسميات البطاقات',dz_pick:'اختر الشاشة للتعديل',dz_pick_hint:'كل شاشة تُعدّل بشكل مستقل — التعديلات هنا لا تؤثر على باقي الشاشات.',dz_scr_dash:'لوحة المعلومات',dz_scr_sum:'جدول الملخص',dz_scr_sku:'جدول الأصناف',dz_scr_fgbal:'تقرير رصيد المنتج التام',dz_scr_oldid:'تقرير الهوية القديمة',dz_scr_transit:'تقرير الترانزيت',rpt_cols_title:'أعمدة التقرير',rpt_cols_hint:'أعد تسمية الرؤوس، وحدّد الألوان، وأضف تنسيقاً شرطياً. تُطبَّق التغييرات على هذا التقرير فقط.',rpt_no_data:'ارفع هذا التقرير أولاً لتحميل أعمدته.',dz_scr_appear:'المظهر العام',chart_order:'ترتيب/مكان بطاقات الرسوم',dz_branch_order:'ترتيب أعمدة الفروع',dz_col:'العمود',dz_name:'الاسم المعروض',dz_show:'إظهار',dz_calc:'الحساب',calc_default:'افتراضي',dz_reset:'استعادة الافتراضي',dz_collapse_all:'طي الكل',dz_expand_all:'فتح الكل',dz_sum_title:'أعمدة الملخص',dz_sku_title:'أعمدة الأصناف',set_date_label:'تاريخ تحديث التقرير',set_btn:'تعيين التاريخ',saved_date:'\u2713 تم حفظ تاريخ التحديث.',dz_color:'اللون',dz_cf:'تنسيق شرطي',cc_hbg:'خلفية العنوان',cc_cbg:'خلفية الخلية',cc_cfg:'لون النص',cc_clear:'مسح الألوان',cf_title:'التنسيق الشرطي',cf_sub:'أضف قواعد: عندما تحقق قيمة الخلية شرطاً، طبّق الألوان. "الصف بالكامل" يلوّن الصف كله.',cf_if:'إذا كانت القيمة',cf_and:'و',cf_between:'بين',cf_outside:'خارج',cf_bg:'التعبئة',cf_fg:'النص',cf_bold:'عريض',cf_scope:'التطبيق على',cf_cell:'هذه الخلية',cf_row:'الصف بالكامل',cf_addrule:'إضافة قاعدة',cf_done:'تم',cust_title:'أعمدة محسوبة مخصصة',cust_help:'أنشئ عموداً جديداً من معادلة. استخدم رموز الأعمدة والعمليات الحسابية ( + - * / و % ).',cust_avail:'الرموز المتاحة',cust_name:'اسم العمود',cust_formula_ph:'مثال:  {total} * 0.15   أو   {br_RYD} + {br_HIT}',cust_add:'إضافة عمود',em_edit:'تعديل العناوين',em_done:'إنهاء التعديل',em_banner:'وضع التعديل — انقر أي عنوان لإعادة تسميته. التغييرات تُزامَن للجميع.',portal_titles:'عناوين بوابة الدخول والمنصة',portal_titles_hint:'عدّل نصوص صفحة الدخول الخارجية واسم المنصة. التغييرات تُزامَن للجميع وتظهر في شاشة الدخول.',
   sum_title:'المنتج التام — ملخص الإجماليات',c_year:'العام',c_month:'الشهر',c_cat:'الفئة',c_total:'الإجمالي',c_pct:'النسبة %',sum_grand:'الإجمالي',
-  ch_brand:'المخزون حسب الفئة (العلامة)',ch_monthly:'الإجماليات الشهرية',nav_sku:'ملخص الأصناف',sku_title:'ملخص إجماليات الأصناف (SKU)',c_code:'كود الصنف',c_size:'الحجم',c_pack2:'الشد',c_dim:'الحجم / الشد',search_item:'بحث بكود الصنف',dimension:'البُعد',ch_topitems:'أعلى الأصناف كميةً',nav_cloud:'السحابة',grp_daily:'التقارير اليومية',grp_data:'البيانات والأدوات',grp_admintools:'أدوات الإدارة',u_selall:'Select All',u_selnone:'مسح',nav_masterdata:'البيانات الرئيسية',nav_spaceact:'المساحات الفعلية',nav_rspace:'مساحات المستودعات',nav_rfgbal:'أرصدة المنتجات',nav_roldid:'الهوية القديمة',nav_rtransit:'الترانزيت',nav_rbottle:'أرصدة القارورة',nav_dailyup:'رفع التقارير اليومية',cloud_title:'\u2601\ufe0f مزامنة سحابية',cloud_sub:'تخزين ومزامنة بيانات التقرير في القاعدة السحابية المختارة.',cloud_cfg_label:'إعدادات Firebase',fb_apikey:'مفتاح API',fb_project:'معرّف المشروع',fb_authdomain:'نطاق المصادقة',fb_bucket:'مساحة التخزين',fb_sender:'معرّف المرسل',fb_appid:'معرّف التطبيق',fb_paste_toggle:'أو الصق إعدادات firebaseConfig كاملة',fb_fill:'تعبئة الحقول من الإعدادات',popout_btn:'نافذة',full_btn:'ملء الشاشة',export_excel:'تصدير إلى Excel',cw_qty:'وحدة',cw_rows:'صف',cw_print:'طباعة',cloud_connect:'اتصال',cloud_save:'حفظ إلى السحابة',cloud_test:'اختبار الاتصال',cloud_load:'تحميل من السحابة',cloud_auto:'تحميل تلقائي عند الفتح وحفظ تلقائي بعد كل تعديل',cloud_live:'مزامنة لحظية ثنائية (موصى بها)',cloud_note_title:'ملاحظات الإعداد',cloud_st_idle:'غير متصل',cloud_n1:'أنشئ مشروع Firebase، فعّل <b>Firestore Database</b>، ثم انسخ <span class=\"tag\">firebaseConfig</span> من إعدادات المشروع.',cloud_n2:'للاختبار اضبط قواعد Firestore على وضع الاختبار. للإنتاج أمّن القواعد.',cloud_n3:'تُخزّن البيانات في المجموعة <span class=\"tag\">inventory_dashboard</span>، المستند <span class=\"tag\">latest</span>.',cloud_n4:'تُحفظ كل البيانات والإعدادات في السحابة فقط (بدون تخزين محلي في المتصفح).',cloud_provider_label:'مزوّد القاعدة السحابية',cloud_provider_hint:'اختر مكان تخزين بياناتك. يتذكّر كل جهاز اختياره.',cloud_sb_cfg_label:'إعدادات Supabase',sb_url:'رابط المشروع',sb_anon:'مفتاح anon العام',cloud_sb_n1:'Supabase: أنشئ جدولاً باسم <span class="tag">cloud_docs</span> بالأعمدة col text و doc text و data jsonb و updated_at int8، ومفتاح أساسي (col, doc)، وفعّل Realtime عليه.',cyl_storage:'المساحة التخزينية',cyl_used:'رصيد مُستخدم',cyl_transit:'ترانزيت',cyl_empty:'فارغة (متاحة)',cyl_branch_title:'الفروع',cyl_fact_title:'المصانع',sp_lbl_actual:'المساحات الفعلية',sp_lbl_used:'المساحات المستخدمة',sp_lbl_transit:'مساحات الترانزيت',sp_lbl_empty:'المساحة الفارغة',bt_rpt_title:'تقرير أرصدة القارورة الحالية والترانزيت بالفروع',btl_dash_title:'لوحة مؤشرات القارورة والفرشة',btl_dash_sub:'تحليل الإنتاج والمبيعات والفرشة والتالف — من بيانات الملف الفعلية',btl_kpi_prod:'الإنتاج',btl_kpi_sales:'المبيعات',btl_kpi_brush:'الفرشة',btl_kpi_dmg:'التالف',btl_kpi_brushpct:'نسبة الفرشة',btl_kpi_dmgpct:'نسبة التالف',btl_ch_trend:'اتجاه المبيعات الشهري',btl_ch_prodsales:'الإنتاج مقابل المبيعات',btl_ch_branch:'الفرشة حسب الفرع',btl_ch_bd:'الفرشة مقابل التالف',
+  ch_brand:'المخزون حسب الفئة (العلامة)',ch_monthly:'الإجماليات الشهرية',nav_sku:'ملخص الأصناف',nav_datecmp:'مقارنة التواريخ — الأعمار',nav_datecmpfg:'مقارنة التواريخ — الأرصدة FG',desc_datecmp:'مقارنة كميات الأصناف عبر الفروع بين تاريخين.',desc_datecmpfg:'مقارنة أرصدة FG Balance بين تاريخين.',dcmp_export:'تصدير Excel',sku_title:'ملخص إجماليات الأصناف (SKU)',c_code:'كود الصنف',c_size:'الحجم',c_pack2:'الشد',c_dim:'الحجم / الشد',search_item:'بحث بكود الصنف',dimension:'البُعد',ch_topitems:'أعلى الأصناف كميةً',nav_cloud:'السحابة',grp_daily:'التقارير اليومية',grp_data:'البيانات والأدوات',grp_admintools:'أدوات الإدارة',u_selall:'Select All',u_selnone:'مسح',nav_masterdata:'البيانات الرئيسية',nav_spaceact:'المساحات الفعلية',nav_rspace:'مساحات المستودعات',nav_rfgbal:'أرصدة المنتجات',nav_roldid:'الهوية القديمة',nav_rtransit:'الترانزيت',nav_rbottle:'أرصدة القارورة',nav_dailyup:'رفع التقارير اليومية',cloud_title:'\u2601\ufe0f مزامنة سحابية',cloud_sub:'تخزين ومزامنة بيانات التقرير في القاعدة السحابية المختارة.',cloud_cfg_label:'إعدادات Firebase',fb_apikey:'مفتاح API',fb_project:'معرّف المشروع',fb_authdomain:'نطاق المصادقة',fb_bucket:'مساحة التخزين',fb_sender:'معرّف المرسل',fb_appid:'معرّف التطبيق',fb_paste_toggle:'أو الصق إعدادات firebaseConfig كاملة',fb_fill:'تعبئة الحقول من الإعدادات',popout_btn:'نافذة',full_btn:'ملء الشاشة',export_excel:'تصدير إلى Excel',cw_qty:'وحدة',cw_rows:'صف',cw_print:'طباعة',cloud_connect:'اتصال',cloud_save:'حفظ إلى السحابة',cloud_test:'اختبار الاتصال',cloud_load:'تحميل من السحابة',cloud_auto:'تحميل تلقائي عند الفتح وحفظ تلقائي بعد كل تعديل',cloud_live:'مزامنة لحظية ثنائية (موصى بها)',cloud_note_title:'ملاحظات الإعداد',cloud_st_idle:'غير متصل',cloud_n1:'أنشئ مشروع Firebase، فعّل <b>Firestore Database</b>، ثم انسخ <span class=\"tag\">firebaseConfig</span> من إعدادات المشروع.',cloud_n2:'للاختبار اضبط قواعد Firestore على وضع الاختبار. للإنتاج أمّن القواعد.',cloud_n3:'تُخزّن البيانات في المجموعة <span class=\"tag\">inventory_dashboard</span>، المستند <span class=\"tag\">latest</span>.',cloud_n4:'تُحفظ كل البيانات والإعدادات في السحابة فقط (بدون تخزين محلي في المتصفح).',cloud_provider_label:'مزوّد القاعدة السحابية',cloud_provider_hint:'اختر مكان تخزين بياناتك. يتذكّر كل جهاز اختياره.',cloud_sb_cfg_label:'إعدادات Supabase',sb_url:'رابط المشروع',sb_anon:'مفتاح anon العام',cloud_sb_n1:'Supabase: أنشئ جدولاً باسم <span class="tag">cloud_docs</span> بالأعمدة col text و doc text و data jsonb و updated_at int8، ومفتاح أساسي (col, doc)، وفعّل Realtime عليه.',cyl_storage:'المساحة التخزينية',cyl_used:'رصيد مُستخدم',cyl_transit:'ترانزيت',cyl_empty:'فارغة (متاحة)',cyl_branch_title:'الفروع',cyl_fact_title:'المصانع',sp_lbl_actual:'المساحات الفعلية',sp_lbl_used:'المساحات المستخدمة',sp_lbl_transit:'مساحات الترانزيت',sp_lbl_empty:'المساحة الفارغة',bt_rpt_title:'تقرير أرصدة القارورة الحالية والترانزيت بالفروع',btl_dash_title:'لوحة مؤشرات القارورة والفرشة',btl_dash_sub:'تحليل الإنتاج والمبيعات والفرشة والتالف — من بيانات الملف الفعلية',btl_kpi_prod:'الإنتاج',btl_kpi_sales:'المبيعات',btl_kpi_brush:'الفرشة',btl_kpi_dmg:'التالف',btl_kpi_brushpct:'نسبة الفرشة',btl_kpi_dmgpct:'نسبة التالف',btl_ch_trend:'اتجاه المبيعات الشهري',btl_ch_prodsales:'الإنتاج مقابل المبيعات',btl_ch_branch:'الفرشة حسب الفرع',btl_ch_bd:'الفرشة مقابل التالف',
   foot:(s,t,q)=>'عرض '+s+' من '+t+' سجل  •  إجمالي الكمية '+q+'  •  اضغط الفلاتر للتصفية',
   imp_title:'&#128228; استيراد البيانات — تحديث تلقائي',
   imp_sub:'ارفع ملف المخزون وسيتم تحديث لوحة المعلومات تلقائياً. الصيغ المدعومة: <span class="tag">.xlsb</span> <span class="tag">.xlsx</span> <span class="tag">.xls</span> <span class="tag">.csv</span>',
@@ -6721,12 +6741,14 @@ function go(p){
   if(p==='imp'){try{renderImportHistory();}catch(e){}}
   if(p==='btl-designer'){setTimeout(function(){try{BTLDS.initPage();}catch(e){}},40);}
   if(p==='snapshots'){setTimeout(function(){try{SNAP.renderPage();}catch(e){}},30);}
+  if(p==='datecmp'){setTimeout(function(){try{DATECMP.render('inv');}catch(e){}},30);}
+  if(p==='datecmpfg'){setTimeout(function(){try{DATECMP.render('fg');}catch(e){}},30);}
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
   /* تبديل إظهار الصفحات بأمان: حارس على كل عنصر حتى لا يمنع غياب عنصرٍ إظهارَ بقية الصفحات */
   ['users','home','dash','sum','sku','imp','cloud','designer','cardbuilder','records',
    'rspace','rfgbal','roldid','rtransit','rbottle','dailyup','masterdata','spaceact','pagebuilder',
    'btl-dash','btl-compare','btl-table','btl-manage','btl-designer',
-   'hr-dash','hr-emp','hr-pending','hr-upload','snapshots'].forEach(function(_p){
+   'hr-dash','hr-emp','hr-pending','hr-upload','snapshots','datecmp','datecmpfg'].forEach(function(_p){
     var _e=document.getElementById('page-'+_p);
     if(_e)_e.classList.toggle('show',p===_p);
   });
@@ -8220,17 +8242,17 @@ function seedUsers(){
   }catch(e){}
 }
 function isAdmin(){return !!(CURRENT_USER&&CURRENT_USER.r==='admin');}
-const ALL_PAGES=['rspace','rfgbal','roldid','rtransit','rbottle','btl-dash','btl-table','btl-manage','btl-compare','dash','sum','sku','masterdata','spaceact','dailyup','imp','cloud','records','designer','cardbuilder','pagebuilder','users','hr-dash','hr-emp','hr-pending','hr-upload','notifications'];
-const PAGE_LABEL={dash:'nav_dash',sum:'nav_sum',sku:'nav_sku',records:'nav_records',imp:'nav_imp',cloud:'nav_cloud',designer:'nav_designer',rspace:'nav_rspace',rfgbal:'nav_rfgbal',roldid:'nav_roldid',rtransit:'nav_rtransit',rbottle:'nav_rbottle',masterdata:'nav_masterdata',spaceact:'nav_spaceact',dailyup:'nav_dailyup',users:'nav_users','btl-dash':'nav_btl_dash','btl-table':'nav_btl_table','btl-manage':'nav_btl_manage','btl-compare':'nav_btl_compare',cardbuilder:'Card Builder',pagebuilder:'Page Builder','hr-dash':'nav_hr_dash','hr-emp':'nav_hr_emp','hr-pending':'nav_hr_pending','hr-upload':'nav_hr_upload',notifications:'🔔 Notifications / الإشعارات'};
+const ALL_PAGES=['rspace','rfgbal','roldid','rtransit','rbottle','btl-dash','btl-table','btl-manage','btl-compare','dash','sum','sku','masterdata','spaceact','dailyup','imp','cloud','records','designer','cardbuilder','pagebuilder','users','hr-dash','hr-emp','hr-pending','hr-upload','datecmp','datecmpfg','snaprecall','notifications'];
+const PAGE_LABEL={dash:'nav_dash',sum:'nav_sum',sku:'nav_sku',datecmp:'nav_datecmp',datecmpfg:'nav_datecmpfg',records:'nav_records',imp:'nav_imp',cloud:'nav_cloud',designer:'nav_designer',rspace:'nav_rspace',rfgbal:'nav_rfgbal',roldid:'nav_roldid',rtransit:'nav_rtransit',rbottle:'nav_rbottle',masterdata:'nav_masterdata',spaceact:'nav_spaceact',dailyup:'nav_dailyup',users:'nav_users','btl-dash':'nav_btl_dash','btl-table':'nav_btl_table','btl-manage':'nav_btl_manage','btl-compare':'nav_btl_compare',cardbuilder:'Card Builder',pagebuilder:'Page Builder','hr-dash':'nav_hr_dash','hr-emp':'nav_hr_emp','hr-pending':'nav_hr_pending','hr-upload':'nav_hr_upload',notifications:'🔔 Notifications / الإشعارات',snaprecall:'⏱ استرجاع التاريخ (Data as of)'};
 /* مجموعات الصلاحيات المنظّمة (للعرض الاحترافي) */
 const PERM_GROUPS=[
   {key:'daily',label:'grp_daily',pages:['rspace','rfgbal','roldid','rtransit','rbottle']},
   {key:'bottle',label:'grp_btl',pages:['btl-dash','btl-table','btl-manage','btl-compare']},
-  {key:'aging',label:'grp_aging',pages:['dash','sum','sku']},
+  {key:'aging',label:'grp_aging',pages:['dash','sum','sku','datecmp','datecmpfg']},
   {key:'data',label:'grp_data',pages:['masterdata','spaceact','dailyup','imp','records']},
   {key:'hr',label:'grp_hr',pages:['hr-dash','hr-emp','hr-pending','hr-upload']},
   {key:'admin',label:'grp_admintools',pages:['cloud','designer','cardbuilder','pagebuilder','users']},
-  {key:'features',label:'grp_features',pages:['notifications']}
+  {key:'features',label:'grp_features',pages:['snaprecall','notifications']}
 ];
 /* صلاحيات المستخدم مع القيمة الافتراضية:
    - صلاحيات صريحة غير فارغة → تُستخدم كما هي
@@ -10817,7 +10839,10 @@ var UM_PAGE_AR={
   cardbuilder:'Card Builder',pagebuilder:'Page Builder',
   'hr-dash':'HR Dashboard','hr-emp':'HR Employees',
   'hr-pending':'HR Pending','hr-upload':'HR Upload',
-  notifications:'Notifications'
+  notifications:'Notifications',
+  datecmp:'Comparison of Dates — Aging',
+  datecmpfg:'Comparison of Dates — FG Balance',
+  snaprecall:'Time-travel bar (Data as of)'
 };
 var UM_GROUP_AR={
   grp_daily:'Daily Reports',grp_btl:'Bottle Management',
@@ -31292,7 +31317,7 @@ var _iv=setInterval(function(){
     var arr=Object.keys(keys).map(function(k){var x=snapM[k],y=cmp?curM[k]:null,base=x||y;return {item:base.item_code,brand:base.brand,branch:base.branch,prod:base.prod,snap:x?x.qty:0,cur:y?y.qty:0};});
     arr.sort(function(x,y){return (y.snap||y.cur)-(x.snap||x.cur);});
     var tq=0,tc=0;
-    var h='<table class="pivot dr-table" style="width:100%"><thead><tr>'+th(L('كود الصنف','Item Code'))+th(L('الفئة','Brand'))+th(L('الفرع','Branch'))+th(L('تاريخ الإنتاج','Production Date'))+th(L('الرصيد','Balance'))+(cmp?th(L('الحالي','Current'))+th(L('الفرق','Change')):'')+'</tr></thead><tbody>';
+    var h='<table class="pivot dr-table" style="width:100%"><thead><tr>'+th(L('كود الصنف','Item Code'))+th(L('الفئة','Brand'))+th(L('الفرع','Branch'))+th(L('تاريخ الإنتاج','Production Date'))+th(L('الرصيد','Balance'))+(cmp?th(L('الحالي','Current'))+th(L('الفرق','Difference')):'')+'</tr></thead><tbody>';
     arr.forEach(function(r){tq+=r.snap;tc+=r.cur;
       h+='<tr><td class="cat">'+esc(r.item||'—')+'</td><td class="cat">'+esc(mvv('identity',r.brand)||'—')+'</td><td class="cat">'+esc(mvv('branch',r.branch)||'—')+'</td><td class="cat">'+esc(r.prod||'—')+'</td><td><b>'+fmt(r.snap)+'</b></td>'+(cmp?('<td>'+fmt(r.cur)+'</td><td>'+deltaCell(r.cur-r.snap)+'</td>'):'')+'</tr>';
     });
@@ -31466,9 +31491,11 @@ var _iv=setInterval(function(){
       (a.length?'':'<span class="snap-tt-empty">'+L('لا توجد بيانات محفوظة بعد','No saved data yet')+'</span>')+
       '<button class="snap-tt-x" title="'+L('إخفاء','Hide')+'" onclick="SNAP.toggleBar()">&#10005;</button></div>';
   }
+  function canRecall(){try{if(typeof isAdmin==='function'&&isAdmin())return true;return !!(typeof CURRENT_USER!=='undefined'&&CURRENT_USER&&CURRENT_USER.perms&&CURRENT_USER.perms.indexOf('snaprecall')>=0);}catch(e){return false;}}
   function ensureBar(pageId){
     var key=(pageId==='dailyup'||pageId==='dash'||pageId==='btl-dash'||pageId==='sum'||pageId==='sku')?'__all__':PAGEMAP[pageId];
     if(!key)return;
+    if(!canRecall()){var _eb=document.getElementById('snap-bar-'+pageId);if(_eb)_eb.style.display='none';var _tg=document.getElementById('snap-toggle-'+pageId);if(_tg)_tg.style.display='none';return;}
     var page=document.getElementById('page-'+pageId);if(!page)return;
     var wrap=page.querySelector('.wrap')||page;
     var bar=document.getElementById('snap-bar-'+pageId);
@@ -31498,5 +31525,470 @@ var _iv=setInterval(function(){
     setTimeout(function(){seedNow();autoTick();},12000);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else setTimeout(boot,0);
+})();
+</script>
+<style id="datecmp-styles">
+.dcmp-page .dcmp-card{background:#fff;border:1px solid var(--line,#e2e8f0);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(16,40,80,.05);margin-bottom:14px}
+.dcmp-page .dcmp-lbl{font-size:10.5px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.dcmp-page .dcmp-clear{font-size:10px;font-weight:700;color:#7c5cd6;cursor:pointer;text-transform:none;letter-spacing:0}
+.dcmp-page .dcmp-clear:hover{text-decoration:underline}
+.dcmp-page .dcmp-sel{font:inherit;font-size:13px;font-weight:700;padding:9px 12px;border:1px solid #d7e0ec;border-radius:10px;background:#fff;color:#0f2747;min-width:230px;cursor:pointer}
+.dcmp-page .dcmp-chips{display:flex;flex-wrap:wrap;gap:7px}
+.dcmp-page .dcmp-chip{display:inline-flex;align-items:center;border:1px solid transparent;border-radius:999px;padding:6px 13px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:.15s;user-select:none}
+.dcmp-page .dcmp-chip.c-br{background:var(--blue,#4a93f2)}
+.dcmp-page .dcmp-chip.c-sz{background:var(--teal,#12b1a2)}
+.dcmp-page .dcmp-chip.c-pk{background:#7c5cd6}
+.dcmp-page .dcmp-chip.c-id{background:#e0792f}
+.dcmp-page .dcmp-chip.off{background:#eef2f7 !important;color:#94a3b8;border-color:#e2e8f0}
+.dcmp-page .dcmp-chip:hover{filter:brightness(1.07)}
+.dcmp-page .dcmp-tbl{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.dcmp-page .dcmp-tbl th,.dcmp-page .dcmp-tbl td{border:1px solid #e8eef5;padding:7px 10px;text-align:center;white-space:nowrap}
+.dcmp-page .dcmp-tbl thead th{background:#f4f7fb;color:#0f2747;font-weight:800;font-size:11px}
+.dcmp-page .dcmp-tbl thead .brhead{background:#eaf1fb;color:#1e4e8c;font-size:12px}
+.dcmp-page .dcmp-tbl thead .tothead{background:#f2ecfb;color:#5b3fb0}
+.dcmp-page .dcmp-tbl thead .subd1{color:#475569}
+.dcmp-page .dcmp-tbl thead .subd2{color:#0f2747}
+.dcmp-page .dcmp-tbl thead .subdf{color:#7c5cd6}
+.dcmp-page .dcmp-tbl .idcol{text-align:start;font-weight:700;color:#0f2747;background:#fbfcfe}
+.dcmp-page .dcmp-tbl .idcode{font-family:Menlo,Consolas,monospace;font-weight:700;color:#1e4e8c}
+.dcmp-page .dcmp-tbl tbody tr:hover td{background:#f8fbff}
+.dcmp-page .dcmp-tbl .totcol{background:#faf7ff;font-weight:700}
+.dcmp-page .dcmp-tbl tfoot td{background:#1e3a8a;color:#fff;font-weight:800;border-color:#2b4bbf}
+.dcmp-page .dcmp-tbl .up{color:#16a34a;font-weight:800}
+.dcmp-page .dcmp-tbl .dn{color:#dc2626;font-weight:800}
+.dcmp-page .dcmp-tbl .zr{color:#94a3b8}
+.dcmp-page .dcmp-tbl tfoot .up{color:#4ade80}
+.dcmp-page .dcmp-tbl tfoot .dn{color:#fca5a5}
+.dcmp-page .dcmp-tbl tfoot .zr{color:#94a3b8}
+.dcmp-page .dcmp-tbl .grp{font-size:12.5px;font-weight:800}
+.dcmp-page .dcmp-tbl .gd1{background:#eaf1fb;color:#1e4e8c}
+.dcmp-page .dcmp-tbl .gd2{background:#e6f7f2;color:#0f8a7e}
+.dcmp-page .dcmp-tbl .gdf{background:#f2ecfb;color:#5b3fb0}
+.dcmp-page .dcmp-tbl .gsep{border-inline-start:3px solid #9fb2cc !important}
+.dcmp-page .dcmp-tbl thead th{background:#eef2f8 !important;color:#1e293b !important;border-color:#d6deea !important}
+.dcmp-page .dcmp-tbl thead .gsep{border-inline-start:3px solid #c3cee0 !important}
+.dcmp-page .dcmp-tbl thead .gd1{background:#dbe8fb !important;color:#1e3a8a !important}
+.dcmp-page .dcmp-tbl thead .gd2{background:#d5f0f2 !important;color:#0e5b6b !important}
+.dcmp-page .dcmp-tbl thead .gdf{background:#eadcfb !important;color:#5b21b6 !important}
+.dcmp-page .dcmp-tbl .totcol{background:#f1f5fb !important;color:#1e293b !important}
+.dcmp-page .dcmp-tbl .totcol span{background:transparent !important;margin:0 !important;padding:0 !important}
+.dcmp-page .dcmp-tbl .totcol .up{color:#15803d !important}
+.dcmp-page .dcmp-tbl .totcol .dn{color:#b91c1c !important}
+.dcmp-page .dcmp-tbl .totcol .zr{color:#64748b !important}
+.dcmp-page .dcmp-ddbar{display:flex;flex-wrap:wrap;gap:12px}
+.dcmp-page .dcmp-dd{position:relative;min-width:210px;flex:1 1 210px}
+.dcmp-page .dcmp-ddbtn{width:100%;text-align:start;font:inherit;font-size:13px;font-weight:700;padding:10px 13px;border:1px solid #d7e0ec;border-radius:10px;background:#fff;color:#0f2747;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dcmp-page .dcmp-ddbtn:hover{border-color:#b9c6da}
+.dcmp-page .dcmp-ddbtn .cnt{font-size:11px;font-weight:700;color:#7c5cd6;margin-inline-start:6px}
+.dcmp-page .dcmp-ddpanel{position:absolute;z-index:60;top:calc(100% + 6px);inset-inline-start:0;min-width:100%;max-height:280px;overflow:auto;background:#fff;border:1px solid #d7e0ec;border-radius:12px;box-shadow:0 14px 34px -8px rgba(16,40,80,.30);padding:8px}
+.dcmp-page .dcmp-ddtools{display:flex;gap:14px;padding:4px 9px 8px;border-bottom:1px solid #eef2f7;margin-bottom:6px}
+.dcmp-page .dcmp-ddtools a{font-size:11.5px;font-weight:800;color:#7c5cd6;cursor:pointer}
+.dcmp-page .dcmp-ddtools a:hover{text-decoration:underline}
+.dcmp-page .dcmp-ddrow{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;font-size:12.5px;font-weight:600;color:#0f2747;cursor:pointer;white-space:nowrap}
+.dcmp-page .dcmp-ddrow:hover{background:#f4f7fb}
+.dcmp-page .dcmp-ddrow input{width:15px;height:15px;accent-color:#7c5cd6;cursor:pointer}
+.dcmp-page .dcmp-editbtn{border:1px solid #d7e0ec;background:#f4f7fb;border-radius:9px;padding:0 11px;cursor:pointer;font-size:15px;color:#0f2747}
+.dcmp-page .dcmp-editbtn:hover{background:#e8eef7}
+.dcmp-page .dcmp-seg{font:inherit;font-size:12.5px;font-weight:800;padding:8px 16px;border:1px solid #d7e0ec;border-radius:10px;background:#fff;color:#0f2747;cursor:pointer}
+.dcmp-page .dcmp-seg.on{background:#0f2747;color:#fff;border-color:#0f2747}
+</style>
+<script>
+/* ============================================================
+   DATECMP — «مقارنة التواريخ» / Comparison of Dates
+   جدول محوري: الأصناف (كود · حجم · مقاس) × الفروع أفقياً،
+   وتحت كل فرع كميتا تاريخين والفرق بينهما — بالاعتماد على اللقطات المحفوظة.
+   ============================================================ */
+(function(){
+  'use strict';
+  var SKEY='data_snapshots_v1';
+  function ls(){try{return (typeof LS!=='undefined'&&LS)?LS:localStorage;}catch(e){return localStorage;}}
+  function isAr(){try{return (typeof LANG!=='undefined'&&LANG==='ar');}catch(e){return true;}}
+  function L(a,e){return isAr()?a:e;}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function fmt(v){if(typeof v==='number'){try{if(typeof drFmt==='function')return drFmt(v);}catch(e){}try{return v.toLocaleString('en-US',{maximumFractionDigits:2});}catch(e){return ''+v;}}return esc(v);}
+  function mvv(k,v){try{if(typeof mv==='function'){var r=mv(k,v);if(r!=null&&r!=='')return r;}}catch(e){}return v;}
+  function pad(n){return (n<10?'0':'')+n;}
+  function _tm(ts){try{var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes());}catch(e){return '';}}
+  function snaps(){try{var a=JSON.parse(ls().getItem(SKEY)||'[]');if(!Array.isArray(a))return [];return a.slice().sort(function(x,y){return x.ts-y.ts;});}catch(e){return [];}}
+  function findSnap(id){var a=snaps();for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];return null;}
+  function curData(){try{return (typeof DATA!=='undefined'&&DATA)?DATA:[];}catch(e){return [];}}
+  function todayKey(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  function curDate(){try{var s=(ls().getItem('upd_date')||'').trim();var m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);if(m){var y=+m[3];if(y<100)y+=2000;return y+'-'+pad(+m[2])+'-'+pad(+m[1]);}}catch(e){}return todayKey();}
+  /* مصادر المقارنة = اللقطات المحفوظة + البيانات الحالية (دائماً متاحة) */
+  function sources(){
+    var a=snaps().map(function(s){return {id:s.id,ts:s.ts,date:(s.updDate||s.date),label:s.label||'',data:s.data,cur:false};});
+    var cd=curData();
+    if(cd&&cd.length){a.push({id:'__cur__',ts:Date.now()+1e9,date:curDate(),label:L('البيانات الحالية','Current data'),data:cd,cur:true});}
+    a.sort(function(x,y){return x.ts-y.ts;});
+    return a;
+  }
+  function findSrc(id){var a=sources();for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];return null;}
+
+  var ST={d1:null,d2:null,br:{},sz:{},pk:{},id:{},yr:{},mode:'inv',init:false};
+  /* تجميع الفروع في مناطق: «الرياض» تشمل الرياض والخرج وهيت */
+  var BR_REGIONS={'__RIYADH__':{ar:'الرياض',en:'Riyadh',members:['1. Riyadh','2. Kharj','3. Heet']}};
+  function brGroup(b){for(var g in BR_REGIONS){if(BR_REGIONS[g].members.indexOf(b)>=0)return g;}return b;}
+  function brGroupLabel(g){var r=BR_REGIONS[g];return r?L(r.ar,r.en):mvv('branch',g);}
+  function selSet(o){var s=[];for(var k in o)if(o[k])s.push(k);return s;}
+  function orderList(vals,order){var out=(order||[]).filter(function(o){return vals.indexOf(o)>=0;});vals.forEach(function(v){if(out.indexOf(v)<0)out.push(v);});return out;}
+
+  function buildAgg(data){
+    var items={};
+    (data||[]).forEach(function(d){
+      var code=d.item_code||'', size=(d.size==null?'':''+d.size), pack=d.pack||d.cat2||'', br=d.branch||'', id=d.identity||d.brand||'';
+      var prod=d.prod_date||'', mon=d.month||'';
+      if(!mon&&/^\d{4}-\d{2}/.test(prod)){var _MAB=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];mon=_MAB[(+prod.slice(5,7))-1]||'';}
+      var year=(prod&&/^(\d{4})/.test(prod))?prod.slice(0,4):((typeof yearOf==='function'&&mon)?String(yearOf(mon)):'');
+      var k=code+'||'+size+'||'+pack+'||'+prod;
+      if(!items[k])items[k]={code:code,size:size,pack:pack,id:id,prod:prod,mon:mon,year:year,q:{}};
+      if(!items[k].id&&id)items[k].id=id;
+      items[k].q[br]=(items[k].q[br]||0)+(+d.qty||0);
+    });
+    return items;
+  }
+  function diffHTML(d){if(!d)return '<span class="zr">0</span>';return d>0?('<span class="up">▲ +'+fmt(d)+'</span>'):('<span class="dn">▼ '+fmt(Math.abs(d))+'</span>');}
+  var _dmax=0;
+  function diffTint(d){var c=diffHTML(d);if(!d||!_dmax)return c;var t=Math.min(1,Math.abs(d)/_dmax);t=Math.pow(t,0.6);var a=(0.10+0.55*t).toFixed(3);var bg=d>0?('rgba(22,163,74,'+a+')'):('rgba(220,38,38,'+a+')');return '<span style="display:block;margin:-7px -10px;padding:7px 10px;background:'+bg+'">'+c+'</span>';}
+  function numCell(v){return v?fmt(v):'<span class="zr">0</span>';}
+
+  function compute(){
+    var a=sources();
+    if(a.length<2)return null;
+    if(!ST.init || !findSrc(ST.d1) || !findSrc(ST.d2)){ST.d1=a[0].id;ST.d2=a[a.length-1].id;ST.init=true;}
+    var s1=findSrc(ST.d1), s2=findSrc(ST.d2);
+    var agg1=buildAgg(s1.data), agg2=buildAgg(s2.data);
+    var keys={};Object.keys(agg1).forEach(function(k){keys[k]=1;});Object.keys(agg2).forEach(function(k){keys[k]=1;});
+    var allKeys=Object.keys(keys);
+    var brSet={},szSet={},pkSet={},idSet={},yrSet={};
+    allKeys.forEach(function(k){var it=agg1[k]||agg2[k];if(it.size!=='')szSet[it.size]=1;if(it.pack!=='')pkSet[it.pack]=1;if(it.id!=='')idSet[it.id]=1;if(it.year)yrSet[it.year]=1;});
+    [agg1,agg2].forEach(function(ag){Object.keys(ag).forEach(function(k){Object.keys(ag[k].q).forEach(function(b){if(b!=='')brSet[b]=1;});});});
+    var BORD=(typeof BRANCH_ORDER!=='undefined')?BRANCH_ORDER:[];
+    var SORD=(typeof SIZE_ORDER!=='undefined')?SIZE_ORDER:[];
+    var IORD=(typeof IDENT_ORDER!=='undefined')?IDENT_ORDER:[];
+    var branchesAll=orderList(Object.keys(brSet),BORD);
+    var branchGroupsAll=[];branchesAll.forEach(function(b){var g=brGroup(b);if(branchGroupsAll.indexOf(g)<0)branchGroupsAll.push(g);});
+    var sizesAll=orderList(Object.keys(szSet),SORD);
+    var packsAll=Object.keys(pkSet).sort();
+    var idsAll=orderList(Object.keys(idSet),IORD);
+    var yearsAll=Object.keys(yrSet).filter(Boolean).sort();
+    var selBr=selSet(ST.br), selSz=selSet(ST.sz), selPk=selSet(ST.pk), selId=selSet(ST.id), selYr=selSet(ST.yr);
+    var branches=branchesAll.filter(function(b){return selBr.length===0||selBr.indexOf(brGroup(b))>=0;});
+    var rowKeys=allKeys.filter(function(k){var it=agg1[k]||agg2[k];
+      if(selSz.length&&selSz.indexOf(it.size)<0)return false;
+      if(selPk.length&&selPk.indexOf(it.pack)<0)return false;
+      if(selId.length&&selId.indexOf(it.id)<0)return false;
+      if(selYr.length&&selYr.indexOf(it.year)<0)return false;
+      if(ST.q){var qq=(''+ST.q).trim().toLowerCase();if(qq&&String(it.code||'').toLowerCase().indexOf(qq)<0)return false;}
+      return true;});
+    // إخفاء الفروع التي كل قيمها أصفار عبر الأصناف المعروضة
+    var brNZ={};
+    rowKeys.forEach(function(k){var q1=(agg1[k]?agg1[k].q:{}),q2=(agg2[k]?agg2[k].q:{});branches.forEach(function(b){if((q1[b]||0)!==0||(q2[b]||0)!==0)brNZ[b]=1;});});
+    branches=branches.filter(function(b){return brNZ[b];});
+    var rows=rowKeys.map(function(k){
+      var it=agg1[k]||agg2[k];var q1=(agg1[k]?agg1[k].q:{}),q2=(agg2[k]?agg2[k].q:{});
+      var cells=branches.map(function(b){var v1=q1[b]||0,v2=q2[b]||0;return {v1:v1,v2:v2,d:v2-v1};});
+      var t1=cells.reduce(function(s,c){return s+c.v1;},0);
+      var t2=cells.reduce(function(s,c){return s+c.v2;},0);
+      return {code:it.code,size:it.size,pack:it.pack,prod:it.prod,mon:it.mon,year:it.year,cells:cells,t1:t1,t2:t2,td:t2-t1};
+    });
+    rows.sort(function(x,y){var a=x.prod||'',b=y.prod||'';if(a===b)return (y.t2||y.t1)-(x.t2||x.t1);if(!a)return 1;if(!b)return -1;return a<b?-1:1;});
+    rows=rows.filter(function(r){return r.t1!==0||r.t2!==0;});
+    return {s1:s1,s2:s2,rows:rows,branches:branches,branchesAll:branchesAll,branchGroupsAll:branchGroupsAll,sizesAll:sizesAll,packsAll:packsAll,idsAll:idsAll,yearsAll:yearsAll,selBr:selBr,selSz:selSz,selPk:selPk,selId:selId,selYr:selYr};
+  }
+
+  function chips(type,list,mapk,sel,cls,labelFn){
+    if(!list.length)return '<span style="color:#94a3b8;font-size:12px">'+L('لا يوجد','none')+'</span>';
+    var anySel=sel.length>0;
+    return '<div class="dcmp-chips">'+list.map(function(v){
+      var picked=sel.indexOf(v)>=0;var on=!anySel||picked;var label=labelFn?labelFn(v):(mapk?mvv(mapk,v):v);
+      return '<span class="dcmp-chip '+cls+(on?'':' off')+'" data-t="'+esc(type)+'" data-v="'+esc(v)+'">'+(picked?'✓ ':'')+esc(label)+'</span>';
+    }).join('')+'</div>';
+  }
+
+  function srcList(){return ST.mode==='fg'?fgSources():sources();}
+  function findInList(a,id){for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];return null;}
+  function setMode(m){if(ST.mode!==m){ST.mode=m;ST.init=false;ST._open=null;render();}}
+  function seg(m,t){return '<button class="dcmp-seg'+(ST.mode===m?' on':'')+'" onclick="DATECMP.setMode(\''+m+'\')">'+esc(t)+'</button>';}
+  function modeSwitch(){return '<div class="dcmp-card" style="padding:10px 14px;margin-bottom:14px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="dcmp-lbl" style="margin:0">'+L('مصدر المقارنة','Compare dataset')+'</span>'+seg('inv',L('المخزون (الأعمار)','Inventory (Aging)'))+seg('fg',L('أرصدة FG Balance','FG Balance'))+'</div></div>';}
+  function curFg(){try{var f=(typeof getDR==='function')?getDR().fgbal:null;return f&&f.rows&&f.rows.length?JSON.parse(JSON.stringify(f)):null;}catch(e){return null;}}
+  function fullDr(){try{var d=(typeof getDR==='function')?getDR():{},DEF=(typeof DEFAULT_DAILY_REPORTS!=='undefined')?DEFAULT_DAILY_REPORTS:{};function cp(o){try{return o?JSON.parse(JSON.stringify(o)):null;}catch(e){return null;}}return {space:cp(d.space||DEF.space),fgbal:cp(d.fgbal||DEF.fgbal),oldid:cp(d.oldid||DEF.oldid),transit:cp(d.transit||DEF.transit),bottle:cp(d.bottle||DEF.bottle),space_date:d.space_date||'',space_time:d.space_time||''};}catch(e){return {fgbal:curFg()};}}
+  function fgOf(s){return (s.dr&&s.dr.fgbal)||s.fgbal||null;}
+  function fgSources(){
+    var a=snaps().filter(function(s){var f=fgOf(s);return !!(f&&f.rows&&f.rows.length);}).map(function(s){return {id:s.id,ts:s.ts,date:(s.updDate||s.date),fg:fgOf(s),cur:false};});
+    var cur=curFg();
+    if(cur){a.push({id:'__cur__',ts:Date.now()+1e9,date:curDate(),fg:cur,cur:true});}
+    a.sort(function(x,y){return x.ts-y.ts;});
+    return a;
+  }
+  function fgAgg(fg){
+    var h=fg.headers||[], nf=fg.numFrom||1, colNames=[];
+    for(var i=nf;i<h.length;i++)colNames.push(String(h[i]));
+    var map={};
+    (fg.rows||[]).forEach(function(row){
+      if(/^(total|grand|\u0627\u0644\u0627\u062c\u0645\u0627\u0644|\u0627\u0644\u0625\u062c\u0645\u0627\u0644|\u0627\u062c\u0645\u0627\u0644)/i.test(String(row[0]||'').trim()))return;
+      var cats=[];for(var c=0;c<nf;c++)cats.push(row[c]==null?'':row[c]);
+      var key=cats.join(' | ');
+      if(!map[key])map[key]={cats:cats,vals:{}};
+      for(var j=nf;j<h.length;j++){var v=row[j];if(typeof v==='number'){var nm=String(h[j]);map[key].vals[nm]=(map[key].vals[nm]||0)+v;}}
+    });
+    return {numFrom:nf,colNames:colNames,map:map};
+  }
+  function ctlHTML(a){
+    var v1=(findInList(a,ST.d1)||{}).date||'', v2=(findInList(a,ST.d2)||{}).date||'';
+    var _dts=a.map(function(s){return s.date;}).sort();
+    var _min=_dts[0], _max=_dts[_dts.length-1];
+    var _avail=a.map(function(s){return s.date+(s.cur?(' ('+L('حالي','live')+')'):'');}).join('، ');
+    return '<div class="dcmp-card"><div style="display:flex;gap:12px;flex-wrap:nowrap;align-items:center;overflow-x:auto">'+
+      '<span class="dcmp-lbl" style="margin:0;white-space:nowrap">'+L('من:','From:')+'</span>'+
+      '<input type="date" class="dcmp-sel" value="'+v1+'" min="'+_min+'" max="'+_max+'" onchange="DATECMP.setD1Date(this.value)"><button class="dcmp-editbtn" title="'+L('تعديل تاريخ اللقطة','Edit snapshot date')+'" onclick="DATECMP.editDate(\'d1\')">✎</button>'+
+      '<span style="font-size:20px;color:#c3cbd8">→</span>'+
+      '<span class="dcmp-lbl" style="margin:0;white-space:nowrap">'+L('إلى:','To:')+'</span>'+
+      '<input type="date" class="dcmp-sel" value="'+v2+'" min="'+_min+'" max="'+_max+'" onchange="DATECMP.setD2Date(this.value)"><button class="dcmp-editbtn" title="'+L('تعديل تاريخ اللقطة','Edit snapshot date')+'" onclick="DATECMP.editDate(\'d2\')">✎</button>'+
+      '<span style="font-size:11px;color:#94a3b8;white-space:nowrap">'+L('التواريخ المتاحة: ','Available dates: ')+esc(_avail)+'</span>'+
+      '<div style="flex:1 1 12px;min-width:8px"></div>'+
+      '<button class="btn-soft sm" style="background:#0891b2;color:#fff;border-color:#0891b2;white-space:nowrap;flex-shrink:0" onclick="DATECMP.saveNow()">📸 '+L('تسجيل تاريخ الآن','Record now')+'</button>'+
+      '<button class="btn-soft sm" style="white-space:nowrap;flex-shrink:0" onclick="DATECMP.clearSnaps()">🗑 '+L('مسح السجلات','Clear records')+'</button>'+
+      '</div></div>';
+  }
+  function renderFG(a,root,sub,exp,head){
+    var s1=findInList(a,ST.d1), s2=findInList(a,ST.d2);
+    var A1=fgAgg(s1.fg), A2=fgAgg(s2.fg), nf=A2.numFrom||A1.numFrom||1;
+    var cols=A2.colNames.slice(); A1.colNames.forEach(function(c){if(cols.indexOf(c)<0)cols.push(c);});
+    var keys={}; Object.keys(A1.map).forEach(function(k){keys[k]=1;}); Object.keys(A2.map).forEach(function(k){keys[k]=1;});
+    var rows=Object.keys(keys).map(function(k){var r1=A1.map[k],r2=A2.map[k],base=r2||r1;
+      var cells=cols.map(function(cn){var v1=(r1&&r1.vals[cn])||0,v2=(r2&&r2.vals[cn])||0;return {v1:v1,v2:v2,d:v2-v1};});
+      var t1=cells.reduce(function(s,c){return s+c.v1;},0),t2=cells.reduce(function(s,c){return s+c.v2;},0);
+      return {cats:base.cats,cells:cells,t1:t1,t2:t2,td:t2-t1};});
+    rows.sort(function(x,y){return (y.t2||y.t1)-(x.t2||x.t1);});
+    rows=rows.filter(function(r){return r.t1!==0||r.t2!==0;});
+    ST._lastFG={s1:s1,s2:s2,cols:cols,nf:nf,rows:rows,catHeaders:(s2.fg.headers||[]).slice(0,nf)};
+    if(sub)sub.textContent=L('مقارنة FG Balance ','FG Balance ')+s1.date+' → '+s2.date+' · '+rows.length+' '+L('صف','rows');
+    if(exp)exp.style.display=rows.length?'':'none';
+    var ctl=ctlHTML(a), tbl;
+    if(!rows.length){tbl='<div class="dcmp-card" style="padding:34px;text-align:center;color:#64748b">'+L('لا توجد بيانات FG Balance في هذين التاريخين.','No FG Balance data for these two dates.')+'</div>';}
+    else{
+      var d1=esc(s1.date),d2=esc(s2.date),nc=cols.length,totLbl=L('الإجمالي','Total'),catH=ST._lastFG.catHeaders,showTot=nc>1;
+      var colT1=cols.map(function(){return 0;}),colT2=cols.map(function(){return 0;});
+      rows.forEach(function(r){r.cells.forEach(function(c,i){colT1[i]+=c.v1;colT2[i]+=c.v2;});});
+      var gT1=rows.reduce(function(s,r){return s+r.t1;},0),gT2=rows.reduce(function(s,r){return s+r.t2;},0);
+      _dmax=0;rows.forEach(function(r){r.cells.forEach(function(c){if(Math.abs(c.d)>_dmax)_dmax=Math.abs(c.d);});if(Math.abs(r.td)>_dmax)_dmax=Math.abs(r.td);});
+      function colRow(){var s='';cols.forEach(function(cn,i){s+='<th class="brhead'+(i===0?' gsep':'')+'">'+esc(cn)+'</th>';});if(showTot)s+='<th class="tothead">'+totLbl+'</th>';return s;}
+      var h='<table class="dcmp-tbl"><thead><tr>';
+      for(var ci=0;ci<nf;ci++)h+='<th class="idcol" rowspan="2">'+esc(catH[ci]||('#'+(ci+1)))+'</th>';
+      h+='<th class="grp gd1 gsep" colspan="'+(nc+(showTot?1:0))+'">'+L('التاريخ الأول','First date')+' · '+d1+'</th>';
+      h+='<th class="grp gd2 gsep" colspan="'+(nc+(showTot?1:0))+'">'+L('التاريخ الثاني','Second date')+' · '+d2+'</th>';
+      h+='<th class="grp gdf gsep" colspan="'+(nc+(showTot?1:0))+'">'+L('الفرق','Difference')+'</th></tr>';
+      h+='<tr>'+colRow()+colRow()+colRow()+'</tr></thead><tbody>';
+      rows.forEach(function(r){h+='<tr>';
+        for(var c=0;c<nf;c++)h+='<td class="idcol'+(c===0?' idcode':'')+'">'+esc(r.cats[c]||'—')+'</td>';
+        r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+numCell(c.v1)+'</td>';});if(showTot)h+='<td class="totcol">'+numCell(r.t1)+'</td>';
+        r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+numCell(c.v2)+'</td>';});if(showTot)h+='<td class="totcol">'+numCell(r.t2)+'</td>';
+        r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+diffTint(c.d)+'</td>';});if(showTot)h+='<td class="totcol">'+diffTint(r.td)+'</td>';
+        h+='</tr>';});
+      h+='</tbody><tfoot><tr><td class="idcol" colspan="'+nf+'" style="text-align:start">'+totLbl+'</td>';
+      cols.forEach(function(_,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+fmt(colT1[i])+'</td>';});if(showTot)h+='<td>'+fmt(gT1)+'</td>';
+      cols.forEach(function(_,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+fmt(colT2[i])+'</td>';});if(showTot)h+='<td>'+fmt(gT2)+'</td>';
+      cols.forEach(function(_,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+diffHTML(colT2[i]-colT1[i])+'</td>';});if(showTot)h+='<td>'+diffHTML(gT2-gT1)+'</td>';
+      h+='</tr></tfoot></table>';
+      tbl='<div class="dcmp-card" style="padding:0;overflow:auto">'+h+'</div>';
+    }
+    root.innerHTML=head+ctl+tbl;
+  }
+
+  function mount(mode){ST.mode=(mode==='fg')?'fg':'inv';if(ST.mode==='fg'){ST.rootId='dcmpfg-root';ST.subId='dcmpfg-sub';ST.expId='dcmpfg-export';}else{ST.rootId='dcmp-root';ST.subId='dcmp-sub';ST.expId='dcmp-export';}ST.init=false;ST._open=null;render();}
+  function render(){
+    var root=document.getElementById(ST.rootId||'dcmp-root'); if(!root)return;
+    var sub=document.getElementById(ST.subId||'dcmp-sub'), exp=document.getElementById(ST.expId||'dcmp-export');
+    var a=srcList();
+    var head='';
+    if(a.length<2){
+      if(sub)sub.textContent=L('يلزم تاريخان للمقارنة','Two dates required to compare');
+      if(exp)exp.style.display='none';
+      root.innerHTML=head+'<div class="dcmp-card" style="padding:34px;text-align:center;color:#64748b;line-height:1.7">'+
+        L('لا توجد بيانات كافية للمقارنة. المقارنة تحتاج إلى تاريخين: البيانات الحالية متاحة دائماً، وتحتاج إلى لقطة محفوظة واحدة على الأقل للمقارنة معها — احفظ لقطة الآن من صفحة «سجل اللقطات».','Not enough data to compare. A comparison needs two dates: the current data is always available, and you need at least one saved snapshot to compare it against — save one now from the “Data Snapshots” page.')+
+        '<br><br><button class="btn-soft sm" style="background:#0891b2;color:#fff;border-color:#0891b2" onclick="DATECMP.saveNow()">📸 '+L('تسجيل تاريخ الآن','Record date now')+'</button> '+
+        '<button class="btn-soft sm" onclick="go(\'snapshots\')">'+L('الذهاب إلى سجل اللقطات','Go to Data Snapshots')+'</button></div>';
+      return;
+    }
+    if(!ST.init||!findInList(a,ST.d1)||!findInList(a,ST.d2)){ST.d1=a[0].id;ST.d2=a[a.length-1].id;ST.init=true;}
+    if(ST.mode==='fg'){renderFG(a,root,sub,exp,head);return;}
+    var R=compute();
+    ST._last=R;
+    if(sub)sub.textContent=L('مقارنة ','Comparing ')+R.s1.date+' → '+R.s2.date+' · '+R.rows.length+' '+L('صنف','items');
+    if(exp)exp.style.display=R.rows.length?'':'none';
+
+    function opts(cur){return a.map(function(s){return '<option value="'+s.id+'"'+(s.id===cur?' selected':'')+'>'+esc(s.date+' '+_tm(s.ts)+(s.label?(' — '+s.label):''))+'</option>';}).join('');}
+    var ctl=ctlHTML(a);
+
+    function clr(type){return '<span class="dcmp-clear" onclick="DATECMP.clear(\''+type+'\')">'+L('مسح','Clear')+'</span>';}
+    var flt='<div class="dcmp-card">'+
+      '<div class="dcmp-ddbar">'+
+        '<div style="flex:1 1 240px"><input id="dcmp-search" class="dcmp-sel" style="width:100%;box-sizing:border-box" placeholder="'+L('🔍 بحث بكود الصنف…','🔍 Search item code…')+'" value="'+esc(ST.q||'')+'" oninput="DATECMP.search(this.value)"></div>'+
+        dd('br',L('الفرع','Branch'),R.branchGroupsAll,null,R.selBr,brGroupLabel)+
+        dd('sz',L('الحجم','Size'),R.sizesAll,null,R.selSz,null)+
+        dd('pk',L('المقاس','Measure'),R.packsAll,'cat2',R.selPk,null)+
+      '</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:14px 28px;margin-top:14px;align-items:center">'+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="dcmp-lbl" style="margin:0">'+L('الفئة (العلامة)','Category (Brand)')+'</span>'+chips('id',R.idsAll,'identity',R.selId,'c-id')+'</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="dcmp-lbl" style="margin:0">'+L('العام','Year')+'</span>'+chips('yr',R.yearsAll,null,R.selYr,'c-br')+'</div>'+
+      '</div>'+
+      '</div>';
+
+    var tbl;
+    if(!R.rows.length){
+      tbl='<div class="dcmp-card" style="padding:34px;text-align:center;color:#64748b">'+L('لا توجد أصناف مطابقة للفلاتر المحددة.','No items match the selected filters.')+'</div>';
+    }else{
+      var d1=esc(R.s1.date), d2=esc(R.s2.date), nb=R.branches.length;
+      var colT1=R.branches.map(function(){return 0;}), colT2=R.branches.map(function(){return 0;});
+      R.rows.forEach(function(r){r.cells.forEach(function(c,i){colT1[i]+=c.v1;colT2[i]+=c.v2;});});
+      var gT1=R.rows.reduce(function(s,r){return s+r.t1;},0), gT2=R.rows.reduce(function(s,r){return s+r.t2;},0);
+      _dmax=0;R.rows.forEach(function(r){r.cells.forEach(function(c){if(Math.abs(c.d)>_dmax)_dmax=Math.abs(c.d);});if(Math.abs(r.td)>_dmax)_dmax=Math.abs(r.td);});
+      var totLbl=L('الإجمالي','Total'), showTot=nb>1;
+      function brRow(){var s='';R.branches.forEach(function(b,i){s+='<th class="brhead'+(i===0?' gsep':'')+'">'+esc(mvv('branch',b))+'</th>';});if(showTot)s+='<th class="tothead">'+totLbl+'</th>';return s;}
+      var h='<table class="dcmp-tbl"><thead>';
+      // header row 1: التواريخ كمجموعات منفصلة
+      h+='<tr><th class="idcol" rowspan="2">'+L('كود الصنف','Item Code')+'</th><th rowspan="2">'+L('الحجم','Size')+'</th><th rowspan="2">'+L('المقاس','Measure')+'</th><th rowspan="2">'+L('تاريخ الإنتاج','Production Date')+'</th><th rowspan="2">'+L('الشهر','Month')+'</th><th rowspan="2">'+L('العام','Year')+'</th>';
+      h+='<th class="grp gd1 gsep" colspan="'+(nb+(showTot?1:0))+'">'+L('التاريخ الأول','First date')+' · '+d1+'</th>';
+      h+='<th class="grp gd2 gsep" colspan="'+(nb+(showTot?1:0))+'">'+L('التاريخ الثاني','Second date')+' · '+d2+'</th>';
+      h+='<th class="grp gdf gsep" colspan="'+(nb+(showTot?1:0))+'">'+L('الفرق','Difference')+'</th></tr>';
+      // header row 2: الفروع داخل كل مجموعة تاريخ
+      h+='<tr>'+brRow()+brRow()+brRow()+'</tr></thead><tbody>';
+      R.rows.forEach(function(r){
+        h+='<tr><td class="idcol idcode">'+esc(r.code||'—')+'</td><td class="idcol">'+esc(r.size||'—')+'</td><td class="idcol">'+esc(mvv('cat2',r.pack)||'—')+'</td><td class="idcol">'+esc(r.prod||'—')+'</td><td class="idcol">'+esc((typeof mn==='function'?mn(r.mon):r.mon)||'—')+'</td><td class="idcol">'+esc(r.year||'—')+'</td>';
+        r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+numCell(c.v1)+'</td>';});if(showTot)h+='<td class="totcol">'+numCell(r.t1)+'</td>';
+        r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+numCell(c.v2)+'</td>';});if(showTot)h+='<td class="totcol">'+numCell(r.t2)+'</td>';
+        r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+diffTint(c.d)+'</td>';});if(showTot)h+='<td class="totcol">'+diffTint(r.td)+'</td>';
+        h+='</tr>';
+      });
+      h+='</tbody><tfoot><tr><td class="idcol" colspan="6" style="text-align:start">'+totLbl+'</td>';
+      R.branches.forEach(function(_,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+fmt(colT1[i])+'</td>';});if(showTot)h+='<td>'+fmt(gT1)+'</td>';
+      R.branches.forEach(function(_,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+fmt(colT2[i])+'</td>';});if(showTot)h+='<td>'+fmt(gT2)+'</td>';
+      R.branches.forEach(function(_,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+diffHTML(colT2[i]-colT1[i])+'</td>';});if(showTot)h+='<td>'+diffHTML(gT2-gT1)+'</td>';
+      h+='</tr></tfoot></table>';
+      tbl='<div class="dcmp-card" style="padding:0;overflow:auto">'+h+'</div>';
+    }
+    root.innerHTML=head+ctl+flt+tbl;
+    if(ST._focusSearch){ST._focusSearch=false;var _si=document.getElementById('dcmp-search');if(_si){_si.focus();try{var _vl=_si.value.length;_si.setSelectionRange(_vl,_vl);}catch(e){}}}
+  }
+
+  function dd(type,label,list,mapk,sel,labelFn){
+    var open=ST._open===type;
+    var summ=!sel.length?L('الكل','All'):(sel.length+' '+L('مختار','selected'));
+    var rows=!list.length?('<div style="padding:10px;color:#94a3b8;font-size:12px">'+L('لا يوجد','none')+'</div>'):
+      list.map(function(v){var picked=sel.indexOf(v)>=0;var lab=labelFn?labelFn(v):(mapk?mvv(mapk,v):v);
+        return '<label class="dcmp-ddrow"><input type="checkbox" data-t="'+esc(type)+'" data-v="'+esc(v)+'" '+(picked?'checked':'')+'><span>'+esc(lab)+'</span></label>';}).join('');
+    return '<div class="dcmp-dd" data-dd="'+esc(type)+'">'+
+      '<button class="dcmp-ddbtn" type="button" onclick="DATECMP.openDD(\''+type+'\')"><span>'+esc(label)+'<span class="cnt">'+summ+'</span></span><span style="color:#94a3b8">▾</span></button>'+
+      '<div class="dcmp-ddpanel" style="display:'+(open?'block':'none')+'">'+
+        '<div class="dcmp-ddtools"><a onclick="DATECMP.clear(\''+type+'\')">'+L('إظهار الكل','Show all')+'</a><a onclick="DATECMP.closeDD()">'+L('تم','Done')+'</a></div>'+rows+
+      '</div></div>';
+  }
+  function openDD(type){ST._open=(ST._open===type)?null:type;render();}
+  function closeDD(){ST._open=null;render();}
+  function saveNow(){
+    try{
+      var up=curDate();
+      if(window.SNAP&&SNAP.capture){var sc=SNAP.capture(true);var a=snaps();a.forEach(function(x){if(x.id===sc.id)x.updDate=up;});ls().setItem(SKEY,JSON.stringify(a));}
+      else{var ts=Date.now();var D=curData().map(function(d){return {item_code:d.item_code||'',identity:d.identity||'',branch:d.branch||'',size:d.size||'',pack:d.pack||'',cat2:d.cat2||'',brand:d.brand||'',qty:(+d.qty||0)};});var a2=snaps().filter(function(x){return (x.updDate||x.date)!==up;});a2.push({id:'snap_'+ts,ts:ts,date:up,updDate:up,label:'',data:D,dr:fullDr(),meta:{rows:D.length,qty:D.reduce(function(s,d){return s+d.qty;},0)}});ls().setItem(SKEY,JSON.stringify(a2));}
+      try{if(typeof syncToast==='function')syncToast(L('✅ تم تسجيل لقطة كاملة بتاريخ الرفع ','✅ Full snapshot recorded for upload date ')+up);}catch(e){}
+    }catch(e){}
+    ST.init=false;render();
+  }
+  function clearSnaps(){
+    if(!confirm(L('مسح كل السجلات المحفوظة؟','Clear all saved records?')))return;
+    try{ls().removeItem(SKEY);}catch(e){}
+    ST.init=false;ST._open=null;render();
+  }
+  function setD1(v){ST.d1=v;render();}  function setD2(v){ST.d2=v;render();}
+  function search(v){ST.q=v;ST._focusSearch=true;render();}
+  function pickByDate(v){if(!v)return null;var a=sources(),s=null;for(var i=0;i<a.length;i++)if(a[i].date===v){s=a[i];break;}if(!s){var cand=null;a.forEach(function(x){if(x.date<=v&&(!cand||x.date>cand.date))cand=x;});s=cand||a[0];}return s?s.id:null;}
+  function setD1Date(v){var id=pickByDate(v);if(id){ST.d1=id;render();}}
+  function setD2Date(v){var id=pickByDate(v);if(id){ST.d2=id;render();}}
+  function editDate(which){
+    var id=(which==='d1')?ST.d1:ST.d2; var s=findSrc(id); if(!s)return;
+    var v=prompt(L('تاريخ الرفع لهذه اللقطة (YYYY-MM-DD):','Upload date for this snapshot (YYYY-MM-DD):'), s.date);
+    if(v==null)return; v=(''+v).trim(); if(!v)return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(v)){try{if(typeof syncToast==='function')syncToast(L('صيغة غير صحيحة — استخدم YYYY-MM-DD','Invalid format — use YYYY-MM-DD'),'err');}catch(e){}return;}
+    if(s.cur){
+      var nid;
+      if(window.SNAP&&SNAP.capture){var sc=SNAP.capture(true);nid=sc.id;var a=snaps();a.forEach(function(x){if(x.id===nid)x.updDate=v;});ls().setItem(SKEY,JSON.stringify(a));}
+      else{var ts=Date.now();var D=curData().map(function(d){return {item_code:d.item_code||'',identity:d.identity||'',branch:d.branch||'',size:d.size||'',pack:d.pack||'',cat2:d.cat2||'',brand:d.brand||'',qty:(+d.qty||0)};});var a3=snaps().filter(function(x){return (x.updDate||x.date)!==v;});nid='snap_'+ts;a3.push({id:nid,ts:ts,date:v,updDate:v,label:'',data:D,dr:fullDr(),meta:{rows:D.length,qty:D.reduce(function(s2,d){return s2+d.qty;},0)}});ls().setItem(SKEY,JSON.stringify(a3));}
+      if(which==='d1')ST.d1=nid; else ST.d2=nid;
+    } else {
+      var a2=snaps(); a2.forEach(function(x){if(x.id===s.id)x.updDate=v;}); ls().setItem(SKEY,JSON.stringify(a2));
+    }
+    ST.init=true; render();
+    try{if(typeof syncToast==='function')syncToast(L('✅ تم تعديل تاريخ اللقطة إلى ','✅ Snapshot date set to ')+v);}catch(e){}
+  }
+  function toggle(type,v){if(!ST[type])ST[type]={};if(ST[type][v])delete ST[type][v];else ST[type][v]=1;render();}
+  function clear(type){ST[type]={};render();}
+
+  function exportFG(){
+    var R=ST._lastFG; if(!R||!R.rows.length)return;
+    try{
+      if(typeof XLSX==='undefined'){try{if(typeof syncToast==='function')syncToast('XLSX not loaded','err');}catch(e){}return;}
+      var d1=R.s1.date,d2=R.s2.date,tot=L('الإجمالي','Total');
+      var g1=L('التاريخ الأول','First date')+' · '+d1, g2=L('التاريخ الثاني','Second date')+' · '+d2, gd=L('الفرق','Difference');
+      var catH=R.catHeaders, head=[];
+      for(var i=0;i<R.nf;i++)head.push(catH[i]||('#'+(i+1)));
+      R.cols.forEach(function(cn){head.push(g1+' · '+cn);});head.push(g1+' · '+tot);
+      R.cols.forEach(function(cn){head.push(g2+' · '+cn);});head.push(g2+' · '+tot);
+      R.cols.forEach(function(cn){head.push(gd+' · '+cn);});head.push(gd+' · '+tot);
+      var aoa=[head];
+      R.rows.forEach(function(r){var row=r.cats.slice(0,R.nf);
+        r.cells.forEach(function(c){row.push(c.v1);});row.push(r.t1);
+        r.cells.forEach(function(c){row.push(c.v2);});row.push(r.t2);
+        r.cells.forEach(function(c){row.push(c.d);});row.push(r.td);aoa.push(row);});
+      var wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet(aoa);
+      XLSX.utils.book_append_sheet(wb,ws,'FG Balance Cmp');
+      XLSX.writeFile(wb,'FGBalance_Comparison_'+d1+'_'+d2+'.xlsx');
+    }catch(e){try{console.error('DATECMP fg export',e);}catch(_){}}
+  }
+  function exportXlsx(){
+    if(ST.mode==='fg')return exportFG();
+    var R=ST._last||compute(); if(!R||!R.rows.length)return;
+    try{
+      if(typeof XLSX==='undefined'){try{if(typeof syncToast==='function')syncToast('XLSX not loaded','err');}catch(e){}return;}
+      var d1=R.s1.date, d2=R.s2.date;
+      var g1=L('التاريخ الأول','First date')+' · '+d1, g2=L('التاريخ الثاني','Second date')+' · '+d2, gd=L('الفرق','Difference');
+      var tot=L('الإجمالي','Total');
+      var head=[L('كود الصنف','Item Code'),L('الحجم','Size'),L('المقاس','Measure'),L('تاريخ الإنتاج','Production Date'),L('الشهر','Month'),L('العام','Year')];
+      R.branches.forEach(function(b){head.push(g1+' · '+mvv('branch',b));});head.push(g1+' · '+tot);
+      R.branches.forEach(function(b){head.push(g2+' · '+mvv('branch',b));});head.push(g2+' · '+tot);
+      R.branches.forEach(function(b){head.push(gd+' · '+mvv('branch',b));});head.push(gd+' · '+tot);
+      var aoa=[head];
+      R.rows.forEach(function(r){var row=[r.code,r.size,r.pack,r.prod,(typeof mn==='function'?mn(r.mon):r.mon),r.year];
+        r.cells.forEach(function(c){row.push(c.v1);});row.push(r.t1);
+        r.cells.forEach(function(c){row.push(c.v2);});row.push(r.t2);
+        r.cells.forEach(function(c){row.push(c.d);});row.push(r.td);aoa.push(row);});
+      var colT1=R.branches.map(function(){return 0;}),colT2=R.branches.map(function(){return 0;});
+      R.rows.forEach(function(r){r.cells.forEach(function(c,i){colT1[i]+=c.v1;colT2[i]+=c.v2;});});
+      var gT1=R.rows.reduce(function(s,r){return s+r.t1;},0),gT2=R.rows.reduce(function(s,r){return s+r.t2;},0);
+      var foot=[tot,'','','','',''];
+      R.branches.forEach(function(_,i){foot.push(colT1[i]);});foot.push(gT1);
+      R.branches.forEach(function(_,i){foot.push(colT2[i]);});foot.push(gT2);
+      R.branches.forEach(function(_,i){foot.push(colT2[i]-colT1[i]);});foot.push(gT2-gT1);
+      aoa.push(foot);
+      var wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols']=[{wch:16},{wch:9},{wch:12}].concat(head.slice(3).map(function(){return {wch:13};}));
+      XLSX.utils.book_append_sheet(wb,ws,'Date Comparison');
+      XLSX.writeFile(wb,'Comparison_'+d1+'_'+d2+'.xlsx');
+    }catch(e){try{console.error('DATECMP export',e);}catch(_){}}
+  }
+
+  document.addEventListener('change',function(e){
+    var t=e.target; if(t&&t.matches&&t.matches('.dcmp-ddpanel input[data-t]')){toggle(t.getAttribute('data-t'),t.getAttribute('data-v'));}
+  });
+  document.addEventListener('click',function(e){
+    var c=e.target&&e.target.closest?e.target.closest('.dcmp-chip'):null;
+    if(c&&c.getAttribute('data-t')){toggle(c.getAttribute('data-t'),c.getAttribute('data-v'));}
+  });
+  document.addEventListener('click',function(e){
+    if(ST._open==null)return;
+    var inDD=e.target&&e.target.closest?e.target.closest('.dcmp-dd'):null;
+    if(!inDD){ST._open=null;render();}
+  });
+
+  window.DATECMP={render:mount,setD1:setD1,setD2:setD2,setD1Date:setD1Date,setD2Date:setD2Date,editDate:editDate,setMode:setMode,search:search,toggle:toggle,clear:clear,openDD:openDD,closeDD:closeDD,saveNow:saveNow,clearSnaps:clearSnaps,exportXlsx:exportXlsx};
 })();
 </script>
