@@ -31630,6 +31630,7 @@ var _iv=setInterval(function(){
   function brGroup(b){for(var g in BR_REGIONS){if(BR_REGIONS[g].members.indexOf(b)>=0)return g;}return b;}
   function brGroupLabel(g){var r=BR_REGIONS[g];return r?L(r.ar,r.en):mvv('branch',g);}
   function selSet(o){var s=[];for(var k in o)if(o[k])s.push(k);return s;}
+  function fgLbl(v){var s=String(v==null?'':v);if(/^\s*my\s*water\s*$/i.test(s))return 'MI';if(/^\s*(ماي|ماى|mai)\s*$/i.test(s))return 'Mai';return v;}
   function orderList(vals,order){var out=(order||[]).filter(function(o){return vals.indexOf(o)>=0;});vals.forEach(function(v){if(out.indexOf(v)<0)out.push(v);});return out;}
 
   function buildAgg(data){
@@ -31753,18 +31754,30 @@ var _iv=setInterval(function(){
   function renderFG(a,root,sub,exp,head){
     var s1=findInList(a,ST.d1), s2=findInList(a,ST.d2);
     var A1=fgAgg(s1.fg), A2=fgAgg(s2.fg), nf=A2.numFrom||A1.numFrom||1;
-    var cols=A2.colNames.slice(); A1.colNames.forEach(function(c){if(cols.indexOf(c)<0)cols.push(c);});
+    var catH=(s2.fg.headers||s1.fg.headers||[]).slice(0,nf);
+    var allCols=A2.colNames.slice(); A1.colNames.forEach(function(c){if(allCols.indexOf(c)<0)allCols.push(c);});
     var keys={}; Object.keys(A1.map).forEach(function(k){keys[k]=1;}); Object.keys(A2.map).forEach(function(k){keys[k]=1;});
+    var catSets=[];for(var _c=0;_c<nf;_c++)catSets.push({});
+    Object.keys(keys).forEach(function(k){var base=A2.map[k]||A1.map[k];base.cats.forEach(function(cv,ci){if(cv!==''&&cv!=null)catSets[ci][cv]=1;});});
+    var selCol=selSet(ST.fgcol||{});
+    var cols=selCol.length?allCols.filter(function(c){return selCol.indexOf(c)>=0;}):allCols.slice();
+    var selCats=[];for(var _s=0;_s<nf;_s++)selCats.push(selSet(ST['fgc'+_s]||{}));
+    var qq=(''+(ST.fgq||'')).trim().toLowerCase();
     var rows=Object.keys(keys).map(function(k){var r1=A1.map[k],r2=A2.map[k],base=r2||r1;
       var cells=cols.map(function(cn){var v1=(r1&&r1.vals[cn])||0,v2=(r2&&r2.vals[cn])||0;return {v1:v1,v2:v2,d:v2-v1};});
       var t1=cells.reduce(function(s,c){return s+c.v1;},0),t2=cells.reduce(function(s,c){return s+c.v2;},0);
       return {cats:base.cats,cells:cells,t1:t1,t2:t2,td:t2-t1};});
+    rows=rows.filter(function(r){
+      for(var ci=0;ci<nf;ci++){if(selCats[ci].length&&selCats[ci].indexOf(r.cats[ci])<0)return false;}
+      if(qq&&String(r.cats.join(' ')).toLowerCase().indexOf(qq)<0)return false;
+      return true;
+    });
     rows.sort(function(x,y){return (y.t2||y.t1)-(x.t2||x.t1);});
     rows=rows.filter(function(r){return r.t1!==0||r.t2!==0;});
-    ST._lastFG={s1:s1,s2:s2,cols:cols,nf:nf,rows:rows,catHeaders:(s2.fg.headers||[]).slice(0,nf)};
+    ST._lastFG={s1:s1,s2:s2,cols:cols,nf:nf,rows:rows,catHeaders:catH};
     if(sub)sub.textContent=L('مقارنة FG Balance ','FG Balance ')+s1.date+' → '+s2.date+' · '+rows.length+' '+L('صف','rows');
     if(exp)exp.style.display=rows.length?'':'none';
-    var ctl=ctlHTML(a), tbl;
+    var ctl=ctlHTML(a), flt=fgFltHTML(catH,catSets,allCols,selCats,selCol), tbl;
     if(!rows.length){tbl='<div class="dcmp-card" style="padding:34px;text-align:center;color:#64748b">'+L('لا توجد بيانات FG Balance في هذين التاريخين.','No FG Balance data for these two dates.')+'</div>';}
     else{
       var d1=esc(s1.date),d2=esc(s2.date),nc=cols.length,totLbl=L('الإجمالي','Total'),catH=ST._lastFG.catHeaders,showTot=nc>1;
@@ -31772,7 +31785,7 @@ var _iv=setInterval(function(){
       rows.forEach(function(r){r.cells.forEach(function(c,i){colT1[i]+=c.v1;colT2[i]+=c.v2;});});
       var gT1=rows.reduce(function(s,r){return s+r.t1;},0),gT2=rows.reduce(function(s,r){return s+r.t2;},0);
       _dmax=0;rows.forEach(function(r){r.cells.forEach(function(c){if(Math.abs(c.d)>_dmax)_dmax=Math.abs(c.d);});if(Math.abs(r.td)>_dmax)_dmax=Math.abs(r.td);});
-      function colRow(){var s='';cols.forEach(function(cn,i){s+='<th class="brhead'+(i===0?' gsep':'')+'">'+esc(cn)+'</th>';});if(showTot)s+='<th class="tothead">'+totLbl+'</th>';return s;}
+      function colRow(){var s='';cols.forEach(function(cn,i){s+='<th class="brhead'+(i===0?' gsep':'')+'">'+esc(fgLbl(cn))+'</th>';});if(showTot)s+='<th class="tothead">'+totLbl+'</th>';return s;}
       var h='<table class="dcmp-tbl"><thead><tr>';
       for(var ci=0;ci<nf;ci++)h+='<th class="idcol" rowspan="2">'+esc(catH[ci]||('#'+(ci+1)))+'</th>';
       h+='<th class="grp gd1 gsep" colspan="'+(nc+(showTot?1:0))+'">'+L('التاريخ الأول','First date')+' · '+d1+'</th>';
@@ -31780,7 +31793,7 @@ var _iv=setInterval(function(){
       h+='<th class="grp gdf gsep" colspan="'+(nc+(showTot?1:0))+'">'+L('الفرق','Difference')+'</th></tr>';
       h+='<tr>'+colRow()+colRow()+colRow()+'</tr></thead><tbody>';
       rows.forEach(function(r){h+='<tr>';
-        for(var c=0;c<nf;c++)h+='<td class="idcol'+(c===0?' idcode':'')+'">'+esc(r.cats[c]||'—')+'</td>';
+        for(var c=0;c<nf;c++)h+='<td class="idcol'+(c===0?' idcode':'')+'">'+esc(fgLbl(r.cats[c])||'—')+'</td>';
         r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+numCell(c.v1)+'</td>';});if(showTot)h+='<td class="totcol">'+numCell(r.t1)+'</td>';
         r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+numCell(c.v2)+'</td>';});if(showTot)h+='<td class="totcol">'+numCell(r.t2)+'</td>';
         r.cells.forEach(function(c,i){h+='<td'+(i===0?' class="gsep"':'')+'>'+diffTint(c.d)+'</td>';});if(showTot)h+='<td class="totcol">'+diffTint(r.td)+'</td>';
@@ -31792,7 +31805,33 @@ var _iv=setInterval(function(){
       h+='</tr></tfoot></table>';
       tbl='<div class="dcmp-card" style="padding:0;overflow:auto">'+h+'</div>';
     }
-    root.innerHTML=head+ctl+tbl;
+    root.innerHTML=head+ctl+flt+tbl;
+    if(ST._focusFGSearch){var _fs=document.getElementById('dcmpfg-search');if(_fs){_fs.focus();_fs.setSelectionRange(_fs.value.length,_fs.value.length);}ST._focusFGSearch=false;}
+  }
+  function fgFltHTML(catH,catSets,allCols,selCats,selCol){
+    var nf=catH.length;
+    var colChips=chips('fgcol',allCols,null,selCol,'c-br',fgLbl);
+    var ddRow='', catRows='';
+    for(var ci=0;ci<nf;ci++){
+      var vals=Object.keys(catSets[ci]).sort();
+      if(!vals.length)continue;
+      var lbl=esc(catH[ci]||('#'+(ci+1)));
+      if(/^\s*(category|الفئة|التصنيف)\s*$/i.test(String(catH[ci]||'')))continue;
+      var forceDD=/^\s*(pack|size|product\s*code|item\s*code|العبوة|الحجم|المقاس|الكود|كود)\s*$/i.test(String(catH[ci]||''));
+      if(vals.length>12||forceDD){
+        ddRow+=dd('fgc'+ci,lbl,vals,null,selCats[ci],fgLbl);
+      }else{
+        catRows+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="dcmp-lbl" style="margin:0">'+lbl+'</span>'+chips('fgc'+ci,vals,null,selCats[ci],'c-id',fgLbl)+'</div>';
+      }
+    }
+    return '<div class="dcmp-card">'+
+      '<div class="dcmp-ddbar" style="align-items:center">'+
+        '<div style="flex:1 1 240px"><input id="dcmpfg-search" class="dcmp-sel" style="width:100%;box-sizing:border-box" placeholder="'+L('🔍 بحث…','🔍 Search…')+'" value="'+esc(ST.fgq||'')+'" oninput="DATECMP.searchFG(this.value)"></div>'+
+        ddRow+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="dcmp-lbl" style="margin:0">'+L('الفرع','Branch')+'</span>'+colChips+'</div>'+
+      '</div>'+
+      (catRows?('<div style="display:flex;flex-wrap:wrap;gap:14px 28px;margin-top:14px;align-items:center">'+catRows+'</div>'):'')+
+      '</div>';
   }
 
   function mount(mode){ST.mode=(mode==='fg')?'fg':'inv';if(ST.mode==='fg'){ST.rootId='dcmpfg-root';ST.subId='dcmpfg-sub';ST.expId='dcmpfg-export';}else{ST.rootId='dcmp-root';ST.subId='dcmp-sub';ST.expId='dcmp-export';}ST.init=false;ST._open=null;render();}
@@ -31901,6 +31940,7 @@ var _iv=setInterval(function(){
   }
   function setD1(v){ST.d1=v;render();}  function setD2(v){ST.d2=v;render();}
   function search(v){ST.q=v;ST._focusSearch=true;render();}
+  function searchFG(v){ST.fgq=v;ST._focusFGSearch=true;render();}
   function pickByDate(v){if(!v)return null;var a=sources(),s=null;for(var i=0;i<a.length;i++)if(a[i].date===v){s=a[i];break;}if(!s){var cand=null;a.forEach(function(x){if(x.date<=v&&(!cand||x.date>cand.date))cand=x;});s=cand||a[0];}return s?s.id:null;}
   function setD1Date(v){var id=pickByDate(v);if(id){ST.d1=id;render();}}
   function setD2Date(v){var id=pickByDate(v);if(id){ST.d2=id;render();}}
@@ -31989,6 +32029,6 @@ var _iv=setInterval(function(){
     if(!inDD){ST._open=null;render();}
   });
 
-  window.DATECMP={render:mount,setD1:setD1,setD2:setD2,setD1Date:setD1Date,setD2Date:setD2Date,editDate:editDate,setMode:setMode,search:search,toggle:toggle,clear:clear,openDD:openDD,closeDD:closeDD,saveNow:saveNow,clearSnaps:clearSnaps,exportXlsx:exportXlsx};
+  window.DATECMP={render:mount,setD1:setD1,setD2:setD2,setD1Date:setD1Date,setD2Date:setD2Date,editDate:editDate,setMode:setMode,search:search,searchFG:searchFG,toggle:toggle,clear:clear,openDD:openDD,closeDD:closeDD,saveNow:saveNow,clearSnaps:clearSnaps,exportXlsx:exportXlsx};
 })();
 </script>
