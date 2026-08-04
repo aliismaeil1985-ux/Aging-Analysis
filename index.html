@@ -2149,7 +2149,7 @@
   </div>
 </div>
 
-<script>let DATA=[];var LS=function(){var mem=Object.create(null),NO_DISK={dash_users:1},MAX=2e5;function disk(){try{return window.localStorage||null}catch(e){return null}}return{getItem:function(k){if(k=String(k),Object.prototype.hasOwnProperty.call(mem,k))return mem[k];if(NO_DISK[k])return null;var d=disk();if(!d)return null;try{var v=d.getItem(k);return null!=v&&(mem[k]=v),null==v?null:v}catch(e){return null}},setItem:function(k,v){k=String(k),v=String(v),mem[k]=v;if(NO_DISK[k])return!0;var _bigOk={dash_data_v1:1,data_snapshots_v1:1,ivx_aging_v1:1,ivx_report_v1:1};if(v.length>MAX&&!_bigOk[k])return!0;var d=disk();if(!d)return!1;try{return d.setItem(k,v),!0}catch(e){try{window._storageFull=!0,window.__lsLastFail=k}catch(_e){}return!1}},removeItem:function(k){k=String(k),delete mem[k];var d=disk();if(d)try{d.removeItem(k)}catch(e){}},clear:function(){for(var k in mem)delete mem[k];var d=disk();if(d)try{d.clear()}catch(e){}},key:function(i){return Object.keys(mem)[i]||null},get length(){return Object.keys(mem).length}}}();try{window.LS=LS}catch(e){}let LANG=localStorage.getItem("ui_lang")||"en";const DATA_SEED=DATA,DATA_KEY="dash_data_v1";try{const _saved=JSON.parse(LS.getItem(DATA_KEY)||"null");Array.isArray(_saved)&&(DATA=_saved)}catch(e){}function saveData(){try{return LS.setItem(DATA_KEY,JSON.stringify(DATA)),window._storageFull=!1,!0}catch(e){window._storageFull=!0;try{console&&console.warn&&console.warn("saveData failed (storage quota?): "+e.message)}catch(_){}try{window.__storageWarned||(window.__storageWarned=!0,"function"==typeof syncToast&&syncToast(void 0!==LANG&&"ar"===LANG?"⚠️ تعذّر حفظ كل البيانات محلياً (تجاوز سعة المتصفّح). الاعتماد على السحابة.":"⚠️ Could not cache all data locally (browser storage full). Using cloud data.","err"))}catch(_){}return!1}}const IMPHIST_KEY="import_history_v1";function getImportHistory(){try{var h=JSON.parse(LS.getItem(IMPHIST_KEY)||"[]");return Array.isArray(h)?h:[]}catch(e){return[]}}function logImportHistory(entry){try{var h=getImportHistory();entry.ts=Date.now(),h.unshift(entry),h.length>30&&(h=h.slice(0,30)),LS.setItem(IMPHIST_KEY,JSON.stringify(h))}catch(e){}try{renderImportHistory()}catch(e){}}function clearImportHistory(){try{LS.setItem(IMPHIST_KEY,"[]")}catch(e){}try{renderImportHistory()}catch(e){}}function exportImportHistory(){try{if("undefined"==typeof XLSX)return alert("XLSX library not loaded"),void 0;var h=_impHistFiltered();if(!h.length){try{syncToast("ar"===LANG?"لا يوجد سجل لتصديره.":"No history to export.","err")}catch(e){}return}var headers="ar"===LANG?["الوقت","اسم الملف","الحالة","عدد الصفوف","الإجمالي","التفاصيل"]:["Time","File","Status","Rows","Total","Details"],rows=h.map(function(e){var ok="ok"===e.status;return[_impFmtTime(e.ts),e.file||"",ok?"ar"===LANG?"نجح":"Success":"ar"===LANG?"فشل":"Failed",ok?e.rows:"",ok?e.total:"",e.msg||""]}),wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet([headers].concat(rows));ws["!cols"]=[{wch:18},{wch:22},{wch:10},{wch:10},{wch:12},{wch:40}],XLSX.utils.book_append_sheet(wb,ws,"Import History"),XLSX.writeFile(wb,"Import_History_"+(new Date).toISOString().slice(0,10)+".xlsx")}catch(e){try{console.error("exportImportHistory",e)}catch(_){}}}function _impFmtTime(ts){try{var d=new Date(ts);return d.toLocaleDateString("en-GB")+" "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}catch(e){return""}}function _impHistFiltered(){var h=getImportHistory(),fromEl=document.getElementById("imp-hist-from"),toEl=document.getElementById("imp-hist-to"),from=fromEl&&fromEl.value?new Date(fromEl.value+"T00:00:00").getTime():null,to=toEl&&toEl.value?new Date(toEl.value+"T23:59:59").getTime():null;null!=from&&(h=h.filter(function(e){return e.ts>=from})),null!=to&&(h=h.filter(function(e){return e.ts<=to}));var qEl=document.getElementById("imp-hist-search"),q=qEl&&qEl.value?qEl.value.trim().toLowerCase():"";return q&&(h=h.filter(function(e){return((e.file||"")+" "+(e.msg||"")).toLowerCase().indexOf(q)>=0})),h}function renderImportHistory(){var box=document.getElementById("imp-history-body");if(box){var all=getImportHistory(),h=_impHistFiltered();if(!all.length)return box.innerHTML='<div style="color:#94a3b8;font-size:13px;padding:8px 0">'+tr("imphist_none")+"</div>",void 0;if(!h.length)return box.innerHTML='<div style="color:#94a3b8;font-size:13px;padding:8px 0">'+tr("imphist_nomatch")+"</div>",void 0;var rows=h.map(function(e){var ok="ok"===e.status,badge=ok?'<span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:8px;font-weight:700;font-size:11.5px">&#10003; '+tr("imphist_success")+"</span>":'<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:8px;font-weight:700;font-size:11.5px">&#10007; '+tr("imphist_failed")+"</span>";return'<tr style="border-bottom:1px solid #eef2f7"><td style="padding:8px 10px;font-size:12.5px;color:#475569;white-space:nowrap">'+_impFmtTime(e.ts)+'</td><td style="padding:8px 10px;font-size:12.5px;color:#1e293b;font-weight:600">'+(e.file||"-")+'</td><td style="padding:8px 10px;font-size:12.5px;color:#334155">'+(ok?e.rows+" "+tr("imphist_col_rows"):"-")+'</td><td style="padding:8px 10px;font-size:12.5px;color:#334155">'+(ok?fmt(e.total||0):"-")+'</td><td style="padding:8px 10px">'+badge+'</td><td style="padding:8px 10px;font-size:12px;color:#64748b;max-width:280px">'+(e.msg||"")+"</td></tr>"}).join("");box.innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;margin-top:6px"><thead><tr style="text-align:right;border-bottom:2px solid #e2e8f0"><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_time")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_file")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_rows")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_total")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_status")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_details")+"</th></tr></thead><tbody>"+rows+"</tbody></table></div>"}}const fmt=n=>Math.round(n).toLocaleString("en-US");let C={navy:"#1e4e8c",teal:"#0f9b8e",blue:"#2f7ed8",orange:"#e0792f",purple:"#7b5cd6"};!function(){var VER="v6.65.0";window.APP_VERSION=VER;try{LS.getItem("dr_app_ver")!==VER&&(["col_labels","col_agg","col_agg2","branch_order","branch_order2","hidden_cols","hidden_branches","ui_titles","ui_colors","col_colors","custom_cols","report_designer","dash_session"].forEach(function(k){LS.removeItem(k)}),LS.setItem("dr_app_ver",VER))}catch(e){}}();try{document.addEventListener("DOMContentLoaded",function(){try{var V=window.APP_VERSION||"v6.18.3",_vf=document.getElementById("app-ver-foot");_vf&&(_vf.textContent=V);var _vs=document.getElementById("app-ver-side");_vs&&(_vs.textContent=V)}catch(e){}})}catch(e){}var APP_CHANGELOG=[{ver:"v6.65.0",date:"2026-08-04",title:"إعادة بناء منطق اللقطات من الصفر — مخزنان مستقلان وشاشتان منفصلتان للرفع القديم",items:[{type:"chg",text:"<b>حُذفت طبقة اللقطات القديمة بالكامل (~49KB):</b> <code>agingCalendar</code> · <code>agingUploads</code> · <code>reportUploads</code> · <code>_repairAgingDays</code> · <code>agingDays</code> · <code>markAgingDay</code> · <code>_bestSnapFor</code> · <code>_upsertOld</code> · <code>saveDrForDate</code> · <code>saveDataForDate</code>، وكل دوال الرفع القديم (<code>_histBatch</code> وطابور <code>_hist*</code> و<code>renderHistList</code> و<code>snapFixDates</code>)، وصفحة <code>page-histup</code>، وحارس <code>snap-storage-guard</code>. لم يبقَ منها شيء."},{type:"new",text:"<b>مبدأ واحد يحكم النظام الجديد:</b> التاريخ الذي ترفعه هو التاريخ الذي تحصل عليه — لا ترشيح بقائمة أيام رفع، ولا طيّ للتواريخ المتطابقة، ولا استنتاج تاريخ من <code>updDate</code>/<code>capDate</code>. هذه الثلاثة كانت مصدر كل حالات الاختفاء."},{type:"new",text:"<b>مخزنان مستقلان تماماً:</b> <code>ivx_report_v1</code> لتقرير المخزون و<code>ivx_aging_v1</code> لأعمار المخزون. لا سجل مشترك ولا شرط اقتران — حذف تاريخ من أحدهما لا يمسّ الآخر، ورفع الأعمار لا يحتاج أرصدة ولا العكس."},{type:"new",text:"<b>شاشتان منفصلتان:</b> «الرفع القديم — تقرير المخزون» و«الرفع القديم — أعمار المخزون»، لكل منهما رفعها وطابورها وجدولها و<b>عمود ربط مستقل</b>: شاشة الأعمار تعرض «اللوحة · الملخّص · المقارنة»، وشاشة التقارير تعرض عدد التقارير المحمّلة فعلاً لكل تاريخ."},{type:"new",text:"<b>زر «نشر» و«عرض» و«حذف» أمام كل تاريخ</b> في كل شاشة، مع «نشر كل التواريخ» و«مراجعة شاملة» و«تصدير أرشيف» و«تفريغ». و«عرض» صار يفتح الشاشة الصحيحة: الأعمار تفتح لوحة المعلومات، والتقارير تفتح صفحة أول تقرير محمّل بمفتاحه."},{type:"fix",text:"<b>لا مرور عبر مستند الإعدادات بعد اليوم:</b> أُخرج <code>data_snapshots_v1</code> من <code>SET_KEYS</code> وصار ذاكرةً مشتقّة تُبنى من المخزنين. كل تاريخ يُنشر في مستند سحابي مستقل ثم يُقرأ ثانيةً للتأكد — فانتهى الحدّ الصامت 716,800 حرفاً الذي كان يبتلع اللقطات ويقول «تم النشر»."},{type:"chg",text:"تقاويم اللوحة والملخّص و SKU وشاشات المقارنة وصفحات التقارير الخمس تقرأ الآن من <code>IVX.calendar()</code> مباشرة — مصدر واحد لا يمكن أن تختلف عليه شاشتان."}]},{ver:"v6.64.0",date:"2026-08-04",title:"لقطات الأعمار القديمة تصل الآن إلى الداشبورد والمقارنة والملخّص + نشر ومراجعة لكل تاريخ",items:[
+<script>let DATA=[];var LS=function(){var mem=Object.create(null),NO_DISK={dash_users:1},MAX=2e5;function disk(){try{return window.localStorage||null}catch(e){return null}}return{getItem:function(k){if(k=String(k),Object.prototype.hasOwnProperty.call(mem,k))return mem[k];if(NO_DISK[k])return null;var d=disk();if(!d)return null;try{var v=d.getItem(k);return null!=v&&(mem[k]=v),null==v?null:v}catch(e){return null}},setItem:function(k,v){k=String(k),v=String(v),mem[k]=v;if(NO_DISK[k])return!0;var _bigOk={dash_data_v1:1,data_snapshots_v1:1,ivx_aging_v1:1,ivx_report_v1:1};if(v.length>MAX&&!_bigOk[k])return!0;var d=disk();if(!d)return!1;try{return d.setItem(k,v),!0}catch(e){try{window._storageFull=!0,window.__lsLastFail=k}catch(_e){}return!1}},removeItem:function(k){k=String(k),delete mem[k];var d=disk();if(d)try{d.removeItem(k)}catch(e){}},clear:function(){for(var k in mem)delete mem[k];var d=disk();if(d)try{d.clear()}catch(e){}},key:function(i){return Object.keys(mem)[i]||null},get length(){return Object.keys(mem).length}}}();try{window.LS=LS}catch(e){}let LANG=localStorage.getItem("ui_lang")||"en";const DATA_SEED=DATA,DATA_KEY="dash_data_v1";try{const _saved=JSON.parse(LS.getItem(DATA_KEY)||"null");Array.isArray(_saved)&&(DATA=_saved)}catch(e){}function saveData(){try{return LS.setItem(DATA_KEY,JSON.stringify(DATA)),window._storageFull=!1,!0}catch(e){window._storageFull=!0;try{console&&console.warn&&console.warn("saveData failed (storage quota?): "+e.message)}catch(_){}try{window.__storageWarned||(window.__storageWarned=!0,"function"==typeof syncToast&&syncToast(void 0!==LANG&&"ar"===LANG?"⚠️ تعذّر حفظ كل البيانات محلياً (تجاوز سعة المتصفّح). الاعتماد على السحابة.":"⚠️ Could not cache all data locally (browser storage full). Using cloud data.","err"))}catch(_){}return!1}}const IMPHIST_KEY="import_history_v1";function getImportHistory(){try{var h=JSON.parse(LS.getItem(IMPHIST_KEY)||"[]");return Array.isArray(h)?h:[]}catch(e){return[]}}function logImportHistory(entry){try{var h=getImportHistory();entry.ts=Date.now(),h.unshift(entry),h.length>30&&(h=h.slice(0,30)),LS.setItem(IMPHIST_KEY,JSON.stringify(h))}catch(e){}try{renderImportHistory()}catch(e){}}function clearImportHistory(){try{LS.setItem(IMPHIST_KEY,"[]")}catch(e){}try{renderImportHistory()}catch(e){}}function exportImportHistory(){try{if("undefined"==typeof XLSX)return alert("XLSX library not loaded"),void 0;var h=_impHistFiltered();if(!h.length){try{syncToast("ar"===LANG?"لا يوجد سجل لتصديره.":"No history to export.","err")}catch(e){}return}var headers="ar"===LANG?["الوقت","اسم الملف","الحالة","عدد الصفوف","الإجمالي","التفاصيل"]:["Time","File","Status","Rows","Total","Details"],rows=h.map(function(e){var ok="ok"===e.status;return[_impFmtTime(e.ts),e.file||"",ok?"ar"===LANG?"نجح":"Success":"ar"===LANG?"فشل":"Failed",ok?e.rows:"",ok?e.total:"",e.msg||""]}),wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet([headers].concat(rows));ws["!cols"]=[{wch:18},{wch:22},{wch:10},{wch:10},{wch:12},{wch:40}],XLSX.utils.book_append_sheet(wb,ws,"Import History"),XLSX.writeFile(wb,"Import_History_"+(new Date).toISOString().slice(0,10)+".xlsx")}catch(e){try{console.error("exportImportHistory",e)}catch(_){}}}function _impFmtTime(ts){try{var d=new Date(ts);return d.toLocaleDateString("en-GB")+" "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}catch(e){return""}}function _impHistFiltered(){var h=getImportHistory(),fromEl=document.getElementById("imp-hist-from"),toEl=document.getElementById("imp-hist-to"),from=fromEl&&fromEl.value?new Date(fromEl.value+"T00:00:00").getTime():null,to=toEl&&toEl.value?new Date(toEl.value+"T23:59:59").getTime():null;null!=from&&(h=h.filter(function(e){return e.ts>=from})),null!=to&&(h=h.filter(function(e){return e.ts<=to}));var qEl=document.getElementById("imp-hist-search"),q=qEl&&qEl.value?qEl.value.trim().toLowerCase():"";return q&&(h=h.filter(function(e){return((e.file||"")+" "+(e.msg||"")).toLowerCase().indexOf(q)>=0})),h}function renderImportHistory(){var box=document.getElementById("imp-history-body");if(box){var all=getImportHistory(),h=_impHistFiltered();if(!all.length)return box.innerHTML='<div style="color:#94a3b8;font-size:13px;padding:8px 0">'+tr("imphist_none")+"</div>",void 0;if(!h.length)return box.innerHTML='<div style="color:#94a3b8;font-size:13px;padding:8px 0">'+tr("imphist_nomatch")+"</div>",void 0;var rows=h.map(function(e){var ok="ok"===e.status,badge=ok?'<span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:8px;font-weight:700;font-size:11.5px">&#10003; '+tr("imphist_success")+"</span>":'<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:8px;font-weight:700;font-size:11.5px">&#10007; '+tr("imphist_failed")+"</span>";return'<tr style="border-bottom:1px solid #eef2f7"><td style="padding:8px 10px;font-size:12.5px;color:#475569;white-space:nowrap">'+_impFmtTime(e.ts)+'</td><td style="padding:8px 10px;font-size:12.5px;color:#1e293b;font-weight:600">'+(e.file||"-")+'</td><td style="padding:8px 10px;font-size:12.5px;color:#334155">'+(ok?e.rows+" "+tr("imphist_col_rows"):"-")+'</td><td style="padding:8px 10px;font-size:12.5px;color:#334155">'+(ok?fmt(e.total||0):"-")+'</td><td style="padding:8px 10px">'+badge+'</td><td style="padding:8px 10px;font-size:12px;color:#64748b;max-width:280px">'+(e.msg||"")+"</td></tr>"}).join("");box.innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;margin-top:6px"><thead><tr style="text-align:right;border-bottom:2px solid #e2e8f0"><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_time")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_file")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_rows")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_total")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_status")+'</th><th style="padding:8px 10px;font-size:11.5px;color:#94a3b8;text-transform:uppercase">'+tr("imphist_col_details")+"</th></tr></thead><tbody>"+rows+"</tbody></table></div>"}}const fmt=n=>Math.round(n).toLocaleString("en-US");let C={navy:"#1e4e8c",teal:"#0f9b8e",blue:"#2f7ed8",orange:"#e0792f",purple:"#7b5cd6"};!function(){var VER="v6.67.0";window.APP_VERSION=VER;try{LS.getItem("dr_app_ver")!==VER&&(["col_labels","col_agg","col_agg2","branch_order","branch_order2","hidden_cols","hidden_branches","ui_titles","ui_colors","col_colors","custom_cols","report_designer","dash_session"].forEach(function(k){LS.removeItem(k)}),LS.setItem("dr_app_ver",VER))}catch(e){}}();try{document.addEventListener("DOMContentLoaded",function(){try{var V=window.APP_VERSION||"v6.18.3",_vf=document.getElementById("app-ver-foot");_vf&&(_vf.textContent=V);var _vs=document.getElementById("app-ver-side");_vs&&(_vs.textContent=V)}catch(e){}})}catch(e){}var APP_CHANGELOG=[{ver:"v6.67.0",date:"2026-08-04",title:"استرداد تقرير المساحات لأي تاريخ — يُشتقّ حسابياً بدل أن يُرفع",items:[{type:"fix",text:"<b>السبب:</b> تقرير المساحات ليس ملفاً مرفوعاً بل <u>مشتقّاً</u>: مجموعة السعات (groups[0]) تُرفع نادراً، والمجموعات الثلاث الأخرى (المستخدَم · الترانزيت · الفارغ) تُحسب من أرصدة التاريخ وترانزيته عبر جداول التحويل. وكان الاسترداد التاريخي يشترط وجود <code>dr.space</code> مخزّناً، فأي تاريخ رُفعت له الأرصدة دون ملف مساحات يعطي «لا توجد بيانات محفوظة للمساحات في هذا التاريخ»."},{type:"new",text:"<b>الاشتقاق الحسابي:</b> صار النظام يبني تقرير المساحات لحظة حفظ أي تاريخ فيه أرصدة أو ترانزيت — يأخذ قالب السعات من ملف المساحات المرفوع لذلك التاريخ، وإلا من أقرب قالب سابق (السعة حقيقة بطيئة التغيّر تُرحَّل للأمام)، ثم يحسب المجموعات الثلاث من بيانات ذلك التاريخ وحده."},{type:"new",text:"<b>يسري على القديم والجديد:</b> زر «∑ احسب المساحات الناقصة» في شاشة تقرير المخزون يعيد اشتقاقها لكل تاريخ محفوظ ينقصها، والالتقاط التلقائي والرفع اليدوي يشتقّانها من تلقاء نفسيهما لكل تاريخ جديد."},{type:"chg",text:"المساحات المشتقّة تُعاد حسابها كلما تغيّرت أرصدة التاريخ أو ترانزيته، بينما <b>ملف المساحات المرفوع صراحةً لا يُدهس أبداً</b>. ويميّز الجدول بينهما: «∑ محسوبة» مقابل «✓» للمرفوعة."}]},{ver:"v6.66.0",date:"2026-08-04",title:"الالتقاط التلقائي للّقطات أثناء تحديث البيانات — يومي أو أسبوعي",items:[{type:"new",text:"<b>التاريخ يبني نفسه.</b> صار النظام يلتقط اللقطة لحظة تحديث البيانات الحية دون أي رفع يدوي: <code>processWorkbook()</code> عند استيراد ملف الأعمار يودع اللقطة في مخزن الأعمار، و<code>drCommit()</code> عند رفع أي تقرير يومي يودعها في مخزن التقارير."},{type:"new",text:"<b>وضعان:</b> <b>يومي</b> — لقطة لكل يوم بيانات؛ <b>أسبوعي</b> — لقطة عند يوم الأسبوع الذي تختاره، أو تلقائياً إن مرّ ٧ أيام بلا لقطة فلا يضيع أسبوع أبداً."},{type:"new",text:"<b>التاريخ يُؤخذ من البيانات لا من ساعة الجهاز:</b> الأعمار تأخذ <code>upd_date</code> الذي كتبه الاستيراد من اسم الملف، والتقارير تأخذ <code>manualDate</code> ثم تاريخ التقرير الذاتي. رفع ملف قديم اليوم يُسجَّل بتاريخه الصحيح."},{type:"fix",text:"<b>التلقائي لا يدهس اليدوي:</b> إن كان التاريخ مرفوعاً يدوياً من إحدى الشاشتين فالالتقاط التلقائي يتخطّاه ويسجّل السبب في سجل البطاقة — ملفك يبقى المرجع والتلقائي يملأ الفراغات."},{type:"new",text:"<b>بطاقة تحكّم على الشاشتين:</b> تشغيل/إيقاف · يومي أو أسبوعي · اختيار يوم الأسبوع · زر «التقط الآن» · آخر لقطة وسجل آخر أربع محاولات. وأُضيف عمود <b>المصدر</b> للجدولين يفرّق «تلقائي» عن «يدوي»."}]},{ver:"v6.65.0",date:"2026-08-04",title:"إعادة بناء منطق اللقطات من الصفر — مخزنان مستقلان وشاشتان منفصلتان للرفع القديم",items:[{type:"chg",text:"<b>حُذفت طبقة اللقطات القديمة بالكامل (~49KB):</b> <code>agingCalendar</code> · <code>agingUploads</code> · <code>reportUploads</code> · <code>_repairAgingDays</code> · <code>agingDays</code> · <code>markAgingDay</code> · <code>_bestSnapFor</code> · <code>_upsertOld</code> · <code>saveDrForDate</code> · <code>saveDataForDate</code>، وكل دوال الرفع القديم (<code>_histBatch</code> وطابور <code>_hist*</code> و<code>renderHistList</code> و<code>snapFixDates</code>)، وصفحة <code>page-histup</code>، وحارس <code>snap-storage-guard</code>. لم يبقَ منها شيء."},{type:"new",text:"<b>مبدأ واحد يحكم النظام الجديد:</b> التاريخ الذي ترفعه هو التاريخ الذي تحصل عليه — لا ترشيح بقائمة أيام رفع، ولا طيّ للتواريخ المتطابقة، ولا استنتاج تاريخ من <code>updDate</code>/<code>capDate</code>. هذه الثلاثة كانت مصدر كل حالات الاختفاء."},{type:"new",text:"<b>مخزنان مستقلان تماماً:</b> <code>ivx_report_v1</code> لتقرير المخزون و<code>ivx_aging_v1</code> لأعمار المخزون. لا سجل مشترك ولا شرط اقتران — حذف تاريخ من أحدهما لا يمسّ الآخر، ورفع الأعمار لا يحتاج أرصدة ولا العكس."},{type:"new",text:"<b>شاشتان منفصلتان:</b> «الرفع القديم — تقرير المخزون» و«الرفع القديم — أعمار المخزون»، لكل منهما رفعها وطابورها وجدولها و<b>عمود ربط مستقل</b>: شاشة الأعمار تعرض «اللوحة · الملخّص · المقارنة»، وشاشة التقارير تعرض عدد التقارير المحمّلة فعلاً لكل تاريخ."},{type:"new",text:"<b>زر «نشر» و«عرض» و«حذف» أمام كل تاريخ</b> في كل شاشة، مع «نشر كل التواريخ» و«مراجعة شاملة» و«تصدير أرشيف» و«تفريغ». و«عرض» صار يفتح الشاشة الصحيحة: الأعمار تفتح لوحة المعلومات، والتقارير تفتح صفحة أول تقرير محمّل بمفتاحه."},{type:"fix",text:"<b>لا مرور عبر مستند الإعدادات بعد اليوم:</b> أُخرج <code>data_snapshots_v1</code> من <code>SET_KEYS</code> وصار ذاكرةً مشتقّة تُبنى من المخزنين. كل تاريخ يُنشر في مستند سحابي مستقل ثم يُقرأ ثانيةً للتأكد — فانتهى الحدّ الصامت 716,800 حرفاً الذي كان يبتلع اللقطات ويقول «تم النشر»."},{type:"chg",text:"تقاويم اللوحة والملخّص و SKU وشاشات المقارنة وصفحات التقارير الخمس تقرأ الآن من <code>IVX.calendar()</code> مباشرة — مصدر واحد لا يمكن أن تختلف عليه شاشتان."}]},{ver:"v6.64.0",date:"2026-08-04",title:"لقطات الأعمار القديمة تصل الآن إلى الداشبورد والمقارنة والملخّص + نشر ومراجعة لكل تاريخ",items:[
 {type:"fix",text:"<b>السبب الجذري (١): الرفع القديم لم يكن يسجّل يوم الرفع.</b> عند حفظ ملف أعمار من «الرفع القديم للبيانات» كانت الدالة <code>_upsertOld()</code> تكتب اللقطة في <code>data_snapshots_v1</code> دون استدعاء <code>markAgingDay()</code>، فلا يُضاف التاريخ إلى <code>aging_upload_days_v1</code>. وبانية التقويم <code>agingCalendar()</code> تُقاطع التواريخ المرشّحة مع تلك القائمة — فتسقط كل التواريخ القديمة من تقويم اللوحة والملخّص و SKU ومن مصادر شاشة المقارنة. صار الرفع القديم يسجّل يوم الرفع ويضبط <code>updDate</code> تلقائياً."},
 {type:"fix",text:"<b>السبب الجذري (٢): طيّ اللقطات المتطابقة كان يبتلع الرفع اليدوي.</b> <code>agingCalendar()</code> كانت تحذف أي تاريخ توقيعه (مجموع الكميات) مطابق للتاريخ السابق له — وهو سلوك مقصود للّقطات التلقائية فقط. لكنه كان يبتلع أيضاً التواريخ التي رفعها المستخدم بنفسه: 2026-08-02 و2026-08-03 و2026-08-04 (٢١٩ صفاً · 1,507,635 لكلٍّ منها) كانت تنهار إلى تاريخ واحد. الآن التاريخ المرفوع يدوياً لا يُطوى أبداً."},
 {type:"fix",text:"<b>«عرض» كان يفتح الأرصدة دائماً.</b> <code>histView()</code> كانت تنتقل إلى <code>rfgbal</code> لكل الصفوف — حتى صفوف الأعمار — فيظهر تقرير الأرصدة بدل أعمار المخزون. صار صف الأعمار يفتح لوحة المعلومات بتاريخه، وصف الأرصدة يفتح تقرير الأرصدة بمفتاحه الصحيح <code>fgbal</code>."},
@@ -2844,12 +2844,15 @@ img,canvas,svg,video,iframe{max-width:100%}
     map: function () { return rd(K_AGE); },
     dates: function () { return Object.keys(rd(K_AGE)).sort(); },
     get: function (d) { return rd(K_AGE)[d] || null; },
-    save: function (d, rows, fileName) {
+    /* isAuto: التقاط تلقائي أثناء تحديث البيانات الحية.
+       لا يدهس رفعاً يدوياً لنفس التاريخ — الملف الذي رفعته بيدك يبقى هو المرجع. */
+    save: function (d, rows, fileName, isAuto) {
       if (!isDate(d) || !rows || !rows.length) return false;
+      var m = rd(K_AGE), prev = m[d];
+      if (isAuto && prev && prev.auto !== true) return false;
       var q = 0, i;
       for (i = 0; i < rows.length; i++) q += +rows[i].qty || 0;
-      var m = rd(K_AGE);
-      m[d] = { date: d, ts: now(), by: who(), rows: rows.slice(), n: rows.length, qty: Math.round(q), file: fileName || "" };
+      m[d] = { date: d, ts: now(), by: who(), auto: !!isAuto, rows: rows.slice(), n: rows.length, qty: Math.round(q), file: fileName || "" };
       if (!wr(K_AGE, m)) return false;
       project();
       return true;
@@ -2858,27 +2861,91 @@ img,canvas,svg,video,iframe{max-width:100%}
     clear: function () { wr(K_AGE, {}); project(); }
   };
 
+  /* ---------- المساحات: تقرير مشتقّ لا مرفوع ----------
+     بنية تقرير المساحات = مجموعة السعات (groups[0]) المرفوعة يدوياً ونادرة
+     التغيّر + ثلاث مجموعات تُحسب من أرصدة ذلك التاريخ وترانزيته عبر جداول
+     التحويل. لذلك كان أي تاريخ رُفعت له الأرصدة دون ملف مساحات يظهر
+     «لا توجد بيانات محفوظة للمساحات». الحل: نشتقّها حسابياً لحظة الحفظ. */
+
+  function spaceTemplate(d) {
+    var m = rd(K_REP), r = m[d];
+    if (r && partHas(r.parts && r.parts.space) && !(r.parts.space || {})._derived) return r.parts.space;
+    /* أقرب قالب سعات سابق — السعة حقيقة بطيئة التغيّر تُرحَّل للأمام */
+    var earlier = Object.keys(m).filter(function (x) {
+      return x <= d && partHas(m[x].parts && m[x].parts.space) && !(m[x].parts.space || {})._derived;
+    }).sort();
+    if (earlier.length) return m[earlier[earlier.length - 1]].parts.space;
+    try { var live = getDR().space; if (partHas(live)) return live; } catch (e) {}
+    try { if (partHas(DEFAULT_DAILY_REPORTS.space)) return DEFAULT_DAILY_REPORTS.space; } catch (e) {}
+    return null;
+  }
+
+  function deriveSpace(d, parts) {
+    if (typeof getDR !== "function" || typeof saveDR !== "function" || typeof getSpaceRep !== "function") return null;
+    if (!partHas(parts.fgbal) && !partHas(parts.transit)) return null;
+    var tpl = spaceTemplate(d);
+    if (!tpl || !tpl.groups || tpl.groups.length < 4) return null;
+
+    var live = {}, out = null;
+    try { live = getDR() || {}; } catch (e) { return null; }
+    var merged = {};
+    for (var k in live) merged[k] = live[k];
+    PARTS.forEach(function (p) { if (partHas(parts[p])) merged[p] = parts[p]; });
+    try { merged.space = JSON.parse(JSON.stringify(tpl)); } catch (e) { return null; }
+    merged.space_date = d;
+    try { saveDR(merged); out = getSpaceRep(); }
+    catch (e) { out = null; }
+    finally { try { saveDR(live); } catch (e) {} }
+
+    if (!out || !out.groups || !out.groups.length) return null;
+    try { out = JSON.parse(JSON.stringify(out)); } catch (e) { return null; }
+    out.date = d;
+    out._derived = true;
+    return out;
+  }
+
   var report = {
     map: function () { return rd(K_REP); },
     dates: function () { return Object.keys(rd(K_REP)).sort(); },
     get: function (d) { return rd(K_REP)[d] || null; },
     /* dr هو مخرَج _histParseBalanceWB — نأخذ منه الأجزاء الحاملة لبيانات فقط،
        وندمجها مع ما سبق رفعه لنفس التاريخ حتى يُرفع كل تقرير في ملف منفصل. */
-    save: function (d, dr, fileName) {
+    save: function (d, dr, fileName, isAuto) {
       if (!isDate(d) || !dr) return false;
       var m = rd(K_REP), prev = m[d], parts = (prev && prev.parts) ? prev.parts : {}, got = [];
+      if (isAuto && prev && prev.auto !== true) return false;
       PARTS.forEach(function (k) { if (partHas(dr[k])) { parts[k] = dr[k]; got.push(k); } });
       if (!got.length) return false;
+      /* تُشتقّ المساحات حسابياً ما لم يُرفع لها ملف صريح لهذا التاريخ.
+         والمشتقّة تُعاد حسابها كلما تغيّرت الأرصدة أو الترانزيت. */
+      if (!partHas(parts.space) || (parts.space || {})._derived) {
+        var sp = deriveSpace(d, parts);
+        if (sp) parts.space = sp;
+      }
       var files = (prev && prev.files) ? prev.files.slice(0, 9) : [];
       if (fileName) files.unshift({ name: fileName, parts: got, at: now() });
-      m[d] = { date: d, ts: now(), by: who(), parts: parts, files: files };
+      m[d] = { date: d, ts: now(), by: who(), auto: !!isAuto, parts: parts, files: files };
       if (!wr(K_REP, m)) return false;
       project();
       return true;
     },
     del: function (d) { var m = rd(K_REP); if (!(d in m)) return false; delete m[d]; wr(K_REP, m); project(); return true; },
     clear: function () { wr(K_REP, {}); project(); },
-    partsOf: function (d) { var r = rd(K_REP)[d]; if (!r) return []; return PARTS.filter(function (k) { return partHas(r.parts && r.parts[k]); }); }
+    partsOf: function (d) { var r = rd(K_REP)[d]; if (!r) return []; return PARTS.filter(function (k) { return partHas(r.parts && r.parts[k]); }); },
+    /* يعيد اشتقاق المساحات لكل تاريخ ينقصها — للتواريخ المحفوظة قبل هذه الميزة */
+    recomputeSpace: function (force) {
+      var m = rd(K_REP), done = [], skip = [];
+      Object.keys(m).sort().forEach(function (d) {
+        var parts = m[d].parts || {};
+        if (partHas(parts.space) && !(parts.space || {})._derived && !force) { skip.push(d); return; }
+        var sp = deriveSpace(d, parts);
+        if (sp) { parts.space = sp; m[d].parts = parts; m[d].ts = now(); done.push(d); }
+        else skip.push(d);
+      });
+      if (done.length) { wr(K_REP, m); project(); }
+      return { done: done, skip: skip };
+    },
+    spaceIsDerived: function (d) { var r = rd(K_REP)[d]; return !!(r && r.parts && r.parts.space && r.parts.space._derived); }
   };
 
   /* ---------- الإسقاط إلى الذاكرة المشتقّة ---------- */
@@ -3126,16 +3193,22 @@ img,canvas,svg,video,iframe{max-width:100%}
       '<div class="ivx-q" id="ivx-queue-' + kind + '"></div></div>';
   }
 
+  function srcPill(r) {
+    return r && r.auto === true
+      ? '<span class="ivx-pill busy" title="التُقط تلقائياً أثناء تحديث البيانات">&#9881;&#65039; تلقائي</span>'
+      : '<span class="ivx-pill off">يدوي</span>';
+  }
+
   function agingTable() {
     var m = aging.map(), dates = Object.keys(m).sort().reverse();
     if (!dates.length) return '<div class="ivx-empty">لا توجد تواريخ أعمار مرفوعة بعد.</div>';
     var cal = calendar("__all__");
-    var h = '<table class="ivx-tbl"><thead><tr><th>التاريخ</th><th>صفوف الأعمار</th><th>الكمية</th><th>الملف</th><th>بواسطة</th><th>الربط</th><th>النشر السحابي</th><th>إجراءات</th></tr></thead><tbody>';
+    var h = '<table class="ivx-tbl"><thead><tr><th>التاريخ</th><th>صفوف الأعمار</th><th>الكمية</th><th>الملف</th><th>المصدر</th><th>الربط</th><th>النشر السحابي</th><th>إجراءات</th></tr></thead><tbody>';
     dates.forEach(function (d) {
       var r = m[d], live = cal.indexOf(d) >= 0, ps = pubState("aging", d);
       h += '<tr><td class="ivx-d">' + esc(d) + "</td><td><b>" + num(r.n) + "</b></td><td>" + num(r.qty) + "</td>" +
         '<td style="text-align:start;max-width:230px;overflow:hidden;text-overflow:ellipsis">' + esc(r.file || "—") + "</td>" +
-        "<td>" + esc(r.by || "—") + "</td>" +
+        "<td>" + srcPill(r) + "</td>" +
         "<td>" + (live ? '<span class="ivx-pill on" title="يصل إلى اللوحة والملخّص وشاشة المقارنة">&#128279; اللوحة · الملخّص · المقارنة</span>'
                        : '<span class="ivx-pill warn">لا يصل</span>') + "</td>" +
         "<td>" + (ps.pub ? '<span class="ivx-pill on" title="' + esc(ps.when) + '">&#9729;&#65039; منشور</span>'
@@ -3154,14 +3227,17 @@ img,canvas,svg,video,iframe{max-width:100%}
     if (!dates.length) return '<div class="ivx-empty">لا توجد تواريخ تقارير مرفوعة بعد.</div>';
     var h = '<table class="ivx-tbl"><thead><tr><th>التاريخ</th>';
     PARTS.forEach(function (k) { h += "<th>" + PART_AR[k] + "</th>"; });
-    h += "<th>الربط</th><th>النشر السحابي</th><th>إجراءات</th></tr></thead><tbody>";
+    h += "<th>المصدر</th><th>الربط</th><th>النشر السحابي</th><th>إجراءات</th></tr></thead><tbody>";
     dates.forEach(function (d) {
       var r = m[d], got = report.partsOf(d), ps = pubState("report", d);
       h += '<tr><td class="ivx-d">' + esc(d) + "</td>";
       PARTS.forEach(function (k) {
         var on = got.indexOf(k) >= 0;
-        h += "<td>" + (on ? '<span class="ivx-y">&#10003;</span>' : '<span style="color:#cbd5e1">—</span>') + "</td>";
+        if (k === "space" && on && report.spaceIsDerived(d))
+          h += '<td><span class="ivx-pill busy" title="مُشتقّة حسابياً من أرصدة هذا التاريخ وترانزيته">&#8721; محسوبة</span></td>';
+        else h += "<td>" + (on ? '<span class="ivx-y">&#10003;</span>' : '<span style="color:#cbd5e1">—</span>') + "</td>";
       });
+      h += "<td>" + srcPill(r) + "</td>";
       h += "<td>" + (got.length
         ? '<span class="ivx-pill on" title="' + esc(got.map(function (k) { return PART_AR[k]; }).join(" · ")) + '">&#128279; ' + got.length + " تقرير</span>"
         : '<span class="ivx-pill warn">بلا بيانات</span>') + "</td>" +
@@ -3211,12 +3287,15 @@ img,canvas,svg,video,iframe{max-width:100%}
     var n = (isAge ? aging.dates() : report.dates()).length;
     var pub = 0;
     (isAge ? aging.dates() : report.dates()).forEach(function (d) { if (pubState(kind, d).pub) pub++; });
-    root.innerHTML = legacyNotice() + uploadBox(kind) +
+    var autoCard = "";
+    try { if (window.IVXAUTO && IVXAUTO.card) autoCard = IVXAUTO.card(kind); } catch (e) {}
+    root.innerHTML = legacyNotice() + autoCard + uploadBox(kind) +
       '<div class="ivx-bar"><h3>&#128197; التواريخ المرفوعة</h3>' +
       '<span style="font-size:12.5px;color:#475569"><b>' + n + "</b> تاريخ · <b style=\"color:#0f9b8e\">" + pub + "</b> منشور</span>" +
       '<span style="margin-inline-start:auto;display:flex;gap:7px;flex-wrap:wrap">' +
       '<button class="ivx-mini pub" onclick="IVX.ui.puball(\'' + kind + '\')">&#9729;&#65039; نشر كل التواريخ</button>' +
       '<button class="ivx-mini" onclick="IVX.ui.verify(\'' + kind + '\')">&#9989; مراجعة شاملة</button>' +
+      (isAge ? "" : '<button class="ivx-mini" onclick="IVX.ui.recalcSpace()" title="اشتقاق تقرير المساحات حسابياً لكل تاريخ ينقصه">&#8721; احسب المساحات الناقصة</button>') +
       '<button class="ivx-mini" onclick="IVX.ui.exportAll(\'' + kind + '\')">&#11015;&#65039; تصدير أرشيف</button>' +
       '<button class="ivx-mini danger" onclick="IVX.ui.clear(\'' + kind + '\')">&#128465; تفريغ الكل</button></span></div>' +
       '<div id="ivx-verify-' + kind + '"></div>' +
@@ -3342,6 +3421,16 @@ img,canvas,svg,video,iframe{max-width:100%}
       render(kind);
       toast("🗑️ فُرّغ المخزن.", "ok");
     },
+    recalcSpace: function () {
+      if (!admin()) { toast("⚠️ متاح للمدير فقط.", "err"); return; }
+      var r = report.recomputeSpace(false);
+      render("report");
+      if (!r.done.length) {
+        toast("لا يوجد تاريخ ينقصه حساب المساحات" + (r.skip.length ? " — " + r.skip.length + " تاريخ إمّا مكتمل أو بلا أرصدة/ترانزيت." : "."), "warn");
+      } else {
+        toast("∑ حُسبت المساحات لـ " + r.done.length + " تاريخ: " + r.done.join(" · "), "ok");
+      }
+    },
     legacy: function (exportFirst) {
       if (!admin()) { toast("⚠️ متاح للمدير فقط.", "err"); return; }
       var recs = legacyRecords();
@@ -3424,5 +3513,252 @@ img,canvas,svg,video,iframe{max-width:100%}
     clearInterval(t);
     setTimeout(pullCloud, 1200);
   }, 1000);
+}();
+</script>
+
+<style id="ivxauto-styles">
+.ivxa{border:2px solid #1d4ed8;border-radius:14px;padding:14px 16px;margin-bottom:16px;background:linear-gradient(135deg,#f5f8ff,#ffffff)}
+.ivxa.off{border-color:#cbd5e1;background:#fbfcfe}
+.ivxa h4{margin:0 0 4px;font-size:14px;font-weight:800;color:#1d4ed8;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ivxa.off h4{color:#64748b}
+.ivxa p{margin:0 0 11px;font-size:12.5px;line-height:1.8;color:#475569}
+.ivxa .ivxa-ctl{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.ivxa select,.ivxa input[type=date]{font:inherit;font-size:12.5px;font-weight:700;padding:6px 10px;border:1px solid #d7e0ec;border-radius:9px;background:#fff;color:#0f2747}
+.ivxa-sw{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:12.5px;font-weight:800;color:#0f2747}
+.ivxa-sw input{position:absolute;opacity:0;width:0;height:0}
+.ivxa-sw i{width:38px;height:21px;border-radius:999px;background:#cbd5e1;position:relative;transition:.18s;flex:none}
+.ivxa-sw i::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.ivxa-sw input:checked + i{background:#1d4ed8}
+.ivxa-sw input:checked + i::after{transform:translateX(17px)}
+html[dir=rtl] .ivxa-sw input:checked + i::after{transform:translateX(-17px)}
+.ivxa-log{margin-top:11px;font-size:12px;color:#475569;border-top:1px dashed #dbe3ee;padding-top:9px}
+.ivxa-log b{color:#0f2747}
+.ivxa-log span.ivxa-none{color:#94a3b8}
+</style>
+<script id="ivx-autocapture-v6660">
+/* ============================================================================
+   IVXAUTO — الالتقاط التلقائي أثناء تحديث البيانات.  v6.66.0
+
+   بدل أن يرفع المستخدم ملفاً قديماً لكل يوم، يلتقط النظام اللقطة لحظة تحديث
+   البيانات الحية ويودعها في مخزن IVX المناسب:
+
+       processWorkbook(wb, fname)  →  بيانات الأعمار الحية  →  ivx_aging_v1
+       drCommit(key, obj)          →  تقرير يومي واحد        →  ivx_report_v1
+
+   الوضعان:
+       يومي   — لقطة لكل يوم بيانات (التاريخ يؤخذ من البيانات نفسها لا من ساعة الجهاز)
+       أسبوعي — لقطة عند اليوم المختار من الأسبوع، أو إن مرّ ٧ أيام بلا لقطة
+
+   قاعدة ثابتة: الالتقاط التلقائي لا يدهس تاريخاً رفعته يدوياً — الملف الذي
+   رفعته بنفسك يبقى هو المرجع، والتلقائي يملأ الفراغات فقط.
+   ========================================================================== */
+!function () {
+  "use strict";
+
+  var KEY = "ivxauto_v1";
+  var DAYS = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+
+  function LSo() { try { return window.LS || window.localStorage; } catch (e) { return window.localStorage; } }
+  function esc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function toast(m, k) { try { if (typeof syncToast === "function") syncToast(m, k || "ok"); } catch (e) {} }
+  function admin() { try { return typeof isAdmin !== "function" || isAdmin(); } catch (e) { return true; } }
+  function isDate(d) { return /^\d{4}-\d{2}-\d{2}$/.test(String(d || "")); }
+
+  function cfg() {
+    var d = { on: true, mode: "daily", weekday: 6, lastAging: "", lastReport: "", log: [] };
+    try {
+      var v = JSON.parse(LSo().getItem(KEY) || "null");
+      if (v && typeof v === "object") { Object.keys(d).forEach(function (k) { if (v[k] != null) d[k] = v[k]; }); }
+    } catch (e) {}
+    if (!Array.isArray(d.log)) d.log = [];
+    return d;
+  }
+  function setCfg(c) { try { LSo().setItem(KEY, JSON.stringify(c)); } catch (e) {} }
+
+  /* ---------- التواريخ ---------- */
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+
+  /* upd_date يُخزَّن DD/MM/YYYY — نطبّعه إلى ISO */
+  function normD(v) {
+    v = String(v == null ? "" : v).trim();
+    var m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return m[0];
+    m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (m) { var y = +m[3]; if (y < 100) y += 2000; return y + "-" + pad(+m[2]) + "-" + pad(+m[1]); }
+    return "";
+  }
+
+  /* تاريخ البيانات الحية للأعمار: من upd_date الذي كتبه الاستيراد، وإلا اليوم */
+  function agingDate() {
+    var d = "";
+    try { d = normD(LSo().getItem("upd_date") || ""); } catch (e) {}
+    return isDate(d) ? d : today();
+  }
+  /* تاريخ التقرير: تاريخه المُثبت يدوياً، ثم تاريخه الذاتي، ثم اليوم */
+  function reportDate(obj) {
+    var d = normD((obj && (obj.manualDate || obj.date)) || "");
+    return isDate(d) ? d : today();
+  }
+
+  function daysBetween(a, b) {
+    try { return Math.round((new Date(b + "T00:00:00") - new Date(a + "T00:00:00")) / 86400000); }
+    catch (e) { return 999; }
+  }
+
+  /* ---------- هل نلتقط هذا التاريخ؟ ---------- */
+  function shouldCapture(c, d, last) {
+    if (!c.on || !isDate(d)) return false;
+    if (c.mode !== "weekly") return true;                 /* يومي: كل تحديث */
+    var wd;
+    try { wd = new Date(d + "T00:00:00").getDay(); } catch (e) { wd = -1; }
+    if (wd === (+c.weekday || 0)) return true;            /* يوم الأسبوع المختار */
+    if (!last) return true;                               /* أول لقطة على الإطلاق */
+    return daysBetween(last, d) >= 7;                     /* أو مرّ أسبوع بلا لقطة */
+  }
+
+  function note(c, kind, d, ok, why) {
+    c.log.unshift({ at: Date.now(), kind: kind, date: d, ok: !!ok, why: why || "" });
+    c.log = c.log.slice(0, 12);
+  }
+
+  /* ---------- الالتقاط ---------- */
+  function captureAging(force) {
+    var c = cfg();
+    if (!force && !c.on) return null;
+    if (!admin()) return null;
+    var rows = [];
+    try { rows = (typeof DATA !== "undefined" && Array.isArray(DATA)) ? DATA : []; } catch (e) {}
+    if (!rows.length) return null;
+    var d = agingDate();
+    if (!force && !shouldCapture(c, d, c.lastAging)) return null;
+
+    var ok = false;
+    try { ok = window.IVX && IVX.aging.save(d, rows, "التقاط تلقائي", true); } catch (e) {}
+    if (ok) c.lastAging = d;
+    note(c, "aging", d, ok, ok ? "" : "التاريخ مرفوع يدوياً — لم يُدهس");
+    setCfg(c);
+    return { date: d, ok: ok, n: rows.length };
+  }
+
+  function captureReport(key, obj, force) {
+    var c = cfg();
+    if (!force && !c.on) return null;
+    if (!admin()) return null;
+    var d = reportDate(obj);
+    if (!force && !shouldCapture(c, d, c.lastReport)) return null;
+
+    var dr = {};
+    if (key && obj) dr[key] = obj;
+    else { try { dr = (typeof getDR === "function" ? getDR() : {}) || {}; } catch (e) { dr = {}; } }
+
+    var ok = false;
+    try { ok = window.IVX && IVX.report.save(d, dr, "التقاط تلقائي", true); } catch (e) {}
+    if (ok) c.lastReport = d;
+    note(c, "report", d, ok, ok ? "" : "التاريخ مرفوع يدوياً — لم يُدهس");
+    setCfg(c);
+    return { date: d, ok: ok, key: key || "all" };
+  }
+
+  function refresh() { try { if (window.IVX && IVX.ui) { IVX.ui.render("aging"); IVX.ui.render("report"); } } catch (e) {} }
+
+  /* ---------- ربط نقاط الالتزام في البيانات الحية ---------- */
+  function hook() {
+    try {
+      var pw = window.processWorkbook;
+      if (typeof pw === "function" && !pw.__ivxa) {
+        var wpw = function () {
+          var r = pw.apply(this, arguments);
+          /* بعد أن يكتب الاستيراد upd_date ويستبدل DATA */
+          setTimeout(function () {
+            try {
+              var res = captureAging(false);
+              if (res && res.ok) { toast("📸 لقطة تلقائية لأعمار " + res.date + " (" + res.n + " صف).", "ok"); refresh(); }
+            } catch (e) {}
+          }, 60);
+          return r;
+        };
+        wpw.__ivxa = 1; window.processWorkbook = wpw;
+      }
+    } catch (e) {}
+
+    try {
+      var dc = window.drCommit;
+      if (typeof dc === "function" && !dc.__ivxa) {
+        var wdc = function (key, obj) {
+          var r = dc.apply(this, arguments);
+          setTimeout(function () {
+            try {
+              var res = captureReport(key, obj, false);
+              if (res && res.ok) { toast("📸 لقطة تلقائية لتقرير " + res.date + ".", "ok"); refresh(); }
+            } catch (e) {}
+          }, 60);
+          return r;
+        };
+        wdc.__ivxa = 1; window.drCommit = wdc;
+      }
+    } catch (e) {}
+  }
+
+  /* ---------- البطاقة على الشاشتين ---------- */
+  function card(kind) {
+    var c = cfg(), isAge = kind === "aging";
+    var last = isAge ? c.lastAging : c.lastReport;
+    var src = isAge ? "تحديث البيانات الحية (استيراد ملف الأعمار)" : "رفع التقارير اليومية (أرصدة · هوية · مساحات · ترانزيت · قارورة)";
+    var logs = c.log.filter(function (x) { return x.kind === (isAge ? "aging" : "report"); }).slice(0, 4);
+
+    var h = '<div class="ivxa' + (c.on ? "" : " off") + '"><h4>&#128248; الالتقاط التلقائي' +
+      '<span class="ivx-pill ' + (c.on ? "busy" : "off") + '">' + (c.on ? (c.mode === "weekly" ? "أسبوعي · " + DAYS[+c.weekday || 0] : "يومي") : "متوقّف") + "</span></h4>" +
+      "<p>يلتقط لقطة تلقائياً من <b>" + src + "</b> ويحفظها بتاريخ البيانات نفسها — لا بتاريخ الجهاز. " +
+      "التلقائي <b>لا يدهس</b> أي تاريخ رفعته يدوياً.</p>" +
+      '<div class="ivxa-ctl">' +
+      '<label class="ivxa-sw"><input type="checkbox"' + (c.on ? " checked" : "") + ' onchange="IVXAUTO.set(\'on\',this.checked)"><i></i>تشغيل</label>' +
+      '<select onchange="IVXAUTO.set(\'mode\',this.value)">' +
+      '<option value="daily"' + (c.mode === "daily" ? " selected" : "") + ">يومي — لقطة لكل يوم بيانات</option>" +
+      '<option value="weekly"' + (c.mode === "weekly" ? " selected" : "") + ">أسبوعي — لقطة كل أسبوع</option></select>";
+
+    if (c.mode === "weekly") {
+      h += '<select onchange="IVXAUTO.set(\'weekday\',this.value)">';
+      DAYS.forEach(function (n, i) { h += '<option value="' + i + '"' + (+c.weekday === i ? " selected" : "") + ">" + n + "</option>"; });
+      h += "</select>";
+    }
+    h += '<button class="ivx-mini pub" onclick="IVXAUTO.now(\'' + kind + '\')">&#128247; التقط الآن</button></div>';
+
+    h += '<div class="ivxa-log">آخر لقطة تلقائية: ' + (last ? "<b>" + esc(last) + "</b>" : '<span class="ivxa-none">لا شيء بعد</span>');
+    if (logs.length) {
+      h += " · السجل: " + logs.map(function (x) {
+        return (x.ok ? "✅ " : "⏭️ ") + esc(x.date) + (x.ok ? "" : " (" + esc(x.why) + ")");
+      }).join(" · ");
+    }
+    h += "</div></div>";
+    return h;
+  }
+
+  window.IVXAUTO = {
+    card: card,
+    capture: { aging: captureAging, report: captureReport },
+    set: function (k, v) {
+      if (!admin()) { toast("⚠️ الإعداد متاح للمدير فقط.", "err"); return; }
+      var c = cfg();
+      c[k] = (k === "weekday") ? (+v || 0) : v;
+      setCfg(c);
+      refresh();
+      toast(k === "on" ? (v ? "✅ الالتقاط التلقائي مُشغّل." : "⏸️ الالتقاط التلقائي متوقّف.") : "✅ حُفظ الإعداد.", "ok");
+    },
+    now: function (kind) {
+      if (!admin()) { toast("⚠️ متاح للمدير فقط.", "err"); return; }
+      var r = kind === "aging" ? captureAging(true) : captureReport(null, null, true);
+      refresh();
+      if (!r) { toast("⚠️ لا توجد بيانات حية لالتقاطها الآن.", "err"); return; }
+      toast(r.ok ? "📸 التُقطت لقطة بتاريخ " + r.date : "⚠️ " + r.date + " مرفوع يدوياً — لم يُدهس.", r.ok ? "ok" : "warn");
+    },
+    cfg: cfg
+  };
+
+  function boot() { hook(); refresh(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else setTimeout(boot, 0);
+  /* نقاط الالتزام قد تُعرَّف بعدنا في ترتيب التحميل — نعيد المحاولة مرة */
+  setTimeout(hook, 1500);
 }();
 </script>
