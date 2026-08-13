@@ -7491,3 +7491,80 @@ html.epm-printing .sp-card{
   };
 }();
 </script>
+<script data-cfasync="false" id="dcmp-blank-guard">!function(){"use strict";
+/* شاشة المقارنة تُستدعى في مسار التنقّل داخل try{}catch(e){} فارغ،
+   فإن سقط بناؤها لأي سبب بقيت المساحة بيضاء بلا كلمة تشرح السبب.
+   هذا الحارس يحوّل الفراغ الصامت إلى رسالة تحمل نص الخطأ وزرّ إعادة محاولة. */
+function L(a,e){try{return"undefined"!=typeof LANG&&"ar"===LANG?a:e}catch(x){return a}}
+function esc(v){return String(null==v?"":v).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var ROOTS={fg:"dcmpfg-root",inv:"dcmp-root"};
+function paint(rootId,mode,msg){
+  var r=document.getElementById(rootId);
+  if(!r||String(r.innerHTML||"").trim())return;
+  r.innerHTML='<div class="dcmp-card" style="padding:26px;text-align:center;line-height:1.9">'+
+    '<div style="font-weight:800;color:#b91c1c;font-size:15px;margin-bottom:8px">'+
+      L("تعذّر بناء شاشة المقارنة","The comparison screen failed to build")+'</div>'+
+    '<div style="color:#475569;font-size:12.5px;direction:ltr;font-family:Menlo,Consolas,monospace;word-break:break-word">'+
+      esc(msg||L("لم تُنتج الشاشة أي محتوى — راجع Console.","No content was produced — check the Console."))+'</div>'+
+    '<button onclick="try{DATECMP.render(&#39;'+mode+'&#39;)}catch(e){}" style="margin-top:14px;border:none;border-radius:10px;padding:9px 18px;background:#1e5398;color:#fff;font-weight:700;cursor:pointer;font-family:inherit">'+
+      L("إعادة المحاولة","Retry")+'</button></div>';
+  try{window.__dcmpErr=msg||"(empty render)"}catch(e){}
+}
+function wrap(){
+  if(!window.DATECMP||"function"!=typeof DATECMP.render||DATECMP.__blankGuard)return!1;
+  var orig=DATECMP.render;DATECMP.__blankGuard=!0;
+  DATECMP.render=function(mode){
+    var m="fg"===mode?"fg":"inv",rootId=ROOTS[m],err="";
+    try{return orig.apply(DATECMP,arguments)}
+    catch(e){err=e&&(e.message||e.name)||String(e);try{console.error("DATECMP.render failed:",e)}catch(_){}}
+    finally{setTimeout(function(){paint(rootId,m,err)},700)}
+  };
+  return!0
+}
+if(!wrap()){var iv=setInterval(function(){wrap()&&clearInterval(iv)},200);setTimeout(function(){clearInterval(iv)},15e3)}
+}();</script>
+<script data-cfasync="false" id="veil-guard">!function(){"use strict";
+/* حارس الضباب: طبقة تغطية تملأ الشاشة وتحمل تمويهاً أو تعتيماً بلا أي صندوق
+   ظاهر بداخلها ليست نافذة مفتوحة — إنها بقايا نافذة لم تُغلق، وتُغبّش المنصة كلها.
+   النافذة الحقيقية تحمل دائماً بطاقة مرئية بداخلها، فلا يمسّها هذا الحارس.
+   يُشترط أن تبقى فارغة فحصين متتاليين (٣ ثوانٍ) قبل إخفائها. */
+var STRIKES={},SEQ=0,KILLED=[];
+function big(r){return r.width>=innerWidth*.7&&r.height>=innerHeight*.7}
+function translucent(c){var m=/rgba?\(([^)]+)\)/.exec(c||"");if(!m)return!1;
+  var p=m[1].split(",").map(parseFloat),a=null==p[3]?1:p[3];return a>.02&&a<.98}
+function hasBox(el){
+  var k=el.querySelectorAll("*");
+  for(var i=0;i<k.length;i++){var c=k[i],cs=getComputedStyle(c);
+    if("none"===cs.display||"hidden"===cs.visibility||+cs.opacity<.05)continue;
+    var r=c.getBoundingClientRect();
+    if(r.width>=80&&r.height>=40&&r.width<innerWidth*.99)return!0}
+  return!1}
+function key(el){return el.id||el.__vgId||(el.__vgId="vg"+ ++SEQ)}
+function scan(){
+  try{
+    var all=document.querySelectorAll("body *");
+    for(var i=0;i<all.length;i++){
+      var el=all[i],cs=getComputedStyle(el);
+      if("fixed"!==cs.position&&"absolute"!==cs.position)continue;
+      if("none"===cs.display||"hidden"===cs.visibility||+cs.opacity<.05)continue;
+      var r=el.getBoundingClientRect();if(!big(r))continue;
+      var blur=(cs.backdropFilter&&"none"!==cs.backdropFilter)||(cs.webkitBackdropFilter&&"none"!==cs.webkitBackdropFilter),
+          dim=translucent(cs.backgroundColor);
+      if(!blur&&!dim)continue;
+      if((parseInt(cs.zIndex,10)||0)<20)continue;
+      var k=key(el);
+      if(hasBox(el)){STRIKES[k]=0;continue}
+      if(!(STRIKES[k]=(STRIKES[k]||0)+1)||STRIKES[k]<2)continue;
+      var tag=(el.id?"#"+el.id:"")+(el.className?"."+String(el.className).trim().split(/\s+/).join("."):"")||el.tagName;
+      el.style.setProperty("display","none","important");
+      el.style.setProperty("backdrop-filter","none","important");
+      el.style.setProperty("-webkit-backdrop-filter","none","important");
+      KILLED.push(tag);window.__veilKilled=KILLED;
+      try{console.warn("[veil-guard] أُزيلت طبقة ضباب عالقة:",tag,el)}catch(e){}
+    }
+  }catch(e){}
+}
+function start(){scan();setInterval(scan,1500)}
+"complete"===document.readyState?setTimeout(start,2500):window.addEventListener("load",function(){setTimeout(start,2500)});
+window.__veilScan=scan;
+}();</script>
