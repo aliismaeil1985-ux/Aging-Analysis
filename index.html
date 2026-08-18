@@ -7635,28 +7635,329 @@ function start(){scan();setInterval(scan,1500)}
 window.__veilScan=scan;
 }();</script>
 
-<style id="hdr-logo-left-css">
-/* الشعار أول الصف قبل العنوان — كان يقع في العمود الأوسط من شبكة الهيدر فيتراكب مع البحث */
-.hdr-bar>.hdr-logo,.hdr-bar>.hdr-brand-logo,.hdr-bar>img.tania-logo{order:-1!important;grid-column:1!important;grid-row:1!important;justify-self:start!important;align-self:center!important;flex:0 0 auto!important;position:static!important}
-.hdr-bar .hdr-title{display:flex!important;align-items:center;gap:10px;min-width:0}
-.hdr-bar .hdr-title>.hdr-logo,.hdr-bar .hdr-title>.hdr-brand-logo,.hdr-bar .hdr-title>img.tania-logo{order:-1!important;flex:0 0 auto!important;grid-column:auto!important;grid-row:auto!important;align-self:center!important;position:static!important;margin:0!important}
-.hdr-bar .hdr-title>.hdr-ttx{min-width:0;flex:1 1 auto}
-.hdr-bar .hdr-title h1{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+<style id="logo-left-css">
+/* ============================================================
+   تثبيت الشعار في طرف الشريط — نهج التموضع المطلق.
+   لا يعتمد على ترتيب العناصر في الـ DOM ولا على أي كود آخر:
+   الشعار عنصر مطلق داخل الشريط، موضعه محسوم بـ inset-inline-start:0
+   فيقع يساراً في الإنجليزية ويميناً في العربية تلقائياً.
+   ============================================================ */
+.topbar{position:relative}
+
+.topbar .tlogo-pin{
+  position:absolute!important;top:50%!important;
+  transform:translateY(-50%)!important;
+  inset-inline-start:2px!important;inset-inline-end:auto!important;
+  left:auto!important;right:auto!important;
+  height:32px!important;width:auto!important;max-width:none!important;
+  margin:0!important;padding:0!important;border:0!important;
+  background:transparent!important;box-shadow:none!important;border-radius:0!important;
+  order:0!important;float:none!important;flex:none!important;
+  z-index:6;pointer-events:none;display:block!important;object-fit:contain}
+
+/* أي شعار آخر داخل الشريط يُخفى: يمنع التكرار والتداخل مع العنوان */
+.topbar img[class*="logo"]:not(.tlogo-pin),
+.topbar .home-logo:not(.tlogo-pin),
+.topbar .tania-logo:not(.tlogo-pin),
+.topbar .hdr-logo:not(.tlogo-pin),
+.topbar .hdr-brand-logo:not(.tlogo-pin),
+.topbar .htext>img:not(.tlogo-pin){display:none!important}
+
+/* حجز مساحة الشعار حتى لا يركب على العنوان */
+.topbar>.htext{padding-inline-start:56px!important}
+.topbar>.htext{display:flex!important;flex-direction:row!important;align-items:center!important;min-width:0}
+.topbar>.htext>h1{min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+/* الوضع الفاتح: بلا خلفية بيضاء إطلاقاً (القاعدة أعلاه).
+   الوضع الداكن: لوحة بيضاء خلف الشعار ليبقى واضحاً. */
+html.dark .topbar .tlogo-pin,body.dark .topbar .tlogo-pin,
+html[data-theme="dark"] .topbar .tlogo-pin,body[data-theme="dark"] .topbar .tlogo-pin,
+.dark .topbar .tlogo-pin,.wh-dark .topbar .tlogo-pin{
+  background:#fff!important;border-radius:10px!important;padding:3px 6px!important;
+  box-shadow:0 2px 10px rgba(0,0,0,.35)!important}
+@media (prefers-color-scheme:dark){
+  html:not(.light):not([data-theme="light"]) .topbar .tlogo-pin{
+    background:#fff!important;border-radius:10px!important;padding:3px 6px!important;
+    box-shadow:0 2px 10px rgba(0,0,0,.35)!important}
+}
 </style>
-<script data-cfasync="false" id="hdr-logo-left-js">!function(){"use strict";
-/* حارس: أي شعار داخل شريط الهيدر يُنقل ليكون أول عنصر قبل العنوان.
-   الترتيب يتغيّر بإعادة بناء الهيدر، فلا يكفي التنسيق وحده. */
+<script data-cfasync="false" id="logo-left-js">!function(){"use strict";
+/* مهمة هذا الحارس صارت بسيطة: التأكد من وجود عنصر شعار واحد (.tlogo-pin)
+   داخل شريط كل صفحة مستهدفة. الموضع كله من التنسيق المطلق — لا نحرّك شيئاً. */
+var LOGO_PAGES={"page-dash":1,"page-sum":1,"page-sku":1};
+function logoSrc(){
+  try{
+    var best="",L=document.querySelectorAll("img.tania-logo,img.home-logo,img.hdr-brand-logo,img.tlogo-pin");
+    for(var i=0;i<L.length;i++){var s=L[i].getAttribute("src")||"";if(s.length>best.length)best=s}
+    return best.length>200?best:"";
+  }catch(e){return ""}
+}
+function ensure(bar){
+  try{
+    var pg=bar.closest?bar.closest(".page"):null;
+    if(!pg||!LOGO_PAGES[pg.id])return;
+    var pins=bar.querySelectorAll(".tlogo-pin");
+    for(var i=1;i<pins.length;i++){if(pins[i].parentNode)pins[i].parentNode.removeChild(pins[i])}
+    var s=logoSrc(); if(!s)return;
+    if(pins.length){ if(pins[0].getAttribute("src")!==s) pins[0].setAttribute("src",s);
+                     if(pins[0].parentElement!==bar) bar.appendChild(pins[0]); return }
+    var im=document.createElement("img");
+    im.className="tlogo-pin"; im.alt="Tania"; im.setAttribute("src",s);
+    bar.appendChild(im);
+  }catch(e){}
+}
 function fix(){try{
-  var bar=document.querySelector(".hdr-bar"); if(!bar) return;
-  var t=bar.querySelector(".hdr-title");
-  var lg=bar.querySelector(".hdr-brand-logo, .hdr-logo, img.tania-logo");
-  if(!lg) return;
-  var host=t||bar;
-  if(lg.parentNode!==host||host.firstElementChild!==lg) host.insertBefore(lg,host.firstElementChild);
+  var bars=document.querySelectorAll(".topbar");
+  for(var i=0;i<bars.length;i++)ensure(bars[i]);
 }catch(e){}}
+var TMR=0;
+function fixSoon(){if(TMR)return;TMR=setTimeout(function(){TMR=0;fix()},60)}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",fix);else fix();
-[200,800,1600,3000,6000].forEach(function(ms){setTimeout(fix,ms)});
-try{var mo=new MutationObserver(function(){fix()});
-  var start=function(){var b=document.querySelector(".hdr-bar");if(b){mo.observe(b,{childList:!0});var t2=b.querySelector(".hdr-title");if(t2)mo.observe(t2,{childList:!0})}else setTimeout(start,500)};
-  start()}catch(e){}
+[80,300,900,2000,3500,6000,10000].forEach(function(ms){setTimeout(fix,ms)});
+try{var mo=new MutationObserver(fixSoon);mo.observe(document.body,{childList:!0,subtree:!0})}catch(e){}
+try{document.addEventListener("click",function(){setTimeout(fix,60);setTimeout(fix,400)},!0)}catch(e){}
+try{
+  window.__logoGuardVer="6";
+  try{document.documentElement.setAttribute("data-logo-guard","6")}catch(_){}
+  window.__logoLeftFix=fix;
+  window.__logoDiag=function(){
+    var o=[];document.querySelectorAll(".topbar").forEach(function(b){
+      var pg=b.closest(".page"); if(!pg||!pg.classList.contains("show"))return;
+      var lg=b.querySelector(".tlogo-pin"), t=b.querySelector(".htext h1");
+      var a=lg?lg.getBoundingClientRect():null, c=t?t.getBoundingClientRect():null, bb=b.getBoundingClientRect();
+      o.push({page:pg.id,pins:b.querySelectorAll(".tlogo-pin").length,
+        otherLogos:b.querySelectorAll('img[class*="logo"]:not(.tlogo-pin)').length,
+        pos:lg?getComputedStyle(lg).position:null,bg:lg?getComputedStyle(lg).backgroundColor:null,
+        dir:getComputedStyle(b).direction,
+        logoX:a?Math.round(a.x):null,barX:Math.round(bb.x),barRight:Math.round(bb.right),
+        logoRight:a?Math.round(a.right):null,titleX:c?Math.round(c.x):null});});
+    return o;};
+}catch(e){}
+}();</script>
+
+<style id="sku-datepicker-css">
+/* ===== حقول التاريخ: عمق طبقي هادئ بدل الإطار المسطّح ===== */
+#page-sku .sf-date input{
+  width:100%;box-sizing:border-box;font-family:inherit;font-size:13.5px;font-weight:700;color:#12325c;
+  border:1px solid #ccd8e8;border-radius:12px;padding:10px 38px 10px 13px;letter-spacing:.2px;
+  background:linear-gradient(180deg,#fff 0%,#f4f8fd 100%);
+  box-shadow:0 1px 0 #fff inset,0 -1px 0 rgba(18,50,92,.05) inset,0 1px 2px rgba(16,40,80,.07),0 4px 10px -6px rgba(16,40,80,.35);
+  transition:box-shadow .18s ease,border-color .18s ease,transform .12s ease;cursor:pointer}
+html[dir=rtl] #page-sku .sf-date input{padding:10px 13px 10px 38px}
+#page-sku .sf-date input:hover{border-color:#9fbbdd;transform:translateY(-1px);
+  box-shadow:0 1px 0 #fff inset,0 2px 4px rgba(16,40,80,.10),0 10px 18px -10px rgba(16,40,80,.45)}
+#page-sku .sf-date input:focus{outline:0;border-color:#2f7ed8;
+  box-shadow:0 0 0 3px rgba(47,126,216,.18),0 1px 0 #fff inset,0 8px 18px -10px rgba(16,40,80,.5)}
+#page-sku .sf-date input.has-val{background:linear-gradient(180deg,#fff 0%,#eef6ff 100%);border-color:#8fb6e4}
+#page-sku .sf-date{position:relative}
+#page-sku .sf-date .dp-ic{position:absolute;inset-inline-end:11px;bottom:11px;font-size:15px;line-height:1;
+  color:#4c74a8;pointer-events:none;opacity:.85;text-shadow:0 1px 0 #fff}
+#page-sku .sf-date input::-webkit-calendar-picker-indicator{opacity:0;display:none}
+#page-sku .sf-date input::-webkit-inner-spin-button{display:none}
+#page-sku input#sku-dq{
+  border:1px solid #ccd8e8;border-radius:12px;padding:10px 13px;font-weight:700;color:#12325c;
+  background:linear-gradient(180deg,#fff 0%,#f4f8fd 100%);
+  box-shadow:0 1px 0 #fff inset,0 1px 2px rgba(16,40,80,.07),0 4px 10px -6px rgba(16,40,80,.35);
+  transition:box-shadow .18s,border-color .18s,transform .12s}
+#page-sku input#sku-dq:hover{border-color:#9fbbdd;transform:translateY(-1px)}
+#page-sku input#sku-dq:focus{outline:0;border-color:#2f7ed8;box-shadow:0 0 0 3px rgba(47,126,216,.18),0 1px 0 #fff inset}
+
+/* ===== التقويم المخصّص ===== */
+.dp-pop{position:fixed;z-index:100002;width:300px;padding:12px 12px 10px;border-radius:18px;
+  background:linear-gradient(180deg,#fff 0%,#f7fafe 100%);border:1px solid #dbe6f3;
+  box-shadow:0 1px 0 #fff inset,0 18px 42px -14px rgba(13,38,74,.45),0 6px 14px -8px rgba(13,38,74,.3);
+  font-family:inherit;opacity:0;transform:translateY(-6px) scale(.985);pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease;overflow:hidden}
+.dp-pop.on{opacity:1;transform:none;pointer-events:auto}
+.dp-hd{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.dp-nav{width:30px;height:30px;flex:0 0 auto;border-radius:10px;border:1px solid #d5e2f1;cursor:pointer;
+  background:linear-gradient(180deg,#fff,#eef4fb);color:#1e4e8c;font-size:15px;font-weight:800;line-height:1;
+  box-shadow:0 1px 0 #fff inset,0 2px 5px -2px rgba(16,40,80,.35);transition:.14s}
+.dp-nav:hover{background:linear-gradient(180deg,#1e4e8c,#16406f);color:#fff;transform:translateY(-1px)}
+.dp-my{flex:1 1 auto;display:flex;gap:7px;justify-content:center}
+.dp-pick{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:800;
+  color:#12325c;border:1px solid #d5e2f1;border-radius:11px;padding:6px 12px;cursor:pointer;
+  background:linear-gradient(180deg,#fff,#f1f6fc);box-shadow:0 1px 0 #fff inset,0 2px 5px -2px rgba(16,40,80,.3);
+  transition:.14s}
+.dp-pick:hover{transform:translateY(-1px);border-color:#9fbbdd;box-shadow:0 1px 0 #fff inset,0 6px 12px -6px rgba(16,40,80,.5)}
+.dp-pick.on{background:linear-gradient(180deg,#1e4e8c,#16406f);color:#fff;border-color:#16406f}
+.dp-pick i{font-style:normal;font-size:9px;opacity:.75;transition:transform .18s}
+.dp-pick.on i{transform:rotate(180deg)}
+.dp-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.dp-wk{transition:opacity .16s ease}
+.dp-pop.panel-on .dp-wk{opacity:0;pointer-events:none}
+.dp-wk span{text-align:center;font-size:10.5px;font-weight:800;color:#7c8ea6;letter-spacing:.3px;padding:3px 0}
+.dp-body{position:relative}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.dp-d{height:33px;border:0;border-radius:10px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;
+  color:#26405f;background:linear-gradient(180deg,#fff,#f3f7fc);
+  box-shadow:0 1px 0 #fff inset,0 1px 2px rgba(16,40,80,.10);transition:.13s}
+.dp-d:hover{transform:translateY(-1px);background:linear-gradient(180deg,#eaf3ff,#d8e9ff);color:#12325c;
+  box-shadow:0 3px 8px -3px rgba(16,40,80,.45)}
+.dp-d.out{color:#b9c6d6;background:#fafcfe;box-shadow:none}
+.dp-d.today{outline:2px solid #f0a848;outline-offset:-2px}
+.dp-d.inrange{background:linear-gradient(180deg,#e6f1ff,#d6e8fd);color:#12325c}
+.dp-d.sel{background:linear-gradient(180deg,#2f7ed8,#1e4e8c);color:#fff;
+  box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 6px 14px -6px rgba(30,78,140,.85)}
+/* القائمة المنزلقة للشهر/السنة */
+.dp-panel{position:absolute;inset:0;z-index:3;border-radius:14px;padding:8px;
+  background:linear-gradient(180deg,#fbfdff,#eef5fc);border:1px solid #dbe6f3;
+  box-shadow:0 1px 0 #fff inset,0 14px 28px -14px rgba(13,38,74,.5);
+  opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+.dp-panel.on{opacity:1;transform:none;pointer-events:auto}
+.dp-panel .in{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:214px;overflow:auto;padding-inline-end:2px}
+.dp-panel .in::-webkit-scrollbar{width:7px}
+.dp-panel .in::-webkit-scrollbar-thumb{background:#c4d6ea;border-radius:8px}
+.dp-opt{height:38px;border:1px solid #dfe9f5;border-radius:10px;cursor:pointer;font-family:inherit;font-size:12.5px;
+  font-weight:800;color:#26405f;background:linear-gradient(180deg,#fff,#f3f7fc);
+  box-shadow:0 1px 0 #fff inset,0 1px 3px rgba(16,40,80,.12);transition:.13s}
+.dp-opt:hover{transform:translateY(-1px);background:linear-gradient(180deg,#eaf3ff,#d8e9ff);
+  box-shadow:0 5px 12px -5px rgba(16,40,80,.5)}
+.dp-opt.cur{background:linear-gradient(180deg,#2f7ed8,#1e4e8c);color:#fff;border-color:#1e4e8c;
+  box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 6px 14px -6px rgba(30,78,140,.8)}
+.dp-ft{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid #e8eff8}
+.dp-ft button{border:1px solid #d5e2f1;border-radius:10px;padding:6px 14px;font-family:inherit;font-size:11.5px;
+  font-weight:800;cursor:pointer;background:linear-gradient(180deg,#fff,#eef4fb);color:#1e4e8c;
+  box-shadow:0 1px 0 #fff inset,0 2px 5px -2px rgba(16,40,80,.3);transition:.14s}
+.dp-ft button:hover{transform:translateY(-1px);background:linear-gradient(180deg,#1e4e8c,#16406f);color:#fff}
+.dp-ft .dp-clr{color:#b4530f;border-color:#f0d7c2;background:linear-gradient(180deg,#fff,#fdf3ea)}
+.dp-ft .dp-clr:hover{background:linear-gradient(180deg,#e0792f,#c26520);color:#fff}
+</style>
+<script data-cfasync="false" id="sku-datepicker-js">!function(){"use strict";
+/* منتقي تاريخ مخصّص لحقلَي «من / إلى».
+   الحقلان يبقيان type=date فقيمتهما ISO كما هي ولا يتغيّر منطق الفلترة.
+   الشهر والسنة قائمتان منزلقتان بالنقر — لا رجوع بالأسهم شهراً شهراً. */
+var IDS=["sku-dfrom","sku-dto"],POP=null,CUR=null,VY=0,VM=0,PANEL=null;
+var AR=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+var EN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var WKA=["أحد","اثن","ثلا","أرب","خمي","جمع","سبت"],WKE=["Su","Mo","Tu","We","Th","Fr","Sa"];
+function ar(){try{return "function"==typeof drIsAr&&drIsAr()}catch(e){return!0}}
+function pad(n){return n<10?"0"+n:""+n}
+function isoOf(y,m,d){return y+"-"+pad(m+1)+"-"+pad(d)}
+function parse(v){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v||"").trim());return m?{y:+m[1],m:+m[2]-1,d:+m[3]}:null}
+function el(id){return document.getElementById(id)}
+function mk(){
+  if(POP)return POP;
+  POP=document.createElement("div");POP.className="dp-pop";
+  POP.innerHTML='<div class="dp-hd"><button type="button" class="dp-nav" data-nav="-1">&#8249;</button>'
+    +'<div class="dp-my">'
+    +'<button type="button" class="dp-pick dp-mbtn" data-panel="m"><span></span><i>&#9660;</i></button>'
+    +'<button type="button" class="dp-pick dp-ybtn" data-panel="y"><span></span><i>&#9660;</i></button>'
+    +'</div><button type="button" class="dp-nav" data-nav="1">&#8250;</button></div>'
+    +'<div class="dp-wk"></div>'
+    +'<div class="dp-body"><div class="dp-grid"></div><div class="dp-panel"><div class="in"></div></div></div>'
+    +'<div class="dp-ft"><button type="button" class="dp-clr">'+(ar()?"مسح":"Clear")+'</button>'
+    +'<button type="button" class="dp-today">'+(ar()?"اليوم":"Today")+"</button></div>";
+  document.body.appendChild(POP);
+  /* لا نمنع السلوك الافتراضي إلا على غير الأزرار، وإلا لم تنفتح القوائم */
+  POP.addEventListener("mousedown",function(e){if(!e.target.closest("button"))e.preventDefault()});
+  POP.addEventListener("click",function(e){
+    var t=e.target.closest("button");if(!t)return;
+    if(t.dataset.nav){panel(null);VM+=+t.dataset.nav;if(VM<0){VM=11;VY--}if(VM>11){VM=0;VY++}return draw()}
+    if(t.dataset.panel)return panel(PANEL===t.dataset.panel?null:t.dataset.panel);
+    if(t.classList.contains("dp-opt")){
+      if(PANEL==="m")VM=+t.dataset.v;else VY=+t.dataset.v;
+      panel(null);return draw()}
+    if(t.classList.contains("dp-clr"))return set("");
+    if(t.classList.contains("dp-today")){var n=new Date();return set(isoOf(n.getFullYear(),n.getMonth(),n.getDate()))}
+    if(t.classList.contains("dp-d")&&t.dataset.iso)return set(t.dataset.iso);
+  });
+  return POP;
+}
+function panel(kind){
+  var p=mk(),box=p.querySelector(".dp-panel"),inn=box.querySelector(".in"),A=ar();
+  p.querySelectorAll(".dp-pick").forEach(function(b){b.classList.toggle("on",!!kind&&b.dataset.panel===kind)});
+  PANEL=kind||null;p.classList.toggle("panel-on",!!kind);
+  if(!kind){box.classList.remove("on");return}
+  var h="";
+  if(kind==="m"){box.querySelector(".in").style.gridTemplateColumns="repeat(3,1fr)";
+    for(var i=0;i<12;i++)h+='<button type="button" class="dp-opt'+(i===VM?" cur":"")+'" data-v="'+i+'">'+(A?AR[i]:EN[i])+"</button>"}
+  else{box.querySelector(".in").style.gridTemplateColumns="repeat(4,1fr)";
+    for(var y=VY-10;y<=VY+10;y++)h+='<button type="button" class="dp-opt'+(y===VY?" cur":"")+'" data-v="'+y+'">'+y+"</button>"}
+  inn.innerHTML=h;box.classList.add("on");
+  try{var cur=inn.querySelector(".dp-opt.cur");if(cur)cur.scrollIntoView({block:"center"})}catch(e){}
+}
+function set(v){
+  if(!CUR)return;
+  CUR.value=v;CUR.classList.toggle("has-val",!!v);
+  try{CUR.dispatchEvent(new Event("change",{bubbles:!0}))}catch(e){try{buildSku()}catch(_){}}
+  close();
+}
+function draw(){
+  var p=mk(),A=ar();
+  p.querySelector(".dp-mbtn span").textContent=A?AR[VM]:EN[VM];
+  p.querySelector(".dp-ybtn span").textContent=VY;
+  var wk=p.querySelector(".dp-wk");wk.innerHTML="";
+  for(var w=0;w<7;w++)wk.innerHTML+="<span>"+(A?WKA[w]:WKE[w])+"</span>";
+  var f=el("sku-dfrom"),t2=el("sku-dto"),vf=f?f.value:"",vt=t2?t2.value:"",cv=CUR?CUR.value:"";
+  var start=new Date(VY,VM,1).getDay(),dim=new Date(VY,VM+1,0).getDate(),pim=new Date(VY,VM,0).getDate();
+  var now=new Date(),tIso=isoOf(now.getFullYear(),now.getMonth(),now.getDate());
+  var g=p.querySelector(".dp-grid"),h="";
+  for(var c=0;c<42;c++){
+    var dn,cls="dp-d",iso2="";
+    if(c<start){dn=pim-start+c+1;cls+=" out"}
+    else if(c-start+1>dim){dn=c-start+1-dim;cls+=" out"}
+    else{dn=c-start+1;iso2=isoOf(VY,VM,dn);
+      if(iso2===tIso)cls+=" today";
+      if(vf&&vt&&iso2>vf&&iso2<vt)cls+=" inrange";
+      if(iso2===cv||iso2===vf||iso2===vt)cls+=" sel"}
+    h+='<button type="button" class="'+cls+'"'+(iso2?' data-iso="'+iso2+'"':" disabled")+">"+dn+"</button>";
+  }
+  g.innerHTML=h;
+}
+function place(inp){
+  var p=mk(),r=inp.getBoundingClientRect(),w=p.offsetWidth||300,h=p.offsetHeight||340;
+  var top=r.bottom+8;if(top+h>window.innerHeight-8)top=Math.max(8,r.top-h-8);
+  var left=r.left;if(left+w>window.innerWidth-8)left=Math.max(8,window.innerWidth-w-8);
+  p.style.top=top+"px";p.style.left=left+"px";
+}
+function open(inp){
+  CUR=inp;var v=parse(inp.value)||parse((el("sku-dfrom")||{}).value)||null,n=new Date();
+  VY=v?v.y:n.getFullYear();VM=v?v.m:n.getMonth();
+  mk();panel(null);draw();place(inp);mk().classList.add("on");
+}
+function close(){if(POP){POP.classList.remove("on");panel(null)}CUR=null}
+function attach(){
+  IDS.forEach(function(id){
+    var i=el(id);if(!i||i.__dp)return;i.__dp=1;
+    i.setAttribute("autocomplete","off");
+    var box=i.closest(".sf");if(box&&!box.classList.contains("sf-date")){box.classList.add("sf-date");
+      var ic=document.createElement("span");ic.className="dp-ic";ic.textContent="📅";box.appendChild(ic)}
+    i.classList.toggle("has-val",!!i.value);
+    i.addEventListener("mousedown",function(e){e.preventDefault();this.blur();open(this)});
+    i.addEventListener("focus",function(){open(this)});
+    i.addEventListener("keydown",function(e){if(e.key==="Escape")close()});
+  });
+}
+document.addEventListener("mousedown",function(e){
+  if(!POP||!POP.classList.contains("on"))return;
+  if(POP.contains(e.target))return;
+  if(e.target&&e.target.id&&IDS.indexOf(e.target.id)>=0)return;
+  close();
+});
+window.addEventListener("resize",close);window.addEventListener("scroll",function(){if(CUR)place(CUR)},!0);
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",attach);else attach();
+[300,1000,2500,5000].forEach(function(ms){setTimeout(attach,ms)});
+try{window.__skuDP={open:open,close:close,attach:attach,panel:function(){return PANEL}}}catch(e){}
+}();</script>
+
+<script data-cfasync="false" id="build-stamp-js">!function(){"use strict";
+/* رقم البناء: مؤشّر مستقل عن APP_VERSION.
+   لا نلمس VER لأن تغييره يمسح تخصيصات المستخدم المحفوظة (أسماء الأعمدة،
+   ترتيب الفروع، الأعمدة المخفية، العناوين والألوان). هذا الرقم للعرض فقط. */
+var BUILD="36";
+window.APP_BUILD=BUILD;
+try{document.documentElement.setAttribute("data-build",BUILD)}catch(e){}
+function stamp(){
+  try{
+    var V=window.APP_VERSION||"", s=V+(V?" · ":"")+"b"+BUILD;
+    ["app-ver-foot","app-ver-side"].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el&&el.textContent.indexOf("b"+BUILD)<0) el.textContent=s;
+    });
+  }catch(e){}
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",stamp);else stamp();
+[300,1200,3000].forEach(function(ms){setTimeout(stamp,ms)});
+try{window.__build=function(){return {build:BUILD,appVersion:window.APP_VERSION,logoGuard:window.__logoGuardVer}}}catch(e){}
 }();</script>
