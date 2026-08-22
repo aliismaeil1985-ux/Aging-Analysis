@@ -8659,11 +8659,13 @@ try{window.__uploadDnD={scan:scan,bound:function(){return document.querySelector
 #page-qhold .qh-fld input:focus,#page-qhold .qh-fld select:focus{outline:0;border-color:#c2410c;box-shadow:0 0 0 3px rgba(194,65,12,.14)}
 #page-qhold .qh-btn{border:0;border-radius:9px;padding:9px 20px;font-weight:800;font-size:13px;cursor:pointer;background:linear-gradient(135deg,#c2410c,#9a3412);color:#fff}
 #page-qhold .qh-btn.soft{background:#fff;border:1px solid #cbd5e1;color:#334155}
-#page-qhold table.qh-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;background:#fff}
-#page-qhold table.qh-tbl th{background:#7c2d12;color:#fff;font-weight:800;font-size:11.5px;letter-spacing:.3px;text-transform:uppercase;padding:10px 12px;text-align:start;position:sticky;top:0;z-index:2}
-#page-qhold table.qh-tbl td{padding:9px 12px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
-#page-qhold table.qh-tbl tbody tr:nth-child(even){background:#fff8f5}
-#page-qhold table.qh-tbl tbody tr:hover{background:#ffedd5}
+#page-qhold table.qh-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;font-variant-numeric:tabular-nums}
+#page-qhold table.qh-tbl th{background:#1e3a5f;color:#fff;font-weight:800;font-size:12px;letter-spacing:.2px;padding:11px 12px;text-align:center;border:1px solid #2c4f7c;position:sticky;top:0;z-index:2}
+#page-qhold table.qh-tbl td{padding:9px 12px;border:1px solid #e2e8f0;white-space:nowrap;text-align:center;color:#1f2f47}
+#page-qhold table.qh-tbl td.qh-l{text-align:start}
+#page-qhold table.qh-tbl tbody tr:nth-child(even) td{background:#f6f9fd}
+#page-qhold table.qh-tbl tbody tr:hover td{background:#e8f0fb}
+#page-qhold table.qh-tbl tfoot td{background:#1e3a5f;color:#fff;font-weight:800;border-color:#2c4f7c}
 #page-qhold .qh-sum{display:flex;gap:12px;flex-wrap:wrap}
 #page-qhold .qh-stat{flex:1 1 170px;background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fdba74;border-radius:12px;padding:14px 16px}
 #page-qhold .qh-stat b{display:block;font-size:22px;font-weight:900;color:#7c2d12;line-height:1.2}
@@ -8783,6 +8785,13 @@ function del(i){
 }
 try{window.__qhDel=del}catch(e){}
 
+function skuMeta(code){
+  try{
+    var m=("function"==typeof collectSpaceSkus?collectSpaceSkus():{})[String(code).trim()]||{};
+    var parts=[m.brand,m.pack,m.size].filter(function(x){return x&&String(x).trim()});
+    return parts.join(" · ");
+  }catch(e){return""}
+}
 function render(){
   var box=document.getElementById("qh-tbl"); if(!box)return;
   var rows=list(),t=totals(),a=ar();
@@ -8792,20 +8801,66 @@ function render(){
     '<div class="qh-stat"><b>'+fmt(t.codes)+'</b><span>'+(a?"عدد الأصناف":"Items affected")+'</span></div>'+
     '<div class="qh-stat"><b>'+fmt(t.rows)+'</b><span>'+(a?"عدد السجلات":"Records")+'</span></div>';
   if(!rows.length){box.innerHTML='<div class="qh-empty">'+(a?"لا توجد كميات محجوزة مسجّلة.":"No held quantities recorded.")+"</div>";return}
-  var h='<table class="qh-tbl"><thead><tr>'+
-    "<th>"+(a?"كود الصنف":"Item Code")+"</th><th>"+(a?"التاريخ":"Date")+"</th>"+
-    "<th>"+(a?"الكمية":"Quantity")+"</th><th>"+(a?"الفرع":"Branch")+"</th>"+
-    "<th>"+(a?"ملاحظة":"Note")+"</th><th></th></tr></thead><tbody>";
+
+  /* ترتيب الفروع كما في المنصّة، ثم أي فرع إضافي ورد في السجلات */
+  var order=[];
+  try{if("undefined"!=typeof DAL_BRANCHES&&DAL_BRANCHES)order=DAL_BRANCHES.slice()}catch(e){}
+  var seenB={},brs=[];
+  order.forEach(function(b){seenB[b]=1});
+  rows.forEach(function(r){var b=String(r.branch||"").trim()||(a?"بدون فرع":"No branch");if(!seenB[b]){seenB[b]=1;order.push(b)}});
+  var used={};
+  rows.forEach(function(r){used[String(r.branch||"").trim()||(a?"بدون فرع":"No branch")]=1});
+  order.forEach(function(b){if(used[b])brs.push(b)});
+
+  /* تجميع أفقي: صف لكل (كود · تاريخ) وأعمدة الفروع */
+  var map={},keys=[];
   rows.forEach(function(r,i){
-    h+='<tr><td style="font-weight:800;color:#7c2d12">'+esc(r.code)+"</td>"+
-       "<td>"+esc(r.date||"—")+"</td>"+
-       '<td style="font-weight:800">'+fmt(r.qty)+"</td>"+
-       "<td>"+esc(r.branch||"—")+"</td>"+
-       "<td>"+esc(r.note||"")+"</td>"+
-       '<td><button class="qh-del" onclick="__qhDel('+i+')">'+(a?"حذف":"Delete")+"</button></td></tr>";
+    var code=String(r.code||"").trim(),date=String(r.date||"").slice(0,10),
+        br=String(r.branch||"").trim()||(a?"بدون فرع":"No branch"),
+        q=parseFloat(r.qty)||0,k=code+"|"+date;
+    if(!map[k]){map[k]={code:code,date:date,note:r.note||"",cells:{},idx:[],tot:0};keys.push(k)}
+    map[k].cells[br]=(map[k].cells[br]||0)+q;
+    map[k].tot+=q; map[k].idx.push(i);
+    if(!map[k].note&&r.note)map[k].note=r.note;
   });
-  box.innerHTML=h+"</tbody></table>";
+  keys.sort(function(x,y){
+    var A=map[x],B=map[y];
+    if(A.code!==B.code)return A.code<B.code?-1:1;
+    return A.date<B.date?-1:A.date>B.date?1:0});
+
+  var h='<table class="qh-tbl"><thead><tr>'+
+    "<th>"+(a?"كود الصنف":"Item Code")+"</th><th>"+(a?"اسم الصنف":"Item Name")+"</th><th>"+(a?"التاريخ":"Date")+"</th>"+
+    brs.map(function(b){return"<th>"+esc(b)+"</th>"}).join("")+
+    "<th>"+(a?"الإجمالي":"Total")+"</th><th>"+(a?"ملاحظة":"Note")+"</th><th></th></tr></thead><tbody>";
+
+  var colTot={},grand=0;
+  keys.forEach(function(k){
+    var r=map[k];grand+=r.tot;
+    h+='<tr><td style="font-weight:800;color:#13396b">'+esc(r.code)+"</td>"+
+       '<td class="qh-l">'+esc(skuMeta(r.code)||"—")+"</td>"+
+       "<td>"+esc(r.date||"—")+"</td>"+
+       brs.map(function(b){
+         var v=r.cells[b]||0; colTot[b]=(colTot[b]||0)+v;
+         return v?'<td style="font-weight:700">'+fmt(v)+"</td>":'<td style="color:#cbd5e1">—</td>'}).join("")+
+       '<td style="font-weight:900;color:#13396b">'+fmt(r.tot)+"</td>"+
+       '<td class="qh-l">'+esc(r.note||"")+"</td>"+
+       '<td><button class="qh-del" onclick="__qhDelKey(\''+esc(r.code)+"','"+esc(r.date)+'\')">'+(a?"حذف":"Delete")+"</button></td></tr>";
+  });
+  h+='</tbody><tfoot><tr><td colspan="3">'+(a?"الإجمالي العام":"Grand Total")+"</td>"+
+     brs.map(function(b){return"<td>"+fmt(colTot[b]||0)+"</td>"}).join("")+
+     "<td>"+fmt(grand)+'</td><td colspan="2">'+keys.length+" "+(a?"صف · ":"rows · ")+fmt(t.rows)+" "+(a?"سجل":"records")+"</td></tr></tfoot>";
+  box.innerHTML=h+"</table>";
 }
+/* حذف كل سجلات (كود · تاريخ) معاً — يوافق العرض الأفقي */
+function delKey(code,date){
+  if(!admin())return;
+  try{if(!confirm(ar()?"حذف كل سجلات هذا الصنف في هذا التاريخ؟":"Delete all records for this item on this date?"))return}catch(e){}
+  var rows=list().filter(function(r){
+    return!(String(r.code||"").trim()===String(code)&&String(r.date||"").slice(0,10)===String(date))});
+  save(rows);
+}
+try{window.__qhDelKey=delKey}catch(e){}
+
 /* ── قالب التعبئة ── */
 function tpl(){
   try{
