@@ -9572,8 +9572,8 @@ try{var mo=new MutationObserver(function(){sweep()});
 .expa-ps .ps-sum{margin-top:11px;display:flex;flex-wrap:wrap;gap:8px;font-size:11.5px;font-weight:800}
 .expa-ps .ps-chip{padding:4px 11px;border-radius:20px}
 @media print{
-  body>*:not(#expa-ov){display:none!important}
-  #expa-ov{position:static!important;display:block!important;inset:auto!important;background:#fff!important}
+  body.prn-expa>*:not(#expa-ov){display:none!important}
+  body.prn-expa #expa-ov{position:static!important;display:block!important;inset:auto!important;background:#fff!important}
   #expa-ov .modal-box{box-shadow:none!important;border:0!important;max-height:none!important;height:auto!important;width:100%!important;max-width:none!important;border-radius:0!important}
   #expa-ov .expa-tools,#expa-ov .mexcel{display:none!important}
   #expa-ov .expa-body{overflow:visible!important;max-height:none!important;padding:0!important}
@@ -9786,7 +9786,10 @@ function exportXlsx(){
     null==r.exp?"":iso(r.exp),"crit"===r.sev?L("منتهي","Expired"):L("أوشك","Soon")])});
   var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),"NearExpiry");
   XLSX.writeFile(wb,"near-expiry-"+cfg().warn+"d.xlsx")}
-function prnt(){setTimeout(function(){try{window.print()}catch(e){}},60)}
+function prnt(){var b=document.body;b.classList.add("prn-expa");
+  var done=function(){b.classList.remove("prn-expa");window.removeEventListener("afterprint",done)};
+  window.addEventListener("afterprint",done);
+  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1500)},60)}
 window.EXPALERT={open:open,close:close,tab:tab,search:search,setCfg:setCfg,exportXlsx:exportXlsx,sort:sortBy,
   print:prnt,refresh:paintCard,scan:scan,cfg:cfg};
 function hook(){
@@ -9847,8 +9850,8 @@ setTimeout(hook,2600);
 .rm-map b{color:#0f2747}
 .rm-empty{padding:36px 18px;text-align:center;color:#94a3b8;font-weight:700}
 @media print{
-  body>*:not(#page-rmbal){display:none!important}
-  #page-rmbal{display:block!important}
+  body.prn-rmbal>*:not(#page-rmbal){display:none!important}
+  body.prn-rmbal #page-rmbal{display:block!important}
   #page-rmbal .rm-btn,#page-rmbal .rm-in,#page-rmbal .rm-kpis,#page-rmbal .topbar .upd{display:none!important}
   .rm-scroll{max-height:none!important;overflow:visible!important;border:0!important}
   .rm-tbl thead{display:table-header-group}
@@ -10067,7 +10070,10 @@ function xlsx(){
   view().forEach(function(r){aoa.push(cs.map(function(c){return r[c[0]]}))});
   var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),"RawMaterial");
   XLSX.writeFile(wb,"raw-material-"+curDate()+".xlsx")}
-function prnt(){setTimeout(function(){try{window.print()}catch(e){}},60)}
+function prnt(){var b=document.body;b.classList.add("prn-rmbal");
+  var done=function(){b.classList.remove("prn-rmbal");window.removeEventListener("afterprint",done)};
+  window.addEventListener("afterprint",done);
+  setTimeout(function(){try{window.print()}catch(e){}setTimeout(done,1500)},60)}
 function nav(){
   try{"function"==typeof fillNavIcons&&fillNavIcons()}catch(e){}
   try{"function"==typeof syncHomeToNav&&syncHomeToNav()}catch(e){}
