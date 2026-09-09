@@ -8291,7 +8291,7 @@ try{window.__skuDP={open:open,close:close,attach:attach,panel:function(){return 
 /* رقم البناء: مؤشّر مستقل عن APP_VERSION.
    لا نلمس VER لأن تغييره يمسح تخصيصات المستخدم المحفوظة (أسماء الأعمدة،
    ترتيب الفروع، الأعمدة المخفية، العناوين والألوان). هذا الرقم للعرض فقط. */
-var BUILD="81";
+var BUILD="82";
 window.APP_BUILD=BUILD;
 try{document.documentElement.setAttribute("data-build",BUILD)}catch(e){}
 function stamp(){
@@ -11561,16 +11561,10 @@ try{
 }catch(e){}
 /* تنبيه أسفل الجدول بأن الإجماليات ما زالت شاملة للمخفي */
 function note(){
+  /* لا شريط تنبيه داخل شاشة المساحات — بيان المخفي موجود في بطاقة التحكّم بشاشة المصمّم.
+     نكتفي بإزالة أي شريط قديم قد يكون معروضاً. */
   try{
-    var wrap=document.getElementById("rep-space-wrap"); if(!wrap)return;
-    var old=wrap.querySelector(".sp-hidden-note"); old&&old.remove();
-    var hid=get(); if(!hid.length)return;
-    var tbl=wrap.querySelector(".sp-scroll"); if(!tbl)return;
-    var a=ar(),d=document.createElement("div");
-    d.className="sp-hidden-note";
-    d.textContent=(a?"⚠ مستودعات مخفية من العرض: ":"⚠ Hidden from view: ")+hid.join(" · ")+
-      (a?"  —  الإجماليات ما زالت شاملة لها.":"  —  totals still include them.");
-    tbl.parentNode.insertBefore(d,tbl.nextSibling);
+    document.querySelectorAll(".sp-hidden-note").forEach(function(el){el.remove()});
   }catch(e){}
 }
 /* ---- البطاقة في شاشة المصمّم ---- */
