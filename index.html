@@ -8291,7 +8291,7 @@ try{window.__skuDP={open:open,close:close,attach:attach,panel:function(){return 
 /* رقم البناء: مؤشّر مستقل عن APP_VERSION.
    لا نلمس VER لأن تغييره يمسح تخصيصات المستخدم المحفوظة (أسماء الأعمدة،
    ترتيب الفروع، الأعمدة المخفية، العناوين والألوان). هذا الرقم للعرض فقط. */
-var BUILD="87";
+var BUILD="96";
 window.APP_BUILD=BUILD;
 try{document.documentElement.setAttribute("data-build",BUILD)}catch(e){}
 function stamp(){
@@ -9335,6 +9335,8 @@ function decorate(){
     document.querySelectorAll("table tbody tr").forEach(function(tr){
       try{
         if(tr.closest("#page-qhold"))return;
+        /* شاشات مستثناة من تعليم الهولد بناءً على طلب المستخدم */
+        if(tr.closest("#page-sku,.dcmp-page,#page-rtransit"))return;
         var td=tr.querySelector("td"); if(!td)return;
         var code=(td.textContent||"").trim();
         if(!M[code])return;
@@ -9643,8 +9645,11 @@ function heldByCode(){
   return M;
 }
 /* بناء نسخة من التقرير مع عمود الهولد — لا نلمس الكائن المخزَّن إطلاقًا */
+/* تقارير مستثناة من عمود الهولد بناءً على طلب المستخدم */
+var NO_HOLD_COL={transit:1};
 function inject(key,rep){
   if(!rep||!rep.headers||!rep.rows)return rep;
+  if(NO_HOLD_COL[String(key||"").toLowerCase()])return rep.__holdOrig||rep;
   var base=rep.__holdOrig||rep;               /* دائمًا نبني من الأصل */
   var H=(base.headers||[]).slice();
   var ti=-1;
@@ -11932,4 +11937,394 @@ if("loading"===document.readyState)document.addEventListener("DOMContentLoaded",
 [500,1500,3500,8000].forEach(function(ms){setTimeout(boot,ms)});
 try{document.addEventListener("click",function(){setTimeout(decorate,320)},!0)}catch(e){}
 try{window.__dalSort={get:getSort,clear:function(){setSort(null);try{renderDALTable()}catch(e){}}}}catch(e){}
+}();</script>
+
+<style id="kpialign-css">
+/* ===== محاذاة بطاقات مؤشّرات لوحة الأعمار =====
+   البطاقات الثماني كانت متساوية الارتفاع بحكم الشبكة، لكن إيقاعها الداخلي مختلف:
+   بطاقة الإجمالي بلا حدّ فارتفع محتواها 1px، وشريطها الملوّن في مكان غير مكان
+   شريط التقدّم، ومنطقة التفاصيل تطول وتقصر حسب عدد الهويّات (سطر إلى ثلاثة)،
+   فتبدو النهايات مبعثرة. هنا نوحّد صندوق القياس والخانات ونحجز للتفاصيل
+   ارتفاعًا واحدًا يُحسب من أطول بطاقة فعليًا. */
+
+/* 1) صندوق قياس موحّد لكل البطاقات */
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total{border:1px solid transparent!important}
+
+/* 2) الشريط الملوّن في بطاقة الإجمالي يحتلّ نفس خانة شريط التقدّم في جيرانها */
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seg{margin-top:12px!important;height:5px!important}
+
+/* 3) خطّ فاصل واحد ومنطقة تفاصيل محجوزة بنفس الارتفاع في البطاقات الثماني */
+#page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini,
+#page-dash .kpis:not(.custom-kpis) .kpi .kpi-seglg,
+#page-dash .kpis:not(.custom-kpis) .kpi .expa-chips{
+  margin-top:9px!important;padding-top:8px!important;
+  border-top:1px solid #eef2f7;
+  min-height:var(--kpi-dh,0px);
+  align-content:flex-start!important;
+}
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seglg{border-top-color:rgba(255,255,255,.22)}
+#page-dash .kpis:not(.custom-kpis) .kpi.t-exp .expa-chips{border-top-color:rgba(255,255,255,.3)}
+/* الخانة تبقى محجوزة حتى لو خلا التصنيف من الهويّات، حفاظًا على الإيقاع */
+#page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini:empty{display:flex!important}
+
+/* 3b) حجم الرقم موحّد في البطاقات الثماني: بطاقة الإجمالي كانت أكبر بدرجتين
+      فتنزل خاناتها التالية 2–4px عن جيرانها. */
+#page-dash .kpis:not(.custom-kpis) .kpi .v,
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total .v{font-size:30px!important;line-height:1.12!important}
+@media (max-width:900px){
+  #page-dash .kpis:not(.custom-kpis) .kpi .v,
+  #page-dash .kpis:not(.custom-kpis) .kpi.t-total .v{font-size:23px!important}
+}
+@media (max-width:640px){
+  #page-dash .kpis:not(.custom-kpis) .kpi .v,
+  #page-dash .kpis:not(.custom-kpis) .kpi.t-total .v{font-size:20px!important}
+}
+
+/* 4) شارة «منها هولد» تنضمّ إلى منطقة التفاصيل بدل أن تُطيل البطاقة وحدها */
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seglg .hold-chip{
+  margin-top:6px!important;flex:1 1 100%;justify-content:flex-start
+}
+
+/* 5) البطاقات المخصّصة تنزل تحت نفس الأعمدة الأربعة */
+@media (min-width:1100px){
+  #page-dash .kpis.custom-kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:stretch!important}
+  #page-dash .kpis.custom-kpis>.kpi{min-width:0!important;width:auto!important}
+}
+:root[data-theme="dark"] #page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini,
+body.dark #page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini{border-top-color:#2c4059}
+</style>
+<script data-cfasync="false" id="kpialign-js">!function(){"use strict";
+/* يقيس أطول منطقة تفاصيل بين البطاقات ويحجز الارتفاع نفسه للجميع،
+   فتبدأ الأسطر وتنتهي على خطّ واحد مهما تغيّرت البيانات. */
+var LAST="",T=0;
+function box(){return document.querySelector("#page-dash .kpis:not(.custom-kpis)")}
+function sync(){
+  try{
+    var b=box(); if(!b)return;
+    if(!b.offsetParent&&!(b.offsetWidth||b.offsetHeight))return;   /* الصفحة مخفيّة */
+    /* شارة الهولد تُنقل داخل منطقة الأسطورة لتدخل ضمن القياس */
+    try{
+      var tot=b.querySelector(".kpi.t-total"),
+          chip=tot&&tot.querySelector(".hold-chip"),
+          lg=tot&&tot.querySelector(".kpi-seglg");
+      if(chip&&lg&&chip.parentNode!==lg)lg.appendChild(chip);
+    }catch(e){}
+    try{legend(oneRow(b))}catch(e){}
+    try{fitH3(b)}catch(e){}
+    try{fitV(b)}catch(e){}
+    var els=[].slice.call(b.querySelectorAll(".kpi-idmini,.kpi-seglg,.expa-chips"));
+    if(!els.length)return;
+    var sig=b.clientWidth+"|"+els.map(function(e){return (e.className||"")+":"+(e.innerHTML||"").length}).join(",");
+    if(sig===LAST)return;
+    LAST=sig;
+    b.style.setProperty("--kpi-dh","0px");
+    var mx=0;
+    els.forEach(function(e){
+      var cs=null;try{cs=getComputedStyle(e)}catch(x){}
+      if(cs&&"none"===cs.display)return;
+      var h=e.offsetHeight; if(h>mx)mx=h;
+    });
+    b.style.setProperty("--kpi-dh",(mx>0?Math.ceil(mx):0)+"px");
+  }catch(e){}
+}
+/* نختصر الأسطورة إذا كانت البطاقات في صفّ واحد أو ضيّقة أصلًا */
+function oneRow(b){
+  try{
+    var c=getComputedStyle(b).gridTemplateColumns||"";
+    if(c.trim().split(/\s+/).filter(Boolean).length>=7)return!0;
+    var t=b.querySelector(".kpi.t-total");
+    return!!(t&&t.clientWidth&&t.clientWidth<320);
+  }catch(e){return!1}
+}
+/* في وضع الصفّ الواحد تُختصر أسطورة بطاقة الإجمالي إلى النِّسَب وحدها،
+   والنصّ الكامل يُحفظ في data-full ويظهر كتلميح — ويُستعاد عند اتّساع الشاشة. */
+function legend(on){
+  var b=box(); if(!b)return;
+  var lg=b.querySelector(".kpi.t-total .kpi-seglg"); if(!lg)return;
+  [].slice.call(lg.children).forEach(function(s){
+    if(!s||1!==s.nodeType||"SPAN"!==s.tagName)return;
+    if(s.className&&s.className.indexOf("hold-chip")>=0)return;
+    var ic=s.querySelector("i");
+    if(on){
+      if(s.hasAttribute("data-full"))return;
+      var t=(s.textContent||"").trim(), i=t.lastIndexOf("\u00b7");
+      if(i<0)return;
+      s.setAttribute("data-full",t); s.setAttribute("title",t);
+      s.textContent=t.slice(i+1).trim();
+      if(ic)s.insertBefore(ic,s.firstChild);
+    }else{
+      if(!s.hasAttribute("data-full"))return;
+      var f=s.getAttribute("data-full");
+      s.removeAttribute("data-full"); s.removeAttribute("title");
+      s.textContent=f;
+      if(ic)s.insertBefore(ic,s.firstChild);
+    }
+  });
+}
+/* الرقم لا يُقصّ أبدًا: إن ضاقت البطاقة عن أطول رقم نُنقص الحجم درجةً درجة،
+   ثم نُوحّد الجميع على الأصغر حتى تبقى الأرقام بحجم واحد ومتحاذية. */
+function fitV(b){
+  var vs=[].slice.call(b.querySelectorAll(".kpi .v")).filter(function(v){return v.clientWidth>0});
+  if(!vs.length)return;
+  /* قواعد الحجم في الـCSS تحمل ‎!important‎ فلا بدّ أن يحملها التعديل السطري أيضًا */
+  function put(v,px){try{v.style.setProperty("font-size",px+"px","important")}catch(e){v.style.fontSize=px+"px"}}
+  vs.forEach(function(v){
+    try{v.style.removeProperty("font-size")}catch(e){v.style.fontSize=""}
+    var fs=parseFloat(getComputedStyle(v).fontSize)||25,g=0;
+    while(v.scrollWidth>v.clientWidth+0.5&&fs>15&&g++<16){fs-=1;put(v,fs)}
+  });
+  var mn=1/0;
+  vs.forEach(function(v){var f=parseFloat(getComputedStyle(v).fontSize)||0;if(f>0&&f<mn)mn=f});
+  if(isFinite(mn)&&mn>0)vs.forEach(function(v){put(v,mn)});
+}
+/* العنوان محصور في سطرين؛ إن طال عن ذلك نُنقص حجمه ثم نُوحّد الجميع
+   على الأصغر، فلا يُقصّ عنوان ولا تختلف أحجام العناوين بين البطاقات. */
+function fitH3(b){
+  var hs=[].slice.call(b.querySelectorAll(".kpi .row h3")).filter(function(x){return x.clientHeight>0});
+  if(!hs.length)return;
+  function put(x,px){try{x.style.setProperty("font-size",px+"px","important")}catch(e){x.style.fontSize=px+"px"}}
+  hs.forEach(function(x){
+    try{x.style.removeProperty("font-size")}catch(e){x.style.fontSize=""}
+    var fs=parseFloat(getComputedStyle(x).fontSize)||12,g=0;
+    while(x.scrollHeight>x.clientHeight+0.5&&fs>8.5&&g++<12){fs-=.5;put(x,fs)}
+  });
+  var mn=1/0;
+  hs.forEach(function(x){var f=parseFloat(getComputedStyle(x).fontSize)||0;if(f>0&&f<mn)mn=f});
+  if(isFinite(mn)&&mn>0)hs.forEach(function(x){put(x,mn)});
+}
+function kick(){clearTimeout(T);T=setTimeout(sync,60)}
+function boot(){
+  sync();
+  try{
+    var b=box();
+    if(b&&!b.__kpiAlignObs){
+      b.__kpiAlignObs=1;
+      new MutationObserver(kick).observe(b,{childList:!0,subtree:!0,characterData:!0});
+    }
+  }catch(e){}
+}
+try{window.addEventListener("resize",kick)}catch(e){}
+try{var _g=window.go;if("function"==typeof _g){window.go=function(){var r=_g.apply(this,arguments);setTimeout(boot,0);setTimeout(boot,180);return r}}}catch(e){}
+try{var _r=window.render;if("function"==typeof _r){window.render=function(){var r=_r.apply(this,arguments);kick();return r}}}catch(e){}
+if("loading"===document.readyState)document.addEventListener("DOMContentLoaded",boot);else boot();
+[400,1200,3000,7000].forEach(function(ms){setTimeout(boot,ms)});
+try{window.__kpiAlign={sync:function(){LAST="";sync()}}}catch(e){}
+}();</script>
+
+<style id="kpirow-css">
+/* ===== بطاقات المؤشّرات في صفّ واحد =====
+   ثماني بطاقات في صفّ واحد تحتاج عرضًا لا يقلّ عن ~1560px حتى تبقى الأرقام
+   والأسطر مقروءة؛ دون ذلك تعود الشبكة إلى 4+4 تلقائيًا. */
+/* الأسطورة المختصرة تعمل في أي عرض متى اختصرها النصّ */
+#page-dash .kpis:not(.custom-kpis) .kpi-seglg span[data-full]{white-space:nowrap!important;cursor:help}
+@media (min-width:1560px){
+  #page-dash .kpis:not(.custom-kpis){
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    gap:10px!important;align-items:stretch!important;
+  }
+  #page-dash .kpis:not(.custom-kpis)>.kpi{
+    padding:13px 12px!important;border-radius:14px!important;min-width:0!important;
+  }
+  /* الرأس: الأيقونة أصغر والعنوان يلتفّ في سطرين دون أن يزيح الأرقام */
+  /* رأس البطاقة بارتفاع ثابت والعنوان محصور في سطرين، فيكبر الخطّ
+     دون أن يزحزح الرقم عن خطّ جيرانه مهما طال النصّ. */
+  #page-dash .kpis:not(.custom-kpis) .kpi .row{
+    height:34px!important;min-height:34px!important;gap:7px!important;
+    align-items:flex-start!important;overflow:hidden!important
+  }
+  #page-dash .kpis:not(.custom-kpis) .kpi .ic{width:30px!important;height:30px!important;font-size:14px!important;border-radius:9px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi .ic svg{width:16px;height:16px}
+  #page-dash .kpis:not(.custom-kpis) .kpi h3{
+    font-size:12px!important;line-height:1.35!important;letter-spacing:0!important;
+    overflow-wrap:break-word!important;word-break:break-word!important;
+    display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden!important;
+  }
+  /* الأرقام */
+  #page-dash .kpis:not(.custom-kpis) .kpi .v,
+  #page-dash .kpis:not(.custom-kpis) .kpi.t-total .v{
+    font-size:25px!important;letter-spacing:-.6px!important;margin-top:8px!important;white-space:nowrap!important
+  }
+  #page-dash .kpis:not(.custom-kpis) .kpi .pill{font-size:12.5px!important;font-weight:800!important;padding:3px 10px!important;margin-top:9px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi .bar{margin-top:10px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seg{margin-top:10px!important}
+  /* منطقة التفاصيل */
+  #page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini,
+  #page-dash .kpis:not(.custom-kpis) .kpi .kpi-seglg,
+  #page-dash .kpis:not(.custom-kpis) .kpi .expa-chips{margin-top:8px!important;padding-top:7px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi-idmini{gap:4px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi-idmini .ir{font-size:9px!important;gap:5px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi-idmini .ir .mb{flex:0 0 22px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi-idmini .ir .pc{min-width:22px!important}
+  /* أسطورة بطاقة الإجمالي: عمود واحد مضغوط يتّسع للتصنيفات الستّة */
+  /* الأسطورة تصبح نِسَبًا بألوانها فقط: كل لون يقابل بطاقته المجاورة في نفس الصف،
+     والاسم الكامل يظهر في تلميح الفأرة. */
+  #page-dash .kpis:not(.custom-kpis) .kpi-seglg{
+    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:4px 6px!important;align-content:flex-start!important
+  }
+  #page-dash .kpis:not(.custom-kpis) .kpi-seglg span{
+    font-size:9px!important;gap:4px!important;min-width:0!important;
+    line-height:1.25!important;white-space:nowrap!important;cursor:help
+  }
+  #page-dash .kpis:not(.custom-kpis) .kpi-seglg span i{width:7px!important;height:7px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seglg .hold-chip{
+    font-size:9px!important;padding:2px 7px!important;margin-top:5px!important;
+    grid-column:1/-1!important
+  }
+  #page-dash .kpis:not(.custom-kpis) .kpi.t-exp .expa-chip{font-size:8.5px!important;padding:2px 7px!important}
+  #page-dash .kpis:not(.custom-kpis) .kpi.t-exp .expa-chips{gap:4px!important}
+  /* البطاقات المخصّصة: أربعة أعمدة بنفس المسافة، فتنطبق حوافّها على حوافّ
+     كل بطاقتين من الصفّ أعلاه بالضبط. */
+  #page-dash .kpis.custom-kpis{gap:10px!important}
+}
+</style>
+
+<style id="skuhold-off-css">
+/* ===== إلغاء تعليم الهولد في شاشة SKU وشاشات مقارنة التواريخ =====
+   المنع الحقيقي في دالة decorate() بـ qhold-js (لا يُضاف الصنف ولا الشارة أصلًا)،
+   فتحتفظ الصفوف بألوانها المتناوبة كما هي. هذه القاعدة شبكة أمان للشارات
+   القديمة إن بقيت في DOM محفوظ. الأرقام والإجماليات لا تتأثّر إطلاقًا. */
+#page-sku .qh-badge,
+.dcmp-page .qh-badge,
+#page-rtransit .qh-badge{display:none!important}
+</style>
+
+<style id="dtl-mode-css">
+/* ===== مفتاح عرض جدول التفاصيل: إجمالي / شهري / يومي ===== */
+#dtm-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 4px 12px;border-bottom:1px solid #e9eef6;margin-bottom:10px;
+}
+#dtm-bar .dtm-lbl{font-size:12px;font-weight:800;color:#64748b;letter-spacing:.2px}
+#dtm-bar .dtm-seg{display:inline-flex;background:#eef2f8;border:1px solid #dde5f0;border-radius:10px;padding:3px;gap:3px}
+#dtm-bar .dtm-b{
+  font-family:inherit;font-size:12.5px;font-weight:800;color:#475569;cursor:pointer;
+  background:transparent;border:0;border-radius:8px;padding:6px 16px;transition:.15s;white-space:nowrap
+}
+#dtm-bar .dtm-b:hover{background:#e2e9f4;color:#1e4e8c}
+#dtm-bar .dtm-b.on{background:#1e4e8c;color:#fff;box-shadow:0 2px 6px rgba(30,78,140,.28)}
+#dtm-bar .dtm-hint{font-size:11.5px;font-weight:700;color:#94a3b8;margin-inline-start:auto}
+:root[data-theme="dark"] #dtm-bar,body.dark #dtm-bar{border-bottom-color:#2c4059}
+:root[data-theme="dark"] #dtm-bar .dtm-seg,body.dark #dtm-bar .dtm-seg{background:#1b2b40;border-color:#2c4059}
+:root[data-theme="dark"] #dtm-bar .dtm-b,body.dark #dtm-bar .dtm-b{color:#c7d7ee}
+/* في وضعَي الشهري والإجمالي تُحذف أعمدة التاريخ، فنُحيّد تدرّج الحرارة على عمود الإجمالي */
+#detail-wrap table.pivot.dtm-flat td.tot{background:#f3f7fc!important}
+@media print{#dtm-bar{display:none!important}}
+</style>
+<script data-cfasync="false" id="dtl-mode-js">!function(){"use strict";
+/* ===== تحويل جدول نافذة التفاصيل بين: يومي · شهري · إجمالي =====
+   لا نُعيد كتابة المُولّد الأصلي: نُمرّر له نسخة من الصفوف بعد تفريغ
+   حقل تاريخ الإنتاج (للشهري) أو تاريخ الإنتاج والشهر معًا (للإجمالي)،
+   فينهار مفتاح التجميع من تلقائه إلى المستوى المطلوب، ثم نحذف الأعمدة
+   التي فقدت معناها. البيانات المصدر لا تُمسّ إطلاقًا — نعمل على نسخة. */
+var KEY="detail_view_mode", MODE=null, SRC=null, BUSY=0;
+function ar(){try{return"undefined"!=typeof LANG&&"ar"===LANG}catch(e){return!0}}
+function mode(){
+  if(MODE)return MODE;
+  try{var v=LS.getItem(KEY);if("day"===v||"mon"===v||"tot"===v)return MODE=v}catch(e){}
+  return MODE="day";
+}
+function setMode(m){MODE=m;try{LS.setItem(KEY,m)}catch(e){}}
+
+/* نسخة من الصفوف بالمستوى المطلوب — دون لمس الأصل */
+function tx(rows,m){
+  if("day"===m)return rows;
+  return (rows||[]).map(function(d){
+    var o={},k;
+    for(k in d)if(Object.prototype.hasOwnProperty.call(d,k))o[k]=d[k];
+    o.prod_date="";
+    if("tot"===m)o.month="";
+    return o;
+  });
+}
+/* حذف أعمدة بمواضع محدّدة مع ضبط colspan في صف الإجمالي العام */
+function strip(tbl,idxs){
+  try{
+    if(!tbl||!idxs.length)return;
+    var set={};idxs.forEach(function(i){set[i]=1});
+    var th=tbl.tHead&&tbl.tHead.rows[0];
+    if(th)[].slice.call(th.cells).forEach(function(c,i){if(set[i]&&c.parentNode)c.parentNode.removeChild(c)});
+    var tb=tbl.tBodies[0];if(!tb)return;
+    [].slice.call(tb.rows).forEach(function(r){
+      if(r.classList.contains("grand")){
+        var f=r.cells[0];
+        if(f&&f.colSpan>1)f.colSpan=Math.max(1,f.colSpan-idxs.length);
+        return;
+      }
+      [].slice.call(r.cells).forEach(function(c,i){if(set[i]&&c.parentNode)c.parentNode.removeChild(c)});
+    });
+  }catch(e){}
+}
+/* في الوضع الإجمالي لا يبقى تاريخ يُرتَّب به، فنرتّب تنازليًا حسب الإجمالي */
+function sortByTotal(tbl){
+  try{
+    var tb=tbl.tBodies[0];if(!tb)return;
+    var rows=[].slice.call(tb.rows).filter(function(r){return!r.classList.contains("grand")});
+    var grand=[].slice.call(tb.rows).filter(function(r){return r.classList.contains("grand")});
+    var num=function(r){var c=r.cells[r.cells.length-1];return parseFloat(String(c?c.textContent:"").replace(/[^\d.-]/g,""))||0};
+    rows.sort(function(a,b){return num(b)-num(a)});
+    rows.forEach(function(r){tb.appendChild(r)});
+    grand.forEach(function(r){tb.appendChild(r)});
+  }catch(e){}
+}
+function after(){
+  try{
+    var tbl=document.querySelector("#detail-wrap table.pivot");
+    if(!tbl)return;
+    var m=mode();
+    tbl.classList.toggle("dtm-flat","day"!==m);
+    /* ترتيب الأعمدة الأصلي: 0 الهوية · 1 الكود · 2 الشدّ · 3 الحجم · 4 السنة · 5 الشهر · 6 تاريخ الإنتاج */
+    if("mon"===m)strip(tbl,[6]);
+    else if("tot"===m){strip(tbl,[4,5,6]);sortByTotal(tbl)}
+  }catch(e){}
+}
+function bar(){
+  try{
+    var wrap=document.getElementById("detail-wrap");if(!wrap||!wrap.parentNode)return;
+    var b=document.getElementById("dtm-bar");
+    if(!b){
+      b=document.createElement("div");b.id="dtm-bar";
+      wrap.parentNode.insertBefore(b,wrap);
+      b.addEventListener("click",function(ev){
+        var t=ev.target&&ev.target.closest?ev.target.closest(".dtm-b"):null;
+        if(!t)return;
+        var m=t.getAttribute("data-m");if(!m||m===mode())return;
+        setMode(m);redraw();
+      });
+    }
+    var a=ar(),m=mode();
+    var L=[["tot",a?"إجمالي":"Totals",a?"صف واحد لكل صنف":"one row per item"],
+           ["mon",a?"شهري":"Monthly",a?"صف لكل صنف في كل شهر":"one row per item per month"],
+           ["day",a?"يومي":"Daily",a?"صف لكل تاريخ إنتاج":"one row per production date"]];
+    var hint="";L.forEach(function(x){if(x[0]===m)hint=x[2]});
+    var html='<span class="dtm-lbl">'+(a?"عرض الجدول":"Table view")+'</span><span class="dtm-seg">'+
+      L.map(function(x){return'<button class="dtm-b'+(x[0]===m?" on":"")+'" data-m="'+x[0]+'">'+x[1]+"</button>"}).join("")+
+      '</span><span class="dtm-hint">'+hint+"</span>";
+    if(b.innerHTML!==html)b.innerHTML=html;
+  }catch(e){}
+}
+function redraw(){
+  try{
+    if(!SRC||"function"!=typeof window.__showDetailRows0)return;
+    BUSY=1;
+    try{window.__showDetailRows0(tx(SRC.rows,mode()),SRC.title)}catch(e){}
+    BUSY=0;
+    bar();after();
+  }catch(e){BUSY=0}
+}
+try{
+  var _o=window.showDetailRows;
+  if("function"==typeof _o){
+    window.__showDetailRows0=_o;
+    window.showDetailRows=function(rows,title){
+      if(BUSY)return _o.apply(this,arguments);
+      SRC={rows:rows||[],title:title};
+      var r=_o.call(this,tx(SRC.rows,mode()),title);
+      try{bar();after()}catch(e){}
+      return r;
+    };
+  }
+}catch(e){}
+try{window.__dtlMode={get:mode,set:function(m){setMode(m);redraw()},redraw:redraw}}catch(e){}
 }();</script>
