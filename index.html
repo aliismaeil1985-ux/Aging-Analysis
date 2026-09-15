@@ -8291,7 +8291,7 @@ try{window.__skuDP={open:open,close:close,attach:attach,panel:function(){return 
 /* رقم البناء: مؤشّر مستقل عن APP_VERSION.
    لا نلمس VER لأن تغييره يمسح تخصيصات المستخدم المحفوظة (أسماء الأعمدة،
    ترتيب الفروع، الأعمدة المخفية، العناوين والألوان). هذا الرقم للعرض فقط. */
-var BUILD="96";
+var BUILD="107";
 window.APP_BUILD=BUILD;
 try{document.documentElement.setAttribute("data-build",BUILD)}catch(e){}
 function stamp(){
@@ -9114,8 +9114,12 @@ try{window.__qhDel=del}catch(e){}
 function skuMeta(code){
   try{
     var m=("function"==typeof collectSpaceSkus?collectSpaceSkus():{})[String(code).trim()]||{};
-    var parts=[m.brand,m.pack,m.size].filter(function(x){return x&&String(x).trim()});
-    return parts.join(" · ");
+    /* الحجم مكرّر داخل نصّ الشدّ أصلاً ("40 × 200 ml" يحمل 200 ml)،
+       فنُسقطه ما دام الشدّ موجوداً ونُبقيه وحده إن غاب الشدّ. */
+    var parts=[m.brand];
+    if(m.pack&&String(m.pack).trim())parts.push(m.pack);
+    else if(m.size&&String(m.size).trim())parts.push(m.size);
+    return parts.filter(function(x){return x&&String(x).trim()}).join(" · ");
   }catch(e){return""}
 }
 function render(){
@@ -9336,7 +9340,7 @@ function decorate(){
       try{
         if(tr.closest("#page-qhold"))return;
         /* شاشات مستثناة من تعليم الهولد بناءً على طلب المستخدم */
-        if(tr.closest("#page-sku,.dcmp-page,#page-rtransit"))return;
+        if(tr.closest("#page-sku,.dcmp-page,#page-rtransit,#epm-root"))return;
         var td=tr.querySelector("td"); if(!td)return;
         var code=(td.textContent||"").trim();
         if(!M[code])return;
@@ -12327,4 +12331,481 @@ try{
   }
 }catch(e){}
 try{window.__dtlMode={get:mode,set:function(m){setMode(m);redraw()},redraw:redraw}}catch(e){}
+}();</script>
+
+<script data-cfasync="false" id="xl-color-js">!function(){"use strict";
+/* ===== تصدير إكسل بألوان الشاشة =====
+   المُصدِّر الأصلي كان يكتب ترويسة كحلية وتظليلاً متناوباً فقط، فتضيع ألوان
+   التغطية (أحمر/أصفر/أخضر) وألوان الإجماليات. هنا نقرأ لون الخلفية ولون الخطّ
+   الفعليَّين من الشاشة لكل خليّة ونكتبهما في الملف — أي أنّ الملف يطابق ما تراه.
+   الأرقام والصيغ كما هي؛ التغيير في المظهر فقط. */
+function num(t){try{if("function"==typeof _xlNum)return _xlNum(t)}catch(e){}
+  if(null==t)return null;var s=String(t).replace(/[,\s ]/g,"").replace(/%$/,"");
+  if(""===s||"-"===s||"—"===s)return null;
+  if(!/^-?\d*\.?\d+$/.test(s))return null;var n=Number(s);return isFinite(n)?n:null}
+/* شبكة النصوص كما في المُصدِّر الأصلي، وشبكة موازية تحمل عنصر الخليّة نفسه */
+function grid(rows,pick){
+  var g=[];
+  rows.forEach(function(r,ri){
+    g[ri]=g[ri]||[];var ci=0;
+    [].slice.call(r.cells).forEach(function(c){
+      while(void 0!==g[ri][ci])ci++;
+      var cs=parseInt(c.colSpan,10)||1, rs=parseInt(c.rowSpan,10)||1, v=pick(c);
+      for(var i=0;i<rs&&ri+i<rows.length;i++){
+        g[ri+i]=g[ri+i]||[];
+        for(var j=0;j<cs;j++)g[ri+i][ci+j]=("txt"===pick.kind&&0!==j)?"":v;
+      }
+      ci+=cs;
+    });
+  });
+  for(var a=0;a<rows.length;a++){g[a]=g[a]||[];for(var b=0;b<g[a].length;b++)if(void 0===g[a][b])g[a][b]="txt"===pick.kind?"":null}
+  return g;
+}
+var pickTxt=function(c){return c.textContent.trim()}; pickTxt.kind="txt";
+var pickEl=function(c){return c}; pickEl.kind="el";
+
+function argbOf(css){
+  if(!css)return null;
+  var m=String(css).match(/rgba?\(([^)]+)\)/); if(!m)return null;
+  var p=m[1].split(",").map(function(x){return parseFloat(x)});
+  if(p.length<3||!isFinite(p[0]))return null;
+  var a=p.length>3&&isFinite(p[3])?p[3]:1;
+  if(!(a>.03))return null;
+  var f=function(v){v=Math.round(v*a+255*(1-a));return("0"+Math.max(0,Math.min(255,v)).toString(16)).slice(-2).toUpperCase()};
+  return"FF"+f(p[0])+f(p[1])+f(p[2]);
+}
+/* لون الخليّة يُقرأ من الخليّة نفسها ثم من صفّها فقط — لا نصعد إلى الجدول
+   أو الصفحة وإلا عاد أبيض فطُمست الترويسة وصفّ الإجمالي.
+   وإذا كان اللون تدرّجاً (background-image) فلا لون مسطّحاً له،
+   فنترك المُصدِّر يستعمل لونه الافتراضي (كحلي للترويسة والإجمالي). */
+function bgOf(el){
+  var n=el,d=0;
+  while(n&&1===n.nodeType&&d<2){
+    var cs=null;try{cs=getComputedStyle(n)}catch(e){}
+    if(cs){
+      var img=String(cs.backgroundImage||"none");
+      if("none"!==img&&img)return null;
+      var c=argbOf(cs.backgroundColor);
+      if(c)return c;
+    }
+    n=n.parentNode;d++;
+    if(!n||1!==n.nodeType||"TR"!==n.tagName)break;
+  }
+  return null;
+}
+function fgOf(el){try{return argbOf(getComputedStyle(el).color)}catch(e){return null}}
+function boldOf(el){try{var w=getComputedStyle(el).fontWeight;return(parseInt(w,10)||("bold"===w?700:400))>=600}catch(e){return!1}}
+
+function build(tableEl,opts){
+  var ar=!1;try{ar="undefined"!=typeof LANG&&"ar"===LANG}catch(e){}
+  var NAVY=opts.headColor||"FF13396B", LIGHT=opts.rowColor||"FFEEF3FB", BORDER=opts.borderColor||"FFCBD8E8";
+  var wb=new ExcelJS.Workbook,
+      ws=wb.addWorksheet((opts.sheet||"Report").slice(0,28),{views:[{rightToLeft:ar}],
+        pageSetup:{orientation:"landscape",fitToPage:!0,fitToWidth:1,fitToHeight:0,
+          margins:{left:.3,right:.3,top:.4,bottom:.4,header:.2,footer:.2}}});
+  var headRows=tableEl.tHead?[].slice.call(tableEl.tHead.rows):[], bodyRows=[];
+  [].slice.call(tableEl.tBodies).forEach(function(tb){bodyRows=bodyRows.concat([].slice.call(tb.rows))});
+  var footRows=tableEl.tFoot?[].slice.call(tableEl.tFoot.rows):[];
+  var gH=grid(headRows,pickTxt), gB=grid(bodyRows,pickTxt), gF=grid(footRows,pickTxt);
+  var eH=grid(headRows,pickEl), eB=grid(bodyRows,pickEl), eF=grid(footRows,pickEl);
+  var ncol=0;gH.concat(gB).concat(gF).forEach(function(l){if(l.length>ncol)ncol=l.length});ncol||(ncol=1);
+  var colMax=[],i;for(i=0;i<ncol;i++)colMax[i]=8;
+  function thin(){return{top:{style:"thin",color:{argb:BORDER}},left:{style:"thin",color:{argb:BORDER}},
+    bottom:{style:"thin",color:{argb:BORDER}},right:{style:"thin",color:{argb:BORDER}}}}
+  if(opts.title){ws.mergeCells(1,1,1,ncol);var tc=ws.getCell(1,1);
+    tc.value=opts.title;tc.font={bold:!0,size:15,color:{argb:NAVY}};
+    tc.alignment={horizontal:"center",vertical:"middle"};ws.getRow(1).height=24}
+  if(opts.subtitle){var sr=opts.title?2:1;ws.mergeCells(sr,1,sr,ncol);var sc=ws.getCell(sr,1);
+    sc.value=opts.subtitle;sc.font={size:10,color:{argb:"FF64748B"}};sc.alignment={horizontal:"center"};}
+  (opts.title||opts.subtitle)&&ws.addRow([]);
+
+  headRows.forEach(function(r,ri){
+    var vals=(gH[ri]||[]).slice(), els=eH[ri]||[];
+    var row=ws.addRow(vals);row.height=20;
+    row.eachCell({includeEmpty:!0},function(cell,col){
+      var el=els[col-1], bg=el?bgOf(el):null, fg=el?fgOf(el):null;
+      cell.fill={type:"pattern",pattern:"solid",fgColor:{argb:bg||NAVY}};
+      cell.font={bold:!0,color:{argb:fg||"FFFFFFFF"},size:10};
+      cell.alignment={horizontal:"center",vertical:"middle",wrapText:!0};
+      cell.border=thin();
+      var L=String(vals[col-1]||"").length;
+      if(col-1<ncol&&L>colMax[col-1])colMax[col-1]=L;
+    });
+  });
+  function emit(r,line,els,isFoot){
+    var grand=/\b(grand|fg-grand|sp-total)\b/.test(" "+r.className+" ")||isFoot;
+    var vals=[],meta=[];
+    (line||[]).forEach(function(t){var pct=/%$/.test(t),n=num(t);
+      vals.push(null!=n?n:t);meta.push({num:null!=n,pct:pct,len:String(t).length})});
+    var row=ws.addRow(vals), even=bodyRows.indexOf(r)%2==1;
+    row.eachCell({includeEmpty:!0},function(cell,col){
+      var ci=col-1, el=(els||[])[ci], bg=el?bgOf(el):null, fg=el?fgOf(el):null;
+      cell.border=thin();
+      if(bg)cell.fill={type:"pattern",pattern:"solid",fgColor:{argb:bg}};
+      else if(grand)cell.fill={type:"pattern",pattern:"solid",fgColor:{argb:NAVY}};
+      else if(even)cell.fill={type:"pattern",pattern:"solid",fgColor:{argb:LIGHT}};
+      cell.font={size:10,bold:!!(el&&boldOf(el))||(!el&&grand),
+        color:{argb:fg||(grand?"FFFFFFFF":"FF1E293B")}};
+      cell.alignment={horizontal:0===ci?(ar?"right":"left"):"center",vertical:"middle"};
+      if(meta[ci]&&meta[ci].num)cell.numFmt=meta[ci].pct?'0.0"%"':"#,##0";
+      if(meta[ci]&&meta[ci].len>colMax[ci])colMax[ci]=meta[ci].len;
+    });
+  }
+  bodyRows.forEach(function(r,ri){emit(r,gB[ri],eB[ri],!1)});
+  footRows.forEach(function(r,ri){emit(r,gF[ri],eF[ri],!0)});
+  for(var c2=1;c2<=ncol;c2++)ws.getColumn(c2).width=Math.max(9,Math.min(34,(colMax[c2-1]||8)+2));
+  return wb.xlsx.writeBuffer().then(function(buf){
+    var blob=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
+        a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=(opts.file||"Report")+".xlsx";
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);
+  });
+}
+/* الجداول المستنسخة غير الموصولة بالصفحة لا قيم محسوبة لها،
+   فنُلحقها مؤقتاً خارج الشاشة لتنطبق عليها قواعد الأنماط ثم نزيلها. */
+function run(tableEl,opts){
+  var host=null;
+  try{
+    if(!tableEl.isConnected){
+      host=document.createElement("div");
+      host.style.cssText="position:absolute;left:-99999px;top:0;width:2400px;visibility:hidden;pointer-events:none";
+      host.appendChild(tableEl);
+      /* نُلحقها داخل الصفحة الظاهرة حتى تنطبق قواعد الأنماط المرتبطة بها */
+      (document.querySelector(".page.show")||document.body).appendChild(host);
+    }
+    return build(tableEl,opts);
+  }finally{
+    try{if(host){host.removeChild(tableEl);host.remove()}}catch(e){}
+  }
+}
+try{
+  var ORIG=window.tableToStyledExcel;
+  window.tableToStyledExcel=function(tableEl,opts){
+    opts=opts||{};
+    try{
+      if("undefined"==typeof ExcelJS||!tableEl||!tableEl.querySelector||!tableEl.querySelector("tr"))
+        return ORIG.apply(this,arguments);
+      return run(tableEl,opts);
+    }catch(e){try{return ORIG.apply(this,arguments)}catch(x){}}
+  };
+  window.__xlColorOrig=ORIG;
+}catch(e){}
+}();</script>
+
+<style id="epm-kpi-css">
+/* ===== بطاقات المؤشّرات داخل ورقة الطباعة =====
+   نسخة الطباعة تُبنى خارج #page-dash، فتسقط عنها كل قواعد الشاشة المرتبطة بتلك
+   الصفحة (الصفّ الواحد، الكثافة المضغوطة، الفجوة 10px)، بينما تُثبَّت أعمدة
+   الشبكة بالبكسل نقلاً عن الشاشة. النتيجة: 8 أعمدة مثبّتة + فجوة 16px الافتراضية
+   = عرض أكبر من الورقة، فتُقصّ البطاقة الأخيرة. هنا نُعيد بناء التنسيق للورقة:
+   صفّ واحد بأعمدة متساوية تنقسم على العرض المتاح مهما كان، فلا تجاوز إطلاقًا. */
+#epm-root .kpis:not(.custom-kpis){
+  display:grid!important;
+  grid-template-columns:none!important;      /* نُبطل الأعمدة المثبّتة بالبكسل */
+  grid-auto-flow:column!important;
+  grid-auto-columns:minmax(0,1fr)!important;
+  gap:8px!important;margin-bottom:10px!important;
+  max-width:100%!important;width:auto!important;
+}
+#epm-root .kpis.custom-kpis{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;max-width:100%!important;
+}
+#epm-root .kpis>.kpi{
+  min-width:0!important;width:auto!important;
+  padding:11px 11px!important;border-radius:12px!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  box-shadow:none!important;
+}
+/* الرأس: ارتفاع ثابت والعنوان في سطرين، فلا يزيح الرقم عن خطّ جيرانه */
+#epm-root .kpis .kpi .row{
+  display:flex!important;align-items:flex-start!important;justify-content:space-between!important;
+  height:32px!important;min-height:32px!important;gap:6px!important;overflow:hidden!important;
+}
+#epm-root .kpis .kpi .ic{
+  width:27px!important;height:27px!important;font-size:13px!important;border-radius:8px!important;flex-shrink:0!important;
+}
+#epm-root .kpis .kpi .ic svg{width:15px;height:15px}
+#epm-root .kpis .kpi h3{
+  font-size:10.5px!important;line-height:1.3!important;letter-spacing:0!important;min-width:0!important;
+  display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden!important;
+  overflow-wrap:break-word!important;word-break:break-word!important;
+}
+#epm-root .kpis .kpi .v,
+#epm-root .kpis .kpi.t-total .v{
+  font-size:21px!important;line-height:1.12!important;letter-spacing:-.4px!important;
+  margin-top:7px!important;white-space:nowrap!important;
+}
+#epm-root .kpis .kpi .pill{
+  font-size:10.5px!important;font-weight:800!important;padding:2px 9px!important;margin-top:8px!important;
+  border-radius:999px!important;
+}
+#epm-root .kpis .kpi .bar{height:5px!important;margin-top:9px!important;border-radius:4px!important}
+#epm-root .kpis .kpi.t-total .kpi-seg{margin-top:9px!important;height:5px!important}
+/* منطقة التفاصيل: فاصل واحد وارتفاع محجوز موحّد */
+#epm-root .kpis .kpi .kpi-idmini,
+#epm-root .kpis .kpi .kpi-seglg,
+#epm-root .kpis .kpi .expa-chips{
+  margin-top:8px!important;padding-top:7px!important;
+  min-height:var(--kpi-dh,52px);align-content:flex-start!important;
+}
+#epm-root .kpis .kpi .kpi-idmini{display:flex!important;flex-direction:column!important;gap:4px!important}
+#epm-root .kpis .kpi .kpi-idmini .ir{font-size:8px!important;gap:4px!important}
+#epm-root .kpis .kpi .kpi-idmini .ir .mb{flex:0 0 18px!important;height:4px!important}
+#epm-root .kpis .kpi .kpi-idmini .ir .pc{min-width:20px!important}
+#epm-root .kpis .kpi .kpi-seglg{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px 5px!important;
+}
+#epm-root .kpis .kpi .kpi-seglg span{font-size:7.5px!important;gap:3px!important;white-space:nowrap!important;min-width:0!important}
+#epm-root .kpis .kpi .kpi-seglg span i{width:6px!important;height:6px!important}
+#epm-root .kpis .kpi.t-total .kpi-seglg .hold-chip{
+  font-size:7.5px!important;padding:2px 6px!important;margin-top:4px!important;grid-column:1/-1!important;
+}
+#epm-root .kpis .kpi.t-exp .expa-chips{display:flex!important;flex-wrap:wrap!important;gap:3px!important}
+#epm-root .kpis .kpi.t-exp .expa-chip{font-size:7.5px!important;padding:2px 6px!important}
+/* زخرفة الوهج لا معنى لها على الورق وتُثقل الطباعة */
+#epm-root .kpis .kpi .expa-beacon{display:none!important}
+/* بطاقة «أوشكت على الانتهاء» خلفيتها حمراء داكنة، وقاعدة الطباعة القديمة
+   كانت تُسوّد عناوين كل البطاقات عدا بطاقة الإجمالي (كُتبت قبل وجود هذه البطاقة)
+   فيصير النصّ كحليًّا على أحمر. نُعيد الأبيض كما هو على الشاشة. */
+#epm-root .kpi.t-exp h3,
+#epm-root .kpi.t-exp .row h3,
+#epm-root .kpi.t-exp .v,
+#epm-root .kpi.t-exp .pill{color:#fff!important}
+</style>
+<script data-cfasync="false" id="epm-kpi-js">!function(){"use strict";
+/* ننقل ارتفاع منطقة التفاصيل المحسوب على الشاشة إلى نسخة الطباعة،
+   فتبقى أسطر البطاقات على خطّ واحد في الورقة كما هي على الشاشة.
+   نراقب #epm-root لأن النسخة تُبنى من أكثر من مسار (فتح المعاينة/قبل الطباعة). */
+function apply(){
+  try{
+    var root=document.getElementById("epm-root"); if(!root)return;
+    var live=document.querySelector("#page-dash .kpis:not(.custom-kpis)");
+    var dh="";
+    if(live){try{dh=(live.style.getPropertyValue("--kpi-dh")||"").trim()}catch(e){}}
+    [].slice.call(root.querySelectorAll(".kpis")).forEach(function(g){
+      try{g.style.removeProperty("grid-template-columns")}catch(e){}
+      if(dh&&!g.classList.contains("custom-kpis"))
+        try{g.style.setProperty("--kpi-dh",dh)}catch(e){}
+    });
+    /* ألوان النصّ المنقولة من الشاشة تُكتب بلا أولوية، فتغلبها قواعد الطباعة
+       ذات ‎!important‎ ويصير النصّ الفاتح فوق خلفية داكنة غير مقروء.
+       نُعيد فرض اللون الفاتح وحده (لمعان ≥ 0.62)؛ أمّا النصّ الرمادي على خلفية
+       بيضاء فنترك قاعدة الطباعة تُغمّقه كما صُمّمت — فهي تزيد وضوحه على الورق. */
+    [].slice.call(root.querySelectorAll(".kpis .kpi *")).forEach(function(el){
+      try{
+        var c=el.style&&el.style.color;
+        if(!c)return;
+        if("important"===el.style.getPropertyPriority("color"))return;
+        var m=String(c).match(/rgba?\(([^)]+)\)/);
+        if(!m)return;
+        var p=m[1].split(",").map(function(x){return parseFloat(x)});
+        if(p.length<3||!isFinite(p[0]))return;
+        var lum=(.299*p[0]+.587*p[1]+.114*p[2])/255;
+        if(lum<.62)return;
+        el.style.setProperty("color",c,"important");
+      }catch(e){}
+    });
+  }catch(e){}
+}
+function boot(){
+  try{
+    var root=document.getElementById("epm-root"); if(!root||root.__epmKpiObs)return;
+    root.__epmKpiObs=1;
+    new MutationObserver(function(){setTimeout(apply,0)}).observe(root,{childList:!0,subtree:!0});
+    apply();
+  }catch(e){}
+}
+try{window.addEventListener("beforeprint",function(){setTimeout(apply,0)})}catch(e){}
+if("loading"===document.readyState)document.addEventListener("DOMContentLoaded",boot);else boot();
+[500,1500,4000].forEach(function(ms){setTimeout(boot,ms)});
+try{window.__epmKpi=apply}catch(e){}
+}();</script>
+
+<style id="epm-qhold-css">
+/* ===== تقرير الكميات المحجوزة على الورق =====
+   شاشة الهولد صُمّمت للإدخال: حقول وأزرار وعمود حذف. أنماطها كلها مقيّدة بـ
+   #page-qhold، ونسخة الطباعة تُبنى خارجها فتنهار. هنا نبني منها تقريراً
+   للعرض على المدير: بلا حقول ولا أزرار ولا عمود حذف، وبجدول يملأ الصفحة. */
+#epm-root .qh-form,
+#epm-root .qh-btn,
+#epm-root .qh-del,
+#epm-root .qh-badge{display:none!important}
+#epm-root .qh-wrap{padding:0!important}
+#epm-root .qh-card{
+  background:transparent!important;border:0!important;border-radius:0!important;
+  padding:0!important;margin-bottom:14px!important;max-height:none!important;overflow:visible!important;
+  box-shadow:none!important;
+}
+/* بطاقات الملخّص في صفّ واحد */
+#epm-root .qh-sum{display:flex!important;gap:10px!important;flex-wrap:nowrap!important}
+#epm-root .qh-stat{
+  flex:1 1 0!important;min-width:0!important;text-align:start!important;
+  background:#fff7ed!important;border:1px solid #f0d5b8!important;
+  border-radius:12px!important;padding:12px 18px!important;
+}
+#epm-root .qh-stat b{display:block!important;font-size:26px!important;font-weight:900!important;color:#7c2d12!important;line-height:1.2!important}
+#epm-root .qh-stat span{display:block!important;font-size:14px!important;font-weight:700!important;color:#9a3412!important}
+/* ===== تصميم الجدول على الورق =====
+   إطار واحد بزوايا مستديرة، بلا خطوط رأسية بين الأعمدة (فهي تُشتّت العين)،
+   وفواصل أفقية خفيفة فقط، وترويسة وصفّ إجمالي كحدّين لونيين للجدول.
+   الجدول يُقاس على محتواه ويُتوسَّط، وحجم خطّه يُحسب ليملأ العرض المتاح. */
+#epm-root #qh-tbl{
+  width:fit-content!important;max-width:100%!important;margin-inline:auto!important;
+  overflow:visible!important;background:transparent!important;border:0!important;
+}
+/* الإطار والزوايا على الجدول نفسه لا على حاويته: حاوية fit-content قد تَقصُر
+   عن عرض الجدول بجزء من البكسل فتقصّ حدّ آخر عمود. */
+#epm-root table.qh-tbl{
+  width:100%!important;border-collapse:separate!important;border-spacing:0!important;
+  background:#fff!important;font-variant-numeric:tabular-nums;table-layout:auto!important;
+  border:1px solid #e7d5c7!important;border-radius:12px!important;overflow:hidden!important;
+  box-shadow:0 1px 3px rgba(120,60,20,.07)!important;
+}
+/* الزوايا تتبع اتجاه الصفحة (يعمل في RTL و LTR معاً) */
+#epm-root table.qh-tbl thead tr:first-child th:first-child{border-start-start-radius:11px!important}
+#epm-root table.qh-tbl thead tr:first-child th:last-child{border-start-end-radius:11px!important}
+#epm-root table.qh-tbl tfoot tr:last-child td:first-child{border-end-start-radius:11px!important}
+#epm-root table.qh-tbl tfoot tr:last-child td:last-child{border-end-end-radius:11px!important}
+#epm-root table.qh-tbl th{
+  background:#7c2d12!important;color:#fff!important;font-weight:700!important;
+  padding:.7em 1.6em!important;text-align:center!important;
+  border:0!important;border-bottom:2px solid #5c1f0c!important;
+  position:static!important;white-space:nowrap!important;font-size:.88em!important;
+  line-height:1.3!important;vertical-align:middle!important;letter-spacing:.5px!important;
+  text-transform:uppercase!important;
+}
+#epm-root table.qh-tbl td{
+  padding:.6em 1.6em!important;text-align:center!important;color:#4a2a17!important;
+  border:0!important;border-bottom:1px solid #f3e4d8!important;
+  white-space:nowrap!important;line-height:1.35!important;vertical-align:middle!important;
+}
+#epm-root table.qh-tbl tbody tr:last-child td{border-bottom:0!important}
+#epm-root table.qh-tbl td.qh-l{text-align:start!important}
+/* الكود والإجمالي مفتاحا القراءة */
+#epm-root table.qh-tbl tbody td:first-child{font-weight:800!important;color:#9a3412!important;letter-spacing:.3px!important}
+#epm-root table.qh-tbl tbody td:nth-last-child(2){font-weight:800!important;color:#7c2d12!important}
+#epm-root table.qh-tbl tfoot td{
+  background:#7c2d12!important;color:#fff!important;font-weight:800!important;
+  border:0!important;border-top:2px solid #5c1f0c!important;
+  font-size:.9em!important;padding:.7em 1.6em!important;
+}
+#epm-root table.qh-tbl tfoot td:first-child{text-align:end!important;letter-spacing:.4px!important}
+/* لا تظليل «محجوز» داخل تقرير الهولد نفسه */
+#epm-root tr.qh-held>td{background:transparent!important;box-shadow:none!important}
+#epm-root table.qh-tbl tbody tr.qh-held:nth-child(even)>td{background:#fffaf5!important}
+</style>
+<script data-cfasync="false" id="epm-qhold-js">!function(){"use strict";
+/* عمود الحذف يُزال من نسخة الطباعة مع ضبط colspan في صفّ الإجمالي،
+   وبطاقة الإدخال تُحذف كاملة — فيخرج التقرير للعرض لا للتحرير. */
+function dropDeleteCol(tbl){
+  try{
+    var th=tbl.tHead&&tbl.tHead.rows[0];
+    if(!th||th.cells.length<2)return;
+    var last=th.cells[th.cells.length-1];
+    /* العمود الأخير هو عمود الحذف: رأسه فارغ */
+    if(String(last.textContent||"").trim()!=="")return;
+    last.parentNode.removeChild(last);
+    var tb=tbl.tBodies[0];
+    tb&&[].slice.call(tb.rows).forEach(function(r){
+      var c=r.cells[r.cells.length-1];
+      if(c&&c.parentNode)c.parentNode.removeChild(c);
+    });
+    var tf=tbl.tFoot;
+    tf&&[].slice.call(tf.rows).forEach(function(r){
+      var c=r.cells[r.cells.length-1];
+      if(!c)return;
+      if(c.colSpan>1)c.colSpan=c.colSpan-1;
+      else c.parentNode.removeChild(c);
+    });
+  }catch(e){}
+}
+/* حجم خطّ الجدول يُحسب ليملأ العرض المتاح: نبدأ من مقاس مرجعي، نقيس العرض
+   الطبيعي للجدول، نضبط الحجم بالنسبة، ثم نصحّح بحلقة قصيرة لأن الحشو ثابت
+   فالعلاقة ليست خطّية تمامًا. النتيجة: أكبر خطّ يتّسع دون تجاوز. */
+function fitTable(tbl){
+  try{
+    var host=tbl.parentNode; if(!host)return;
+    /* الحاوية المباشرة صارت بعرض المحتوى (fit-content)، فالعرض المتاح يُقرأ
+       من البطاقة الأم لا منها، وإلا ظلّ الخطّ عند مقاسه المرجعي. */
+    var box=(host.closest&&(host.closest(".qh-card")||host.closest(".epm-scale")))||host.parentNode||host;
+    var avail=(box&&box.clientWidth)||host.clientWidth||0;
+    if(avail<80)return;
+    var BASE=14;
+    /* الورقة تُصغَّر لاحقًا بمعامل ثابت، فنحسب الحدّ الأعلى بحيث لا يتجاوز
+       الخطّ المطبوع ~15px مهما اتّسع الجدول — كي لا يخرج تقريرًا بخطّ ضخم. */
+    var sc=1;
+    try{
+      var w=tbl.closest?tbl.closest(".epm-scale"):null;
+      if(w){
+        var z=parseFloat(w.style.zoom);
+        if(isFinite(z)&&z>0)sc=z;
+        else{
+          var m=String(w.style.transform||"").match(/scale\(([\d.]+)\)/);
+          if(m)sc=parseFloat(m[1])||1;
+        }
+      }
+    }catch(e){}
+    var CAP=Math.max(15,Math.min(32,16/(sc>0?sc:1)));
+    function put(px){tbl.style.setProperty("font-size",px.toFixed(2)+"px","important")}
+    put(BASE);
+    var nat=tbl.scrollWidth||tbl.getBoundingClientRect().width||0;
+    if(!(nat>0))return;
+    var f=Math.max(10,Math.min(CAP,BASE*avail/nat));
+    put(f);
+    /* نترك هامش أمان 4px حتى لا يقصّ الإطار المستدير حدّ آخر عمود */
+    var LIM=avail-4,g=0;
+    while(tbl.scrollWidth>LIM&&f>10&&g++<60){f-=.4;put(f)}
+    g=0;
+    while(tbl.scrollWidth<LIM-6&&f<CAP&&g++<80){
+      f+=.4;put(f);
+      if(tbl.scrollWidth>LIM){f-=.4;put(f);break}
+    }
+  }catch(e){}
+}
+/* بطاقات الملخّص تُحاذي عرض الجدول بالضبط فيقرأ التقرير ككتلة واحدة.
+   العرض يُقسَم على معامل تصغير الورقة للعودة إلى وحدات التخطيط. */
+function alignSummary(tbl){
+  try{
+    var root=document.getElementById("epm-root"); if(!root)return;
+    var sum=root.querySelector(".qh-sum"); if(!sum)return;
+    var sc=1;
+    var w=tbl.closest?tbl.closest(".epm-scale"):null;
+    if(w){
+      var z=parseFloat(w.style.zoom);
+      if(isFinite(z)&&z>0)sc=z;
+      else{var m=String(w.style.transform||"").match(/scale\(([\d.]+)\)/);if(m)sc=parseFloat(m[1])||1}
+    }
+    var host=tbl.parentNode;
+    var px=Math.round((host&&host.getBoundingClientRect().width||0)/(sc>0?sc:1));
+    if(px>80){sum.style.setProperty("width",px+"px","important");
+      sum.style.setProperty("margin-inline","auto","important")}
+  }catch(e){}
+}
+function apply(){
+  try{
+    var root=document.getElementById("epm-root"); if(!root)return;
+    [].slice.call(root.querySelectorAll(".qh-form")).forEach(function(f){
+      var card=f.closest?f.closest(".qh-card"):null;
+      (card||f).remove();
+    });
+    [].slice.call(root.querySelectorAll("table.qh-tbl")).forEach(function(t){dropDeleteCol(t);fitTable(t);alignSummary(t)});
+    /* شارات وتظليل «محجوز» لا معنى لها داخل تقرير الهولد */
+    [].slice.call(root.querySelectorAll(".qh-badge")).forEach(function(b){b.remove()});
+    [].slice.call(root.querySelectorAll("tr.qh-held")).forEach(function(r){r.classList.remove("qh-held")});
+  }catch(e){}
+}
+function boot(){
+  try{
+    var root=document.getElementById("epm-root"); if(!root||root.__epmQhObs)return;
+    root.__epmQhObs=1;
+    new MutationObserver(function(){setTimeout(apply,0)}).observe(root,{childList:!0,subtree:!0});
+    apply();
+  }catch(e){}
+}
+try{window.addEventListener("beforeprint",function(){setTimeout(apply,0)})}catch(e){}
+if("loading"===document.readyState)document.addEventListener("DOMContentLoaded",boot);else boot();
+[500,1500,4000].forEach(function(ms){setTimeout(boot,ms)});
+try{window.__epmQhold=apply}catch(e){}
 }();</script>
