@@ -10163,6 +10163,17 @@ try{var mo=new MutationObserver(function(){sweep()});
 .expa-days .dq{min-width:44px;text-align:end}
 .expa-days .dp{min-width:34px;text-align:end;color:#fde68a}
 .expa-days .dm{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.7)}
+.expa-thr{position:relative;z-index:3;margin-top:9px;border-top:1px solid rgba(255,255,255,.22);padding-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;cursor:default}
+.expa-thr .tl{font-size:9.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:rgba(255,255,255,.8);margin-inline-end:auto}
+.expa-thr .ts{display:inline-flex;align-items:center;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;overflow:hidden}
+.expa-thr .ts button{border:none;background:transparent;color:#fff;font:inherit;font-size:13px;font-weight:800;width:22px;height:22px;cursor:pointer}
+.expa-thr .ts button:hover{background:rgba(255,255,255,.18)}
+.expa-thr .ts input{width:38px;height:22px;border:none;background:#fff;color:#991b1b;font:inherit;font-size:12px;font-weight:800;text-align:center;-moz-appearance:textfield}
+.expa-thr .ts input::-webkit-outer-spin-button,.expa-thr .ts input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.expa-thr .tp{display:flex;gap:4px;width:100%}
+.expa-thr .tp button{flex:1;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:6px;font:inherit;font-size:10px;font-weight:800;padding:2px 0;cursor:pointer}
+.expa-thr .tp button.on{background:#fde68a;color:#7c2d12;border-color:#fde68a}
+#epm-root .expa-thr{display:none!important}
 .kpi.t-exp.calm{background:linear-gradient(150deg,#065f46,#10b981)!important;border-color:#065f46!important;animation:none}
 .kpi.t-exp.calm .sweep,.kpi.t-exp.calm .halo{animation:none}
 .expa-beacon{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:1}
@@ -10316,16 +10327,40 @@ function paintCard(){
   var _minChip=null==_minRem?"":'<span class="expa-chip crit">'+(_minRem<=0
       ? L("منتهٍ منذ "+Math.abs(Math.round(_minRem))+" يوم","Expired "+Math.abs(Math.round(_minRem))+"d ago")
       : L("أقل متبقٍ · "+Math.round(_minRem)+" يوم","Least left · "+Math.round(_minRem)+"d"))+"</span>";
+  /* بدل الشارات: قائمة عمودية أنيقة (البيان · الكمية · عدد الأصناف) */
+  var _li=function(lab,val,sub,cls){return'<div class="el '+(cls||"")+'"><span class="ek">'+lab+'</span><span class="ev">'+val+"</span>"+(null!=sub?'<span class="en">'+sub+"</span>":"")+"</div>"};
   document.getElementById("expa-k-chips").innerHTML=list.length?
-    _minChip+
-    '<span class="expa-chip crit">'+L("منتهي","Expired")+" "+nf(t.crit)+" · "+t.critN+"</span>"+
-    '<span class="expa-chip warn">'+L("أوشك","Soon")+" "+nf(t.warn)+" · "+t.warnN+"</span>":
-    '<span class="expa-chip" style="background:#dcfce7;color:#166534">'+L("لا توجد أصناف قريبة من الانتهاء","Nothing near expiry")+"</span>";
-  paintDays(list,q);
+    (null==_minRem?"":_li(_minRem<=0?L("منتهٍ منذ","Expired ago"):L("أقل متبقٍ","Least left"),Math.abs(Math.round(_minRem))+L(" يوم","d"),null,"min"))+
+    _li(L("منتهي","Expired"),nf(t.crit),t.critN+" "+L("صنف","items"),"crit")+
+    _li(L("أوشك","Soon"),nf(t.warn),t.warnN+" "+L("صنف","items"),"warn"):
+    '<div class="el ok"><span class="ek">'+L("لا توجد أصناف قريبة من الانتهاء","Nothing near expiry")+"</span></div>";
+  paintDays(list,q);paintTh(c);
   paintPanels()}
+/* حد التنبيه (يوم) داخل البطاقة — تعديل مباشر دون فتح اللوحة */
+function paintTh(c){var el=document.getElementById("expa-k-th");
+  if(!el){var host=document.getElementById("kpi-expalert");if(!host)return;el=document.createElement("div");el.className="expa-thr";el.id="expa-k-th";
+    el.addEventListener("click",function(e){e.stopPropagation()});el.addEventListener("keydown",function(e){e.stopPropagation()});
+    var dd=document.getElementById("expa-k-days");dd&&dd.parentNode===host?host.insertBefore(el,dd.nextSibling):host.appendChild(el)}
+  /* لا نُعيد الرسم فقط أثناء الكتابة في الخانة؛ الضغط على زر لا يمنع التحديث */
+  var ae=document.activeElement;if(ae&&ae.tagName==="INPUT"&&el.contains(ae))return;
+  el.innerHTML='<span class="tl">'+L("حد التنبيه (يوم)","Alert threshold (d)")+'</span>'+
+    '<span class="ts"><button type="button" onclick="var i=this.parentNode.querySelector(\'input\');EXPALERT.setCfg(\'warn\',Math.max(1,(parseInt(i.value,10)||1)-1))">−</button>'+
+    '<input type="number" min="1" max="365" value="'+c.warn+'" onchange="EXPALERT.setCfg(\'warn\',this.value)" onkeydown="event.key===\'Enter\'&&this.blur()">'+
+    '<button type="button" onclick="var i=this.parentNode.querySelector(\'input\');EXPALERT.setCfg(\'warn\',Math.min(365,(parseInt(i.value,10)||0)+1))">+</button></span>'+
+    '<span class="tp">'+PRESETS.map(function(d){return'<button type="button" class="'+(d===c.warn?"on":"")+'" onclick="EXPALERT.setCfg(\'warn\','+d+')">'+d+"</button>"}).join("")+"</span>"}
+/* عند عدم وجود أصناف تحت الحد: نوضّح أقرب الأصناف للانتهاء ومتى تدخل التنبيه،
+   حتى لا يبدو الصفر خطأً في الحساب */
+function nearestHtml(){var c=cfg(),rows=[];try{rows="function"==typeof filtered?filtered():(window.DATA||[])}catch(e){rows=window.DATA||[]}
+  var g={};(rows||[]).forEach(function(d){var age=null;try{age="function"==typeof rowAgeDays?rowAgeDays(d):null}catch(e){}
+    if(null==age||isNaN(age))return;var rem=Math.round(c.shelf-age);(g[rem]=g[rem]||{q:0,n:0}).q+=+d.qty||0;g[rem].n++});
+  var ks=Object.keys(g).map(Number).sort(function(a,b){return a-b}).slice(0,3);if(!ks.length)return"";
+  var h='<div class="eh">'+L("لا أصناف ضمن "+c.warn+" يوم · الأقرب للانتهاء","None within "+c.warn+"d · nearest to expiry")+"</div>";
+  ks.forEach(function(k){var o=g[k],gap=k-c.warn;
+    h+='<div class="dr"><span class="dd">'+k+L(" يوم","d")+'</span><span class="dg">'+L("يدخل التنبيه بعد "+gap+" يوم","enters alert in "+gap+"d")+'</span><span class="dq">'+nf(o.q)+"</span></div>"});
+  return h}
 /* تحليل الكمية حسب اليوم المتبقي — أقرب 3 أيام داخل البطاقة */
 function paintDays(list,q){var el=document.getElementById("expa-k-days");if(!el)return;
-  if(!list.length||!(q>0)){el.innerHTML="";return}
+  if(!list.length||!(q>0)){el.innerHTML=nearestHtml();return}
   var g={},keys=[];list.forEach(function(r){var d=Math.round(r.rem);if(!g[d]){g[d]={qty:0,n:0};keys.push(d)}g[d].qty+=r.qty;g[d].n++});
   keys.sort(function(a,b){return a-b});
   var top=keys.slice(0,3),mx=0;top.forEach(function(d){mx=Math.max(mx,g[d].qty)});
@@ -12349,6 +12384,12 @@ function legend(on){
    ثم نُوحّد الجميع على الأصغر حتى تبقى الأرقام بحجم واحد ومتحاذية. */
 function fitV(b){
   var vs=[].slice.call(b.querySelectorAll(".kpi .v")).filter(function(v){return v.clientWidth>0});
+  /* البطاقة الحمراء لها رقم أكبر: تُصغَّر فقط إن ضاقت، ولا تدخل في توحيد الحجم */
+  vs.filter(function(v){return v.closest&&v.closest(".t-exp")}).forEach(function(v){
+    try{v.style.removeProperty("font-size")}catch(e){}
+    var fs=parseFloat(getComputedStyle(v).fontSize)||40,g=0;
+    while(v.scrollWidth>v.clientWidth+0.5&&fs>18&&g++<24){fs-=1;try{v.style.setProperty("font-size",fs+"px","important")}catch(e){}}});
+  vs=vs.filter(function(v){return!(v.closest&&v.closest(".t-exp"))});
   if(!vs.length)return;
   /* قواعد الحجم في الـCSS تحمل ‎!important‎ فلا بدّ أن يحملها التعديل السطري أيضًا */
   function put(v,px){try{v.style.setProperty("font-size",px+"px","important")}catch(e){v.style.fontSize=px+"px"}}
@@ -15631,3 +15672,478 @@ body.dark .fg-wcf-n{background:#1e2e4a;color:#cbd5e1}
   } catch (e) {}
 }();
 </script>
+
+<script data-cfasync="false" id="dr-colorder-fix">!function(){"use strict";
+/* تثبيت ترتيب أعمدة الفروع في التقارير اليومية (FG Balance وغيرها).
+   السبب السابق: rptMoveCol كان يبدّل الأعمدة داخل البيانات الحالية وقالب الذاكرة فقط،
+   ولا يحفظ الترتيب كإعداد — فأي رفع جديد (Excel أو SAP) أو مزامنة أو إعادة تحميل يعيد ترتيب الملف/القالب.
+   الآن يُحفظ الترتيب بأسماء الأعمدة في RPT[key].colOrder (ضمن report_designer المتزامن مع السحابة)
+   ويُطبَّق تلقائياً قبل كل عرض وعلى القالب الذي يبني منه رفع SAP. */
+function R(){try{return"undefined"!=typeof RPT&&RPT?RPT:null}catch(e){return null}}
+function nk(x){return String(null==x?"":x).trim().toLowerCase()}
+function saveR(){try{LS.setItem("report_designer",JSON.stringify(RPT))}catch(e){}try{"function"==typeof pushSettingsToCloud&&pushSettingsToCloud()}catch(e){}}
+function orderOf(key){var r=R();return r&&r[key]&&Array.isArray(r[key].colOrder)?r[key].colOrder:null}
+/* يعيد ترتيب الأعمدة المعروفة في الترتيب المحفوظ داخل الخانات التي تشغلها، ويترك الأعمدة الجديدة/غير المعروفة في مكانها */
+function apply(obj,ord){if(!obj||!Array.isArray(obj.headers)||!ord||!ord.length)return!1;
+ var pos={};ord.forEach(function(h,i){var k=nk(h);k in pos||(pos[k]=i)});
+ var H=obj.headers,slots=[],items=[];H.forEach(function(h,i){var k=nk(h);k in pos&&(slots.push(i),items.push(i))});
+ if(items.length<2)return!1;
+ items.sort(function(a,b){return pos[nk(H[a])]-pos[nk(H[b])]});
+ var perm=H.map(function(_,i){return i}),changed=!1;slots.forEach(function(s,n){perm[s]=items[n];items[n]!==s&&(changed=!0)});
+ if(!changed)return!1;
+ var re=function(a){if(!Array.isArray(a))return a;var o=a.slice();perm.forEach(function(src,dst){o[dst]=src<a.length?a[src]:void 0});
+  while(o.length&&void 0===o[o.length-1]&&o.length>a.length)o.pop();return o};
+ obj.headers=re(H);Array.isArray(obj.rows)&&(obj.rows=obj.rows.map(re));Array.isArray(obj.total)&&(obj.total=re(obj.total));
+ return!0}
+function applyAll(key){var ord=orderOf(key);if(!ord)return;
+ try{"undefined"!=typeof DR_TEMPLATES&&DR_TEMPLATES[key]&&apply(DR_TEMPLATES[key],ord)}catch(e){}
+ try{"undefined"!=typeof DEFAULT_DAILY_REPORTS&&DEFAULT_DAILY_REPORTS[key]&&apply(DEFAULT_DAILY_REPORTS[key],ord)}catch(e){}
+ try{var s=getDR();s&&s[key]&&apply(s[key],ord)&&saveDR(s)}catch(e){}}
+function wrap(){
+ if("function"==typeof window.rptMoveCol&&!window.rptMoveCol.__co){var o=window.rptMoveCol;
+  window.rptMoveCol=function(key){var r=o.apply(this,arguments);try{var s=getDR(),src=s&&s[key]&&s[key].headers||"undefined"!=typeof DR_TEMPLATES&&DR_TEMPLATES[key]&&DR_TEMPLATES[key].headers;
+   if(src&&src.length){var X=R();if(X){X[key]=X[key]||{};X[key].colOrder=src.slice();saveR()}}}catch(e){}return r};window.rptMoveCol.__co=1}
+ if("function"==typeof window.renderDailyReport&&!window.renderDailyReport.__co){var rd=window.renderDailyReport;
+  window.renderDailyReport=function(key){try{applyAll(key)}catch(e){}return rd.apply(this,arguments)};window.renderDailyReport.__co=1}}
+window.DRCOLORDER={apply:applyAll,reset:function(key){var X=R();X&&X[key]&&(delete X[key].colOrder,saveR())},get:orderOf};
+wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoaded",wrap);setTimeout(wrap,1500);setTimeout(function(){wrap();["fgbal","oldid","transit"].forEach(applyAll)},2500);
+}();</script>
+
+<style id="kpi-detail-font-fix">
+/* تكبير خط المسميات داخل البطاقات (البيضاء + الإجمالي) لملء الفراغ — الشاشة فقط */
+@media (min-width:861px){
+#page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini{gap:8px!important;margin-top:12px!important;padding-top:11px!important}
+#page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini .ir{font-size:12px!important;gap:7px!important;line-height:1.35!important;color:#475a73!important}
+#page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini .ir .mb{flex:0 0 28px!important;height:6px!important}
+#page-dash .kpis:not(.custom-kpis) .kpi .kpi-idmini .ir .pc{font-size:12px!important;min-width:34px!important}
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seglg{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px 10px!important;margin-top:12px!important;padding-top:11px!important}
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seglg span{font-size:12px!important;gap:6px!important;white-space:nowrap!important}
+#page-dash .kpis:not(.custom-kpis) .kpi.t-total .kpi-seglg span i{width:10px!important;height:10px!important;border-radius:3px!important}
+}
+</style>
+
+<style id="kpi-exp-wide">
+/* البطاقة الحمراء: أعرض وأقل ارتفاعاً — عمودان داخليان (الملخّص | التحليل + حد التنبيه) */
+#page-dash .kpis:not(.custom-kpis)>.kpi.t-exp{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:16px;align-content:start}
+#page-dash .kpi.t-exp>.row{grid-column:1;grid-row:1}
+#page-dash .kpi.t-exp>.v{grid-column:1;grid-row:2}
+#page-dash .kpi.t-exp>.pill{grid-column:1;grid-row:3;justify-self:stretch}
+#page-dash .kpi.t-exp>.bar{grid-column:1;grid-row:4}
+#page-dash .kpi.t-exp>.expa-chips{grid-column:1;grid-row:5;align-content:flex-start}
+#page-dash .kpi.t-exp>.expa-days{grid-column:2;grid-row:1/4;margin-top:0!important;border-top:none!important;padding-top:0!important;border-inline-start:1px solid rgba(255,255,255,.22);padding-inline-start:14px}
+#page-dash .kpi.t-exp>.expa-thr{grid-column:2;grid-row:4/6;align-self:start;margin-top:8px!important;border-top:1px solid rgba(255,255,255,.22);border-inline-start:1px solid rgba(255,255,255,.22);padding-inline-start:14px}
+#page-dash .kpi.t-exp>.expa-days:empty+.expa-thr{grid-row:1/6;border-top:none;margin-top:0!important;padding-top:0}
+#page-dash .kpi.t-exp .expa-days .dr{font-size:11.5px}
+#page-dash .kpi.t-exp .expa-days .dd{min-width:44px}
+#page-dash .kpi.t-exp .expa-thr .tl{flex:0 0 auto}
+#page-dash .kpi.t-exp .expa-thr .tp{width:auto;flex:1 1 100%}
+#page-dash .kpi.t-exp>.expa-beacon{grid-column:1}
+/* شاشة كبيرة: 7 بطاقات + بطاقة حمراء بعرض مضاعف تقريباً في صف واحد */
+@media (min-width:1560px){
+  #page-dash .kpis:not(.custom-kpis){grid-template-columns:repeat(7,minmax(0,1fr)) minmax(0,1.9fr)!important}
+}
+/* لابتوب: 5 أعمدة — الصف الثاني: بطاقتان + الحمراء على 3 أعمدة */
+@media (min-width:1100px) and (max-width:1559px){
+  #page-dash .kpis:not(.custom-kpis){grid-template-columns:repeat(5,minmax(0,1fr))!important}
+  #page-dash .kpis:not(.custom-kpis)>.kpi.t-exp{grid-column:span 3}
+}
+/* تابلت: 3 أعمدة — الحمراء على عمودين بجانب آخر بطاقة */
+@media (min-width:861px) and (max-width:1099px){
+  #page-dash .kpis:not(.custom-kpis){grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  #page-dash .kpis:not(.custom-kpis)>.kpi.t-exp{grid-column:span 2}
+}
+/* جوال: الإجمالي والحمراء بعرض كامل، والبقية بطاقتان في كل صف */
+@media (max-width:860px){
+  #page-dash .kpis:not(.custom-kpis)>.kpi.t-total,
+  #page-dash .kpis:not(.custom-kpis)>.kpi.t-exp{grid-column:1/-1}
+}
+@media (max-width:420px){
+  #page-dash .kpis:not(.custom-kpis)>.kpi.t-exp{column-gap:10px}
+  #page-dash .kpi.t-exp>.expa-days,#page-dash .kpi.t-exp>.expa-thr{padding-inline-start:10px}
+}
+</style>
+
+<style id="kpi-exp-list">
+#page-dash .kpi.t-exp .expa-chips{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;gap:3px!important;margin-top:10px!important;border-top:1px solid rgba(255,255,255,.22);padding-top:8px!important}
+#page-dash .kpi.t-exp .expa-chips .el{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1.5}
+#page-dash .kpi.t-exp .expa-chips .el::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff;flex-shrink:0}
+#page-dash .kpi.t-exp .expa-chips .el.warn::before{background:#fde68a}
+#page-dash .kpi.t-exp .expa-chips .el.min::before{background:#fca5a5}
+#page-dash .kpi.t-exp .expa-chips .el.ok::before{background:#86efac}
+#page-dash .kpi.t-exp .expa-chips .ek{flex:1;color:rgba(255,255,255,.85);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#page-dash .kpi.t-exp .expa-chips .ev{min-width:44px;text-align:end}
+#page-dash .kpi.t-exp .expa-chips .en{min-width:52px;text-align:end;font-size:10.5px;color:#fde68a}
+#page-dash .kpi.t-exp.calm .expa-chips .en{color:#bbf7d0}
+#page-dash .kpi.t-exp .expa-chips .el{gap:6px}
+#page-dash .kpi.t-exp .expa-chips .ek{flex:1 0 auto;overflow:visible}
+#page-dash .kpi.t-exp .expa-chips .ev{min-width:0}
+#page-dash .kpi.t-exp .expa-chips .en{min-width:0}
+@media (min-width:1560px){#page-dash .kpi.t-exp .expa-chips .el{font-size:11px}#page-dash .kpi.t-exp .expa-chips .en{font-size:10px}}
+</style>
+
+<style id="kpi-exp-vertical">
+/* البطاقة الحمراء: عمود واحد طولي — بدون قائمة (أقل متبقٍ/منتهي/أوشك) */
+html body #page-dash .kpis .kpi.t-exp>.expa-chips,html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp .expa-chips{display:none!important}
+#page-dash .kpi.t-exp .expa-thr .ts{margin-inline-start:auto!important}
+#page-dash .kpis:not(.custom-kpis)>.kpi.t-exp{display:flex!important;flex-direction:column!important}
+#page-dash .kpi.t-exp>.expa-days{margin-top:12px!important;border-top:1px solid rgba(255,255,255,.22)!important;padding-top:9px!important;border-inline-start:none!important;padding-inline-start:0!important;gap:6px!important}
+#page-dash .kpi.t-exp>.expa-thr{margin-top:10px!important;border-top:1px solid rgba(255,255,255,.22)!important;padding-top:9px!important;border-inline-start:none!important;padding-inline-start:0!important;flex-wrap:wrap!important}
+#page-dash .kpi.t-exp>.expa-days:empty+.expa-thr{margin-top:12px!important}
+#page-dash .kpi.t-exp .expa-days .eh,#page-dash .kpi.t-exp .expa-thr .tl{font-size:10.5px!important}
+#page-dash .kpi.t-exp .expa-days .dr{font-size:12.5px!important;gap:9px!important}
+#page-dash .kpi.t-exp .expa-days .dd{min-width:48px!important;padding:2px 7px!important}
+#page-dash .kpi.t-exp .expa-days .mb{height:6px!important}
+#page-dash .kpi.t-exp .expa-days .dq{min-width:52px!important}
+#page-dash .kpi.t-exp .expa-days .dp{min-width:38px!important}
+#page-dash .kpi.t-exp .expa-thr .tl{flex:1 1 auto!important;margin-inline-end:auto!important}
+#page-dash .kpi.t-exp .expa-thr .ts button{width:26px!important;height:26px!important}
+#page-dash .kpi.t-exp .expa-thr .ts input{height:26px!important;width:44px!important;font-size:13px!important}
+#page-dash .kpi.t-exp .expa-thr .tp{flex:1 1 100%!important;margin-top:4px}
+#page-dash .kpi.t-exp .expa-thr .tp button{font-size:11px!important;padding:3px 0!important}
+</style>
+
+<style id="kpi-exp-polish">
+/* البطاقة الحمراء — رقم أكبر وتنسيق داخلي: [الرقم ⟷ النسبة] ثم الشريط ثم لوحتان (الأيام · حد التنبيه) */
+html body #page-dash .kpis:not(.custom-kpis)>.kpi.t-exp{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;column-gap:12px!important;align-content:start!important;row-gap:0!important}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.row,html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.bar,html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.expa-days,html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.expa-thr,html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.expa-chips{grid-column:1/-1!important}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.row{grid-row:1!important;min-width:0}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.expa-days{grid-row:4!important}html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.expa-thr{grid-row:5!important}html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.bar{grid-row:3!important}
+html body #page-dash .kpi.t-exp>.row{grid-row:1}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.v{grid-column:1!important;grid-row:2;font-size:40px!important;line-height:1.05!important;letter-spacing:-1px!important;margin-top:10px!important;font-weight:800!important;text-shadow:0 3px 14px rgba(0,0,0,.3)!important;position:relative;z-index:2}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.pill{grid-column:2!important;grid-row:2;align-self:center!important;justify-self:end!important;margin-top:10px!important;font-size:14px!important;font-weight:800!important;padding:5px 14px!important;border-radius:999px!important;position:relative;z-index:2}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.bar{grid-row:3;height:6px!important;margin-top:12px!important;border-radius:6px!important}
+html body #page-dash .kpi.t-exp>.expa-days{grid-row:4}
+html body #page-dash .kpi.t-exp>.expa-thr{grid-row:5}
+html body #page-dash .kpi.t-exp>.expa-days,html body #page-dash .kpi.t-exp>.expa-thr{background:rgba(0,0,0,.14)!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:11px!important;padding:9px 11px!important;margin-top:12px!important}
+html body #page-dash .kpi.t-exp>.expa-thr{margin-top:8px!important}
+html body #page-dash .kpi.t-exp .expa-days .eh{margin-bottom:2px}
+html body #page-dash .kpi.t-exp .expa-days .dr{font-size:13px!important}
+html body #page-dash .kpi.t-exp .expa-days .dd{background:rgba(255,255,255,.2)!important;min-width:50px!important}
+html body #page-dash .kpi.t-exp .expa-days .mb{background:rgba(255,255,255,.16)!important}
+html body #page-dash .kpi.t-exp .expa-thr .ts{background:rgba(255,255,255,.12)!important}
+/* الوهج: صغير وخافت في المسافة بين الرقم والنسبة، فلا يغطي البيانات */
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.expa-beacon{inset:auto!important;top:44px!important;left:50%!important;transform:translateX(-50%);width:60px!important;height:60px!important;opacity:.35!important;z-index:1!important}
+@media (max-width:860px){html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp>.v{font-size:34px!important}}
+</style>
+
+<style id="kpi-exp-presets-sm">
+/* أزرار الفترات: شرائح صغيرة بعرض المحتوى بدل أزرار ممتدة */
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp .expa-thr{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:6px 8px!important}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp .expa-thr .tl{flex:1 1 100%!important;margin:0!important}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp .expa-thr .tp{flex:0 1 auto!important;width:auto!important;margin:0!important;gap:4px!important;order:2}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp .expa-thr .tp button{flex:0 0 auto!important;min-width:0!important;padding:2px 7px!important;font-size:10.5px!important;line-height:1.4!important;border-radius:999px!important}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp .expa-thr .ts{order:3;margin-inline-start:auto!important}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp .expa-thr .ts button{width:22px!important;height:22px!important;font-size:12px!important}
+html body #page-dash .kpis:not(.custom-kpis) .kpi.t-exp.t-exp .expa-thr .ts input{width:38px!important;height:22px!important;font-size:12px!important}
+/* عرض أقل للبطاقة على الشاشة الكبيرة */
+@media (min-width:1560px){html body #page-dash .kpis:not(.custom-kpis){grid-template-columns:repeat(7,minmax(0,1fr)) minmax(0,1.55fr)!important}}
+</style>
+
+<style id="kpi-exp-nearest">html body #page-dash .kpi.t-exp .expa-days .dg{flex:1;min-width:0;font-size:11px;font-weight:700;color:rgba(255,255,255,.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}</style>
+
+<style id="aix-css">
+#aix{background:#fff;border:1px solid #e3eaf3;border-radius:16px;margin:0 0 16px;box-shadow:0 1px 3px rgba(16,40,80,.06);overflow:hidden;font-size:13px;color:#13294b}
+#aix .ax-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:linear-gradient(135deg,#0f2747,#1e4e8c);color:#fff}
+#aix .ax-hd b{font-size:14.5px;font-weight:800}
+#aix .ax-hd .sub{font-size:11.5px;opacity:.75;font-weight:600}
+#aix .ax-hd em{margin-inline-start:auto;font-style:normal;opacity:.8}
+#aix .ax-tabs{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid #eef2f7;flex-wrap:wrap;background:#f8fafc}
+#aix .ax-tabs button{border:1px solid #d6e0ec;background:#fff;border-radius:999px;padding:6px 14px;font:inherit;font-size:12.5px;font-weight:700;color:#39526e;cursor:pointer}
+#aix .ax-tabs button.on{background:#1e4e8c;color:#fff;border-color:#1e4e8c}
+#aix .ax-tabs .cnt{display:inline-block;min-width:18px;margin-inline-start:6px;border-radius:999px;background:#fee2e2;color:#991b1b;font-size:10.5px;padding:0 6px}
+#aix .ax-tabs button.on .cnt{background:rgba(255,255,255,.22);color:#fff}
+#aix .ax-bd{padding:14px 16px}
+#aix .ax-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+#aix .ax-k{border:1px solid #e8eef5;border-radius:12px;padding:10px 12px;background:#fbfdff}
+#aix .ax-k .l{font-size:11px;font-weight:700;color:#64748b}
+#aix .ax-k .v{font-size:21px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+#aix .ax-k .s{font-size:11px;color:#64748b;margin-top:2px}
+#aix .ax-list{display:flex;flex-direction:column;gap:8px}
+#aix .ax-i{display:flex;gap:10px;align-items:flex-start;border:1px solid #e8eef5;border-inline-start:4px solid #94a3b8;border-radius:10px;padding:9px 12px;background:#fff;line-height:1.65}
+#aix .ax-i.crit{border-inline-start-color:#b91c1c;background:#fff7f7}
+#aix .ax-i.warn{border-inline-start-color:#d97706;background:#fffbf2}
+#aix .ax-i.good{border-inline-start-color:#15803d;background:#f5fbf7}
+#aix .ax-i.info{border-inline-start-color:#1e4e8c}
+#aix .ax-i .ic{font-size:16px;line-height:1.4}
+#aix .ax-i .tx b{font-weight:800}
+#aix .ax-i .act{display:block;font-size:12px;color:#475569;margin-top:2px}
+#aix .ax-tw{overflow:auto;border:1px solid #e8eef5;border-radius:10px;margin-top:10px;max-height:340px}
+#aix table{width:100%;border-collapse:collapse;font-size:12px}
+#aix th{position:sticky;top:0;background:#f1f5f9;color:#475569;font-size:11px;font-weight:800;text-align:start;padding:7px 9px;white-space:nowrap;border-bottom:1px solid #e2e8f0}
+#aix td{padding:6px 9px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+#aix td.n{text-align:end;font-variant-numeric:tabular-nums;font-weight:700}
+#aix h4{margin:14px 0 6px;font-size:13px;font-weight:800;color:#0f2747}
+#aix .ax-note{font-size:11.5px;color:#64748b;background:#f8fafc;border-radius:9px;padding:8px 10px;line-height:1.7;margin-top:10px}
+#aix .ax-sm{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+#aix .ax-ch{border:1px solid #e8eef5;border-radius:12px;padding:10px 12px}
+#aix .ax-ch .t{font-size:12px;font-weight:800;color:#334155}
+#aix .ax-ch .t span{float:inline-end;color:#0f2747;font-variant-numeric:tabular-nums}
+#aix .ax-ch svg{display:block;width:100%;height:110px;margin-top:6px;overflow:visible}
+#aix .ax-ch .tip{font-size:11px;color:#475569;min-height:16px;margin-top:2px}
+#aix .ax-chat{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow:auto;padding:4px 2px}
+#aix .ax-m{max-width:88%;border-radius:12px;padding:9px 12px;line-height:1.75;white-space:pre-wrap}
+#aix .ax-m.u{align-self:flex-end;background:#1e4e8c;color:#fff}
+#aix .ax-m.a{align-self:flex-start;background:#f1f5f9;color:#13294b}
+#aix .ax-m.a table{margin-top:6px;background:#fff;border-radius:8px}
+#aix .ax-in{display:flex;gap:8px;margin-top:10px}
+#aix .ax-in input{flex:1;border:1px solid #d6e0ec;border-radius:10px;padding:9px 12px;font:inherit}
+#aix .ax-b{border:1px solid #d6e0ec;background:#fff;border-radius:10px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;color:#13294b}
+#aix .ax-b.pri{background:#1e4e8c;border-color:#1e4e8c;color:#fff}
+#aix .ax-sug{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#aix .ax-sug button{border:1px dashed #b8c8dc;background:#f8fafc;border-radius:999px;padding:4px 11px;font:inherit;font-size:11.5px;cursor:pointer;color:#39526e}
+#aix .ax-cfg{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12px}
+#aix .ax-cfg input{border:1px solid #d6e0ec;border-radius:8px;padding:6px 9px;font:inherit;font-size:12px;min-width:220px}
+#aix .pill{display:inline-block;border-radius:999px;padding:1px 8px;font-size:10.5px;font-weight:800}
+#aix .pill.r{background:#fee2e2;color:#991b1b}#aix .pill.a{background:#fef3c7;color:#92400e}#aix .pill.g{background:#dcfce7;color:#14532d}
+body.dark #aix,:root[data-theme="dark"] #aix{background:#13233a;border-color:#22374f;color:#e2e8f0}
+body.dark #aix .ax-tabs,:root[data-theme="dark"] #aix .ax-tabs{background:#0f1d31;border-color:#22374f}
+body.dark #aix .ax-k,body.dark #aix .ax-i,body.dark #aix .ax-ch,body.dark #aix .ax-m.a,:root[data-theme="dark"] #aix .ax-k,:root[data-theme="dark"] #aix .ax-i,:root[data-theme="dark"] #aix .ax-ch,:root[data-theme="dark"] #aix .ax-m.a{background:#172a44;border-color:#22374f;color:#e2e8f0}
+body.dark #aix th,:root[data-theme="dark"] #aix th{background:#0f1d31;color:#cbd5e1}
+body.dark #aix h4,:root[data-theme="dark"] #aix h4{color:#e2e8f0}
+@media print{#aix{display:none!important}}
+</style>
+<script data-cfasync="false" id="aix-js">!function(){"use strict";
+/* ===== AIX — الرؤى الذكية لأعمار المخزون =====
+   1) رؤى وتوصيات   2) توقّع (من اللقطات الأسبوعية + محاكاة FIFO)
+   3) جودة البيانات   4) اسأل البيانات (محلي، ويمكن ربطه بـ Claude API بمفتاح يضعه المدير)
+   كل الحسابات داخل المتصفح؛ لا يُرسل شيء للإنترنت إلا عند تفعيل مفتاح API وطرح سؤال. */
+var KS="aix_state_v1",KAI="aix_ai_cfg_v1",DAY=864e5;
+function ar(){try{return"undefined"==typeof LANG||"ar"===LANG}catch(e){return!0}}
+function L(a,e){return ar()?a:e}
+function st(){try{return window.LS||localStorage}catch(e){return localStorage}}
+function rj(k,d){try{var v=JSON.parse(st().getItem(k)||"null");return v&&"object"==typeof v?v:d}catch(e){return d}}
+function wj(k,v){try{st().setItem(k,JSON.stringify(v))}catch(e){}}
+function esc(s){return String(null==s?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function nf(n){return Math.round(+n||0).toLocaleString("en-US")}
+function pf(p){try{return"function"==typeof pctFmt?pctFmt(p):Math.round(p)+"%"}catch(e){return Math.round(p)+"%"}}
+function admin(){try{return"function"==typeof isAdmin&&isAdmin()}catch(e){return!1}}
+function ecfg(){var o=rj("expalert_cfg_v1",{}),s=parseInt(o.shelf,10),w=parseInt(o.warn,10);return{shelf:s>0?s:365,warn:w>0?w:31}}
+function asOf(){try{return"function"==typeof agingAsOfMs?agingAsOfMs():Date.now()}catch(e){return Date.now()}}
+function pd(d){try{if("function"==typeof rowProdDate){var x=rowProdDate(d);return x?x.getTime():null}}catch(e){}var t=Date.parse(d&&d.prod_date);return isNaN(t)?null:t}
+function rowsLive(){try{return"function"==typeof filtered?filtered():(window.DATA||[])}catch(e){return window.DATA||[]}}
+function rowsAll(){try{return DATA||[]}catch(e){return window.DATA||[]}}
+function isoD(ms){var d=new Date(ms),p=function(n){return(n<10?"0":"")+n};return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())}
+function nm(d){var c=String(d.item_code||"").trim();try{var M=rj("md_items_v1",{})[c];if(M){var t=[M.Brand,M.Category,M.Size,M.Pack].filter(function(x){return x&&String(x).trim()}).join(" ");if(t)return t}}catch(e){}
+ return[d.cat2,d.size,d.pack].filter(function(x){return x&&String(x).trim()}).join(" ")||c}
+function ib(d){return String(d.item_code||"")+"|"+String(d.branch||"")}
+function bk(d){return ib(d)+"|"+String(d.prod_date||"")+"|"+String(d.identity||"")}
+/* ---------- enrich ---------- */
+function enrich(rows,atMs,c){var out=[];(rows||[]).forEach(function(d){var q=+d.qty||0,p=pd(d),age=null==p?null:Math.floor((atMs-p)/DAY);
+  out.push({d:d,q:q,p:p,age:age,rem:null==age?null:c.shelf-age,ib:ib(d),bk:bk(d)})});return out}
+/* ---------- snapshots ---------- */
+function snaps(){var m={};try{m=window.IVX&&IVX.aging?IVX.aging.map():{}}catch(e){m={}}
+ return Object.keys(m).filter(function(k){return/^\d{4}-\d{2}-\d{2}$/.test(k)&&m[k]&&Array.isArray(m[k].rows)&&m[k].rows.length}).sort().map(function(k){return{date:k,ms:new Date(k+"T00:00:00").getTime(),rows:m[k].rows}})}
+/* معدّل السحب اليومي لكل صنف×فرع: من أقرب لقطة سابقة بـ 7 أيام فأكثر.
+   السحب = نقص كمية الدفعات الموجودة سابقاً (الدفعات الجديدة إنتاج لا تُحسب). */
+function rates(liveRows,liveMs){var S=snaps().filter(function(s){return s.ms<=liveMs-6*DAY});if(!S.length)return{ok:!1};
+ var prev=S[S.length-1],days=Math.max(1,Math.round((liveMs-prev.ms)/DAY)),now={},was={},R={};
+ liveRows.forEach(function(d){now[bk(d)]=(now[bk(d)]||0)+(+d.qty||0)});
+ prev.rows.forEach(function(d){was[bk(d)]=(was[bk(d)]||0)+(+d.qty||0)});
+ Object.keys(was).forEach(function(k){var out=Math.max(0,was[k]-(now[k]||0)),key=k.split("|").slice(0,2).join("|");R[key]=(R[key]||0)+out/days});
+ return{ok:!0,r:R,from:prev.date,days:days}}
+/* محاكاة FIFO: بعد h يوم، ما الكمية المتبقية من كل دفعة؟ */
+function fifo(E,R,h){var g={};E.forEach(function(e){(g[e.ib]=g[e.ib]||[]).push(e)});var res=[];
+ Object.keys(g).forEach(function(k){var a=g[k].slice().sort(function(x,y){return(x.p||0)-(y.p||0)}),cap=(R&&R[k]||0)*h;
+  a.forEach(function(e){var take=Math.min(e.q,cap);cap-=take;res.push({e:e,left:e.q-take})})});return res}
+/* الهدر المتوقع لكل دفعة قريبة: ما لن يُباع قبل انتهاء صلاحيتها (FIFO) */
+function wasteRisk(E,R){var g={};E.forEach(function(e){null!=e.rem&&(g[e.ib]=g[e.ib]||[]).push(e)});var out=[];
+ Object.keys(g).forEach(function(k){var a=g[k].slice().sort(function(x,y){return(x.p||0)-(y.p||0)}),r=R&&R[k]||0,older=0;
+  a.forEach(function(e){if(e.rem<=0){out.push({e:e,rate:r,waste:e.q,clear:Infinity});older+=e.q;return}
+   var sell=Math.max(0,r*e.rem-older),w=Math.max(0,e.q-sell),clear=r>0?(older+e.q)/r:Infinity;older+=e.q;
+   e.rem<=180&&w>0&&out.push({e:e,rate:r,waste:w,clear:clear})})});
+ return out.sort(function(x,y){return y.waste-x.waste})}
+/* ---------- data quality ---------- */
+function quality(rows,atMs,c){var I=[],seen={},known=null;try{var M=rj("md_items_v1",{});known=Object.keys(M).length?M:null}catch(e){}
+ var BR={};try{(BRANCH_ORDER||[]).forEach(function(b){BR[b]=1})}catch(e){}
+ function add(t,sev,d,why){I.push({t:t,sev:sev,d:d,why:why})}
+ rows.forEach(function(d){var q=+d.qty,p=pd(d),k=bk(d);
+  if(!d.prod_date)add("nodate","r",d,L("بدون تاريخ إنتاج","No production date"));
+  else if(null==p)add("baddate","r",d,L("تاريخ إنتاج غير مقروء: ","Unreadable date: ")+d.prod_date);
+  else if(p>atMs+DAY)add("future","r",d,L("تاريخ إنتاج في المستقبل","Production date in the future"));
+  else if((atMs-p)/DAY>c.shelf*1.5)add("old","a",d,L("عمر غير منطقي (","Implausible age (")+Math.floor((atMs-p)/DAY)+L(" يوم)","d)"));
+  if(isNaN(q))add("nanq","r",d,L("كمية غير رقمية","Non-numeric qty"));else if(q<0)add("negq","r",d,L("كمية سالبة","Negative qty"));else if(0===q)add("zeroq","a",d,L("كمية صفر","Zero qty"));
+  if(!String(d.item_code||"").trim())add("nocode","r",d,L("بدون كود صنف","No item code"));
+  else if(known&&!known[String(d.item_code).trim()])add("nomd","a",d,L("الكود غير موجود في Master Data","Code not in Master Data"));
+  if(!d.branch)add("nobr","r",d,L("بدون فرع","No branch"));else if(Object.keys(BR).length&&!BR[d.branch])add("unkbr","a",d,L("فرع غير معروف: ","Unknown branch: ")+d.branch);
+  if(seen[k])add("dup","a",d,L("سطر مكرر (نفس الصنف/الفرع/الهوية/التاريخ)","Duplicate line (same item/branch/identity/date)"));seen[k]=1;
+  null!=p&&(atMs-p)/DAY>=c.shelf&&add("exp","r",d,L("منتهي الصلاحية وما زال في الرصيد","Expired but still in stock"))});
+ return I}
+/* ---------- state ---------- */
+var S=rj(KS,{open:!0,tab:"ins"}),CHAT=[],BUSY=!1;
+function save(){wj(KS,S)}
+function host(){var p=document.getElementById("page-dash");if(!p)return null;var el=document.getElementById("aix");
+ if(!el){el=document.createElement("div");el.id="aix";var ck=document.getElementById("custom-kpis"),k=p.querySelector(".kpis:not(.custom-kpis)"),a=ck||k;
+  a&&a.parentNode?a.parentNode.insertBefore(el,a.nextSibling):(p.querySelector(".wrap")||p).appendChild(el)}return el}
+/* ---------- compute all ---------- */
+function compute(){var c=ecfg(),at=asOf(),live=rowsLive(),E=enrich(live,at,c),Rt=rates(rowsAll(),at),R=Rt.ok?Rt.r:null,tot=0,wAge=0,qAge=0;
+ E.forEach(function(e){tot+=e.q;null!=e.age&&(wAge+=e.age*e.q,qAge+=e.q)});
+ return{c:c,at:at,E:E,Rt:Rt,R:R,tot:tot,avgAge:qAge?wAge/qAge:0,Q:quality(live,at,c)}}
+function sumBy(E,f,pred){var m={};E.forEach(function(e){if(pred&&!pred(e))return;var k=f(e);m[k]=(m[k]||0)+e.q});return m}
+function top(m,n){return Object.keys(m).sort(function(a,b){return m[b]-m[a]}).slice(0,n||3)}
+/* ---------- 1) insights ---------- */
+function insights(X){var c=X.c,E=X.E,I=[],tot=X.tot||1;
+ var aged=E.filter(function(e){return null!=e.age&&e.age>90}),agedQ=aged.reduce(function(s,e){return s+e.q},0);
+ var near=E.filter(function(e){return null!=e.rem&&e.rem<=c.warn}),nearQ=near.reduce(function(s,e){return s+e.q},0);
+ var soon30=E.filter(function(e){return null!=e.rem&&e.rem>c.warn&&e.rem<=c.warn+30}),soonQ=soon30.reduce(function(s,e){return s+e.q},0);
+ var expd=E.filter(function(e){return null!=e.rem&&e.rem<=0}),expQ=expd.reduce(function(s,e){return s+e.q},0);
+ expQ>0&&I.push({s:"crit",ic:"⛔",t:L("يوجد <b>"+nf(expQ)+"</b> منتهي الصلاحية في الرصيد ("+expd.length+" سطر).","<b>"+nf(expQ)+"</b> expired units still on hand ("+expd.length+" lines)."),a:L("الإجراء: إيقاف البيع والتسوية/الإتلاف حسب السياسة.","Action: block sales and write off per policy.")});
+ nearQ>0&&I.push({s:"warn",ic:"⏳",t:L("<b>"+nf(nearQ)+"</b> ضمن حد التنبيه ("+c.warn+" يوم) — "+pf(nearQ/tot*100)+" من المخزون.","<b>"+nf(nearQ)+"</b> within the "+c.warn+"-day alert — "+pf(nearQ/tot*100)+" of stock.")});
+ soonQ>0&&I.push({s:"info",ic:"📅",t:L("خلال 30 يوماً سيدخل <b>"+nf(soonQ)+"</b> إضافية في التنبيه.","In the next 30 days <b>"+nf(soonQ)+"</b> more will enter the alert."),a:L("أكبرها: ","Largest: ")+top(sumBy(soon30,function(e){return nm(e.d)+" · "+e.d.branch}),3).map(esc).join("، ")});
+ if(agedQ>0){var byB=sumBy(aged,function(e){return e.d.branch||"—"}),tb=top(byB,1)[0],sh=byB[tb]/agedQ*100;
+  I.push({s:agedQ/tot>.15?"warn":"info",ic:"🧓",t:L("المخزون الأقدم من 90 يوماً: <b>"+nf(agedQ)+"</b> ("+pf(agedQ/tot*100)+")، ويتركّز "+pf(sh)+" منه في <b>"+esc(tb)+"</b>.","Stock older than 90 days: <b>"+nf(agedQ)+"</b> ("+pf(agedQ/tot*100)+"); "+pf(sh)+" of it sits in <b>"+esc(tb)+"</b>."),
+   a:sh>=40?L("التركّز مرتفع — راجع خطة التوزيع/التحويل لهذا الفرع.","High concentration — review distribution/transfers for this branch."):""})}
+ /* أعلى متوسط عمر حسب الفرع */
+ var wb={},qb={};E.forEach(function(e){if(null==e.age)return;var b=e.d.branch||"—";wb[b]=(wb[b]||0)+e.age*e.q;qb[b]=(qb[b]||0)+e.q});
+ var ba=Object.keys(qb).filter(function(b){return qb[b]>0}).map(function(b){return{b:b,a:wb[b]/qb[b]}}).sort(function(x,y){return y.a-x.a});
+ ba.length>1&&I.push({s:"info",ic:"🏬",t:L("متوسط عمر المخزون (مرجّح بالكمية) <b>"+Math.round(X.avgAge)+" يوم</b>. الأعلى: <b>"+esc(ba[0].b)+"</b> ("+Math.round(ba[0].a)+" يوم)، والأقل: "+esc(ba[ba.length-1].b)+" ("+Math.round(ba[ba.length-1].a)+" يوم).","Weighted average age <b>"+Math.round(X.avgAge)+"d</b>. Highest: <b>"+esc(ba[0].b)+"</b> ("+Math.round(ba[0].a)+"d), lowest: "+esc(ba[ba.length-1].b)+" ("+Math.round(ba[ba.length-1].a)+"d).")});
+ /* مخاطر الهدر + توصيات التحويل */
+ var W=[],TR=[];
+ if(X.R){W=wasteRisk(E,X.R);var wq=W.reduce(function(s,w){return s+w.waste},0);
+  wq>0?I.push({s:"crit",ic:"🗑️",t:L("بمعدّل السحب الحالي، يُتوقّع ألا يُباع <b>"+nf(wq)+"</b> قبل انتهاء صلاحيته ("+W.length+" دفعة).","At the current draw rate, <b>"+nf(wq)+"</b> is expected not to sell before expiry ("+W.length+" batches)."),a:L("راجع جدول المخاطر أدناه: عروض بيع، تحويل لفرع أسرع سحباً، أو أولوية صرف.","See the risk table below: promotions, transfer to a faster branch, or dispatch priority.")})
+     :I.push({s:"good",ic:"✅",t:L("بمعدّل السحب الحالي، كل الدفعات القريبة تُصرَّف قبل انتهاء صلاحيتها.","At the current draw rate, all near-expiry batches clear before they expire.")});
+  /* تحويل: نفس الصنف في فرع آخر يسحب أسرع ومخزونه يكفي أياماً أقل من المتبقي */
+  var stockIB=sumBy(E,function(e){return e.ib});
+  W.slice(0,40).forEach(function(w){var code=String(w.e.d.item_code||""),best=null;
+   Object.keys(X.R).forEach(function(k){var p=k.split("|");if(p[0]!==code||p[1]===String(w.e.d.branch))return;var r=X.R[k];if(!(r>0))return;
+    var cover=(stockIB[k]||0)/r,room=r*Math.max(0,w.e.rem-7)-(stockIB[k]||0);room>0&&(!best||room>best.room)&&(best={b:p[1],r:r,room:room,cover:cover})});
+   best&&TR.push({w:w,to:best.b,qty:Math.min(w.waste,best.room),rate:best.r,cover:best.cover})});
+  TR.length&&I.push({s:"good",ic:"🔁",t:L("يمكن تفادي جزء من الهدر بتحويل <b>"+nf(TR.reduce(function(s,t){return s+t.qty},0))+"</b> إلى فروع تسحب نفس الصنف أسرع ("+TR.length+" اقتراح).","Part of the waste can be avoided by transferring <b>"+nf(TR.reduce(function(s,t){return s+t.qty},0))+"</b> to branches selling the same item faster ("+TR.length+" suggestions).")});
+  /* بطيء الحركة */
+  var slow=Object.keys(stockIB).filter(function(k){return stockIB[k]>0&&!(X.R[k]>0)}).map(function(k){var a=0,q=0;E.forEach(function(e){e.ib===k&&null!=e.age&&(a+=e.age*e.q,q+=e.q)});return{k:k,q:stockIB[k],age:q?a/q:0}}).filter(function(x){return x.age>60}).sort(function(x,y){return y.q-x.q});
+  slow.length&&I.push({s:"warn",ic:"🐢",t:L("<b>"+slow.length+"</b> صنف×فرع بلا أي سحب منذ "+X.Rt.from+" وعمرها فوق 60 يوماً (إجمالي "+nf(slow.reduce(function(s,x){return s+x.q},0))+").","<b>"+slow.length+"</b> item×branch with no draw since "+X.Rt.from+" and older than 60 days (total "+nf(slow.reduce(function(s,x){return s+x.q},0))+")."),a:L("أكبرها: ","Largest: ")+slow.slice(0,3).map(function(x){var p=x.k.split("|");return esc(p[0]+" · "+p[1])}).join("، ")})}
+ else I.push({s:"info",ic:"ℹ️",t:L("لحساب معدّل السحب والهدر المتوقع والتحويلات نحتاج لقطة أعمار سابقة بأسبوع على الأقل (اللقطات الأسبوعية تكفي).","Draw rate, expected waste and transfers need an aging snapshot at least a week older (the weekly snapshots are enough).")});
+ X.Q.length&&I.push({s:"warn",ic:"🧹",t:L("جودة البيانات: <b>"+X.Q.length+"</b> ملاحظة في الملف الحالي — راجع تبويب «جودة البيانات».","Data quality: <b>"+X.Q.length+"</b> issues in the current file — see the “Data quality” tab.")});
+ return{I:I,W:W,TR:TR,nearQ:nearQ,agedQ:agedQ,soonQ:soonQ}}
+function vInsights(X){var r=insights(X),h='<div class="ax-kpis">'+
+  kp(L("متوسط العمر (مرجّح)","Weighted avg age"),Math.round(X.avgAge)+L(" يوم","d"),L("حتى ","As of ")+isoD(X.at))+
+  kp(L("أقدم من 90 يوماً","Older than 90d"),nf(r.agedQ),pf(r.agedQ/(X.tot||1)*100))+
+  kp(L("ضمن حد التنبيه","Within alert"),nf(r.nearQ),L("الحد ","Threshold ")+X.c.warn+L(" يوم","d"))+
+  kp(L("يدخل التنبيه خلال 30 يوماً","Entering alert in 30d"),nf(r.soonQ),"")+
+  (X.R?kp(L("هدر متوقع","Expected waste"),nf(r.W.reduce(function(s,w){return s+w.waste},0)),L("سحب منذ ","Draw since ")+X.Rt.from):"")+"</div>";
+ h+='<div class="ax-list">'+r.I.map(function(i){return'<div class="ax-i '+i.s+'"><span class="ic">'+i.ic+'</span><div class="tx">'+i.t+(i.a?'<span class="act">'+i.a+"</span>":"")+"</div></div>"}).join("")+"</div>";
+ if(r.W.length){h+="<h4>🗑️ "+L("دفعات معرّضة للهدر (FIFO بمعدّل السحب الفعلي)","Batches at risk of waste (FIFO at actual draw rate)")+'</h4><div class="ax-tw"><table><thead><tr><th>'+[L("الصنف","Item"),L("الفرع","Branch"),L("الهوية","Identity"),L("الكمية","Qty"),L("المتبقي","Left"),L("السحب/يوم","Draw/day"),L("يُصرَّف خلال","Clears in"),L("هدر متوقع","Exp. waste")].join("</th><th>")+"</th></tr></thead><tbody>"+
+  r.W.slice(0,60).map(function(w){var e=w.e;return"<tr><td>"+esc(e.d.item_code)+" · "+esc(nm(e.d))+"</td><td>"+esc(e.d.branch)+"</td><td>"+esc(e.d.identity)+'</td><td class="n">'+nf(e.q)+'</td><td class="n">'+Math.round(e.rem)+'</td><td class="n">'+(w.rate>0?w.rate.toFixed(1):"0")+'</td><td class="n">'+(isFinite(w.clear)?Math.round(w.clear)+L(" يوم","d"):"∞")+'</td><td class="n"><span class="pill r">'+nf(w.waste)+"</span></td></tr>"}).join("")+"</tbody></table></div>"}
+ if(r.TR.length){h+="<h4>🔁 "+L("اقتراحات تحويل بين الفروع","Inter-branch transfer suggestions")+'</h4><div class="ax-tw"><table><thead><tr><th>'+[L("الصنف","Item"),L("من","From"),L("إلى","To"),L("كمية مقترحة","Suggested qty"),L("سحب الفرع المستلم/يوم","Receiver draw/day"),L("تغطية المستلم الحالية","Receiver cover")].join("</th><th>")+"</th></tr></thead><tbody>"+
+  r.TR.slice(0,30).map(function(t){var e=t.w.e;return"<tr><td>"+esc(e.d.item_code)+" · "+esc(nm(e.d))+"</td><td>"+esc(e.d.branch)+"</td><td><b>"+esc(t.to)+'</b></td><td class="n"><span class="pill g">'+nf(t.qty)+'</span></td><td class="n">'+t.rate.toFixed(1)+'</td><td class="n">'+Math.round(t.cover)+L(" يوم","d")+"</td></tr>"}).join("")+"</tbody></table></div>"}
+ h+='<div class="ax-note">'+L("طريقة الحساب: العمر = تاريخ التقرير − تاريخ الإنتاج · المتبقي = مدة الصلاحية ("+X.c.shelf+") − العمر · السحب اليومي = نقص كمية الدفعات نفسها بين آخر لقطة أسبوعية والبيانات الحالية ÷ عدد الأيام · الصرف يفترض FIFO (الأقدم أولاً). الرؤى تتبع فلاتر الداشبورد.",
+  "Method: age = report date − production date · left = shelf life ("+X.c.shelf+") − age · daily draw = decrease of the same batches between the last weekly snapshot and current data ÷ days · dispatch assumes FIFO. Insights follow the dashboard filters.")+"</div>";
+ return h}
+function kp(l,v,s){return'<div class="ax-k"><div class="l">'+l+'</div><div class="v">'+v+"</div>"+(s?'<div class="s">'+s+"</div>":"")+"</div>"}
+/* ---------- 2) forecast ---------- */
+function spark(id,pts,color,fmt){if(!pts.length)return'<div class="ax-ch"><div class="t">—</div></div>';
+ var W=300,H=100,P=6,mn=Math.min.apply(null,pts.map(function(p){return p.v})),mx=Math.max.apply(null,pts.map(function(p){return p.v}));mx===mn&&(mx=mn+1,mn=Math.max(0,mn-1));
+ var x=function(i){return pts.length<2?W/2:P+i*(W-2*P)/(pts.length-1)},y=function(v){return H-P-(v-mn)/(mx-mn)*(H-2*P)};
+ var d=pts.map(function(p,i){return(i?"L":"M")+x(i).toFixed(1)+" "+y(p.v).toFixed(1)}).join(" "),last=pts[pts.length-1];
+ var dots=pts.map(function(p,i){return'<circle cx="'+x(i).toFixed(1)+'" cy="'+y(p.v).toFixed(1)+'" r="9" fill="transparent" data-t="'+esc(p.l+" · "+fmt(p.v))+'"></circle>'}).join("");
+ return'<svg viewBox="0 0 '+W+" "+H+'" preserveAspectRatio="none" onmousemove="AIX._tip(event,\''+id+'\')"><line x1="0" x2="'+W+'" y1="'+(H-P)+'" y2="'+(H-P)+'" stroke="#e2e8f0" stroke-width="1"/><path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/><circle cx="'+x(pts.length-1).toFixed(1)+'" cy="'+y(last.v).toFixed(1)+'" r="4" fill="'+color+'" stroke="#fff" stroke-width="2"/>'+dots+'</svg><div class="tip" id="'+id+'">'+esc(last.l+" · "+fmt(last.v))+"</div>"}
+function vForecast(X){var c=X.c,h="",S0=snaps(),live=rowsAll();
+ /* تاريخي من اللقطات + النقطة الحية */
+ var hist=S0.map(function(s){var E=enrich(s.rows,s.ms,c),t=0,n=0,a=0,aq=0;E.forEach(function(e){t+=e.q;null!=e.rem&&e.rem<=c.warn&&(n+=e.q);null!=e.age&&(a+=e.age*e.q,aq+=e.q)});return{l:s.date,t:t,n:n,a:aq?a/aq:0}});
+ var liveD=isoD(X.at);if(!hist.length||hist[hist.length-1].l!==liveD){var E2=enrich(live,X.at,c),t=0,n=0,a=0,aq=0;E2.forEach(function(e){t+=e.q;null!=e.rem&&e.rem<=c.warn&&(n+=e.q);null!=e.age&&(a+=e.age*e.q,aq+=e.q)});hist.push({l:liveD+L(" (حالي)"," (live)"),t:t,n:n,a:aq?a/aq:0})}
+ hist=hist.slice(-16);
+ h+="<h4>📈 "+L("اتجاه آخر ","Trend of the last ")+hist.length+L(" لقطة (أسبوعية)"," snapshots (weekly)")+'</h4><div class="ax-sm">'+
+  '<div class="ax-ch"><div class="t">'+L("إجمالي الكمية","Total quantity")+"</div>"+spark("axt1",hist.map(function(p){return{l:p.l,v:p.t}}),"#1e4e8c",nf)+"</div>"+
+  '<div class="ax-ch"><div class="t">'+L("ضمن حد التنبيه","Within alert")+"</div>"+spark("axt2",hist.map(function(p){return{l:p.l,v:p.n}}),"#b91c1c",nf)+"</div>"+
+  '<div class="ax-ch"><div class="t">'+L("متوسط العمر (يوم)","Avg age (days)")+"</div>"+spark("axt3",hist.map(function(p){return{l:p.l,v:p.a}}),"#0f766e",function(v){return Math.round(v)+L(" يوم","d")})+"</div></div>";
+ /* إسقاط مستقبلي */
+ var HZ=[7,14,30,60,90],rowsH=HZ.map(function(hz){var nn=0,ne=0,sn=0,se=0;
+   X.E.forEach(function(e){if(null==e.rem)return;var r=e.rem-hz;r<=c.warn&&r>0&&(nn+=e.q);r<=0&&(ne+=e.q)});
+   if(X.R)fifo(X.E,X.R,hz).forEach(function(o){var e=o.e;if(null==e.rem||!(o.left>0))return;var r=e.rem-hz;r<=c.warn&&r>0&&(sn+=o.left);r<=0&&(se+=o.left)});
+   return{hz:hz,nn:nn,ne:ne,sn:sn,se:se}});
+ h+="<h4>🔮 "+L("توقّع الكميات القريبة والمنتهية","Projected near-expiry and expired quantities")+'</h4><div class="ax-tw"><table><thead><tr><th>'+L("بعد","After")+"</th><th>"+L("ضمن التنبيه — بدون مبيعات","Within alert — no sales")+"</th><th>"+L("منتهي — بدون مبيعات","Expired — no sales")+"</th>"+(X.R?"<th>"+L("ضمن التنبيه — بمعدّل السحب","Within alert — at draw rate")+"</th><th>"+L("منتهي متوقّع (هدر)","Expected expired (waste)")+"</th>":"")+"</tr></thead><tbody>"+
+  rowsH.map(function(r){return"<tr><td><b>"+r.hz+L(" يوم","d")+'</b></td><td class="n">'+nf(r.nn)+'</td><td class="n">'+nf(r.ne)+"</td>"+(X.R?'<td class="n">'+nf(r.sn)+'</td><td class="n"><span class="pill '+(r.se>0?"r":"g")+'">'+nf(r.se)+"</span></td>":"")+"</tr>"}).join("")+"</tbody></table></div>";
+ h+='<div class="ax-note">'+L("«بدون مبيعات» أسوأ حالة: كل الأصناف تتقدّم في العمر دون صرف. «بمعدّل السحب» يصرف من كل صنف×فرع بمعدّله الفعلي منذ "+(X.Rt.ok?X.Rt.from:"—")+" بنظام FIFO، فيبقى ما لم يُصرف. اللقطات أسبوعية، فالتوقّع يتحسّن مع تراكمها.",
+  "“No sales” is the worst case: everything ages without dispatch. “At draw rate” dispatches each item×branch at its actual rate since "+(X.Rt.ok?X.Rt.from:"—")+" (FIFO). Snapshots are weekly, so the forecast improves as they accumulate.")+"</div>";
+ return h}
+/* ---------- 3) quality ---------- */
+function vQuality(X){var Q=X.Q;if(!Q.length)return'<div class="ax-i good"><span class="ic">✅</span><div class="tx">'+L("لم تُرصد مشاكل في بيانات الأعمار الحالية.","No issues found in the current aging data.")+"</div></div>";
+ var g={};Q.forEach(function(i){(g[i.t]=g[i.t]||{n:0,q:0,sev:i.sev,why:i.why.replace(/:.*$/,"")}).n++;g[i.t].q+=+i.d.qty||0});
+ var h='<div class="ax-list">'+Object.keys(g).sort(function(a,b){return g[b].n-g[a].n}).map(function(k){var o=g[k];return'<div class="ax-i '+("r"===o.sev?"crit":"warn")+'"><span class="ic">'+("r"===o.sev?"🔴":"🟠")+'</span><div class="tx"><b>'+esc(o.why)+"</b> — "+o.n+L(" سطر · كمية "," lines · qty ")+nf(o.q)+"</div></div>"}).join("")+"</div>";
+ h+='<div class="ax-tw"><table><thead><tr><th>'+[L("الملاحظة","Issue"),L("كود","Code"),L("الصنف","Item"),L("الفرع","Branch"),L("الهوية","Identity"),L("تاريخ الإنتاج","Prod. date"),L("الكمية","Qty")].join("</th><th>")+"</th></tr></thead><tbody>"+
+  Q.slice(0,300).map(function(i){var d=i.d;return'<tr><td><span class="pill '+("r"===i.sev?"r":"a")+'">'+esc(i.why)+"</span></td><td>"+esc(d.item_code)+"</td><td>"+esc(nm(d))+"</td><td>"+esc(d.branch)+"</td><td>"+esc(d.identity)+"</td><td>"+esc(d.prod_date)+'</td><td class="n">'+esc(d.qty)+"</td></tr>"}).join("")+"</tbody></table></div>";
+ h+='<div class="ax-note">'+L("الفحص على البيانات الحالية بعد الفلاتر. صحّح المصدر (SAP/Excel) ثم أعد الرفع. «الكود غير موجود في Master Data» يعني أن الاسم والحجم يُستنتجان من الملف فقط.","Checks run on current filtered data. Fix the source (SAP/Excel) and re-upload. “Code not in Master Data” means names/sizes come from the file only.")+"</div>";
+ return h}
+/* ---------- 4) ask ---------- */
+var AR_BR={"الرياض":"riyadh","الخرج":"kharj","خرج":"kharj","هيت":"heet","الهيت":"heet","جدة":"jeddah","جده":"jeddah","الدمام":"dammam","دمام":"dammam","القصيم":"qassim","قصيم":"qassim","الأحساء":"ahsa","الاحساء":"ahsa","احساء":"ahsa"};
+var AR_ID={"ماي":"mai","مكعبات":"mokabat","موكابات":"mokabat","سباركلنج":"sparkling","تي جي":"tg","الهوية الجديدة":"new identity","الجديدة":"new identity","القديمة":"old identity","الهوية القديمة":"old identity","سار":"sar"};
+function norm(s){return String(s||"").toLowerCase().replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-1632}).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه")}
+function parseQ(q){var t=norm(q),o={br:[],id:[],sz:null,age:null,rem:null,exp:!1,near:!1,group:null,top:!1};
+ var all=rowsAll(),brs={},ids={};all.forEach(function(d){d.branch&&(brs[d.branch]=1);d.identity&&(ids[d.identity]=1)});
+ Object.keys(brs).forEach(function(b){var core=norm(b).replace(/^\d+[.\-\s]+/,"").replace(/\(.*\)/,"").trim();(core&&t.indexOf(core)>=0)&&o.br.push(b)});
+ Object.keys(AR_BR).forEach(function(a){t.indexOf(norm(a))>=0&&Object.keys(brs).forEach(function(b){norm(b).indexOf(AR_BR[a])>=0&&o.br.indexOf(b)<0&&o.br.push(b)})});
+ Object.keys(ids).forEach(function(b){var core=norm(b).replace(/^\d+[.\-\s]+/,"").trim();(core&&t.indexOf(core)>=0)&&o.id.push(b)});
+ Object.keys(AR_ID).forEach(function(a){t.indexOf(norm(a))>=0&&Object.keys(ids).forEach(function(b){norm(b).indexOf(AR_ID[a])>=0&&o.id.indexOf(b)<0&&o.id.push(b)})});
+ var sm=t.match(/(\d{2,4})\s*(ml|مل|ملي)/);sm&&(o.sz=sm[1]);var gm=t.match(/(\d+(?:\.\d+)?)\s*(l|لتر)\b/);gm&&!o.sz&&(o.sz=String(Math.round(parseFloat(gm[1])*1e3)));
+ var isRem=/متبق|باقي|left|remain|ينتهي|انتهاء/.test(t),num=function(re){var m=t.match(re);return m?+m[1]:null};
+ var gt=num(/(?:اكبر من|اكثر من|فوق|اعلى من|over|more than|older than|>\s*)\s*(\d+)/),lt=num(/(?:اقل من|تحت|دون|under|less than|within|خلال|<\s*)\s*(\d+)/),bt=t.match(/بين\s*(\d+)\s*و\s*(\d+)|between\s*(\d+)\s*and\s*(\d+)/);
+ var rng=bt?[+(bt[1]||bt[3]),+(bt[2]||bt[4])]:null,cond={gt:gt,lt:lt,rng:rng};(null!=gt||null!=lt||rng)&&(isRem?o.rem=cond:o.age=cond);
+ /منته|expired/.test(t)&&!/قريب|اوشك/.test(t)&&(o.exp=!0);/قريب|اوشك|near/.test(t)&&(o.near=!0);
+ /حسب الفرع|لكل فرع|by branch|الفروع/.test(t)?o.group="branch":/حسب الهويه|لكل هويه|by identity|الهويات/.test(t)?o.group="identity":/حسب الحجم|by size|الاحجام/.test(t)?o.group="size":/حسب الصنف|لكل صنف|by item|الاصناف/.test(t)&&(o.group="item");
+ /اعلى|اكثر\s|اكبر\s(?!من)|top|اهم/.test(t)&&!o.group&&(o.top=!0,o.group="item");return o}
+function okc(c,v){if(!c||null==v)return!c;return(null==c.gt||v>c.gt)&&(null==c.lt||v<c.lt)&&(!c.rng||v>=Math.min(c.rng[0],c.rng[1])&&v<=Math.max(c.rng[0],c.rng[1]))}
+function localAnswer(q){var X=compute(),o=parseQ(q),c=X.c;
+ var E=enrich(rowsAll(),X.at,c).filter(function(e){var d=e.d;
+  if(o.br.length&&o.br.indexOf(d.branch)<0)return!1;if(o.id.length&&o.id.indexOf(d.identity)<0)return!1;
+  if(o.sz&&String(d.size||"").replace(/\D/g,"").indexOf(o.sz)<0&&nm(d).replace(/\D/g," ").split(/\s+/).indexOf(o.sz)<0)return!1;
+  if(o.age&&!okc(o.age,e.age))return!1;if(o.rem&&!okc(o.rem,e.rem))return!1;if(o.exp&&!(null!=e.rem&&e.rem<=0))return!1;if(o.near&&!(null!=e.rem&&e.rem<=c.warn))return!1;return!0});
+ var fb="";if(!E.length&&o.near){/* لا شيء ضمن الحد: نعرض الأقرب للانتهاء بدل الصفر */
+  var all=enrich(rowsAll(),X.at,c).filter(function(e){return null!=e.rem&&(!o.br.length||o.br.indexOf(e.d.branch)>=0)&&(!o.id.length||o.id.indexOf(e.d.identity)>=0)}).sort(function(x,y){return x.rem-y.rem}).slice(0,8);
+  fb='<div style="margin-top:6px">'+L("لا أصناف ضمن حد التنبيه ("+c.warn+" يوم). الأقرب للانتهاء:","Nothing within the "+c.warn+"-day alert. Nearest to expiry:")+'</div><table><thead><tr><th>'+L("الصنف","Item")+"</th><th>"+L("الفرع","Branch")+"</th><th>"+L("المتبقي","Left")+"</th><th>"+L("الكمية","Qty")+"</th></tr></thead><tbody>"+all.map(function(e){return"<tr><td>"+esc(e.d.item_code)+" · "+esc(nm(e.d))+"</td><td>"+esc(e.d.branch)+'</td><td class="n">'+Math.round(e.rem)+L(" يوم","d")+'</td><td class="n">'+nf(e.q)+"</td></tr>"}).join("")+"</tbody></table>"}
+ if((o.near||o.exp||o.rem)&&"item"===o.group&&E.length){var rows2=E.slice().sort(function(x,y){return x.rem-y.rem}).slice(0,10);
+  fb='<table><thead><tr><th>'+L("الصنف","Item")+"</th><th>"+L("الفرع","Branch")+"</th><th>"+L("المتبقي","Left")+"</th><th>"+L("الكمية","Qty")+"</th></tr></thead><tbody>"+rows2.map(function(e){return"<tr><td>"+esc(e.d.item_code)+" · "+esc(nm(e.d))+"</td><td>"+esc(e.d.branch)+'</td><td class="n">'+Math.round(e.rem)+L(" يوم","d")+'</td><td class="n">'+nf(e.q)+"</td></tr>"}).join("")+"</tbody></table>";o.group=null}
+ var q0=E.reduce(function(s,e){return s+e.q},0),a=0,aq=0;E.forEach(function(e){null!=e.age&&(a+=e.age*e.q,aq+=e.q)});
+ var f=[];o.br.length&&f.push(o.br.join("، "));o.id.length&&f.push(o.id.join("، "));o.sz&&f.push(o.sz+"ml");
+ var cd=function(c,w){if(!c)return;c.rng?f.push(w+" "+L("بين ","between ")+c.rng[0]+"–"+c.rng[1]):(null!=c.gt&&f.push(w+" > "+c.gt),null!=c.lt&&f.push(w+" < "+c.lt))};cd(o.age,L("العمر","age"));cd(o.rem,L("المتبقي","left"));
+ o.exp&&f.push(L("منتهي","expired"));o.near&&f.push(L("ضمن التنبيه ","within alert ")+c.warn);
+ var txt=L("الكمية: ","Quantity: ")+nf(q0)+" · "+E.length+L(" سطر"," lines")+(aq?" · "+L("متوسط العمر ","avg age ")+Math.round(a/aq)+L(" يوم","d"):"")+(f.length?"\n"+L("الشروط: ","Filters: ")+f.join(" · "):"\n"+L("(كل البيانات — لم أتعرّف على شروط في السؤال)","(all data — no filters recognised)"));
+ var tbl="";if(o.group&&E.length){var gf={branch:function(e){return e.d.branch||"—"},identity:function(e){return e.d.identity||"—"},size:function(e){return e.d.size||"—"},item:function(e){return(e.d.item_code||"")+" · "+nm(e.d)}}[o.group],m=sumBy(E,gf),ks=top(m,o.top?5:15);
+  tbl='<table><thead><tr><th>'+esc({branch:L("الفرع","Branch"),identity:L("الهوية","Identity"),size:L("الحجم","Size"),item:L("الصنف","Item")}[o.group])+"</th><th>"+L("الكمية","Qty")+"</th><th>%</th></tr></thead><tbody>"+ks.map(function(k){return"<tr><td>"+esc(k)+'</td><td class="n">'+nf(m[k])+'</td><td class="n">'+pf(m[k]/(q0||1)*100)+"</td></tr>"}).join("")+"</tbody></table>"}
+ return{txt:txt,tbl:tbl+fb,E:E,X:X}}
+function aiCfg(){var o=rj(KAI,{});return{key:o.key||"",model:o.model||"claude-sonnet-4-5"}}
+function digest(X){var c=X.c,E=X.E,by={};E.forEach(function(e){var k=[e.d.branch,e.d.identity,null==e.age?"?":e.age<=30?"0-30":e.age<=60?"31-60":e.age<=90?"61-90":e.age<=180?"91-180":e.age<=240?"181-240":"240+"].join("|");by[k]=(by[k]||0)+e.q});
+ var r=insights(X);return JSON.stringify({as_of:isoD(X.at),shelf_life_days:c.shelf,alert_threshold_days:c.warn,total_qty:Math.round(X.tot),weighted_avg_age:Math.round(X.avgAge),
+  qty_by_branch_identity_ageband:by,near_expiry_items:E.filter(function(e){return null!=e.rem&&e.rem<=c.warn+60}).slice(0,120).map(function(e){return{code:e.d.item_code,item:nm(e.d),branch:e.d.branch,identity:e.d.identity,qty:e.q,age:e.age,days_left:e.rem}}),
+  waste_risk:r.W.slice(0,40).map(function(w){return{code:w.e.d.item_code,branch:w.e.d.branch,qty:w.e.q,days_left:w.e.rem,draw_per_day:+w.rate.toFixed(2),expected_waste:Math.round(w.waste)}}),
+  transfers:r.TR.slice(0,20).map(function(t){return{code:t.w.e.d.item_code,from:t.w.e.d.branch,to:t.to,qty:Math.round(t.qty)}}),
+  draw_rate_since:X.Rt.ok?X.Rt.from:null,data_quality_issues:X.Q.length})}
+function askClaude(q,loc,cb){var A=aiCfg();if(!A.key)return cb(null);
+ var sys="You are an inventory-aging analyst for a bottled-water company dashboard. Answer in "+(ar()?"Arabic":"English")+", concisely, with concrete numbers from the JSON only. If data is insufficient, say so. Use short bullet points and end with 1-3 actionable recommendations.";
+ var body={model:A.model,max_tokens:900,system:sys,messages:[{role:"user",content:"DATA (aggregated, JSON):\n"+digest(loc.X)+"\n\nLOCAL ENGINE RESULT:\n"+loc.txt+"\n\nQUESTION:\n"+q}]};
+ fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":A.key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify(body)})
+  .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(o){if(!o.ok)return cb(null,(o.j&&o.j.error&&o.j.error.message)||"API error");
+   cb((o.j.content||[]).filter(function(b){return"text"===b.type}).map(function(b){return b.text}).join("\n"))}).catch(function(e){cb(null,e&&e.message||"network")})}
+function vAsk(){var A=aiCfg(),sug=ar()?["كم المخزون الأكبر من 90 يوم حسب الفرع؟","كم مخزون ماي في الرياض؟","أعلى الأصناف القريبة من الانتهاء","الكمية المتبقي لها أقل من 120 يوم حسب الهوية","كم المنتهي الصلاحية؟"]:["Stock older than 90 days by branch?","Mai stock in Riyadh?","Top near-expiry items","Qty with less than 120 days left by identity","How much is expired?"];
+ var h='<div class="ax-chat" id="aix-chat">'+(CHAT.length?CHAT.map(function(m){return'<div class="ax-m '+m.r+'">'+m.h+"</div>"}).join(""):'<div class="ax-m a">'+L("اسألني عن بيانات الأعمار بالعربي أو الإنجليزي — الفرع، الهوية، الحجم، العمر، المتبقي، المنتهي، «حسب الفرع/الهوية/الحجم/الصنف».","Ask about the aging data — branch, identity, size, age, days left, expired, “by branch/identity/size/item”.")+"\n"+(A.key?"🤖 "+L("التحليل الموسّع عبر Claude مفعّل.","Extended analysis via Claude is on."):"⚙️ "+L("الوضع المحلي (بدون إنترنت). يمكن للمدير تفعيل تحليل Claude من الإعدادات أدناه.","Local mode (offline). An admin can enable Claude analysis below."))+"</div>")+"</div>";
+ h+='<div class="ax-in"><input id="aix-q" placeholder="'+esc(L("اكتب سؤالك…","Type your question…"))+'" onkeydown="event.key===\'Enter\'&&AIX.ask()"><button class="ax-b pri" onclick="AIX.ask()">'+(BUSY?"…":L("إرسال","Send"))+'</button>'+(CHAT.length?'<button class="ax-b" onclick="AIX.clearChat()">'+L("مسح","Clear")+"</button>":"")+"</div>";
+ h+='<div class="ax-sug">'+sug.map(function(s){return'<button onclick="AIX.ask(this.textContent)">'+esc(s)+"</button>"}).join("")+"</div>";
+ admin()&&(h+='<details class="ax-cfg"><summary style="cursor:pointer;font-weight:700">⚙️ '+L("إعداد Claude API (للمدير — يُحفظ على هذا الجهاز فقط)","Claude API setup (admin — stored on this device only)")+'</summary><div class="ax-cfg"><input id="aix-key" type="password" placeholder="sk-ant-…" value="'+esc(A.key)+'"><input id="aix-model" placeholder="model" value="'+esc(A.model)+'" style="min-width:170px"><button class="ax-b pri" onclick="AIX.saveKey()">'+L("حفظ","Save")+'</button><button class="ax-b" onclick="AIX.saveKey(1)">'+L("إزالة المفتاح","Remove key")+'</button></div><div class="ax-note">'+L("عند التفعيل تُرسل ملخّصات مجمّعة فقط (كميات حسب الفرع/الهوية/العمر وأهم الأصناف القريبة) مع السؤال إلى Anthropic — لا يُرسل الملف كاملاً. المفتاح لا يُزامَن مع السحابة.","When enabled, only aggregated summaries (qty by branch/identity/age and top near-expiry items) plus the question are sent to Anthropic — never the full file. The key is not synced to the cloud.")+"</div></details>");
+ return h}
+/* ---------- render ---------- */
+var _t=null;function kick(){clearTimeout(_t);_t=setTimeout(render,250)}
+function render(){var el=host();if(!el)return;var p=document.getElementById("page-dash");if(p&&!p.classList.contains("show")&&!el.innerHTML){return}
+ var X=null;try{X=compute()}catch(e){X=null}
+ var tabs=[["ins","💡 "+L("رؤى وتوصيات","Insights")],["fc","🔮 "+L("التوقّع","Forecast")],["dq","🧹 "+L("جودة البيانات","Data quality"),X?X.Q.length:0],["ask","💬 "+L("اسأل البيانات","Ask the data")]];
+ var h='<div class="ax-hd" onclick="AIX.toggle()"><span style="font-size:18px">🤖</span><div><b>'+L("الرؤى الذكية","Smart insights")+'</b><div class="sub">'+L("تحليل تلقائي · توقّع · تدقيق · أسئلة","Auto analysis · forecast · audit · Q&A")+"</div></div><em>"+(S.open?"▲":"▼")+"</em></div>";
+ if(S.open){h+='<div class="ax-tabs">'+tabs.map(function(t){return'<button class="'+(S.tab===t[0]?"on":"")+'" onclick="AIX.tab(\''+t[0]+'\')">'+t[1]+(t[2]?'<span class="cnt">'+t[2]+"</span>":"")+"</button>"}).join("")+'</div><div class="ax-bd">';
+  if(!X||!X.E.length)h+='<div class="ax-note">'+L("لا توجد بيانات أعمار بعد.","No aging data yet.")+"</div>";
+  else try{h+="ins"===S.tab?vInsights(X):"fc"===S.tab?vForecast(X):"dq"===S.tab?vQuality(X):vAsk()}catch(e){h+='<div class="ax-note">⚠️ '+esc(e.message)+"</div>"}
+  h+="</div>"}
+ var keep=document.activeElement&&"aix-q"===document.activeElement.id?document.getElementById("aix-q").value:null;
+ el.innerHTML=h;if(null!=keep){var qi=document.getElementById("aix-q");qi&&(qi.value=keep,qi.focus())}
+ var ch=document.getElementById("aix-chat");ch&&(ch.scrollTop=ch.scrollHeight)}
+window.AIX={render:render,
+ toggle:function(){S.open=!S.open;save();render()},tab:function(t){S.tab=t;save();render()},
+ ask:function(q){var inp=document.getElementById("aix-q");q=String(q||inp&&inp.value||"").trim();if(!q||BUSY)return;
+  var loc=localAnswer(q);CHAT.push({r:"u",h:esc(q)});CHAT.push({r:"a",h:esc(loc.txt)+loc.tbl});
+  if(aiCfg().key){BUSY=!0;CHAT.push({r:"a",h:"🤖 …"});render();askClaude(q,loc,function(t,err){BUSY=!1;CHAT.pop();CHAT.push({r:"a",h:t?"🤖 "+esc(t):"⚠️ "+L("تعذّر الوصول إلى Claude: ","Could not reach Claude: ")+esc(err||"")});render()})}else render()},
+ clearChat:function(){CHAT=[];render()},
+ saveKey:function(rm){if(!admin())return;var o={key:rm?"":(document.getElementById("aix-key").value||"").trim(),model:(document.getElementById("aix-model").value||"").trim()||"claude-sonnet-4-5"};wj(KAI,o);render()},
+ _tip:function(ev,id){var t=ev.target;if(t&&t.getAttribute&&t.getAttribute("data-t")){var e=document.getElementById(id);e&&(e.textContent=t.getAttribute("data-t"))}},
+ _compute:compute,_parse:parseQ,_local:localAnswer};
+function boot(){try{var r=window.render;if("function"==typeof r&&!r.__aix){window.render=function(){var x=r.apply(this,arguments);kick();return x};window.render.__aix=1}}catch(e){}
+ try{if(window.EXPALERT&&EXPALERT.setCfg&&!EXPALERT.setCfg.__aix){var sc=EXPALERT.setCfg;EXPALERT.setCfg=function(){var x=sc.apply(this,arguments);kick();return x};EXPALERT.setCfg.__aix=1}}catch(e){}
+ try{var p=document.getElementById("page-dash");p&&!p.__aix&&(p.__aix=1,new MutationObserver(function(){p.classList.contains("show")&&kick()}).observe(p,{attributes:!0,attributeFilter:["class"]}))}catch(e){}
+ try{document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("[onclick*='setLang'],[onclick*='toggleLang'],.lang-btn");b&&setTimeout(render,300)},!0)}catch(e){}
+ kick()}
+"loading"===document.readyState?document.addEventListener("DOMContentLoaded",boot):boot();setTimeout(boot,2e3);
+}();</script>
