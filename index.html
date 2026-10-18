@@ -15978,19 +15978,19 @@ function applyColl(){
    sth.title=ar()?(open?"انقر لإخفاء أعمدة الخرج والرياض وهيت":"انقر لإظهار تفصيل الخرج والرياض وهيت"):(open?"Click to hide Al-Kharj / Riyadh / Heet":"Click to show Al-Kharj / Riyadh / Heet detail")}
   return!0}catch(e){return!1}}
 /* ---------- عرض موحّد ومعتدل لأعمدة الأرقام (مفتوح أو مغلق) ---------- */
-var WMIN=150,WMAX=150;
+var WMIN=78,WMAX=132;
 function layoutCols(){
  try{var r=window._rr;if(!r||"fgbal"!==r.key||!r.rep)return;
   var wrap=document.getElementById("rep-fgbal-wrap"),tbl=wrap&&wrap.querySelector("table.fg-table");if(!tbl)return;
   var h=r.rep.headers||[],nf=null!=r.rep.numFrom?r.rep.numFrom:1,c=r.cols||{},ti=c.total,tri=c.transit;
-  var old=tbl.querySelector("colgroup.fg-cg");old&&old.remove();tbl.style.width="auto";
+  var old=tbl.querySelector("colgroup.fg-cg");old&&old.remove();tbl.style.width="auto";tbl.style.tableLayout="auto";
   var ths=[].slice.call(tbl.querySelectorAll("thead th")).filter(function(t){return"none"!==t.style.display});
   var isNum=function(t){var dc=t.getAttribute("data-col");if(null==dc)return!1;var k=parseInt(dc,10);return!isNaN(k)&&k>=nf};
   var avail=(wrap.clientWidth||0)-32,fixed=0,n=0;
   ths.forEach(function(t){if(isNum(t))n++;else fixed+=t.offsetWidth});
   var W=n?Math.floor((avail-fixed)/n):WMIN;W=Math.max(WMIN,Math.min(WMAX,W));
   var cg=document.createElement("colgroup");cg.className="fg-cg";
-  ths.forEach(function(t){var col=document.createElement("col");if(isNum(t)){col.style.width=W+"px";col.style.minWidth=W+"px"}cg.appendChild(col)});
+  var tot=0; ths.forEach(function(t){var col=document.createElement("col"),w=isNum(t)?W:t.offsetWidth; col.style.width=w+"px"; tot+=w; cg.appendChild(col)}); tbl.style.width="auto";
   tbl.insertBefore(cg,tbl.firstChild)}catch(e){}}
 var _rz=0;try{window.addEventListener("resize",function(){clearTimeout(_rz);_rz=setTimeout(layoutCols,150)})}catch(e){}
 window.__fgToggleRiyadh=function(ev){try{ev&&ev.stopPropagation&&ev.stopPropagation()}catch(e){}
@@ -16086,7 +16086,7 @@ try{var _rrr=window.renderRichReport;
   window.renderRichReport.__fgcol=1}}catch(e){}
 /* ---------- تنسيق ---------- */
 var css=document.createElement("style");css.id="fgcol-css";css.textContent=
- "#rep-fgbal-wrap table.fg-table tbody td:not(.cat):not(.fg-vsep):not([colspan]){text-align:center;white-space:nowrap}#rep-fgbal-wrap table.fg-table thead th{white-space:nowrap}"+"#rep-fgbal-wrap th.fg-mv{cursor:grab}#rep-fgbal-wrap th.fg-mv:active{cursor:grabbing}"+
+ "#rep-fgbal-wrap table.fg-table tbody td:not(.cat):not(.fg-vsep):not([colspan]){text-align:center;white-space:nowrap}#rep-fgbal-wrap table.fg-table thead th{white-space:normal;line-height:1.25;padding-inline:6px;overflow-wrap:anywhere}#rep-fgbal-wrap table.fg-table thead th:not([data-col]){white-space:nowrap}"+"#rep-fgbal-wrap th.fg-mv{cursor:grab}#rep-fgbal-wrap th.fg-mv:active{cursor:grabbing}"+
  "#rep-fgbal-wrap th.fg-dragging{opacity:.45}"+
  "#rep-fgbal-wrap th.fg-drop-l{box-shadow:inset 4px 0 0 #f59e0b}#rep-fgbal-wrap th.fg-drop-r{box-shadow:inset -4px 0 0 #f59e0b}"+
  "#rep-fgbal-wrap th.fg-syn-th{cursor:pointer}"+"#rep-fgbal-wrap table.fg-syn-open td[data-fgsyn]{border-inline:1px solid rgba(74,147,242,.45)}"+"#rep-fgbal-wrap table.fg-syn-open td[data-fgsyn]:not([class*=\"dal-c\"]){background:#e9f1fc!important;color:#0f2747!important}"+
