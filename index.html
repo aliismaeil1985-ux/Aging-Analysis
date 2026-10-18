@@ -119,6 +119,24 @@ html[dir="ltr"] .spd-box{direction:ltr;text-align:left}.spd-h{display:flex;align
 
 <style id="nav-theme-dyn"></style>
 <style id="narrow-phone-fix">@media (max-width:359px){.dr-up-grid{grid-template-columns:1fr!important}.dr-up-grid>*,.grid>*,.grid .card,.card .ch{min-width:0}.chartbox{max-width:100%}.chartbox canvas{max-width:100%!important}}</style>
+<style id="row3d-css">
+/* 3D row hover with blue rounded frame - all reports and screens */
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])){transition:transform .17s cubic-bezier(.2,.8,.3,1),filter .17s ease}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover{position:relative;z-index:6;transform:translateY(-3px);filter:brightness(1.03) saturate(1.06) drop-shadow(0 9px 7px rgba(15,39,71,.34)) drop-shadow(0 2px 2px rgba(15,39,71,.22))}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td{box-shadow:inset 0 2px 0 #3b82f6,inset 0 -2px 0 #3b82f6!important}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:not([class*=dal-c]):not(.fg-vsep){background-image:linear-gradient(180deg,rgba(255,255,255,.88),rgba(222,236,253,.88))!important}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:first-child,.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:last-child{position:sticky}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:first-child{clip-path:inset(0 round 14px 0 0 14px)}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:last-child{clip-path:inset(0 round 0 14px 14px 0)}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:first-child::after{content:"";position:absolute;inset:0;pointer-events:none;border:2px solid #3b82f6;border-inline-end:0;border-radius:14px 0 0 14px}
+.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:last-child::after{content:"";position:absolute;inset:0;pointer-events:none;border:2px solid #3b82f6;border-inline-start:0;border-radius:0 14px 14px 0}
+:dir(rtl) .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:first-child{clip-path:inset(0 round 0 14px 14px 0)}
+:dir(rtl) .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:last-child{clip-path:inset(0 round 14px 0 0 14px)}
+:dir(rtl) .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:first-child::after{border-radius:0 14px 14px 0}
+:dir(rtl) .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:last-child::after{border-radius:14px 0 0 14px}
+@media (prefers-reduced-motion:reduce){.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])){transition:none}}
+@media print{.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover{transform:none;filter:none}}
+</style>
 </head>
 <body>
 
@@ -12669,7 +12687,7 @@ function grid(rows,pick){
   var g=[];
   rows.forEach(function(r,ri){
     g[ri]=g[ri]||[];var ci=0;
-    [].slice.call(r.cells).forEach(function(c){
+    [].slice.call(r.cells).filter(function(c){return!hid(c)}).forEach(function(c){
       while(void 0!==g[ri][ci])ci++;
       var cs=parseInt(c.colSpan,10)||1, rs=parseInt(c.rowSpan,10)||1, v=pick(c);
       for(var i=0;i<rs&&ri+i<rows.length;i++){
@@ -12682,7 +12700,12 @@ function grid(rows,pick){
   for(var a=0;a<rows.length;a++){g[a]=g[a]||[];for(var b=0;b<g[a].length;b++)if(void 0===g[a][b])g[a][b]="txt"===pick.kind?"":null}
   return g;
 }
-var pickTxt=function(c){return c.textContent.trim()}; pickTxt.kind="txt";
+/* خلايا مخفية (أعمدة مطوية/فواصل بصرية) لا مكان لها في الملف: كانت ترويسة العمود تُصدَّر وبياناته لا */
+function hid(c){try{return c.classList.contains("fg-vsep")||"none"===getComputedStyle(c).display}catch(e){return!1}}
+var DECO=".rr-pin-dot,.rr-sort-ind,.fg-wcf,.fg-wcf-btn,.fg-syn-car,.dal-tip,.rr-pin,.fg-grip";
+function clean(c){var t;try{if(c.querySelector&&c.querySelector(DECO)){var k=c.cloneNode(!0);[].slice.call(k.querySelectorAll(DECO)).forEach(function(x){x.remove()});t=k.textContent}else t=c.textContent}catch(e){t=c.textContent}
+  return String(t).replace(/\s+/g," ").replace(/^[\s\u25B8\u25C2\u25CF\u25B2\u25BC\u25BE\u25B4]+|[\s\u25B8\u25C2\u25CF\u25B2\u25BC\u25BE\u25B4]+$/g,"").trim()}
+var pickTxt=function(c){return clean(c)}; pickTxt.kind="txt";
 var pickEl=function(c){return c}; pickEl.kind="el";
 
 function argbOf(css){
@@ -12775,6 +12798,16 @@ function build(tableEl,opts){
   bodyRows.forEach(function(r,ri){emit(r,gB[ri],eB[ri],!1)});
   footRows.forEach(function(r,ri){emit(r,gF[ri],eF[ri],!0)});
   for(var c2=1;c2<=ncol;c2++)ws.getColumn(c2).width=Math.max(9,Math.min(34,(colMax[c2-1]||8)+2));
+  try{var top=((opts.title||opts.subtitle)?(opts.title&&opts.subtitle?3:2):0),h1=top+1,h2=top+headRows.length;
+    if(headRows.length){
+      ws.views=[{rightToLeft:ar,state:"frozen",xSplit:1,ySplit:h2,topLeftCell:"B"+(h2+1),zoomScale:100}];
+      if(1===headRows.length&&bodyRows.length)ws.autoFilter={from:{row:h2,column:1},to:{row:h2,column:ncol}};
+      ws.pageSetup.printTitlesRow=h1+":"+h2;
+    }
+    ws.pageSetup.paperSize=9;ws.pageSetup.horizontalCentered=!0;
+    ws.headerFooter={oddFooter:"&L&D&C"+(opts.title?String(opts.title).replace(/&/g,"&&"):"")+"&R&P / &N"};
+    wb.creator="Tania Water";wb.created=new Date;
+  }catch(e){}
   return wb.xlsx.writeBuffer().then(function(buf){
     var blob=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
         a=document.createElement("a");
@@ -12807,8 +12840,9 @@ try{
     try{
       if("undefined"==typeof ExcelJS||!tableEl||!tableEl.querySelector||!tableEl.querySelector("tr"))
         return ORIG.apply(this,arguments);
-      return run(tableEl,opts);
-    }catch(e){try{return ORIG.apply(this,arguments)}catch(x){}}
+      var _a=arguments,_r=run(tableEl,opts);
+      return _r&&_r.catch?_r.catch(function(){try{return ORIG.apply(null,_a)}catch(x){try{"function"==typeof toast&&toast("تعذّر تصدير Excel / Excel export failed","err")}catch(_){}}}):_r;
+    }catch(e){try{return ORIG.apply(this,arguments)}catch(x){try{"function"==typeof toast&&toast("تعذّر تصدير Excel / Excel export failed","err")}catch(_){}}}
   };
   window.__xlColorOrig=ORIG;
 }catch(e){}
@@ -16100,4 +16134,61 @@ var css=document.createElement("style");css.id="fgcol-css";css.textContent=
  ".fg-ord-reset{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:9px;padding:6px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}"+
  ".fg-ord-reset:hover{background:#f1f5f9}"+"input.fg-pos{width:52px;padding:4px 6px;margin:0 6px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;font-weight:700;text-align:center;background:#fff}"+".fg-grip{cursor:grab;font-size:16px;color:#64748b;padding:0 4px;user-select:none}"+"tr.fg-rowdrag{opacity:.45}tr.fg-rowover td{box-shadow:inset 0 3px 0 #4a93f2}";
 document.head.appendChild(css);
+}();</script>
+<script data-cfasync="false" id="bandfocus-js">!function(){"use strict";
+/* ===== تركيز لون التغطية داخل الجدول الرئيسي =====
+   النقر على CRITICAL/LOW/IDEAL/HIGH/EXCESS لم يعد يفتح نافذة: يُثبَّت في الجدول
+   كل خلايا هذا اللون (ويمكن اختيار أكثر من لون)، وتُخفى أرقام وألوان بقية الخلايه.
+   النقر على الزر نفسه مرة أخرى يلغي التركيز. */
+var KEY="fgbal",SEL={},WRAP="rep-fgbal-wrap";
+function wrap(){return document.getElementById(WRAP)}
+function active(){return Object.keys(SEL).filter(function(k){return SEL[k]})}
+function bandOf(td){var m=/\bdal-(c[1-5])\b/.exec(td.className);return m?m[1]:null}
+function ensureReset(w,act){var bs=w.querySelectorAll(".fg-cov-btn");if(!bs.length)return;var r=w.querySelector(".bf-reset");if(!r){var l=bs[bs.length-1];r=document.createElement("button");r.type="button";r.className="bf-reset";var ar=document.documentElement.dir==="rtl";r.textContent=ar?"\u21BA \u0625\u0639\u0627\u062F\u0629 \u0636\u0628\u0637":"\u21BA Reset";r.title=ar?"\u0625\u0644\u063A\u0627\u0621 \u062A\u062B\u0628\u064A\u062A \u0627\u0644\u0623\u0644\u0648\u0627\u0646":"Clear colour focus";r.onclick=function(e){e.preventDefault();e.stopPropagation();window.__bandFocusClear()};l.parentNode.insertBefore(r,l.nextSibling)}r.disabled=!act;r.classList.toggle("bf-reset-on",!!act)}
+function apply(){
+  var w=wrap();if(!w)return;
+  var on=active(),tb=w.querySelector("tbody");ensureReset(w,on.length>0);if(!on.length&&!w.__bfDirty)return;w.__bfDirty=on.length>0;
+  w.classList.toggle("bf-on",on.length>0);
+  [].slice.call(w.querySelectorAll(".fg-cov-btn")).forEach(function(b){var k=b.getAttribute("data-band");b.classList.toggle("bf-act",!!SEL[k]);b.setAttribute("aria-pressed",SEL[k]?"true":"false")});
+  if(!tb)return;
+  var rows=[].slice.call(tb.rows);
+  rows.forEach(function(tr){
+    var any=!1;
+    [].slice.call(tr.cells).forEach(function(td){
+      td.classList.remove("bf-keep","bf-dim");
+      if(!on.length)return;
+      if(td.classList.contains("cat")||td.classList.contains("fg-vsep")||td.colSpan>1||tr.classList.contains("grand"))return;
+      var b=bandOf(td);
+      if(b&&SEL[b]){td.classList.add("bf-keep");any=!0}
+      else td.classList.add("bf-dim");
+    });
+    tr.classList.toggle("bf-norow",!!on.length&&!tr.classList.contains("grand")&&tr.cells.length>3&&!any);
+  });
+}
+window.rrShowCovFilter=function(band,btn){
+  try{if(!/^c[1-5]$/.test(band))return;
+    SEL[band]=!SEL[band];apply();
+  }catch(e){}
+};
+window.__bandFocusClear=function(){SEL={};apply()};
+/* إعادة التطبيق بعد كل إعادة رسم للجدول (فرز/بحث/تبديل وضع/تمرير) */
+var _t=0;
+function sched(){clearTimeout(_t);_t=setTimeout(apply,30)}
+try{new MutationObserver(function(ms){
+  for(var i=0;i<ms.length;i++){var m=ms[i];if(m.type==="childList"){sched();return}}
+}).observe(document.body,{childList:!0,subtree:!0})}catch(e){}
+/* الأنماط */
+var css=
+"#rep-fgbal-wrap .bf-reset{margin-inline-start:2px;padding:2px 8px;line-height:1.4;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#64748b;font-size:10px;font-weight:700;white-space:nowrap;flex:0 0 auto;font-family:inherit;cursor:pointer;opacity:.5;transition:all .15s ease}"+
+"#rep-fgbal-wrap .bf-reset.bf-reset-on{opacity:1;color:#fff;background:#3b82f6;border-color:#3b82f6;box-shadow:0 2px 6px rgba(59,130,246,.35)}"+
+"#rep-fgbal-wrap .bf-reset:disabled{cursor:default}"+
+"#rep-fgbal-wrap.bf-on td.bf-dim,#rep-fgbal-wrap.bf-on td.bf-dim *{color:transparent!important;text-shadow:none!important}"+
+"#rep-fgbal-wrap.bf-on td.bf-dim{background:#fff!important;background-image:none!important;box-shadow:none!important}"+
+"#rep-fgbal-wrap.bf-on tbody tr:not(.grand):nth-child(even) td.bf-dim{background:#f6f9fd!important}"+
+"#rep-fgbal-wrap.bf-on td.bf-keep{box-shadow:inset 0 0 0 2px rgba(15,39,71,.55)!important;font-weight:800}"+
+"#rep-fgbal-wrap.bf-on tbody tr.bf-norow{display:none!important}"+
+".fg-cov-btn{transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease}"+
+"#rep-fgbal-wrap .fg-cov-btn.bf-act{transform:translateY(-2px);box-shadow:0 0 0 3px #fff,0 0 0 5px #3b82f6,0 6px 12px rgba(15,39,71,.3)}"+
+"#rep-fgbal-wrap.bf-on .fg-cov-btn:not(.bf-act){opacity:.55}";
+var st=document.createElement("style");st.id="bandfocus-css";st.textContent=css;document.head.appendChild(st);
 }();</script>
