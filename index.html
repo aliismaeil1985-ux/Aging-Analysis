@@ -15929,7 +15929,7 @@ function norm(s){return String(null==s?"":s).toLowerCase().replace(/[^a-z0-9؀-�
 window.__fgIsSyn=function(n){n=String(null==n?"":n).trim();return n===LBL_AR||n===LBL_EN};
 function isSyn(n){return window.__fgIsSyn(n)}
 function isOpen(){return!0===rd(KE)}
-var MINE=[],RAW=null,RAWN={};
+var MINE=[],RAW=null,RAWN={};try{wr(KO,null)}catch(e){}
 function colTotal(h){for(var i=0;i<h.length;i++)if("total"===String(h[i]).toLowerCase().trim())return i;return-1}
 function num(v){if("number"==typeof v)return v;if(null==v||""===String(v).trim())return null;var n=parseFloat(String(v).replace(/,/g,""));return isNaN(n)?null:n}
 /* ---------- تحويل البيانات: ترتيب محفوظ + عمود الإجمالي ---------- */
@@ -15938,7 +15938,7 @@ function transform(key,rep){
  var raw=rep.__fgRaw||rep,h=raw.headers.slice(),nf=null!=raw.numFrom?raw.numFrom:1,ti=colTotal(h);
  RAW=raw;RAWN={};if(ti<0||ti<=nf)return raw;
  var cur=[],i;for(i=nf;i<ti;i++){cur.push(i);RAWN[norm(h[i])]=1}
- var saved=rd(KO),order=cur.slice();
+ var saved=null,order=cur.slice();
  if(saved&&saved.length){
   var byN={};cur.forEach(function(ix){byN[norm(h[ix])]=ix});
   var res=[],used={};saved.forEach(function(n){if(byN[n]!=null&&!used[n]){used[n]=1;res.push(byN[n])}});
@@ -15988,21 +15988,62 @@ function decorate(){
  try{var r=window._rr;if(!r||"fgbal"!==r.key)return;
   ths().forEach(function(th){if(movable(th)){th.setAttribute("draggable","true");th.classList.add("fg-mv");
     th.title||(th.title=ar()?"اسحب لتغيير ترتيب العمود":"Drag to reorder")}});
-  var top=document.querySelector("#rep-fgbal-wrap .fg-top"),b=document.getElementById("fg-ord-reset"),has=!!(rd(KO)&&rd(KO).length);
+  var top=document.querySelector("#rep-fgbal-wrap .fg-top"),b=document.getElementById("fg-ord-reset"),has=!1;
   if(top&&has&&!b){b=document.createElement("button");b.id="fg-ord-reset";b.type="button";b.className="fg-ord-reset";
    b.textContent="↺ "+(ar()?"ترتيب الأعمدة الافتراضي":"Reset column order");b.onclick=function(){wr(KO,null);rerender()};
    var anchor=top.querySelector(".fg-zero");anchor&&anchor.nextSibling?top.insertBefore(b,anchor.nextSibling):top.appendChild(b)}
   else if(b&&!has)b.remove()}catch(e){}}
-function rerender(){
- try{var raw=RAW;if(!raw||"function"!=typeof window.renderRichReport)return;var r=window._rr||{},
-  keep={q:r.query,b:r.brand,s:r.size,z:r.hideZero,c:r.covSel,w:r.whSel};
-  window.renderRichReport("fgbal",raw);r=window._rr;
+function keepRender(fn){
+ try{var r=window._rr||{},keep={q:r.query,b:r.brand,s:r.size,z:r.hideZero,c:r.covSel,w:r.whSel};
+  fn();r=window._rr;if(!r)return;
   r.query=keep.q||"";keep.b&&(r.brand=keep.b);keep.s&&(r.size=keep.s);null!=keep.z&&(r.hideZero=keep.z);keep.c&&(r.covSel=keep.c);keep.w&&(r.whSel=keep.w);
   var gi=document.getElementById("fgbal-gsearch");gi&&(gi.value=r.query);var gx=document.getElementById("fgbal-x");gx&&(gx.style.display=r.query?"":"none");
   var hz=document.getElementById("fgbal-hz");hz&&(hz.checked=!!r.hideZero);
   var pb=document.getElementById("fg-pal-btn");if(pb&&window.__palMode){pb.classList.add("on");var pl=pb.querySelector(".fg-pal-lbl");pl&&(pl.textContent="الكميات")}
   var cb=document.getElementById("fg-cov-btn");if(cb&&window.__covMode){cb.classList.add("on");var cl=cb.querySelector(".fg-cov-lbl");cl&&(cl.textContent="الكميات")}
   window.rrRefresh()}catch(e){}}
+/* نقل عمود = نفس آلية «إعدادات ← أعمدة التقرير»: تعديل ترتيب رؤوس البيانات المخزّنة (فتتطابق الطريقتان ويُزامَن للسحابة) */
+function permIdx(obj,f,t){
+ if(!obj||!obj.headers||!obj.rows)return!1;var h=obj.headers,n=h.length;if(f<0||t<0||f>=n||t>=n||f===t)return!1;
+ var idx=[],i;for(i=0;i<n;i++)idx.push(i);idx.splice(f,1);idx.splice(t,0,f);
+ var nh=idx.map(function(x){return h[x]});for(i=0;i<n;i++)h[i]=nh[i];
+ obj.rows.forEach(function(r){if(!Array.isArray(r))return;var m=idx.map(function(x){return x<r.length?r[x]:""});for(var k=0;k<m.length;k++)r[k]=m[k]});return!0}
+function permName(obj,fromN,toN,bf){
+ if(!obj||!obj.headers)return!1;var h=obj.headers,f=h.indexOf(fromN),t=h.indexOf(toN);if(f<0||t<0||f===t)return!1;
+ var rest=h.filter(function(_,i){return i!==f}),tp=rest.indexOf(toN),dest=bf?tp:tp+1;return permIdx(obj,f,dest)}
+function applyAll(key,fn){
+ var did=!1;try{var s=getDR();if(s&&s[key]&&fn(s[key])){saveDR(s);did=!0;try{drPush()}catch(e){}}}catch(e){}
+ try{window.DEFAULT_DAILY_REPORTS&&DEFAULT_DAILY_REPORTS[key]&&fn(DEFAULT_DAILY_REPORTS[key])}catch(e){}
+ try{"undefined"!=typeof DR_TEMPLATES&&DR_TEMPLATES&&DR_TEMPLATES[key]&&fn(DR_TEMPLATES[key])}catch(e){}
+ return did}
+function afterMove(key){
+ var run=function(){try{renderDailyReport(key)}catch(e){var raw=RAW;"fgbal"===key&&raw&&window.renderRichReport("fgbal",raw)}};
+ "fgbal"===key?keepRender(run):run();
+ try{dzReportCols(key,"dz-rpt-"+key)}catch(e){}}
+/* يحفظ الترتيب كإعداد (RPT[key].colOrder المتزامن مع السحابة) تمامًا كما يفعل rptMoveCol، وإلا أعاد dr-colorder-fix الترتيب القديم عند العرض */
+function saveOrder(key){try{var s=getDR(),src=s&&s[key]&&s[key].headers;
+ if(src&&src.length&&"undefined"!=typeof RPT&&RPT){RPT[key]=RPT[key]||{};RPT[key].colOrder=src.slice();
+  try{LS.setItem("report_designer",JSON.stringify(RPT))}catch(e){}try{"function"==typeof pushSettingsToCloud&&pushSettingsToCloud()}catch(e){}}}catch(e){}}
+function commitMove(fromN,toN,bf){applyAll("fgbal",function(o){return permName(o,fromN,toN,bf)});saveOrder("fgbal");afterMove("fgbal")}
+function moveCol(key,f,t){applyAll(key,function(o){return permIdx(o,f,t)});saveOrder(key);afterMove(key)}
+/* ---------- شاشة الإعدادات: رقم الترتيب + سحب الصف بحركة واحدة ---------- */
+var SDRAG=null;
+function augSettings(key,contId){
+ try{var cont=document.getElementById(contId);if(!cont)return;var tb=cont.querySelector("table.dz-table tbody");if(!tb)return;
+  var rows=[].slice.call(tb.rows),n=rows.length;
+  rows.forEach(function(tr,i){if(tr.__fgp)return;tr.__fgp=1;var td=tr.cells[0];if(!td)return;
+   var g=document.createElement("span");g.className="fg-grip";g.textContent="⠿";g.draggable=!0;g.title=ar()?"اسحب الصف إلى المكان المطلوب":"Drag to move";
+   g.addEventListener("dragstart",function(e){SDRAG=i;try{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(i))}catch(x){}tr.classList.add("fg-rowdrag")});
+   g.addEventListener("dragend",function(){SDRAG=null;rows.forEach(function(r){r.classList.remove("fg-rowdrag","fg-rowover")})});
+   var inp=document.createElement("input");inp.type="number";inp.min=1;inp.max=n;inp.value=i+1;inp.className="fg-pos";
+   inp.title=ar()?"اكتب رقم المكان الجديد للعمود ثم Enter":"Type the new position then press Enter";
+   var go=function(){var v=parseInt(inp.value,10);if(isNaN(v)){inp.value=i+1;return}v=Math.max(1,Math.min(n,v))-1;if(v===i){inp.value=i+1;return}moveCol(key,i,v)};
+   inp.addEventListener("change",go);inp.addEventListener("keydown",function(e){"Enter"===e.key&&(e.preventDefault(),go())});
+   td.insertBefore(inp,td.firstChild);td.insertBefore(g,td.firstChild);
+   tr.addEventListener("dragover",function(e){if(null==SDRAG)return;e.preventDefault();tr.classList.add("fg-rowover")});
+   tr.addEventListener("dragleave",function(){tr.classList.remove("fg-rowover")});
+   tr.addEventListener("drop",function(e){if(null==SDRAG)return;e.preventDefault();var f=SDRAG;SDRAG=null;if(f!==i)moveCol(key,f,i)})})}catch(e){}}
+try{var _dzr=window.dzReportCols;if("function"==typeof _dzr&&!_dzr.__fgcol){window.dzReportCols=function(key,contId){var o=_dzr.apply(this,arguments);augSettings(key,contId);return o};window.dzReportCols.__fgcol=1}}catch(e){}
 var DRAG=null;
 function clr(){ths().forEach(function(t){t.classList.remove("fg-dragging","fg-drop-l","fg-drop-r")})}
 function before(th,e){var rc=th.getBoundingClientRect(),mid=rc.left+rc.width/2,rtl="rtl"===getComputedStyle(th.closest("table")).direction;return rtl?e.clientX>mid:e.clientX<mid}
@@ -16014,10 +16055,7 @@ document.addEventListener("dragover",function(e){if(!DRAG)return;var th=e.target
  var db=before(th,e),rtl="rtl"===getComputedStyle(th.closest("table")).direction,left=rtl?!db:db;th.classList.add(left?"fg-drop-l":"fg-drop-r")},!0);
 document.addEventListener("drop",function(e){if(!DRAG)return;var th=e.target&&e.target.closest&&e.target.closest("#rep-fgbal-wrap th[data-col]");
  if(!th||th===DRAG||!movable(th)){clr();DRAG=null;return}e.preventDefault();
- var names=ths().filter(movable).map(function(t){return norm(hdrName(t))}),from=norm(hdrName(DRAG)),to=norm(hdrName(th)),bf=before(th,e);
- clr();DRAG=null;names=names.filter(function(n){return n!==from});var at=names.indexOf(to);if(at<0)return;
- /* before() يعيد «قبل الهدف في ترتيب DOM» (المحفوظ هو ترتيب DOM) سواء RTL أو LTR */
- names.splice(bf?at:at+1,0,from);wr(KO,names);rerender()},!0);
+ var fromN=hdrName(DRAG),toN=hdrName(th),bf=before(th,e);clr();DRAG=null;if(fromN===toN)return;commitMove(fromN,toN,bf)},!0);
 document.addEventListener("dragend",function(){clr();DRAG=null},!0);
 document.addEventListener("click",function(e){var td=e.target&&e.target.closest&&e.target.closest("#rep-fgbal-wrap td[data-fgsyn]");td&&window.__fgToggleRiyadh(e)},!0);
 /* ---------- تغليف renderRichReport (الطبقة الأخيرة) ---------- */
@@ -16039,6 +16077,6 @@ var css=document.createElement("style");css.id="fgcol-css";css.textContent=
  "#rep-fgbal-wrap th.fg-syn-th .fg-syn-car{font-size:10px;opacity:.9}"+
  "#rep-fgbal-wrap td[data-fgsyn]{cursor:pointer;font-weight:800}"+
  ".fg-ord-reset{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:9px;padding:6px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}"+
- ".fg-ord-reset:hover{background:#f1f5f9}";
+ ".fg-ord-reset:hover{background:#f1f5f9}"+"input.fg-pos{width:52px;padding:4px 6px;margin:0 6px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;font-weight:700;text-align:center;background:#fff}"+".fg-grip{cursor:grab;font-size:16px;color:#64748b;padding:0 4px;user-select:none}"+"tr.fg-rowdrag{opacity:.45}tr.fg-rowover td{box-shadow:inset 0 3px 0 #4a93f2}";
 document.head.appendChild(css);
 }();</script>
