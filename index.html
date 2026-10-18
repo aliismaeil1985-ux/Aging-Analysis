@@ -16192,3 +16192,14 @@ var css=
 "#rep-fgbal-wrap.bf-on .fg-cov-btn:not(.bf-act){opacity:.55}";
 var st=document.createElement("style");st.id="bandfocus-css";st.textContent=css;document.head.appendChild(st);
 }();</script>
+<script data-cfasync="false" id="hdrtint-js">!function(){"use strict";
+var RE=/^(al-?kharj|riyadh|riyadh total|heet|الخرج|الرياض|هيت|إجمالي الرياض)$/i;
+function nm(th){var c=th.cloneNode(!0);[].slice.call(c.querySelectorAll(".fg-wcf,.rr-sort-ind,.rr-pin-dot")).forEach(function(x){x.remove()});return c.textContent.replace(/[▸▾●]/g,"").replace(/\s+/g," ").trim()}
+function run(){var w=document.getElementById("rep-fgbal-wrap");if(!w)return;
+[].slice.call(w.querySelectorAll("thead th")).forEach(function(th){var on=RE.test(nm(th));if(th.classList.contains("hdr-lt")!==on)th.classList.toggle("hdr-lt",on)})}
+var t=0;function s(){clearTimeout(t);t=setTimeout(run,40)}
+try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++)if(ms[i].type==="childList"){s();return}}).observe(document.body,{childList:!0,subtree:!0})}catch(e){}
+var st=document.createElement("style");st.id="hdrtint-css";
+st.textContent="#rep-fgbal-wrap thead th.hdr-lt{background-image:linear-gradient(#5a9be0,#3f81c8)!important;color:#fff!important;text-shadow:0 1px 1px rgba(15,39,71,.35)}";
+document.head.appendChild(st);run();
+}();</script>
