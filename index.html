@@ -4243,7 +4243,8 @@ img,canvas,svg,video,iframe{max-width:100%}
       if (kind === "aging") ok = it.rows ? aging.save(it.date, it.rows, it.name) : false;
       else ok = it.dr ? report.save(it.date, it.dr, it.name) : false;
       it.ok = !!ok;
-      it.status = ok ? "✅ محفوظ" : "⚠️ تعذّر الحفظ";
+      it.status = ok ? "✅ محفوظ · " + it.date : "⚠️ تعذّر الحفظ" + (_lastErr ? " (" + (_lastErr === "future" ? "تاريخ مستقبلي" : _lastErr === "storage-full" ? "التخزين ممتلئ" : _lastErr === "no-rows" ? "لا صفوف" : _lastErr) + ")" : "");
+      if (ok) { try { var _dd = new Date(it.date + "T00:00:00"), _ago = (Date.now() - _dd.getTime()) / 864e5; if (_ago > 45) { toast("⚠️ تم الحفظ بتاريخ " + it.date + " — بعيد عن اليوم. إن كان خطأً غيّر التاريخ واحفظ ثم احذف التاريخ الخاطئ من الجدول.", "warn"); } } catch (e) {} }
       ok ? done++ : fail++;
     });
     renderQueue(kind);
@@ -4259,7 +4260,7 @@ img,canvas,svg,video,iframe{max-width:100%}
     var h = '<table><thead><tr><th>الملف</th><th>المحتوى</th><th>التاريخ</th><th>الحالة</th><th></th></tr></thead><tbody>';
     q.forEach(function (it, i) {
       h += "<tr><td style=\"text-align:start\">" + esc(it.name) + "</td><td>" + esc(it.kind) + "</td>" +
-        '<td><input type="date" value="' + esc(it.date) + '" onchange="IVX.ui.qdate(\'' + kind + '\',' + i + ',this.value)" style="font:inherit;font-size:12px;padding:3px 6px;border:1px solid #d7e0ec;border-radius:7px"></td>' +
+        '<td><input type="date" value="' + esc(it.date) + '" onchange="IVX.ui.qdate(\'' + kind + '\',' + i + ',this.value,this)" style="font:inherit;font-size:12px;padding:3px 6px;border:1px solid #d7e0ec;border-radius:7px"></td>' +
         "<td>" + (it.ok === true ? '<span class="ivx-pill on">' + esc(it.status || "محفوظ") + "</span>"
           : it.ok === false ? '<span class="ivx-pill err">' + esc(it.status || "لم يُحفظ") + "</span>"
           : '<span class="ivx-pill off">بانتظار الحفظ</span>') + "</td>" +
@@ -4490,7 +4491,14 @@ img,canvas,svg,video,iframe{max-width:100%}
       var f = e.dataTransfer && e.dataTransfer.files ? Array.prototype.slice.call(e.dataTransfer.files) : [];
       if (f.length) enqueue(kind, f);
     },
-    qdate: function (kind, i, v) { if (Q[kind][i]) { Q[kind][i].date = v; Q[kind][i].ok = null; Q[kind][i].status = ""; renderQueue(kind); } },
+    qdate: function (kind, i, v, el) {
+      var it = Q[kind][i]; if (!it) return;
+      it.date = v; it.ok = null; it.status = "";
+      /* لا نعيد رسم الجدول أثناء الكتابة — إعادة الرسم كانت تُفقد التركيز وتُبقي تاريخاً ناقصاً/خاطئاً */
+      var done = false;
+      try { var tr = el && el.closest && el.closest("tr"); if (tr && tr.cells[3]) { tr.cells[3].innerHTML = '<span class="ivx-pill ' + (isDate(v) ? "off" : "err") + '">' + (isDate(v) ? "بانتظار الحفظ" : "⚠️ تاريخ غير صالح") + "</span>"; done = true; } } catch (e) {}
+      if (!done) renderQueue(kind);
+    },
     qdel: function (kind, i) { Q[kind].splice(i, 1); renderQueue(kind); },
     qclear: function (kind) { Q[kind] = []; renderQueue(kind); },
     qsave: saveQueue,
