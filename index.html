@@ -136,6 +136,11 @@ html[dir="ltr"] .spd-box{direction:ltr;text-align:left}.spd-h{display:flex;align
 :dir(rtl) .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:last-child::after{border-radius:14px 0 0 14px}
 @media (prefers-reduced-motion:reduce){.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])){transition:none}}
 @media print{.page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover{transform:none;filter:none}}
+
+/* magnifier cell: hovered cell gets blue frame + enlarged */
+html.cell-mag .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:hover:not(:first-child):not(:last-child):not(.fg-vsep):not(.cat){position:relative;z-index:9;transform:scale(1.22);transition:transform .14s cubic-bezier(.2,.8,.3,1);box-shadow:inset 0 2px 0 #3b82f6,inset 0 -2px 0 #3b82f6!important;font-weight:800}
+html.cell-mag .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:hover:not(:first-child):not(:last-child):not(.fg-vsep):not(.cat)::after{content:"";position:absolute;inset:0;pointer-events:none;border:2px solid #3b82f6;border-radius:5px;box-shadow:0 8px 16px rgba(15,39,71,.38)}
+@media print{html.cell-mag .page table:not(.no3d) > tbody > tr:not(.grand):not(.total):not([class*=total]):not(:has(> th)):not(:has(> td[colspan])):hover > td:hover{transform:none!important}}
 </style>
 </head>
 <body>
@@ -15962,7 +15967,7 @@ function boot(){try{var r=window.render;if("function"==typeof r&&!r.__aix){windo
 <script data-cfasync="false" id="fgcol-js">!function(){"use strict";
 /* ===== تقرير أرصدة المنتج التام: ترتيب الأعمدة بالسحب + عمود «إجمالي الرياض» القابل للفتح والإغلاق ===== */
 var KO="fg_colorder_v1",KE="fg_riyadh_open_v1",LBL_AR="إجمالي الرياض",LBL_EN="Riyadh Total";
-var MEM={alkharj:1,kharjcustpacking:1,riyadh:1,heet:1,heat:1,"الخرج":1,"الرياض":1,"هيت":1};
+var MEM={alkharj:1,kharjcustpacking:1,riyadh:1,heet:1,heat:1,"الخرج":1,"الرياض":1,"هيت":1};/* مجموع «إجمالي الرياض» = الأعمدة المعروضة فقط (الخرج + الرياض + هيت) — «تغليف الخرج» عمود مخفي ولا يدخل في الإجمالي */var MEMS={alkharj:1,riyadh:1,heet:1,heat:1,"الخرج":1,"الرياض":1,"هيت":1};
 function ar(){try{return"undefined"==typeof LANG||"ar"===LANG}catch(e){return!0}}
 function ST(){try{return"undefined"!=typeof LS&&LS?LS:window.localStorage}catch(e){return window.localStorage}}
 function rd(k){try{return JSON.parse(ST().getItem(k)||"null")}catch(e){return null}}
@@ -15990,7 +15995,7 @@ function transform(key,rep){
  var newIdx=[];for(i=0;i<nf;i++)newIdx.push(i);order.forEach(function(x){newIdx.push(x)});for(i=ti;i<h.length;i++)newIdx.push(i);
  var changed=newIdx.some(function(x,p){return x!==p});
  var H=newIdx.map(function(x){return h[x]}),mem=[];
- H.forEach(function(n,p){p>=nf&&p<newIdx.indexOf(ti)&&MEM[norm(n)]&&mem.push(p)});
+ H.forEach(function(n,p){p>=nf&&p<newIdx.indexOf(ti)&&MEMS[norm(n)]&&mem.push(p)});
  var withSyn=mem.length>=2;
  if(!changed&&!withSyn)return raw;
  var rows=raw.rows.map(function(r){var o=newIdx.map(function(x){return x<r.length?r[x]:""});for(var j=h.length;j<r.length;j++)o.push(r[j]);return o});
@@ -16193,7 +16198,8 @@ var css=
 "#rep-fgbal-wrap.bf-on td.bf-dim,#rep-fgbal-wrap.bf-on td.bf-dim *{color:transparent!important;text-shadow:none!important}"+
 "#rep-fgbal-wrap.bf-on td.bf-dim{background:#fff!important;background-image:none!important;box-shadow:none!important}"+
 "#rep-fgbal-wrap.bf-on tbody tr:not(.grand):nth-child(even) td.bf-dim{background:#f6f9fd!important}"+
-"#rep-fgbal-wrap.bf-on td.bf-keep{box-shadow:inset 0 0 0 2px rgba(15,39,71,.55)!important;font-weight:800}"+
+"#rep-fgbal-wrap.bf-on tbody tr:hover td.bf-dim{box-shadow:inset 0 2px 0 #3b82f6,inset 0 -2px 0 #3b82f6!important}"+
+"#rep-fgbal-wrap.bf-on td.bf-keep{box-shadow:inset 0 0 0 1px rgba(15,39,71,.16)!important}"+
 "#rep-fgbal-wrap.bf-on tbody tr.bf-norow{display:none!important}"+
 ".fg-cov-btn{transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease}"+
 "#rep-fgbal-wrap .fg-cov-btn.bf-act{transform:translateY(-2px);box-shadow:0 0 0 3px #fff,0 0 0 5px #3b82f6,0 6px 12px rgba(15,39,71,.3)}"+
@@ -16256,3 +16262,22 @@ var st=document.createElement("style");st.id="dcmp-hidebr-css";
 st.textContent=".dcmp-page .dcmp-tbl .dcmp-hb{display:none!important}.dcmp-page .dcmp-tbl.dcmp-hb-on .totcol{border-inline-start:2px solid #b9c6dc}";
 document.head.appendChild(st);run();
 }();</script>
+<script data-cfasync="false" id="cellmag-js">!function(){"use strict";var K="cell_mag_v1",de=document.documentElement;
+function ar(){try{return typeof isAr==="function"?!!isAr():de.dir==="rtl"}catch(e){return!1}}
+var on=!0;try{on=localStorage.getItem(K)!=="0"}catch(e){}
+var b=document.createElement("button");b.id="cellmag-btn";b.type="button";
+function paint(){de.classList.toggle("cell-mag",on);b.setAttribute("aria-pressed",on?"true":"false");b.className=on?"on":"";
+b.title=ar()?(on?"إلغاء تكبير الخلية عند التمرير":"تفعيل تكبير الخلية عند التمرير (عدسة)"):(on?"Turn off cell magnifier":"Turn on cell magnifier");b.textContent="\u{1F50D}"}
+b.onclick=function(){on=!on;try{localStorage.setItem(K,on?"1":"0")}catch(e){}paint()};
+var st=document.createElement("style");st.id="cellmag-css";
+st.textContent="#cellmag-btn{position:fixed;inset-inline-end:14px;bottom:14px;z-index:99990;width:34px;height:34px;border-radius:50%;border:1px solid #c7d2fe;background:#fff;color:#4338ca;font-size:15px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(15,39,71,.25);display:flex;align-items:center;justify-content:center;padding:0;opacity:.8;transition:all .15s ease}#cellmag-btn:hover{opacity:1;transform:scale(1.1)}#cellmag-btn.on{background:#3b82f6;border-color:#3b82f6;color:#fff;opacity:1;box-shadow:0 0 0 3px rgba(59,130,246,.3),0 4px 12px rgba(15,39,71,.3)}@media print{#cellmag-btn{display:none!important}}";
+document.head.appendChild(st);function add(){if(!document.body)return;document.body.appendChild(b);paint()}
+if(document.body)add();else document.addEventListener("DOMContentLoaded",add)}();</script>
+<style id="vlines-css">
+/* خطوط طولية أخف وأرفع في جداول التقارير */
+html:not(#_) .fg-table td.fg-trtd,html:not(#_) table td.rr-hold-cell,html:not(#_) table td.rr-hold-td{border-left:1px solid #e3e9f2!important}
+html:not(#_) .fg-table th.fg-trth,html:not(#_) table th.rr-hold-th{border-left:1px solid rgba(255,255,255,.3)!important}
+html:not(#_) .fg-table tbody tr:not(.grand) td.tot{border-inline-end:1px solid #e6ecf4!important}
+html:not(#_) .fg-table tr.grand td.tot{border-inline-end:1px solid rgba(255,255,255,.16)!important}
+html:not(#_) .fg-table th.fg-toth{border-inline-end:1px solid rgba(255,255,255,.2)!important}
+</style>
