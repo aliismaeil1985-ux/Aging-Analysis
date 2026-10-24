@@ -16674,7 +16674,7 @@ function inject(){
        +['Code',A("كرتون","Cartons"),A("كرتون/بلت","Ctn/pallet"),A("بلت","Pallets"),A("الطبقات","Layers"),A("مساحة البلت","Pallet m²"),'m²',''].map(function(t){return '<th style="padding:3px 8px;text-align:center">'+t+'</th>'}).join("")+'</tr>';
       rs.forEach(function(x){
         h+='<tr style="border-top:1px solid #e2e8f0'+(x.r?'':';background:#fee2e2')+'"><td style="padding:3px 8px">'+esc(x.c)+'</td><td style="text-align:center">'+f(x.q,0)+'</td>'
-         +(x.r?'<td style="text-align:center">'+f(x.r.cpp,0)+'</td><td style="text-align:center">'+f(x.pal,2)+'</td><td style="text-align:center">'+f(x.r.layers,2)+'</td><td style="text-align:center">'+f(x.ps,2)+'</td><td style="text-align:center;font-weight:700">'+f(x.m2,1)+'</td><td style="color:#b45309">'+(x.ov?A("استثناء مستودع","warehouse override"):"")+'</td>'
+         +(x.r?'<td style="text-align:center">'+f(x.r.cpp,0)+'</td><td style="text-align:center">'+f(x.pal,2)+'</td><td style="text-align:center">'+f(x.r.layers,2)+'</td><td style="text-align:center">'+f(x.ps,2)+'</td><td style="text-align:center;font-weight:700">'+f(x.m2,1)+'</td><td style="color:#b45309">'+(x.ov?A("استثناء مستودع","override")+": "+[["cpp",x.b&&x.b.cpp,x.r.cpp],["layers",x.b&&x.b.layers,x.r.layers],["size",x.b&&x.b.size,x.r.size]].filter(function(t){return t[1]!==t[2]}).map(function(t){return t[0]+" "+f(t[1],2)+" → "+f(t[2],2)}).join(" · "):"")+'</td>'
            :'<td colspan="5" style="text-align:center;color:#b91c1c">'+A("بلا معامل تحويل","no conversion")+'</td><td></td>')+'</tr>';
       });
       h+='</table></div></div>';
