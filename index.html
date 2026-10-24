@@ -16556,3 +16556,162 @@ setInterval(check,20000);setTimeout(check,2000);
 })();
 </script>
 
+
+<script id="spmiss-js">(function(){
+function A(a,e){try{return typeof _A==="function"?_A(a,e):a}catch(x){return a}}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function scan(){
+  var st=getDR(),conv=getSpaceConv(),nIdx=_spBuildConvNorm(conv),L=_spWarehouseLists();
+  var dis=getSpaceConvDisabled(),exc=getSpaceExcluded();
+  function isEx(c){return dis[c]||exc[c]||dis[_spNormCode(c)]||exc[_spNormCode(c)]}
+  var names=L.B.concat(L.F),codes=L.BC.concat(L.FC),out={};
+  function run(src,kind){
+    var rep=st[src];if(!rep||!rep.rows||!rep.rows.length)return;
+    var H=rep.headers||[],nf=rep.numFrom!=null?rep.numFrom:(src==="fgbal"?5:2);
+    var cols=names.map(function(n,i){return _spMatchCols(H,nf,n,codes[i])});
+    var cats={};
+    if(src==="transit")(st.fgbal&&st.fgbal.rows||[]).forEach(function(r){var c=String(r[0]==null?"":r[0]).trim();if(c)cats[c]=String(r[3]||"").trim().toLowerCase()});
+    rep.rows.forEach(function(row){
+      var code=String(row[0]==null?"":row[0]).trim();
+      if(!code||code==="0"||isEx(code))return;
+      if(src==="fgbal"&&_spIsBottel(row))return;
+      if(src==="transit"&&(cats[code]==="bottel"||cats[code]==="bottle"))return;
+      names.forEach(function(n,i){
+        var cs=cols[i];if(!cs.length)return;
+        var q=0,any=false;
+        cs.forEach(function(c){var v=row[c];if(typeof v==="number"){any=true;if(src==="fgbal"){if(v>q)q=v}else q+=v}});
+        if(!(q>0))return;
+        if(_spConvLookup(code,conv,nIdx,n))return;
+        var o=out[n]=out[n]||{used:{},tr:{}};
+        var m=(kind==="used"?o.used:o.tr);m[code]=(m[code]||0)+q;
+      });
+    });
+  }
+  run("fgbal","used");run("transit","tr");
+  return out;
+}
+window.__spMissScan=scan;
+function avgM2(n,kind){ /* متوسط م²/كرتون لهذا المستودع من الأكواد المحسوبة */
+  try{
+    var st=getDR(),conv=getSpaceConv(),nIdx=_spBuildConvNorm(conv),L=_spWarehouseLists();
+    var names=L.B.concat(L.F),codes=L.BC.concat(L.FC),i=names.indexOf(n);if(i<0)return 0;
+    var rep=st.fgbal;if(!rep||!rep.rows)return 0;
+    var cs=_spMatchCols(rep.headers||[],rep.numFrom!=null?rep.numFrom:5,n,codes[i]);if(!cs.length)return 0;
+    var m2=0,q=0;
+    rep.rows.forEach(function(row){
+      var c=String(row[0]==null?"":row[0]).trim();if(!c||c==="0"||_spIsBottel(row))return;
+      var mx=0;cs.forEach(function(k){var v=row[k];if(typeof v==="number"&&v>mx)mx=v});
+      if(!(mx>0))return;var r=_spConvLookup(c,conv,nIdx,n);if(!r)return;
+      m2+=_spM2For(c,mx,conv,nIdx,n);q+=mx;
+    });
+    return q>0?m2/q:0;
+  }catch(e){return 0}
+}
+function fmt(v){return Math.round(v).toLocaleString("en-US")}
+function inject(){
+  try{
+    var old=document.getElementById("spmiss-box");if(old)old.remove();
+    var wrap=document.getElementById("rep-space-wrap");if(!wrap||!wrap.parentNode)return;
+    var d=scan(),ks=Object.keys(d).filter(function(n){return Object.keys(d[n].used).length||Object.keys(d[n].tr).length});
+    if(!ks.length)return;
+    var h='<div id="spmiss-box" style="margin:14px 0;border:1.5px solid #f59e0b;background:#fffbeb;color:#78350f;border-radius:14px;padding:12px 16px;font-size:13px;line-height:1.8;direction:'+(document.documentElement.dir||"rtl")+'">'
+     +'<div style="font-weight:800;font-size:14px;margin-bottom:4px">⚠ '+A("أكواد لها رصيد لكن بلا معامل تحويل — مساحتها غير محتسبة في «المساحة المستخدمة»","Codes with stock but no conversion factor — their space is NOT counted in “used space”")+'</div>'
+     +'<div style="margin-bottom:8px;opacity:.85">'+A("أكمل (كرتون/بلت، الطبقات، مساحة البلت) لهذه الأكواد من: البيانات الرئيسية ← جدول الأصناف. التقدير أدناه للعلم فقط ولا يدخل في الجدول.","Fill (cartons/pallet, layers, pallet size) for these codes in Master Data → Items table. The estimate below is informational only and is not added to the table.")+'</div>';
+    ks.forEach(function(n){
+      var u=d[n].used,t=d[n].tr,uc=Object.keys(u).sort(function(a,b){return u[b]-u[a]}),tc=Object.keys(t).sort(function(a,b){return t[b]-t[a]});
+      var uq=uc.reduce(function(s,c){return s+u[c]},0),tq=tc.reduce(function(s,c){return s+t[c]},0),av=avgM2(n),est=av>0?uq*av:0;
+      h+='<div style="border-top:1px dashed #f3c36b;padding:6px 0"><b>'+esc(n)+'</b>';
+      if(uc.length)h+=' — '+A("رصيد: ","stock: ")+uc.length+A(" كود · "," codes · ")+fmt(uq)+A(" كرتون","  cartons")+(est>0?' <span style="color:#b45309">≈ +'+fmt(est)+' '+A("م² ناقصة (تقدير)","m² missing (est.)")+'</span>':'');
+      if(tc.length)h+=' | '+A("ترانزيت: ","transit: ")+tc.length+A(" كود · "," codes · ")+fmt(tq)+A(" كرتون"," cartons");
+      h+='<div style="font-size:12px;opacity:.9">'+uc.slice(0,12).map(function(c){return esc(c)+' ('+fmt(u[c])+')'}).join(" · ")+(uc.length>12?" …":"")+'</div></div>';
+    });
+    h+='</div>';
+    wrap.insertAdjacentHTML("afterend",h);
+  }catch(e){}
+}
+window.__spMissInject=inject;
+function wrapR(){
+  if(typeof renderSpaceReport!=="function"||renderSpaceReport.__spm)return;
+  var o=renderSpaceReport;
+  var w=function(){var r=o.apply(this,arguments);try{setTimeout(inject,0)}catch(e){}return r};
+  w.__spm=1;window.renderSpaceReport=w;
+}
+try{wrapR()}catch(e){}
+})();
+</script>
+
+<script id="spdet-js">(function(){
+function A(a,e){try{return typeof _A==="function"?_A(a,e):a}catch(x){return a}}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function f(v,d){return (+v).toLocaleString("en-US",{maximumFractionDigits:d==null?1:d})}
+function rowsFor(n){
+  var st=getDR(),conv=getSpaceConv(),nIdx=_spBuildConvNorm(conv),L=_spWarehouseLists();
+  var names=L.B.concat(L.F),codes=L.BC.concat(L.FC),i=names.indexOf(n);if(i<0)return[];
+  var rep=st.fgbal;if(!rep||!rep.rows)return[];
+  var cs=_spMatchCols(rep.headers||[],rep.numFrom!=null?rep.numFrom:5,n,codes[i]);if(!cs.length)return[];
+  var dis=getSpaceConvDisabled(),exc=getSpaceExcluded(),out=[];
+  rep.rows.forEach(function(row){
+    var c=String(row[0]==null?"":row[0]).trim();if(!c||c==="0"||_spIsBottel(row))return;
+    if(dis[c]||exc[c]||dis[_spNormCode(c)]||exc[_spNormCode(c)])return;
+    var q=0;cs.forEach(function(k){var v=row[k];if(typeof v==="number"&&v>q)q=v});if(!(q>0))return;
+    var r=_spConvLookup(c,conv,nIdx,n),b=_spConvLookup(c,conv,nIdx,null);
+    var ov=!!(r&&b&&(r.cpp!==b.cpp||r.layers!==b.layers||r.size!==b.size));
+    out.push({c:c,q:q,r:r,b:b,ov:ov,ps:r?window.__spPalArea(c,n,r):0,pal:r?q/r.cpp:0,m2:r?_spM2For(c,q,conv,nIdx,n):0});
+  });
+  out.sort(function(a,b){return b.m2-a.m2});return out;
+}
+window.__spUsedRows=rowsFor;
+function inject(){
+  try{
+    var old=document.getElementById("spdet-box");if(old)old.remove();
+    var wrap=document.getElementById("rep-space-wrap");if(!wrap||!wrap.parentNode)return;
+    var L=_spWarehouseLists(),h='<details id="spdet-box" style="margin:10px 0;border:1px solid #cbd5e1;border-radius:12px;padding:8px 14px;background:#f8fafc;color:#0f2747;font-size:12.5px"><summary style="cursor:pointer;font-weight:800">'+A("تفاصيل حساب المساحة المستخدمة لكل صنف (للتدقيق)","Used-space calculation per SKU (audit)")+'</summary>';
+    L.F.concat(L.B).forEach(function(n){
+      var rs=rowsFor(n);if(!rs.length)return;
+      var tq=0,tp=0,tm=0;rs.forEach(function(x){tq+=x.q;tp+=x.pal;tm+=x.m2});
+      h+='<div style="margin-top:10px"><b>'+esc(n)+'</b> — '+f(tq,0)+A(" كرتون · "," ctn · ")+f(tp,2)+A(" بلت · "," pallets · ")+'<b>'+f(tm,1)+' m²</b>';
+      h+='<div style="overflow:auto;max-height:260px"><table style="border-collapse:collapse;width:100%;margin-top:4px"><tr style="background:#e2e8f0">'
+       +['Code',A("كرتون","Cartons"),A("كرتون/بلت","Ctn/pallet"),A("بلت","Pallets"),A("الطبقات","Layers"),A("مساحة البلت","Pallet m²"),'m²',''].map(function(t){return '<th style="padding:3px 8px;text-align:center">'+t+'</th>'}).join("")+'</tr>';
+      rs.forEach(function(x){
+        h+='<tr style="border-top:1px solid #e2e8f0'+(x.r?'':';background:#fee2e2')+'"><td style="padding:3px 8px">'+esc(x.c)+'</td><td style="text-align:center">'+f(x.q,0)+'</td>'
+         +(x.r?'<td style="text-align:center">'+f(x.r.cpp,0)+'</td><td style="text-align:center">'+f(x.pal,2)+'</td><td style="text-align:center">'+f(x.r.layers,2)+'</td><td style="text-align:center">'+f(x.ps,2)+'</td><td style="text-align:center;font-weight:700">'+f(x.m2,1)+'</td><td style="color:#b45309">'+(x.ov?A("استثناء مستودع","warehouse override"):"")+'</td>'
+           :'<td colspan="5" style="text-align:center;color:#b91c1c">'+A("بلا معامل تحويل","no conversion")+'</td><td></td>')+'</tr>';
+      });
+      h+='</table></div></div>';
+    });
+    h+='</details>';
+    var ref=document.getElementById("spmiss-box")||wrap;
+    ref.insertAdjacentHTML("afterend",h);
+  }catch(e){}
+}
+function wrapR(){
+  if(typeof renderSpaceReport!=="function")return;
+  var o=renderSpaceReport,w=function(){var r=o.apply(this,arguments);try{setTimeout(inject,30)}catch(e){}return r};
+  window.renderSpaceReport=w;
+}
+try{wrapR()}catch(e){}
+})();
+</script>
+
+<script id="spall-js">
+/* مساحة المستخدمة = الوحدات ÷ وحدات/بلت ÷ رصّات الصنف × مساحة البلت (من Space Actuals للمستودع) */
+(function(){
+var _memo=null,_memoT=0;
+function acts(){var t=Date.now();if(_memo&&t-_memoT<300)return _memo;try{_memo=getSpaceActuals()}catch(e){_memo=null}_memoT=t;return _memo}
+window.__spPalArea=function(code,wh,r){
+  try{
+    var ov=null;try{ov=spConvWhOverride(wh,code)||spConvWhOverride(wh,_spNormCode(code))}catch(e){}
+    if(ov&&ov.size>0)return ov.size;
+    var act=acts();
+    if(act&&wh){var k=_spWhKey(wh),rec=null;(act.branches||[]).concat(act.factories||[]).forEach(function(x){if(!rec&&x&&_spWhKey(x.name)===k)rec=x});
+      var v=parseFloat(rec&&rec.palOne);if(isFinite(v)&&v>0)return v}
+    var g=parseFloat(act&&act.palOne);if(isFinite(g)&&g>0)return g;
+  }catch(e){}
+  return r?r.size:0;
+};
+window._spM2For=_spM2For=function(code,qty,conv,normIdx,wh){
+  var r=_spConvLookup(code,conv,normIdx||null,wh||null);if(!r)return 0;
+  return qty/r.cpp/r.layers*window.__spPalArea(code,wh,r);
+};
+})();
+</script>
