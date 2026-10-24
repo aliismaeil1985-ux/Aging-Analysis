@@ -16656,32 +16656,93 @@ function rowsFor(n){
     var q=0;cs.forEach(function(k){var v=row[k];if(typeof v==="number"&&v>q)q=v});if(!(q>0))return;
     var r=_spConvLookup(c,conv,nIdx,n),b=_spConvLookup(c,conv,nIdx,null);
     var ov=!!(r&&b&&(r.cpp!==b.cpp||r.layers!==b.layers||r.size!==b.size));
-    out.push({c:c,q:q,r:r,b:b,ov:ov,ps:r?window.__spPalArea(c,n,r):0,pal:r?q/r.cpp:0,m2:r?_spM2For(c,q,conv,nIdx,n):0});
+    var note="";
+    if(ov)note=[["cpp",b.cpp,r.cpp],["layers",b.layers,r.layers],["size",b.size,r.size]].filter(function(t){return t[1]!==t[2]}).map(function(t){return t[0]+" "+f(t[1],2)+" → "+f(t[2],2)}).join(" · ");
+    out.push({c:c,q:q,r:r,ov:ov,note:note,ps:r?window.__spPalArea(c,n,r):0,pal:r?q/r.cpp:0,m2:r?_spM2For(c,q,conv,nIdx,n):0,
+      brand:String(row[1]||""),size:String(row[2]||""),cat:String(row[3]||"")});
   });
   out.sort(function(a,b){return b.m2-a.m2});return out;
 }
 window.__spUsedRows=rowsFor;
+function actOf(n){try{var a=getSpaceActuals(),k=_spWhKey(n),r=null;(a.branches||[]).concat(a.factories||[]).forEach(function(x){if(!r&&x&&_spWhKey(x.name)===k)r=x});return r}catch(e){return null}}
+function build(){
+  var L=_spWarehouseLists(),out=[];
+  L.B.concat(L.F).forEach(function(n){
+    var rs=rowsFor(n);if(!rs.length)return;
+    var t={n:n,rows:rs,q:0,pal:0,m2:0,miss:0};
+    rs.forEach(function(x){t.q+=x.q;t.pal+=x.pal;t.m2+=x.m2;if(!x.r)t.miss++});
+    var a=actOf(n);t.act=a?(parseFloat(a.m2)||0):0;out.push(t);
+  });
+  return out;
+}
+function heads(){return ["Code",A("العلامة","Brand"),A("الحجم","Size"),A("الفئة","Category"),A("كرتون","Cartons"),A("كرتون/بلت","Ctn/pallet"),A("بلت","Pallets"),A("الرصّات","Layers"),A("مساحة البلت م²","Pallet m²"),A("المساحة م²","Used m²"),A("ملاحظة","Note")]}
+function rowArr(x){return x.r?[x.c,x.brand,x.size,x.cat,x.q,x.r.cpp,+x.pal.toFixed(2),x.r.layers,x.ps,+x.m2.toFixed(1),x.note?A("استثناء مستودع: ","Override: ")+x.note:""]:[x.c,x.brand,x.size,x.cat,x.q,"","","","","",A("بلا معامل تحويل","No conversion")]}
+function exportXlsx(data){
+  try{
+    if(typeof XLSX==="undefined")return alert(A("مكتبة Excel غير محمّلة","Excel library not loaded"));
+    var wb=XLSX.utils.book_new(),sum=[[A("المستودع","Warehouse"),A("كرتون","Cartons"),A("بلت","Pallets"),A("المساحة المستخدمة م²","Used m²"),A("المساحة الفعلية م²","Actual m²"),A("النسبة %","Used %"),A("أكواد بلا معامل","Codes w/o conversion")]];
+    var T=[0,0,0,0];
+    data.forEach(function(t){sum.push([t.n,t.q,+t.pal.toFixed(2),+t.m2.toFixed(1),t.act,t.act>0?+(t.m2/t.act*100).toFixed(1):"",t.miss]);T[0]+=t.q;T[1]+=t.pal;T[2]+=t.m2;T[3]+=t.act});
+    sum.push([A("الإجمالي","Total"),T[0],+T[1].toFixed(2),+T[2].toFixed(1),T[3],T[3]>0?+(T[2]/T[3]*100).toFixed(1):"",""]);
+    var ws=XLSX.utils.aoa_to_sheet(sum);ws["!cols"]=[{wch:24},{wch:14},{wch:12},{wch:18},{wch:18},{wch:10},{wch:18}];
+    XLSX.utils.book_append_sheet(wb,ws,A("الملخص","Summary").slice(0,31));
+    var used={};
+    data.forEach(function(t){
+      var aoa=[heads()].concat(t.rows.map(rowArr));
+      aoa.push([A("الإجمالي","Total"),"","","",t.q,"",+t.pal.toFixed(2),"","",+t.m2.toFixed(1),""]);
+      var w=XLSX.utils.aoa_to_sheet(aoa);w["!cols"]=[{wch:12},{wch:14},{wch:10},{wch:10},{wch:12},{wch:11},{wch:10},{wch:9},{wch:12},{wch:11},{wch:40}];
+      var nm=String(t.n).replace(/[\\\/\?\*\[\]:]/g," ").slice(0,28),k=nm,j=2;while(used[k])k=nm.slice(0,26)+"_"+j++;used[k]=1;
+      XLSX.utils.book_append_sheet(wb,w,k);
+    });
+    var d=new Date(),ds=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);
+    XLSX.writeFile(wb,"Space_Used_Audit_"+ds+".xlsx");
+  }catch(e){alert("Excel: "+(e&&e.message||e))}
+}
+function close(){var m=document.getElementById("spaud-ov");if(m)m.remove()}
+function open(){
+  close();
+  var data=build(),dir=document.documentElement.dir||"rtl";
+  var ov=document.createElement("div");ov.id="spaud-ov";
+  ov.style.cssText="position:fixed;inset:0;background:rgba(15,39,71,.55);z-index:100020;display:flex;align-items:center;justify-content:center;padding:16px;direction:"+dir;
+  var h='<div style="background:#fff;color:#0f2747;border-radius:16px;width:min(1180px,98vw);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit">'
+   +'<div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #e2e8f0"><div style="font-weight:800;font-size:16px;flex:1">'+A("تفاصيل حساب المساحة المستخدمة لكل صنف","Used-space calculation per SKU")+'</div>'
+   +'<select id="spaud-sel" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:8px;font-family:inherit"><option value="">'+A("كل المستودعات","All warehouses")+'</option>'+data.map(function(t,i){return '<option value="'+i+'">'+esc(t.n)+'</option>'}).join("")+'</select>'
+   +'<button id="spaud-x" style="background:#16a34a;color:#fff;border:0;border-radius:9px;padding:8px 16px;font-weight:800;cursor:pointer;font-family:inherit">⬇ Excel</button>'
+   +'<button id="spaud-c" style="background:#e2e8f0;color:#0f2747;border:0;border-radius:9px;padding:8px 14px;font-weight:800;cursor:pointer;font-family:inherit">✕</button></div>'
+   +'<div id="spaud-body" style="overflow:auto;padding:14px 18px"></div></div>';
+  ov.innerHTML=h;document.body.appendChild(ov);
+  function paint(){
+    var v=document.getElementById("spaud-sel").value,list=v===""?data:[data[+v]],b="";
+    if(!list.length||!list[0]){b='<div style="padding:24px;text-align:center;color:#64748b">'+A("لا توجد بيانات: ارفع تقرير FG Balance أولاً.","No data — upload the FG Balance report first.")+'</div>'}
+    else{
+      b+='<table style="border-collapse:collapse;width:100%;margin-bottom:16px;font-size:12.5px"><tr style="background:#0f2747;color:#fff">'+[A("المستودع","Warehouse"),A("كرتون","Cartons"),A("بلت","Pallets"),A("المستخدمة م²","Used m²"),A("الفعلية م²","Actual m²"),"%"].map(function(t){return '<th style="padding:6px 10px;text-align:center">'+t+'</th>'}).join("")+'</tr>';
+      var T=[0,0,0,0];
+      list.forEach(function(t){T[0]+=t.q;T[1]+=t.pal;T[2]+=t.m2;T[3]+=t.act;b+='<tr style="border-top:1px solid #e2e8f0"><td style="padding:5px 10px"><b>'+esc(t.n)+'</b>'+(t.miss?' <span style="color:#b91c1c">('+t.miss+A(" بلا معامل",' no conv.')+')</span>':'')+'</td><td style="text-align:center">'+f(t.q,0)+'</td><td style="text-align:center">'+f(t.pal,2)+'</td><td style="text-align:center;font-weight:700">'+f(t.m2,1)+'</td><td style="text-align:center">'+f(t.act,0)+'</td><td style="text-align:center">'+(t.act>0?f(t.m2/t.act*100,0)+"%":"")+'</td></tr>'});
+      b+='<tr style="border-top:2px solid #0f2747;background:#f1f5f9;font-weight:800"><td style="padding:6px 10px">'+A("الإجمالي","Total")+'</td><td style="text-align:center">'+f(T[0],0)+'</td><td style="text-align:center">'+f(T[1],2)+'</td><td style="text-align:center">'+f(T[2],1)+'</td><td style="text-align:center">'+f(T[3],0)+'</td><td style="text-align:center">'+(T[3]>0?f(T[2]/T[3]*100,0)+"%":"")+'</td></tr></table>';
+      list.forEach(function(t){
+        b+='<div style="margin:10px 0 4px;font-weight:800">'+esc(t.n)+' — '+f(t.q,0)+A(" كرتون · "," ctn · ")+f(t.pal,2)+A(" بلت · "," pallets · ")+f(t.m2,1)+' m²</div>';
+        b+='<div style="overflow:auto"><table style="border-collapse:collapse;width:100%;font-size:12px"><tr style="background:#e2e8f0">'+heads().map(function(x){return '<th style="padding:4px 8px;text-align:center;white-space:nowrap">'+x+'</th>'}).join("")+'</tr>';
+        t.rows.forEach(function(x){var a=rowArr(x);b+='<tr style="border-top:1px solid #e2e8f0'+(x.r?'':';background:#fee2e2')+'">'+a.map(function(c,i){return '<td style="padding:3px 8px;text-align:'+(i<4||i===10?'start':'center')+(i===9?';font-weight:700':'')+(i===10&&x.note?';color:#b45309':'')+'">'+(typeof c==="number"?f(c,i===6?2:(i===9?1:2)):esc(c))+'</td>'}).join("")+'</tr>'});
+        b+='</table></div>';
+      });
+    }
+    document.getElementById("spaud-body").innerHTML=b;
+  }
+  paint();
+  document.getElementById("spaud-sel").onchange=paint;
+  document.getElementById("spaud-c").onclick=close;
+  document.getElementById("spaud-x").onclick=function(){var v=document.getElementById("spaud-sel").value;exportXlsx(v===""?data:[data[+v]])};
+  ov.addEventListener("mousedown",function(e){if(e.target===ov)close()});
+}
+window.spOpenUsedAudit=open;
 function inject(){
   try{
     var old=document.getElementById("spdet-box");if(old)old.remove();
     var wrap=document.getElementById("rep-space-wrap");if(!wrap||!wrap.parentNode)return;
-    var L=_spWarehouseLists(),h='<details id="spdet-box" style="margin:10px 0;border:1px solid #cbd5e1;border-radius:12px;padding:8px 14px;background:#f8fafc;color:#0f2747;font-size:12.5px"><summary style="cursor:pointer;font-weight:800">'+A("تفاصيل حساب المساحة المستخدمة لكل صنف (للتدقيق)","Used-space calculation per SKU (audit)")+'</summary>';
-    L.F.concat(L.B).forEach(function(n){
-      var rs=rowsFor(n);if(!rs.length)return;
-      var tq=0,tp=0,tm=0;rs.forEach(function(x){tq+=x.q;tp+=x.pal;tm+=x.m2});
-      h+='<div style="margin-top:10px"><b>'+esc(n)+'</b> — '+f(tq,0)+A(" كرتون · "," ctn · ")+f(tp,2)+A(" بلت · "," pallets · ")+'<b>'+f(tm,1)+' m²</b>';
-      h+='<div style="overflow:auto;max-height:260px"><table style="border-collapse:collapse;width:100%;margin-top:4px"><tr style="background:#e2e8f0">'
-       +['Code',A("كرتون","Cartons"),A("كرتون/بلت","Ctn/pallet"),A("بلت","Pallets"),A("الطبقات","Layers"),A("مساحة البلت","Pallet m²"),'m²',''].map(function(t){return '<th style="padding:3px 8px;text-align:center">'+t+'</th>'}).join("")+'</tr>';
-      rs.forEach(function(x){
-        h+='<tr style="border-top:1px solid #e2e8f0'+(x.r?'':';background:#fee2e2')+'"><td style="padding:3px 8px">'+esc(x.c)+'</td><td style="text-align:center">'+f(x.q,0)+'</td>'
-         +(x.r?'<td style="text-align:center">'+f(x.r.cpp,0)+'</td><td style="text-align:center">'+f(x.pal,2)+'</td><td style="text-align:center">'+f(x.r.layers,2)+'</td><td style="text-align:center">'+f(x.ps,2)+'</td><td style="text-align:center;font-weight:700">'+f(x.m2,1)+'</td><td style="color:#b45309">'+(x.ov?A("استثناء مستودع","override")+": "+[["cpp",x.b&&x.b.cpp,x.r.cpp],["layers",x.b&&x.b.layers,x.r.layers],["size",x.b&&x.b.size,x.r.size]].filter(function(t){return t[1]!==t[2]}).map(function(t){return t[0]+" "+f(t[1],2)+" → "+f(t[2],2)}).join(" · "):"")+'</td>'
-           :'<td colspan="5" style="text-align:center;color:#b91c1c">'+A("بلا معامل تحويل","no conversion")+'</td><td></td>')+'</tr>';
-      });
-      h+='</table></div></div>';
-    });
-    h+='</details>';
-    var ref=document.getElementById("spmiss-box")||wrap;
-    ref.insertAdjacentHTML("afterend",h);
+    var d=document.createElement("div");d.id="spdet-box";d.style.cssText="margin:12px 0";
+    d.innerHTML='<button type="button" style="background:#0f2747;color:#fff;border:0;border-radius:10px;padding:9px 18px;font-weight:800;cursor:pointer;font-family:inherit;font-size:13px">📋 '+A("تفاصيل حساب المساحة المستخدمة","Used-space calculation details")+'</button>';
+    d.firstChild.onclick=open;
+    var ref=document.getElementById("spmiss-box")||wrap;ref.insertAdjacentElement("afterend",d);
   }catch(e){}
 }
 function wrapR(){
