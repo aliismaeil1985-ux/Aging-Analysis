@@ -16851,3 +16851,29 @@ try{LASTJ=JSON.stringify(getDR())}catch(e){}
 .sp-table thead th small{display:block !important;font-size:12.5px !important;font-weight:700 !important;opacity:.95 !important;margin-top:4px !important}
 .sp-table thead th.sp-vsep{padding:0 !important}
 </style>
+
+<style id="mbfg-css">
+@media (max-width:640px){
+ /* بطاقات الإجماليات: شبكة عمودين، والإجمالي الكلي بعرض كامل */
+ #rep-fgbal-wrap .fg-cards{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;overflow:visible!important}
+ #rep-fgbal-wrap .fg-card{width:auto!important;min-width:0!important;max-width:none!important;flex:none!important;margin:0!important}
+ #rep-fgbal-wrap .fg-card.fg-c-grand{grid-column:1/-1!important;order:-1}
+ #rep-fgbal-wrap .fg-grand-split{min-height:0!important}
+ #rep-fgbal-wrap .fg-c-grand .fg-grand-val{font-size:26px!important}
+ /* شريط الأدوات: بحث + ≠0 في صف، ثم الفلاتر اللونية في صف واحد، ثم الأزرار بعمودين */
+ #rep-fgbal-wrap .fg-top{display:grid!important;grid-template-columns:1fr auto;gap:8px!important;align-items:center}
+ #rep-fgbal-wrap .fg-search{width:auto!important;min-width:0!important;max-width:none!important}
+ #rep-fgbal-wrap .fg-cov-row{grid-column:1/-1;display:grid!important;grid-template-columns:repeat(10,minmax(0,1fr))!important;gap:6px!important;margin:0!important;width:100%!important}
+ #rep-fgbal-wrap .fg-cov-row>.fg-cov-btn{grid-column:span 2;padding:11px 2px!important;min-width:0!important;width:100%!important;font-size:9.5px!important;letter-spacing:0!important;border-radius:14px!important}
+ #rep-fgbal-wrap .fg-cov-row>div:not([class]){display:none!important}
+ #rep-fgbal-wrap .fg-cov-row>#dal-color-toggle-btn,#rep-fgbal-wrap .fg-cov-row>#fg-cov-btn,#rep-fgbal-wrap .fg-cov-row>#fg-pal-btn,#rep-fgbal-wrap .fg-cov-row>#dal-list-btn{grid-column:span 5;width:100%!important;justify-content:center!important;padding:10px 6px!important;font-size:11px!important}
+ /* شارات الأرقام الملوّنة: حجم موحّد لكل البطاقات */
+ .mb-card-val{box-sizing:border-box!important;width:96px!important;min-width:96px!important;text-align:center!important;font-size:17px!important;padding:6px 6px!important;border-radius:12px!important}
+ .mb-card-val.mb-dal{display:block!important;padding:6px 6px!important}
+ .mb-row .v{box-sizing:border-box;text-align:end}
+ #rep-fgbal-wrap .fg-cov-row>.rr-keepcols{grid-column:span 6;order:10;margin:0!important;width:100%!important;padding:10px 6px!important;font-size:11px!important}
+ #rep-fgbal-wrap .fg-cov-row>.bf-reset{grid-column:span 4;order:11;margin:0!important;width:100%!important;padding:10px 4px!important;font-size:11px!important}
+ .mb-row .v.mb-dal{display:block!important;width:78px;padding:3px 6px!important}
+ .mb-card-head{gap:8px!important}
+}
+</style>
