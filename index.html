@@ -15811,7 +15811,7 @@ function quality(rows,atMs,c){var I=[],seen={},known=null;try{var M=rj("md_items
   null!=p&&(atMs-p)/DAY>=c.shelf&&add("exp","r",d,L("منتهي الصلاحية وما زال في الرصيد","Expired but still in stock"))});
  return I}
 /* ---------- state ---------- */
-var S=rj(KS,{open:!0,tab:"ins"}),CHAT=[],BUSY=!1;
+var S=(function(){var o=rj(KS,{open:!1,tab:"ins"});o.open=!1;return o})(),CHAT=[],BUSY=!1;
 function save(){wj(KS,S)}
 function host(){var p=document.getElementById("page-dash");if(!p)return null;var el=document.getElementById("aix");
  if(!el){el=document.createElement("div");el.id="aix";var ck=document.getElementById("custom-kpis"),k=p.querySelector(".kpis:not(.custom-kpis)"),a=ck||k;
@@ -15975,7 +15975,7 @@ function render(){var el=host();if(!el)return;var p=document.getElementById("pag
  var ch=document.getElementById("aix-chat");ch&&(ch.scrollTop=ch.scrollHeight)}
 window.AIX={render:render,
  toggle:function(){S.open=!S.open;save();render()},tab:function(t){S.tab=t;save();render()},
- ask:function(q){var inp=document.getElementById("aix-q");q=String(q||inp&&inp.value||"").trim();if(!q||BUSY)return;
+ ask:function(q){S.open=!0;var inp=document.getElementById("aix-q");q=String(q||inp&&inp.value||"").trim();if(!q||BUSY)return;
   var loc=localAnswer(q);CHAT.push({r:"u",h:esc(q)});CHAT.push({r:"a",h:esc(loc.txt)+loc.tbl});
   if(aiCfg().key){BUSY=!0;CHAT.push({r:"a",h:"🤖 …"});render();askClaude(q,loc,function(t,err){BUSY=!1;CHAT.pop();CHAT.push({r:"a",h:t?"🤖 "+esc(t):"⚠️ "+L("تعذّر الوصول إلى Claude: ","Could not reach Claude: ")+esc(err||"")});render()})}else render()},
  clearChat:function(){CHAT=[];render()},
@@ -16351,6 +16351,7 @@ add("rfgbal","hidecolors","إخفاء الألوان","Hide colors",["#dal-color
 add("rfgbal","coverage","أيام التغطية","Coverage days",["#fg-cov-btn"]);
 add("rfgbal","pallets","عدد البلتات","Pallets",["#fg-pal-btn"]);
 add("rfgbal","list","وضع القائمة","List mode",["#dal-list-btn"]);
+add("dash","smartai","التحليل الذكي (Smart insights)","Smart insights (AI analysis)",["#aix"]);
 add("datecmp","exportbtn","زر التصدير بالأعلى","Export button",["#dcmp-export"]);
 add("datecmp","hidebr","إخفاء الفروع","Hide branches",["#dcmp-hb-btn"]);
 add("datecmpfg","exportbtn","زر التصدير بالأعلى","Export button",["#dcmpfg-export"]);
@@ -16877,3 +16878,47 @@ try{LASTJ=JSON.stringify(getDR())}catch(e){}
  .mb-card-head{gap:8px!important}
 }
 </style>
+
+<script id="warnexp-js">(function(){
+var WARN_DAYS=7;
+function ar(){try{return"function"==typeof drIsAr?drIsAr():"undefined"!=typeof LANG&&"ar"===LANG}catch(e){return!0}}
+function L(a,e){return ar()?a:e}
+function esc(s){return String(null==s?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function adminMail(){try{var us=getUsers()||[];for(var i=0;i<us.length;i++)if(us[i]&&"admin"===us[i].r&&/@/.test(us[i].email||""))return us[i].email}catch(e){}try{if("undefined"!=typeof ADMIN_AUTH_EMAIL&&ADMIN_AUTH_EMAIL)return ADMIN_AUTH_EMAIL}catch(e){}return""}
+function dayStart(t){var d=new Date(t);d.setHours(0,0,0,0);return d.getTime()}
+function calDays(exp){return Math.round((dayStart(exp)-dayStart(Date.now()))/864e5)}
+function ss(){try{return window.sessionStorage}catch(e){return null}}
+var ICON='<svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="40" fill="#fff4e0"/><circle cx="42" cy="44" r="22" fill="#fff" stroke="#f59e0b" stroke-width="4"/><path d="M42 30v15l10 6" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/><path d="M34 16h16" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/></svg>';
+window.umxExpiryWarn=function(rec,days){
+ try{var old=document.getElementById("umx-exp-ov");old&&old.remove();
+  var d="";try{d=new Date(rec.expiresAt).toLocaleDateString(ar()?"ar-EG":"en-GB",{day:"numeric",month:"long",year:"numeric"})}catch(e){}
+  var u=rec.u||"",mail=adminMail();
+  var title=days<=0?L("ينتهي وصولك <span style=\"color:#dc2626\">اليوم</span>","Your access ends <span style=\"color:#dc2626\">today</span>"):1===days?L("ينتهي وصولك <span style=\"color:#dc2626\">غدًا</span>","Your access ends <span style=\"color:#dc2626\">tomorrow</span>"):L("تنتهي صلاحية حسابك بعد <span style=\"color:#dc2626\">"+days+" أيام</span>","Your account expires in <span style=\"color:#dc2626\">"+days+" days</span>");
+  var pct=Math.max(4,Math.min(100,Math.round((Math.max(days,0)+1)/(WARN_DAYS+1)*100)));
+  var subj=encodeURIComponent(L("طلب تجديد صلاحية الحساب — ","Account renewal request — ")+u),msg=encodeURIComponent(L("السلام عليكم،\nأرجو تجديد صلاحية حسابي ("+u+") التي تنتهي بتاريخ "+d+".\nشكرًا.","Hello,\nPlease renew my account ("+u+") which expires on "+d+".\nThank you."));
+  var ov=document.createElement("div");ov.id="umx-exp-ov";ov.setAttribute("dir",ar()?"rtl":"ltr");
+  ov.innerHTML='<div class="umx-exp-box k2">'+ICON+'<h3>'+title+'</h3><div style="height:10px;border-radius:10px;background:#e2e8f0;overflow:hidden;margin:12px 0 4px"><i style="display:block;height:100%;width:'+pct+'%;background:linear-gradient(90deg,#f59e0b,#ef4444)"></i></div>'
+   +'<p style="font-size:12.5px;color:#64748b">'+L("ينتهي بتاريخ ","Ends on ")+'<b>'+esc(d)+'</b></p><p>'+L("لتفادي انقطاع الوصول، يرجى طلب التجديد من مدير النظام قبل هذا التاريخ.","To avoid losing access, please request renewal from the system administrator before this date.")+'</p>'
+   +(mail?'<span class="umx-exp-chip">📧 '+esc(mail)+'</span><br><a class="umx-exp-btn" href="mailto:'+esc(mail)+'?subject='+subj+'&body='+msg+'">'+L("طلب التجديد","Request renewal")+'</a>':'')
+   +'<button class="umx-exp-btn gh" onclick="document.getElementById(\'umx-exp-ov\').remove()">'+L("متابعة","Continue")+'</button></div>';
+  ov.addEventListener("click",function(e){e.target===ov&&ov.remove()});document.body.appendChild(ov)}catch(e){}};
+function check(){
+ try{
+  var cu="undefined"!=typeof CURRENT_USER?CURRENT_USER:null;if(!cu||!cu.u)return;
+  if("function"==typeof isAdmin&&isAdmin())return;
+  var us=("function"==typeof getUsers&&getUsers())||[],r=null;
+  for(var i=0;i<us.length;i++)if(us[i]&&us[i].u===cu.u){r=us[i];break}
+  if(!r||r.r==="admin"||!r.expiresAt)return;
+  var left=r.expiresAt-Date.now();if(left<=0||left>(WARN_DAYS+1)*864e5)return;
+  var days=calDays(r.expiresAt);if(days>WARN_DAYS)return;
+  var S=ss(),key="expwarn:"+r.u+":"+r.expiresAt+":"+dayStart(Date.now());
+  if(S&&S.getItem(key))return;
+  if(document.getElementById("umx-exp-ov")||(document.getElementById("login-ov")&&document.getElementById("login-ov").offsetParent!==null))return;
+  S&&S.setItem(key,"1");
+  window.umxExpiryWarn(r,days);
+ }catch(e){}
+}
+window.__umxExpWarnCheck=check;
+setInterval(check,5000);setTimeout(check,2500);
+})();
+</script>
