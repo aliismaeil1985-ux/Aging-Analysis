@@ -16950,3 +16950,44 @@ try{document.addEventListener("visibilitychange",function(){document.hidden||pul
 #umx-exp-ov .umx-exp-btn:not(.gh){background:linear-gradient(135deg,#2563eb,#1d4ed8)!important;box-shadow:0 8px 18px -6px rgba(37,99,235,.55)!important}
 #umx-exp-ov .umx-exp-btn:hover{transform:translateY(-1px)}
 #umx-exp-ov .umx-exp-btn.gh{background:#fff!important;color:#475569!important;border:1px solid #e2e8f0!important}</style>
+<script data-cfasync="false" id="permdiag-js">!function(){"use strict";
+function esc(x){return String(x==null?"":x).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function row(k,v){return '<tr><td style="padding:4px 8px;color:#64748b;white-space:nowrap">'+k+'</td><td style="padding:4px 8px;font-weight:600;word-break:break-all;direction:ltr;text-align:left">'+esc(v)+'</td></tr>'}
+function show(rows){var o=document.getElementById("pdg-ov");o&&o.remove();o=document.createElement("div");o.id="pdg-ov";o.style.cssText="position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px";
+o.innerHTML='<div style="background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow:auto;padding:18px;font:13px/1.6 Tajawal,Segoe UI,sans-serif;box-shadow:0 30px 70px rgba(0,0,0,.4)"><h3 style="margin:0 0 8px;font-size:16px">🔍 تشخيص الصلاحيات</h3><table style="width:100%;border-collapse:collapse">'+rows+'</table><div style="text-align:center;margin-top:12px"><button onclick="document.getElementById(\'pdg-ov\').remove()" style="padding:8px 22px;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;font-weight:700">إغلاق</button></div></div>';o.addEventListener("click",function(e){e.target===o&&o.remove()});document.body.appendChild(o)}
+window.__permDiag=function(){
+ var cu=null;try{cu=CURRENT_USER}catch(e){}
+ var loc=null;try{loc=(getUsers()||[]).find(function(x){return cu&&x.u===cu.u})}catch(e){}
+ var r=row("المستخدم / الدور",cu?cu.u+" / "+cu.r:"-")+row("صلاحيات الجلسة الحالية",cu&&cu.perms?cu.perms.length+": "+cu.perms.join(", "):"-")+row("السجل المحلي",loc?(loc.perms||[]).length+": "+(loc.perms||[]).join(", "):"غير موجود");
+ var fr=false,fd=false;try{fr=!!fbReady;fd=!!fbDB}catch(e){}
+ r+=row("fbReady / fbDB",fr+" / "+fd);
+ show(r+row("السحابة","جارٍ الجلب..."));
+ if(!fr||!fd)return;
+ var t0=Date.now();
+ fbDB.collection(FB_COL).doc(FB_USERS_DOC).get().then(function(doc){
+  var rr=row("المستخدم / الدور",cu?cu.u+" / "+cu.r:"-")+row("صلاحيات الجلسة الحالية",cu&&cu.perms?cu.perms.length+": "+cu.perms.join(", "):"-")+row("السجل المحلي",loc?(loc.perms||[]).length+": "+(loc.perms||[]).join(", "):"غير موجود")+row("fbReady / fbDB",fr+" / "+fd);
+  if(!doc.exists)rr+=row("السحابة","وثيقة المستخدمين غير موجودة");
+  else{var d=doc.data()||{},f=(d.users||[]).find(function(x){return x&&cu&&String(x.u).toLowerCase()===String(cu.u).toLowerCase()});
+   rr+=row("آخر تحديث للسحابة",d.updatedAt?new Date(d.updatedAt).toLocaleString():"-")+row("عدد المستخدمين في السحابة",(d.users||[]).length)+row("سجل المستخدم في السحابة",f?(f.r+" | "+(f.perms||[]).length+": "+(f.perms||[]).join(", ")):"غير موجود في السحابة")}
+  show(rr);
+ }).catch(function(e){show(row("المستخدم / الدور",cu?cu.u+" / "+cu.r:"-")+row("صلاحيات الجلسة الحالية",cu&&cu.perms?cu.perms.join(", "):"-")+row("خطأ قراءة السحابة",(e&&(e.code||e.message))||e))});
+};
+function pill(){try{var cu=CURRENT_USER;var p=document.getElementById("pdg-pill");var need=cu&&cu.r!=="admin";if(!need){p&&p.remove();return}if(p)return;p=document.createElement("button");p.id="pdg-pill";p.textContent="🔍 صلاحياتي";p.style.cssText="position:fixed;bottom:12px;left:12px;z-index:2147482000;padding:6px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;color:#334155;font:600 12px Tajawal,Segoe UI,sans-serif;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:.85";p.onclick=function(){window.__permDiag()};document.body.appendChild(p)}catch(e){}}
+setInterval(pill,1500);
+}();</script>
+<script data-cfasync="false" id="trlink-js">!function(){"use strict";
+/* ربط عمود Transit في FG Balance بتقرير FG Transit (عمود Total) — لأن عمود Transit في ملف الرفع رابط خارجي قيمته المخزّنة صفر */
+function ix(h,name){for(var i=0;i<(h||[]).length;i++)if(String(h[i]).trim().toLowerCase()===name)return i;return-1}
+function ck(v){var n=Number(String(v).replace(/[^0-9.\-]/g,""));return isNaN(n)||!String(v).trim()?String(v).trim():String(n)}
+function overlay(rep){try{
+ if(!rep||!rep.rows||!rep.headers)return rep;
+ var dr=getDR(),tr=dr&&dr.transit;if(!tr||!tr.rows||!tr.rows.length)return rep;
+ var ti=ix(rep.headers,"transit");if(ti<0)return rep;
+ var tc=ix(tr.headers,"total");if(tc<0)tc=tr.headers.length-1;
+ var m={};tr.rows.forEach(function(r){var k=ck(r[0]);if(k)m[k]=(m[k]||0)+(Number(r[tc])||0)});
+ var o=Object.assign({},rep);o.rows=rep.rows.map(function(r){var k=ck(r[0]);if(!k||!(k in m))return r;var c=r.slice();c[ti]=m[k];return c});
+ return o}catch(e){return rep}}
+try{var _r=window.renderRichReport;if("function"==typeof _r&&!_r.__tl){window.renderRichReport=function(key,rep){return _r.call(this,key,"fgbal"===key?overlay(rep):rep)};window.renderRichReport.__tl=1}}catch(e){}
+try{var _d=window.renderDailyReport,busy=0;if("function"==typeof _d&&!_d.__tl){window.renderDailyReport=function(key){var r=_d.apply(this,arguments);if("transit"===key&&!busy){busy=1;try{_d.call(this,"fgbal")}catch(e){}busy=0}return r};window.renderDailyReport.__tl=1}}catch(e){}
+window.__trOverlay=overlay;
+}();</script>
