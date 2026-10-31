@@ -15668,7 +15668,7 @@ function colTextShare(R,c){var n=0,t=0;R.forEach(function(r){var v=r&&r[c];if(nu
 function swapCols(rep,a,b){var h=rep.headers,x=h[a];h[a]=h[b];h[b]=x;rep.rows.forEach(function(r){if(Array.isArray(r)){var y=r[a];r[a]=r[b];r[b]=y}})}
 /* يرجع قائمة الإصلاحات (فارغة = لا شيء) */
 function repair(rep,key){
- var out={moved:[],mislabel:[],cleaned:0};
+ var out={moved:[],mislabel:[],cleaned:0,totals:0};
  if(!rep||!Array.isArray(rep.headers)||!Array.isArray(rep.rows)||!FIX[key])return out;
  var F=FIX[key],nf=F.length,h=rep.headers,R=rep.rows;
  if(h.length<=nf||lo(h[0])!==lo(F[0]))return out;
@@ -15688,12 +15688,17 @@ function repair(rep,key){
  for(var c=nf;c<h.length;c++){
   if(/coverage|note|remark|ملاح|التغطية/i.test(String(h[c])))continue;
   R.forEach(function(r){if(Array.isArray(r)&&isTxt(r[c])){r[c]="";out.cleaned++}})}
+ /* v49: الإجمالي المخزَّن يجب أن يساوي مجموع أعمدة المخازن (يُصحّح أي إجمالي بلا أرصدة، مثل 1 و3 مع أصفار) */
+ if("fgbal"===key||"oldid"===key){var ti=-1;for(var q=nf;q<h.length;q++)if("total"===lo(h[q])){ti=q;break}
+  if(ti>nf){R.forEach(function(r){if(!Array.isArray(r))return;var sm=0;for(var c2=nf;c2<ti;c2++){var v=r[c2],n="number"==typeof v?v:(null==v||""===String(v).trim()?0:Number(String(v).replace(/,/g,"")));isFinite(n)&&(sm+=n)}
+   sm=Math.round(1e3*sm)/1e3;var cur=r[ti],cn="number"==typeof cur?cur:(null==cur||""===String(cur).trim()?0:Number(String(cur).replace(/,/g,"")));
+   if(!isFinite(cn)||Math.abs(cn-sm)>.0005){r[ti]=sm;out.totals++}})}}
  return out}
 function admin(){try{return"function"!=typeof isAdmin||isAdmin()}catch(e){return!1}}
 var LAST={};
 function fixStored(key){
  try{var s=getDR();if(!s||!s[key])return;var r=repair(s[key],key);
-  if(r.moved.length||r.mislabel.length||r.cleaned){LAST[key]=r;s[key]._prefixFix={at:Date.now(),moved:r.moved,mislabel:r.mislabel,cleaned:r.cleaned};
+  if(r.moved.length||r.mislabel.length||r.cleaned||r.totals){LAST[key]=r;s[key]._prefixFix={at:Date.now(),moved:r.moved,mislabel:r.mislabel,cleaned:r.cleaned,totals:r.totals};
    saveDR(s);try{admin()&&"function"==typeof drPush&&drPush()}catch(e){}}}catch(e){}}
 function fixTemplates(){
  Object.keys(FIX).forEach(function(key){
@@ -15705,7 +15710,7 @@ function fixTemplates(){
    if(!ok)return;var nh=pre.concat(rest);if(nh.join("|")!==h.join("|")){o.headers=nh}});
   try{var X=window.RPT&&RPT[key];if(X&&Array.isArray(X.colOrder)){var rest2=X.colOrder.filter(function(x){return fl.indexOf(lo(x))<0});var nco=F.concat(rest2);if(nco.join("|")!==X.colOrder.join("|")){X.colOrder=nco;try{LS.setItem("report_designer",JSON.stringify(RPT))}catch(e){}}}}catch(e){}})}
 function banner(key){
- try{var r=LAST[key]||(function(){try{var f=getDR()[key]._prefixFix;return f&&{moved:f.moved,mislabel:f.mislabel,cleaned:f.cleaned}}catch(e){return null}})();
+ try{var _o=document.querySelectorAll(".pg-note");[].forEach.call(_o,function(e){e.remove()});return;var r=LAST[key]||(function(){try{var f=getDR()[key]._prefixFix;return f&&{moved:f.moved,mislabel:f.mislabel,cleaned:f.cleaned}}catch(e){return null}})();
   var w=document.getElementById("rep-"+key+"-wrap");if(!w||!r||!(r.mislabel.length||r.moved.length||r.cleaned))return;
   if(w.querySelector(".pg-note"))return;
   var ar="undefined"==typeof LANG||"ar"===LANG,d=document.createElement("div");d.className="pg-note";
@@ -15718,7 +15723,7 @@ function wrap(){
  try{if("function"==typeof window.renderDailyReport&&!window.renderDailyReport.__pg){var rd=window.renderDailyReport;
   window.renderDailyReport=function(key){try{FIX[key]&&(fixTemplates(),fixStored(key))}catch(e){}var x=rd.apply(this,arguments);try{FIX[key]&&setTimeout(function(){banner(key)},60)}catch(e){}return x};window.renderDailyReport.__pg=1}}catch(e){}
  try{if("function"==typeof window.drCommit&&!window.drCommit.__pg){var dc=window.drCommit;
-  window.drCommit=function(key,obj){try{if(FIX[key]&&obj){var r=repair(obj,key);(r.moved.length||r.mislabel.length||r.cleaned)&&(LAST[key]=r)}}catch(e){}return dc.apply(this,arguments)};window.drCommit.__pg=1}}catch(e){}}
+  window.drCommit=function(key,obj){try{if(FIX[key]&&obj){var r=repair(obj,key);(r.moved.length||r.mislabel.length||r.cleaned||r.totals)&&(LAST[key]=r)}}catch(e){}return dc.apply(this,arguments)};window.drCommit.__pg=1}}catch(e){}}
 window.FGGUARD={repair:repair,fixStored:fixStored,fixTemplates:fixTemplates};
 wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoaded",wrap);setTimeout(wrap,1600);setTimeout(function(){wrap();fixTemplates();["fgbal","oldid","transit"].forEach(fixStored)},2800);
 }();</script>
