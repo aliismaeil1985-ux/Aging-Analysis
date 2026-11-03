@@ -18697,7 +18697,20 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
   function me() { try { return (CURRENT_USER && CURRENT_USER.u) || "guest"; } catch (e) { return "guest"; } }
   function toast(m, ok) { try { typeof syncToast === "function" ? syncToast(m, ok === false ? "err" : "ok") : 0; } catch (e) { } }
   function nz(s) { return String(s == null ? "" : s).replace(/[؟،؛!?;:()"']/g, " ").replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }).toLowerCase().replace(/[ً-ْـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/[^a-z0-9؀-ۿ.]+/g, " ").replace(/\s+/g, " ").trim(); }
-  function packQ(t) { return String(t).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }).match(/(\d{2,4})\s*[×xX*]\s*(\d{1,3})(?!\d)/); }
+  /* العبوة: "600 × 30" أو "24 في 200 ملي" أو "200 مل × 24" ← [نص, الحجم, العدد] (الحجم أولاً دائماً) */
+  var PK_SIZES = [100, 125, 150, 200, 250, 300, 330, 350, 400, 500, 600, 750, 1000, 1500];
+  function packQ(t) {
+    var s = String(t).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }).replace(/[۰-۹]/g, function (d) { return d.charCodeAt(0) - 1776; });
+    s = s.replace(/(\d)\s*(ml|ملي|مل)?\s*(?:في|ضرب|by|[xX×*])\s*(\d)/gi, function (a, d1, u, d2) { return d1 + (u ? " " + u : "") + " × " + d2; });
+    var m = s.match(/(\d{1,4})\s*(ml|ملي|مل)?\s*×\s*(\d{1,4})(?!\d)\s*(ml|ملي|مل)?/i); if (!m) return null;
+    var A = +m[1], B = +m[3], size, cnt;
+    if (m[4]) { size = B; cnt = A; } else if (m[2]) { size = A; cnt = B; }
+    else if (PK_SIZES.indexOf(A) >= 0 && PK_SIZES.indexOf(B) < 0) { size = A; cnt = B; }
+    else if (PK_SIZES.indexOf(B) >= 0 && PK_SIZES.indexOf(A) < 0) { size = B; cnt = A; }
+    else { size = A; cnt = B; }
+    if (!(size >= 50 && cnt >= 1 && cnt <= 200)) return null;
+    return [m[0], String(size), String(cnt)];
+  }
   function has(q, words) { return words.some(function (w) { return new RegExp("(^| )" + nz(w) + "( |$)").test(q) || (nz(w).length >= 4 && q.indexOf(nz(w)) >= 0); }); }
   function today() { return new Date().toISOString().slice(0, 10); }
 
@@ -18812,7 +18825,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     }
     if (amb.length) return { clarify: amb, plan: plan };
     // لا كيانات ولا مجموعات ولا كلمات مفتاحية → لم نفهم
-    var understood = Object.keys(by).length || plan.group_by.length || plan.filters.length || has(q, ["كم", "اجمالي", "إجمالي", "مجموع", "كميه", "كمية", "رصيد", "عندنا", "المتوفر", "اعرض", "total", "stock"]);
+    var understood = Object.keys(by).length || g.length || plan.filters.length || has(q, ["كم", "اجمالي", "إجمالي", "مجموع", "كميه", "كمية", "رصيد", "ارصده", "الارصده", "عندنا", "المتوفر", "اعرض", "total", "stock", "عمر", "اعمار", "قديم", "اقدم", "احدث", "ترانزيت", "الترانزيت", "مساحه", "المساحات", "مساحات", "تغطيه", "تاريخ", "شرائح", "مخزون", "المخزون", "تقرير", "قارن", "مقارنه", "الاعلى", "الاقل", "اعلى", "اقل", "اكثر", "فروع", "الفروع", "مستودعات", "المستودعات"]);
     if (!understood) return { unknown: true };
     return { plan: plan, assume: assume, entities: ents.filter(function (e) { return e.score >= .7; }).slice(0, 6) };
   }
@@ -18941,6 +18954,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     s += "\nأحجام العبوات في المنصة مثل: 200 ml, 330 ml, 600 ml, 1.5 L, 5 Gal. الأسماء بالعربية/الإنجليزية تُحلّ عبر find_entities.";
     s += "\nبروتوكول الإجابة: أنت بوت ذكي يفهم نية السائل ثم تختار بنفسك الشكل الأنسب للإجابة: (1) رقم أو حقيقة واحدة ← جملة واحدة واضحة والرقم بالخط العريض. (2) ترتيب أو الأعلى والأقل ← قائمة مرقمة من 3 إلى 5 عناصر بصيغة «الاسم: **الرقم**» ثم سطر للإجمالي. (3) مقارنة بين عنصرين أو أكثر ← جدول Markdown صغير (حتى 6 صفوف) ثم جملة استنتاج واحدة. (4) سؤال تحليلي مثل لماذا أو ماذا تقترح ← فقرة قصيرة: النتيجة ثم السبب ثم توصية واحدة، مع التمييز بين الحقيقة من البيانات والاستنتاج. (5) سؤال غامض أو ناقص ← اطرح سؤالاً توضيحياً واحداً قصيراً قبل أي استعلام. (6) تحية أو شكر أو سؤال عام ← جملة ودودة دون أدوات. قواعد الشكل: Markdown فقط، بلا مقدمات ولا إعادة صياغة السؤال، الأرقام من نتائج الأدوات فقط وبفواصل الآلاف، لا تذكر أسماء الأدوات أو الحقول التقنية، " + styleRule() + "، واختم عند الفائدة باقتراح متابعة واحد قصير. قاعدة المحلّل: بعد الأرقام أضف سطراً واحداً بعنوان «التحليل:» يستنتج منه ما يهم (تركّز، فجوة، خطر صلاحية، أو توصية قصيرة) مبنياً على أرقام النتيجة فقط. قاعدة الدقة للأصناف: عند السؤال عن الأقدم أو الأعلى أو أي صنف محدد، اذكر الصنف كاملاً بالترتيب: كود الصنف أولاً ثم الاسم الكامل (الماركة والفئة والحجم والعبوة) ثم الفرع/المستودع ثم العمر بالأيام والكمية؛ ولا تكتفِ بالحجم أبداً. للأقدم استخدم group_by على item_code وitem_name وbranch مع max لـ age_days وترتيب تنازلي. لا تنشئ Excel أو PDF أو رسماً بيانياً إلا بطلب صريح.";
     s += permRule();
+    s += "\nقاعدة الوضوح: إذا كان الطلب غير واضح أو لم تجد ما يطابقه في البيانات فلا تخمّن ولا تُجب بأرقام تقريبية؛ قل «طلبك غير واضح» واطلب التوضيح بسؤال قصير واحد أو اعرض خيارات محددة. لا تذكر رقماً لم يأتِ من نتيجة أداة.";
     s += "\nاللغة: أجب بنفس لغة آخر رسالة للمستخدم؛ إذا كتب بالإنجليزية فأجب بالإنجليزية كاملاً (بما فيها الجمل الثابتة) وإن كتب بالعربية فبالعربية. عند الرفض بسبب الصلاحيات بالإنجليزية استخدم: «This information is not within your permissions. Ask the admin to open the permission.»";
     if (chat.ctx.lastResultId && A.results[chat.ctx.lastResultId]) { var r = A.results[chat.ctx.lastResultId]; s += "\nآخر نتيجة: id=" + r.id + " عنوان=" + r.title + " خطة=" + JSON.stringify(r.plan); }
     return s;
@@ -19086,13 +19100,31 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var bad = nums.filter(function (n) { return !pool[Math.round(n)]; });
     return bad.length ? "⚠ لم أجد هذه الأرقام في نتائج الاستعلام (قد تكون استنتاجاً أو خطأً): " + bad.slice(0, 5).map(A.fmtN).join("، ") + " — اعتمد على الجدول." : "";
   }
+  function unlinkedNumber(q, o) {
+    try {
+      if (/\d{4}[-\/]\d{1,2}|\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}/.test(q)) return "";
+      var nums = (q.match(/\d+(?:\.\d+)?/g) || []); if (!nums.length) return "";
+      var cons = {}; var js = JSON.stringify(o.plan.filters || []) + " " + (o.want || "") + " " + (o.plan.limit || "");
+      (js.match(/\d+(?:\.\d+)?/g) || []).forEach(function (n) { cons[n] = 1; });
+      var pk = packQ(q); if (pk) { cons[pk[1]] = 1; cons[pk[2]] = 1; }
+      var idiom = /(اعلى|اقل|اكبر|اصغر|اول|اخر|افضل|اسوا|top|اكثر من|اقل من|اكبر من|اصغر من|خلال|منذ|بعد|قبل|قرابه|حوالي)\s*\d+|\d+\s*(ايام|يوم|اسبوع|اسابيع|شهر|اشهر|اصناف|صنف|عناصر|نتائج|سنه|سنوات|%)/;
+      var rest = nums.filter(function (n) { return !cons[n]; }); if (!rest.length) return "";
+      if (idiom.test(nz(q))) return "";
+      return rest[0];
+    } catch (e) { return ""; }
+  }
   function localTurn(chat, text, turn) { var EN0 = isEnQ(text); if (EN0) A.outLang = "en"; try { var r0 = localTurn0(chat, text, turn); if (EN0 && r0 && r0.text) r0.text = toEn(r0.text); return r0; } finally { A.outLang = "ar"; } }
   function localTurn0(chat, text, turn) {
     var ctx = chat.ctx, EN = isEnQ(text), t0 = Date.now(); var o = AIIE_localAsk(EN ? enToAr(text) : text, ctx);
     if (o.file && A.cfg().ft_export === false) return { text: "تصدير الملفات معطّل من الإدارة.", ms: Date.now() - t0 };
     if (o.file) { var f = { kind: o.file, rid: o.resultId }; turn.files.push(f); return { text: "جهّزتُ ملف " + ({ excel: "Excel", pdf: "PDF", image: "الصورة" }[o.file]) + " من آخر نتيجة — اضغط زر التحميل أدناه.", ms: Date.now() - t0 }; }
-    if (o.unknown) return { text: "لم أفهم المطلوب بدقة في الوضع المحلي. جرّب صياغة مثل: «كم رصيد 200 مل حسب المصنع؟» أو «أعمار المخزون في مصنع جدة». (الفهم الكامل يتطلب ربط Claude من لوحة الإدارة.)", ms: Date.now() - t0 };
+    if (o.unknown) return { text: EN ? "Your request is not clear to me, so I will not guess. Try e.g. “balance of 200 ml by warehouse” or “stock aging in Jeddah”." : "طلبك غير واضح لي، ولن أخمّن إجابة. جرّب صياغة مثل: «كم رصيد 200 مل حسب المصنع؟» أو «أعمار المخزون في مصنع جدة». (الفهم الأوسع يتطلب ربط Claude من لوحة الإدارة.)", ms: Date.now() - t0 };
     if (o.clarify) { var a0 = o.clarify[0]; if (o.vague) return { text: "أي منتج تقصد؟ حدّد الاسم أو الحجم أو الكود (مثل «200 مل» أو «الهوية الجديدة 330 مل»).", ms: Date.now() - t0 }; return { text: "السؤال يحتمل أكثر من معنى (" + a0.field + "): " + a0.options.join(" / ") + ". أيها تقصد؟", clar: a0.options, ms: Date.now() - t0 }; }
+    /* لا نخمّن: رقم في السؤال لم يُربط بصنف/حجم/عمر ← نطلب التوضيح بدل إجابة قد تكون خاطئة */
+    if (o.plan && !o.clarify) {
+      var qn = String(EN ? enToAr(text) : text).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }), un = unlinkedNumber(qn, o);
+      if (un) return { text: (EN ? "I am not sure what you mean: I could not link the number “" + un + "” to an item, size or age. Please rephrase, e.g. “balance of 200 ml × 24”." : "طلبك غير واضح لي: لم أتمكن من ربط الرقم «" + un + "» بصنف أو حجم أو عمر، فلن أخمّن إجابة. وضّح طلبك أكثر، مثل: «رصيد 200 مل × 24» أو «أعمار 600 مل»."), ms: Date.now() - t0, noCard: true };
+    }
     _viz = null; if (o.plan && A.permitted && !A.permitted(o.plan.dataset)) return { text: noPermText(o.plan.dataset), ms: Date.now() - t0, noCard: true };
     var res = A.runQuery(o.plan); if (res.denied) return { text: res.place ? noPlaceText(res) : noPermText(o.plan.dataset), ms: Date.now() - t0, noCard: true }; if (!res.ok) { return { text: res.error + (res.fields ? " — الحقول: " + res.fields.join(", ") : ""), error: res.error, ms: Date.now() - t0 }; }
     turn.results.push(res.id);
@@ -19549,6 +19581,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
 
   /* ================= الإدخال الصوتي (Web Speech API — بديل عن الكتابة) ================= */
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var VOICE = { ok: !!SR, tts: !!(window.speechSynthesis && window.SpeechSynthesisUtterance) };
   function VC() { var o = rj("ai_voice_v1", {}); var c = A.cfg(), own = c.voiceUserChoice !== false;
     return { lang: o.lang || "ar-SA", auto: o.auto !== false, speak: o.speak != null ? !!o.speak : !!c.speakDefault, engine: o.engine || "auto", netfail: o.netfail || 0, voice: (own && o.voice) || c.voiceDefault || "", color: o.color || "", rate: (own && o.rate) || +c.voiceRate || .92, vlib: (own && o.vlib) || {} }; }
@@ -19560,6 +19593,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     t = String(t || "").replace(/\s+/g, " ").trim();
     var m = { "مئتين": "200", "مائتين": "200", "ميتين": "200", "ثلاثمئة": "300", "ثلاثمائة": "300", "ثلثمية": "300", "ستمئة": "600", "ستمائة": "600", "ستمية": "600", "مئة": "100", "مائة": "100", "ميه": "100", "الف": "1000", "ألف": "1000" };
     Object.keys(m).forEach(function (k) { t = t.replace(new RegExp("(^|\\s)" + k + "(?=\\s|$)", "g"), "$1" + m[k]); });
+    t = t.replace(/(^|\s)(?:طالب|ارصده|ارصدة|رصيده)\s+(?:منتج\s+)?(?=\d)/g, "$1رصيد ");
     return t;
   }
   var VERR = { "not-allowed": "تعذّر استخدام الميكروفون — اسمح للموقع بالوصول إليه من إعدادات المتصفح (أيقونة القفل بجانب العنوان).", "service-not-allowed": "خدمة الصوت غير مسموحة في هذا المتصفح — استخدم Google Chrome.", "audio-capture": "لم أجد ميكروفوناً متصلاً بالجهاز.", "network": "المتصفح لم يستطع الوصول لخدمة التعرف على الصوت. تأكد من الإنترنت وجرّب Google Chrome (بعض المتصفحات مثل Brave، أو الشبكات التي تحجب خدمات Google، لا تدعم الإدخال الصوتي).", "language-not-supported": "لغة الإدخال الصوتي غير مدعومة في هذا المتصفح." };
@@ -19684,9 +19718,9 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var fin = function () { if (tok !== S.spkTok) return; S.speaking = false; try { clearInterval(S.spkKA); } catch (e) { } onDone && onDone(); };
     if (!VOICE.tts || A.cfg().ft_tts === false || !segs || !segs.length) { S.speaking = false; onDone && setTimeout(fin, 0); return; }
     try {
-      var sy = window.speechSynthesis; sy.cancel(); S.speaking = true; try { clearInterval(S.spkKA); } catch (e) { }
+      var sy = window.speechSynthesis; try { sy.cancel(); if (IOS) sy.resume(); } catch (e) { } S.speaking = true; try { clearInterval(S.spkKA); } catch (e) { }
       /* Chrome يقطع النطق بعد ~15 ثانية: نكرر pause/resume، وننطق مقطعاً واحداً في كل مرة (لا طابور طويل) */
-      S.spkKA = setInterval(function () { if (tok !== S.spkTok) { clearInterval(S.spkKA); return; } try { if (sy.speaking && !sy.paused) { sy.pause(); sy.resume(); } } catch (e) { } }, 9000);
+      if (!IOS) S.spkKA = setInterval(function () { if (tok !== S.spkTok) { clearInterval(S.spkKA); return; } try { if (sy.speaking && !sy.paused) { sy.pause(); sy.resume(); } } catch (e) { } }, 9000);
       var i = 0, retried = 0;
       var next = function () {
         if (tok !== S.spkTok) return;
@@ -19696,11 +19730,19 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
         var done = false, adv = function (err) { if (done) return; done = true; clearTimeout(wd); if (tok !== S.spkTok) return; if (err && retried < 1 && !/canceled|interrupted/.test(err)) { retried++; return setTimeout(next, 120); } retried = 0; i++; setTimeout(next, /[.؟!:]$|،$/.test(t) ? 160 : 260); };
         var wd = setTimeout(function () { try { sy.cancel(); } catch (e) { } adv(""); }, 3000 + t.length * 220);
         u.onend = function () { adv(""); }; u.onerror = function (ev) { adv(String(ev && ev.error || "x")); };
+        var st0 = Date.now(); u.onstart = function () { S.ttsStarted = true; };
+        if (IOS && i === 0 && !S.ttsStarted) setTimeout(function () { if (!S.ttsStarted && tok === S.spkTok) { try { toast("لم يبدأ الصوت: ارفع صوت الجهاز وأوقف الوضع الصامت، ثم اضغط زر 🔊 أسفل الرد", false); } catch (e) { } } }, 2800);
         try { sy.speak(u); } catch (e) { adv("x"); }
       };
-      next();
+      if (IOS) setTimeout(next, 90); else next();
     } catch (e) { S.speaking = false; onDone && setTimeout(fin, 0); }
   }
+  /* iOS/Safari: لا يُسمح بالنطق بعد عملية غير متزامنة إلا إذا «فُتح» الصوت بلمسة مستخدم سابقة */
+  function unlockTTS() {
+    if (S.ttsUnlocked || !VOICE.tts) return; S.ttsUnlocked = true;
+    try { var sy = window.speechSynthesis, u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.rate = 1; u.lang = "ar-SA"; sy.resume && sy.resume(); sy.speak(u); } catch (e) { S.ttsUnlocked = false; }
+  }
+  ["touchend", "click", "keydown"].forEach(function (ev) { document.addEventListener(ev, function (e) { try { if (!S.ttsUnlocked && e.target && e.target.closest && e.target.closest("#aiw,#aiw-fab,.navbtn,[data-a]")) unlockTTS(); } catch (x) { } }, true); });
   function stopSpeak() { S.spkTok = (S.spkTok || 0) + 1; try { clearInterval(S.spkKA); } catch (e) { } try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) { } S.speaking = false; }
   function speakMsg(m) { if (S.speaking) { stopSpeak(); } speakSegs(spokenSegments(m)); }
   function speak(text) { speakSegs(chunk(speechText(text), 140)); }
