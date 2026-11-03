@@ -19100,6 +19100,20 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var bad = nums.filter(function (n) { return !pool[Math.round(n)]; });
     return bad.length ? "⚠ لم أجد هذه الأرقام في نتائج الاستعلام (قد تكون استنتاجاً أو خطأً): " + bad.slice(0, 5).map(A.fmtN).join("، ") + " — اعتمد على الجدول." : "";
   }
+  /* لهجة/نطق عامي ← مصطلحات المنصة (فايف جالون = 5 جالون ...) */
+  function dialectNorm(t) {
+    var s = String(t || "");
+    [[/(^|\s)(?:فايف|فيف|فاف)(?=\s|$)/g, "$15"], [/(^|\s)سيكس(?=\s|$)/g, "$16"], [/(^|\s)(?:ال)?(?:خمسه|خمسة|خمس)\s+(?=جال|جلون|gal)/g, "$15 "], [/(^|\s)ال(?=\s*\d)/g, "$1"], [/(^|\s)(?:عشره|عشرة)\s+(?=لتر|ليتر)/g, "$110 "],
+     [/(جالسك|جالونك|جالوان|جالن|جلون|جلن|جالو)(?=\s|$)/g, "جالون"], [/(^|\s)(\d+(?:\.\d+)?)\s*(?:جالون)(?=\s|$)/g, "$1$2 جالون"]].forEach(function (r) { s = s.replace(r[0], r[1]); });
+    return s;
+  }
+  function sizeMentionUnlinked(q, o) {
+    try {
+      var m = nz(q).match(/(\d+(?:\.\d+)?)\s*(مل|ملي|ml|لتر|ليتر|جالون|gal)/); if (!m) return "";
+      var f = (o.plan && o.plan.filters) || []; if (f.some(function (x) { return x.field === "size" || x.field === "pack" || x.field === "item_code" || x.field === "description"; })) return "";
+      return m[1] + " " + m[2];
+    } catch (e) { return ""; }
+  }
   function unlinkedNumber(q, o) {
     try {
       if (/\d{4}[-\/]\d{1,2}|\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}/.test(q)) return "";
@@ -19115,14 +19129,16 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
   }
   function localTurn(chat, text, turn) { var EN0 = isEnQ(text); if (EN0) A.outLang = "en"; try { var r0 = localTurn0(chat, text, turn); if (EN0 && r0 && r0.text) r0.text = toEn(r0.text); return r0; } finally { A.outLang = "ar"; } }
   function localTurn0(chat, text, turn) {
-    var ctx = chat.ctx, EN = isEnQ(text), t0 = Date.now(); var o = AIIE_localAsk(EN ? enToAr(text) : text, ctx);
+    var ctx = chat.ctx, EN = isEnQ(text), t0 = Date.now(); var text0 = text; text = dialectNorm(text); var o = AIIE_localAsk(EN ? enToAr(text) : text, ctx); text = text0;
     if (o.file && A.cfg().ft_export === false) return { text: "تصدير الملفات معطّل من الإدارة.", ms: Date.now() - t0 };
     if (o.file) { var f = { kind: o.file, rid: o.resultId }; turn.files.push(f); return { text: "جهّزتُ ملف " + ({ excel: "Excel", pdf: "PDF", image: "الصورة" }[o.file]) + " من آخر نتيجة — اضغط زر التحميل أدناه.", ms: Date.now() - t0 }; }
     if (o.unknown) return { text: EN ? "Your request is not clear to me, so I will not guess. Try e.g. “balance of 200 ml by warehouse” or “stock aging in Jeddah”." : "طلبك غير واضح لي، ولن أخمّن إجابة. جرّب صياغة مثل: «كم رصيد 200 مل حسب المصنع؟» أو «أعمار المخزون في مصنع جدة». (الفهم الأوسع يتطلب ربط Claude من لوحة الإدارة.)", ms: Date.now() - t0 };
     if (o.clarify) { var a0 = o.clarify[0]; if (o.vague) return { text: "أي منتج تقصد؟ حدّد الاسم أو الحجم أو الكود (مثل «200 مل» أو «الهوية الجديدة 330 مل»).", ms: Date.now() - t0 }; return { text: "السؤال يحتمل أكثر من معنى (" + a0.field + "): " + a0.options.join(" / ") + ". أيها تقصد؟", clar: a0.options, ms: Date.now() - t0 }; }
     /* لا نخمّن: رقم في السؤال لم يُربط بصنف/حجم/عمر ← نطلب التوضيح بدل إجابة قد تكون خاطئة */
     if (o.plan && !o.clarify) {
-      var qn = String(EN ? enToAr(text) : text).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }), un = unlinkedNumber(qn, o);
+      var qn = dialectNorm(String(EN ? enToAr(text) : text)).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }), sm = sizeMentionUnlinked(qn, o);
+      if (sm) return { text: EN ? "I could not find the size “" + sm + "” in the data, so I will not answer with other items. Check the size or item name." : "لم أجد الحجم «" + sm + "» في بيانات هذا التقرير، فلن أجيب بأصناف أخرى. تأكد من الحجم أو اسم الصنف (مثل «5 جالون» أو «200 مل»).", ms: Date.now() - t0, noCard: true };
+      var un = unlinkedNumber(qn, o);
       if (un) return { text: (EN ? "I am not sure what you mean: I could not link the number “" + un + "” to an item, size or age. Please rephrase, e.g. “balance of 200 ml × 24”." : "طلبك غير واضح لي: لم أتمكن من ربط الرقم «" + un + "» بصنف أو حجم أو عمر، فلن أخمّن إجابة. وضّح طلبك أكثر، مثل: «رصيد 200 مل × 24» أو «أعمار 600 مل»."), ms: Date.now() - t0, noCard: true };
     }
     _viz = null; if (o.plan && A.permitted && !A.permitted(o.plan.dataset)) return { text: noPermText(o.plan.dataset), ms: Date.now() - t0, noCard: true };
@@ -19373,7 +19389,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
       '<div class="aiw-myl"><label><input type="checkbox" id="ai-vspeak"' + (vc.speak ? " checked" : "") + '> اقرأ كل الردود صوتياً</label>' + (VOICE.ok || cloudOK() ? '<label>لغة الصوت <select id="ai-vlang"><option value="ar-SA"' + (vc.lang === "ar-SA" ? " selected" : "") + '>العربية</option><option value="en-US"' + (vc.lang === "en-US" ? " selected" : "") + '>English</option></select></label><label>محرك التعرّف <select id="ai-veng"><option value="auto"' + (vc.engine === "auto" ? " selected" : "") + '>تلقائي</option><option value="cloud"' + (vc.engine === "cloud" ? " selected" : "") + '>الخادم (Whisper)</option><option value="browser"' + (vc.engine === "browser" ? " selected" : "") + '>المتصفح فقط</option></select></label>' : "") + "</div>" +
       (isAdm() ? '<a href="#" data-a="gotoai" style="font-size:12.5px;color:#1f6fe0">🛠 لوحة تحكم AI (للمدراء)</a>' : "") + "</div>" : "";
     var inp = '<div class="aiw-in"><div class="aiw-pill"><button class="aiw-send" data-a="send" title="إرسال"' + (S.busy ? " disabled" : "") + ">" + ICONS.send + '</button><textarea id="ai-q" rows="1" placeholder="اكتب سؤالك هنا..."></textarea>' + (A.cfg().ft_attach === false ? "" : '<label class="aiw-ib" title="إرفاق ملف Excel/CSV للتحليل">' + ICONS.clip + '<input type="file" id="ai-file" accept=".xlsx,.xls,.csv" style="display:none"></label>') + (micOK() && A.cfg().ft_dict !== false ? '<button class="aiw-ib aiw-mic' + (S.listening ? " on" : "") + '" id="ai-mic" data-a="mic" title="إملاء صوتي: تحدّث ليُكتب سؤالك">' + ICONS.mic + '</button>' : "") + (micOK() && A.cfg().ft_live !== false ? '<button class="aiw-live' + (S.vm && S.vm.on ? " on" : "") + '" id="ai-live" data-a="live" title="تحويل المحادثة من نص إلى محادثة صوتية" aria-label="محادثة صوتية">' + ICONS.wave + "</button>" : "") + "</div>" + (S.att ? '<div class="ai-src" style="padding:6px 14px 0">📎 ' + esc(S.att.name) + " (" + S.att.rows.length + ' صف) <a href="#" data-a="noatt">إزالة</a></div>' : "") + "</div>" + vo +
-      '<div class="aiw-ft"><span class="aiw-st ' + (llm ? "cl" : "lo") + '">' + (llm ? "● Claude متصل · الحسابات من بيانات المنصة" : "● وضع محلي (بدون Claude)") + '</span><span id="ai-vstat"></span>' + '<button data-a="vlib" title="مكتبة الأصوات">🎙️ الأصوات</button><button data-a="vopts">إعداداتي</button>' + "</div>";
+      '<div class="aiw-ft"><span class="aiw-st ' + (llm ? "cl" : "lo") + '">' + (llm ? "● Claude متصل · الحسابات من بيانات المنصة" : "● وضع محلي (بدون Claude)") + '</span><span id="ai-vstat"></span>' + '<small style="opacity:.55;margin-inline-end:6px">'+BUILD+'</small><button data-a="vlib" title="مكتبة الأصوات">🎙️ الأصوات</button><button data-a="vopts">إعداداتي</button>' + "</div>";
     return '<div class="aiw-msgs" id="ai-msgs">' + welcome + msgs + think + "</div>" + inp + hist + (S.vlib ? vlibHtml() : "");
   }
   function renderWin() {
@@ -19493,7 +19509,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     tab = tab || S.admTab || "ov";
     if (tab === "ft") return featuresCard(c);
     if (tab === "vc") return cards[1];
-    if (tab === "ln") return cards[2];
+    if (tab === "ln") return cards[2] + '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🔌 اختبار الاتصال بـ Claude</h4><div class="ai-src" style="margin-bottom:8px">يفحص: رابط Worker ← استجابته ← مفتاح Claude ← توثيق Firebase. إذا لم ينجح الاختبار يعمل المساعد بالفهم المحلي المحدود فقط (وقد يخطئ).</div><div class="ai-act"><button data-a="wtest">▶ ابدأ الاختبار</button></div><div id="ai-wtest" dir="auto" style="margin-top:8px;white-space:pre-line;font-weight:700;color:#12325a">' + (S.wtest || "") + "</div></div>";
     if (tab === "lg") return cards[3] + '<div class="ai-card"><h4 style="margin:0 0 10px;color:#12325a">🧹 الصيانة</h4><div class="ai-act"><button data-a="clrlog">🧹 مسح السجل والاستهلاك (هذا الجهاز)</button><button data-a="health">🔌 اختبار الاتصال</button><button data-a="cfgexp">⬇ تصدير الإعدادات (JSON)</button><button data-a="cfgreset" style="background:#fde2e2;color:#b91c1c">↺ إعادة الإعدادات للافتراضي</button></div><div class="ai-src" style="margin-top:6px">إعادة الضبط تحذف إعدادات المساعد المحفوظة (محلياً وفي السحابة) وتعيد كل شيء للقيم الافتراضية.</div></div>';
     var ul = Object.keys(users).sort(function (a, b) { return users[b] - users[a]; }).slice(0, 15), bl = (c.blockedUsers || []).map(String);
     return cards[0] + '<div class="ai-card"><h4 style="margin:0 0 10px;color:#12325a">👥 استخدام المستخدمين (آخر 14 يوماً)</h4>' + (ul.length ? '<div class="ai-tw"><table><thead><tr><th>المستخدم</th><th>الاستفسارات</th><th>الحالة</th><th></th></tr></thead><tbody>' + ul.map(function (u) { var b = bl.indexOf(u) >= 0; return "<tr><td>" + esc(u) + "</td><td class='n'>" + users[u] + "</td><td>" + (b ? "⛔ موقوف" : "✔ نشط") + '</td><td><button class="ai-chip" data-a="blk" data-v="' + esc(u) + '">' + (b ? "إلغاء الإيقاف" : "إيقاف") + "</button></td></tr>"; }).join("") + "</tbody></table></div>" : '<div class="ai-src">لا يوجد استخدام مسجّل بعد على هذا الجهاز.</div>') + '</div>';
@@ -19525,7 +19541,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var t = e.target.closest("[data-a]"); if (!t) return; var a = t.getAttribute("data-a"), v = t.getAttribute("data-v"); if (t.tagName === "A") e.preventDefault();
     if (a === "send") send(); else if (a === "new") { newChat(); S.hist = false; render(); } else if (a === "open") { S.cur = v; S.hist = false; render(); } else if (a === "tab") { S.tab = v; render(); if (v === "adm") checkHealth(); }
     else if (a === "wclose") closeWin(); else if (a === "wopen") openWin(); else if (a === "wadmin") { S.vopts = !S.vopts; render(); } else if (a === "admtab") { S.admTab = v; render(); } else if (a === "theme") { VCset("color", v); applyName(); render(); } else if (a === "gotoai") { S.admTab = "ov"; S.openPage = Date.now(); closeWin(); window.go(PAGE); checkHealth(); render(); } else if (a === "blk") { var bc = A.cfg(), bl = (bc.blockedUsers || []).map(String), ix = bl.indexOf(v); ix >= 0 ? bl.splice(ix, 1) : bl.push(v); bc.blockedUsers = bl; wj("ai_cfg_v1", bc); try { fbDB.collection(FB_COL).doc("ai_cfg").set({ blockedUsers: bl }, { merge: true }); } catch (e) { } toast(ix >= 0 ? "أُلغي إيقاف " + v : "أُوقف " + v + " عن المساعد"); render(); } else if (a === "cfgexp") { try { var bb = new Blob([JSON.stringify(A.cfg(), null, 2)], { type: "application/json" }), aa = document.createElement("a"); aa.href = URL.createObjectURL(bb); aa.download = "ai_config.json"; aa.click(); } catch (e) { } } else if (a === "cfgreset") { if (!confirm("إعادة كل إعدادات المساعد للقيم الافتراضية؟")) return; wj("ai_cfg_v1", {}); try { fbDB.collection(FB_COL).doc("ai_cfg").delete(); } catch (e) { } toast("أُعيدت الإعدادات للافتراضي"); render(); }
-    else if (a === "hist") { S.hist = !S.hist; render(); } else if (a === "vopts") { S.vopts = !S.vopts; render(); } else if (a === "vlib") { S.vlib = !S.vlib; S.vlL = S.vlL || (VC().lang === "en-US" ? "en" : "ar"); render(); } else if (a === "vltab") { S.vlL = v; render(); } else if (a === "vlp") { S.vlP = v; render(); } else if (a === "vlt") { vlTest(+v); } else if (a === "vls") { vlSelect(+v); } else if (a === "vprev") { stopSpeak(); speakSegs(["مرحباً، أنا مساعد الذكاء.", "رصيد الصنف ستمائة في ثلاثين، إجمالي الرصيد: " + numToSpeech("1323") + "."]); }
+    else if (a === "hist") { S.hist = !S.hist; render(); } else if (a === "vopts") { S.vopts = !S.vopts; render(); } else if (a === "vlib") { S.vlib = !S.vlib; S.vlL = S.vlL || (VC().lang === "en-US" ? "en" : "ar"); render(); } else if (a === "vltab") { S.vlL = v; render(); } else if (a === "vlp") { S.vlP = v; render(); } else if (a === "wtest") { wtest(); } else if (a === "vlt") { vlTest(+v); } else if (a === "vldiag") { vlDiag(); } else if (a === "vls") { vlSelect(+v); } else if (a === "vprev") { stopSpeak(); speakSegs(["مرحباً، أنا مساعد الذكاء.", "رصيد الصنف ستمائة في ثلاثين، إجمالي الرصيد: " + numToSpeech("1323") + "."]); }
     else if (a === "tbl") { var mt = curChat().msgs[+v]; if (mt) { mt.expand = true; saveChats(); render(); scrollToMsg(v); } }
     else if (a === "chartx") { var mc = curChat().msgs[+v]; if (mc) { mc.expand = true; mc.chart = true; saveChats(); render(); scrollToMsg(v); } }
     else if (a === "copy") { var mq = curChat().msgs[+v]; if (mq) { try { navigator.clipboard.writeText(String(mq.t).replace(/\*\*/g, "")); toast("نُسخ الرد"); } catch (er) { } } }
@@ -19581,6 +19597,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
 
   /* ================= الإدخال الصوتي (Web Speech API — بديل عن الكتابة) ================= */
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var BUILD = "v80";
   var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var VOICE = { ok: !!SR, tts: !!(window.speechSynthesis && window.SpeechSynthesisUtterance) };
   function VC() { var o = rj("ai_voice_v1", {}); var c = A.cfg(), own = c.voiceUserChoice !== false;
@@ -19915,9 +19932,39 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
       var on = sel.name === x.name && Math.abs((sel.pitch || 1) - x.pitch) < .01;
       return '<div class="vl-c' + (on ? " on" : "") + '"><div class="vl-av">' + vlicon(x.per) + '</div><div class="vl-n"><b title="' + esc(x.name) + '">' + esc(x.title ? x.title + " · " + x.name : x.name) + "</b><small>" + vlPerAr(x.per) + (x.virt ? " (محاكاة بالنبرة)" : "") + " · " + (x.q >= 3 ? "طبيعي عالي الجودة" : x.q === 2 ? "جوجل" : x.q === 1 ? "سحابي" : "نظام") + '</small></div><button class="vl-play" data-a="vlt" data-v="' + i + '">▶ تجربة</button><button class="vl-sel" data-a="vls" data-v="' + i + '">' + (on ? "✔ مختار" : "اختيار") + "</button></div>";
     }).join("");
-    return '<div class="vl"><h4><span>🎙️ مكتبة الأصوات</span><button class="ai-chip" data-a="vlib">إغلاق</button></h4>' + tabs + pf +
+    var dg = '<div class="vl-note" style="background:#fff;border:1.5px dashed #c7d6ee;border-radius:12px;padding:9px 11px"><button class="ai-chip" data-a="vldiag">🔍 فحص الصوت على هذا الجهاز</button> <span style="color:#94a3b8">إصدار المساعد: ' + BUILD + '</span>' + (S.vlDiagMsg ? '<div dir="auto" style="margin-top:7px;color:#12325a;font-weight:700;white-space:pre-line">' + esc(S.vlDiagMsg) + "</div>" : "") + "</div>";
+    return '<div class="vl"><h4><span>🎙️ مكتبة الأصوات</span><button class="ai-chip" data-a="vlib">إغلاق</button></h4>' + dg + tabs + pf +
       (cards || '<div class="vl-note">لا توجد أصوات ' + (L === "ar" ? "عربية" : "إنجليزية") + " على هذا الجهاز لهذا التصنيف.</div>") +
       '<div class="vl-note">' + n + " صوت " + (L === "ar" ? "عربي" : "إنجليزي") + " متاح على جهازك. جودة وعدد الأصوات يعتمدان على المتصفح ونظام التشغيل: أفضل الأصوات الطبيعية في Microsoft Edge، وفي Windows يمكن إضافة أصوات عربية من الإعدادات ← الوقت واللغة ← الكلام. الأصوات الطفولية (ولد/بنت) تُحاكى بتعديل النبرة وسرعة الكلام على أقرب صوت متاح، وقد يتجاهل بعض المتصفحات النبرة.</div></div>";
+  }
+  function wtest() {
+    var c = A.cfg(), url = String(c.workerUrl || "").replace(/\/+$/, ""), out = [];
+    function put(t) { S.wtest = out.concat(t ? [t] : []).join("\n"); var e = $("ai-wtest"); if (e) e.textContent = S.wtest; }
+    if (!url || !/^https:\/\//i.test(url)) { out.push("❌ رابط Worker غير مضبوط (أو لا يبدأ بـ https://). الصقه في «رابط Worker» أعلاه واضغط حفظ."); put(""); return; }
+    out.push("✔ الرابط مضبوط: " + url); put("… جارٍ فحص الاستجابة");
+    fetch(url + "/health").then(function (r) { return r.json(); }).then(function (j) {
+      out.push("✔ الـ Worker يستجيب (النموذج: " + (j.model || "؟") + ")");
+      out.push(j.keyConfigured ? "✔ مفتاح Claude مضبوط" : "❌ مفتاح Claude غير مضبوط ← نفّذ: wrangler secret put ANTHROPIC_API_KEY");
+      out.push(j.stt ? "✔ الإملاء الصوتي (Workers AI) مفعّل" : "ℹ الإملاء السحابي غير مفعّل (اختياري)");
+      put("… جارٍ فحص توثيق Firebase"); return token();
+    }).then(function (tk) {
+      if (!tk) { out.push("❌ تعذّر توثيق Firebase ← فعّل Anonymous في Authentication وأضف النطاق في Authorized domains."); put(""); return; }
+      out.push("✔ توثيق Firebase ناجح — الاتصال جاهز؛ ستأتي الإجابات من Claude."); put("");
+    }).catch(function (e) { out.push("❌ تعذّر الوصول للـ Worker: " + (e && e.message || e) + " ← تأكد من الرابط ومن ALLOWED_ORIGINS في wrangler.toml (يجب أن يحوي نطاق المنصة)."); put(""); });
+  }
+  function vlDiag() {
+    var r = { tts: !!(window.speechSynthesis && window.SpeechSynthesisUtterance), n: 0, ar: 0, started: false, ended: false, err: "" };
+    try { var vs = window.speechSynthesis.getVoices() || []; r.n = vs.length; r.ar = vs.filter(function (x) { return /^ar/i.test(x.lang || ""); }).length; } catch (e) { }
+    function show(extra) { S.vlDiagMsg = "التقنية مدعومة: " + (r.tts ? "نعم" : "لا ← هذا المتصفح لا يدعم النطق") + "\nعدد الأصوات: " + r.n + " (العربية: " + r.ar + ")\nجهاز آبل: " + (IOS ? "نعم" : "لا") + " · الصوت مُفعَّل: " + (S.ttsUnlocked ? "نعم" : "لا") + "\nبدأ النطق: " + (r.started ? "نعم" : "لا") + " · انتهى: " + (r.ended ? "نعم" : "لا") + (r.err ? "\nخطأ: " + r.err : "") + (extra ? "\n" + extra : ""); render(); }
+    if (!r.tts) return show("");
+    try {
+      unlockTTS(); var sy = window.speechSynthesis; sy.cancel(); try { sy.resume(); } catch (e) { }
+      var u = new SpeechSynthesisUtterance("اختبار الصوت. واحد اثنان ثلاثة."); u.lang = "ar-SA"; var v = pickVoice("ar-SA"); if (v) { u.voice = v; u.lang = v.lang || u.lang; } u.volume = 1; u.rate = 1;
+      u.onstart = function () { r.started = true; }; u.onend = function () { r.ended = true; show(r.started ? "إذا سمعتَ الصوت فكل شيء سليم." : ""); }; u.onerror = function (ev) { r.err = String(ev && ev.error || "unknown"); show(""); };
+      setTimeout(function () { sy.speak(u); }, IOS ? 90 : 0);
+      setTimeout(function () { if (!r.ended && !r.err) show(r.started ? "بدأ النطق لكن لم ينتهِ بعد." : (IOS ? "لم يبدأ النطق: أوقف الوضع الصامت (مفتاح الجانب) وارفع الصوت ثم أعد الفحص." : "لم يبدأ النطق: تحقق من صوت الجهاز وإعدادات الموقع (الصوت).")); }, 3500);
+      show("جارٍ الاختبار…");
+    } catch (e) { r.err = String(e && e.message || e); show(""); }
   }
   function vlTest(i) {
     var x = (S.vlItems || [])[i]; if (!x) return; stopSpeak();
@@ -21811,4 +21858,48 @@ document.addEventListener("click",function(e){var th=e.target&&e.target.closest&
 var tm=0;function sched(){clearTimeout(tm);tm=setTimeout(run,90)}
 try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++)if(ms[i].type==="childList"){sched();return}}).observe(document.body,{childList:!0,subtree:!0})}catch(e){}
 run();window.DCMP_GH=run})();
+</script>
+<script data-cfasync="false" id="syncdiag-js">
+/* فحص المزامنة والأداء: للقراءة فقط (لا يكتب شيئاً في Firestore) */
+(function(){"use strict";
+function ar(){try{return typeof isAr==="function"?!!isAr():document.documentElement.dir==="rtl"}catch(e){return!0}}
+function bytes(s){try{return new Blob([s]).size}catch(e){return String(s).length}}
+function kb(n){return n>=1048576?(n/1048576).toFixed(2)+" MB":Math.round(n/1024)+" KB"}
+function withTimeout(p,ms,tag){return new Promise(function(res){var done=!1,t=setTimeout(function(){if(!done){done=!0;res({timeout:!0,tag:tag})}},ms);p.then(function(v){if(!done){done=!0;clearTimeout(t);res({ok:!0,v:v})}},function(e){if(!done){done=!0;clearTimeout(t);res({err:e&&(e.code||e.message)||String(e)})}})})}
+function box(html){var o=document.getElementById("sd-ov");if(!o){o=document.createElement("div");o.id="sd-ov";o.style.cssText="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px";o.onclick=function(e){if(e.target===o)o.remove()};document.body.appendChild(o)}
+ o.innerHTML='<div dir="'+(ar()?"rtl":"ltr")+'" style="background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow:auto;padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit;color:#0f2747"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:16px">\u{1F50D} '+(ar()?"فحص المزامنة والأداء":"Sync & performance check")+'</b><button type="button" onclick="document.getElementById(\'sd-ov\').remove()" style="border:none;background:#eef2f7;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:15px">✕</button></div><div id="sd-body" style="font-size:13px;line-height:1.9;white-space:pre-line">'+html+'</div></div>'}
+function body(t){var b=document.getElementById("sd-body");if(b)b.textContent=t}
+async function run(){
+ var A=ar(),L=[],adv=[];box(A?"جارٍ الفحص…":"Checking…");
+ L.push((A?"الاتصال بالإنترنت: ":"Online: ")+(navigator.onLine?(A?"نعم":"yes"):(A?"لا ← الجهاز غير متصل":"no")));
+ try{var c=navigator.connection;c&&L.push((A?"الشبكة: ":"Network: ")+(c.effectiveType||"?")+" · "+(c.downlink||"?")+" Mbps · RTT "+(c.rtt||"?")+" ms")}catch(e){}
+ /* أحجام البيانات المحلية */
+ var dr="";try{dr=JSON.stringify(getDR())}catch(e){}
+ var drB=bytes(dr);L.push((A?"حجم التقارير اليومية (مستند daily_reports): ":"Daily reports document: ")+kb(drB)+(A?" — الحد الأقصى لـ Firestore 1 MB":" — Firestore limit is 1 MB"));
+ if(drB>900*1024)adv.push(A?"⚠ مستند التقارير اليومية قريب من الحد (1 MB) وسيفشل حفظه أو يتأخر. قلّل بيانات السجلات المحفوظة داخله أو انقل اللقطات القديمة.":"⚠ The daily reports document is close to the 1 MB limit.");
+ try{var tot=0,arr=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i),v=localStorage.getItem(k)||"",n=bytes(k)+bytes(v);tot+=n;arr.push([k,n])}arr.sort(function(a,b){return b[1]-a[1]});
+  L.push((A?"إجمالي التخزين المحلي: ":"Local storage total: ")+kb(tot)+(A?" (الحد التقريبي 5 MB)":" (≈5 MB limit)"));
+  L.push((A?"أكبر المفاتيح: ":"Largest keys: ")+arr.slice(0,4).map(function(x){return x[0]+" "+kb(x[1])}).join(" · "));
+  if(tot>4*1024*1024)adv.push(A?"⚠ التخزين المحلي شبه ممتلئ، وهذا يبطّئ المنصة ويُفشل الحفظ. امسح السجلات القديمة (مثل سجل المساعد والمحادثات).":"⚠ Local storage is almost full.")}catch(e){}
+ body(L.join("\n")+"\n\n"+(A?"… جارٍ قياس سرعة السحابة":"… measuring cloud speed"));
+ /* سرعة Firestore (قراءة فقط) */
+ if(typeof fbDB==="undefined"||!fbDB){L.push(A?"Firebase غير مهيّأ في هذه الصفحة.":"Firebase is not initialised.")}
+ else{
+  var t0=performance.now(),r=await withTimeout(fbDB.collection(FB_COL).doc("daily_reports").get({source:"server"}),20000,"read"),ms=Math.round(performance.now()-t0);
+  if(r.ok){L.push((A?"قراءة من السحابة: نجحت خلال ":"Cloud read OK in ")+ms+" ms");if(ms>4000)adv.push(A?"⚠ الاستجابة بطيئة جداً ("+ms+" ms): المشكلة غالباً في الشبكة أو في وضع الاتصال البطيء (long-polling). جرّب شبكة أخرى أو بدون VPN/جدار حماية.":"⚠ Very slow cloud response.")}
+  else if(r.timeout)adv.push(A?"❌ لا استجابة من Firestore خلال 20 ثانية: غالباً الشبكة تحجب الاتصال، أو الحصة اليومية المجانية استُهلكت.":"❌ No Firestore response in 20s.");
+  else{L.push((A?"قراءة من السحابة: فشلت — ":"Cloud read failed — ")+r.err);
+   if(/resource-exhausted|quota/i.test(r.err))adv.push(A?"❌ استُهلكت الحصة اليومية المجانية لـ Firestore (50,000 قراءة / 20,000 كتابة). يتجدد العدّاد يومياً بتوقيت المحيط الهادئ، أو رقّ الخطة إلى Blaze (الدفع حسب الاستخدام وتكلفته منخفضة).":"❌ Firestore free quota exhausted.");
+   else if(/permission/i.test(r.err))adv.push(A?"❌ قواعد الأمان ترفض القراءة: تحقق من تسجيل الدخول وقواعد Firestore.":"❌ Permission denied.");
+   else if(/unavailable/i.test(r.err))adv.push(A?"❌ خدمة Firestore غير متاحة من شبكتك حالياً.":"❌ Firestore unavailable.")}
+  try{var pw=await withTimeout(fbDB.waitForPendingWrites(),6000,"pw");L.push((A?"كتابات معلّقة غير مرسلة: ":"Pending writes: ")+(pw.ok?(A?"لا يوجد":"none"):(A?"نعم — ما زالت في الطابور":"yes — still queued")));if(!pw.ok)adv.push(A?"ℹ توجد كتابات في الطابور لم تصل للسحابة؛ ستُرسل تلقائياً عند عودة الاتصال أو تجدّد الحصة. لا تمسح بيانات المتصفح قبل ذلك.":"ℹ Writes are queued and will sync when possible.")}catch(e){}
+  L.push((A?"وضع الاتصال: ":"Transport: ")+(window.__fbLongPolling?(A?"Long-polling (أبطأ لكنه أكثر ثباتاً)":"Long-polling (slower)"):"WebSocket"));
+ }
+ if(!adv.length)adv.push(A?"✔ لم يظهر عطل واضح من جهة هذا الجهاز. إن استمر البطء فافحص صفحة Usage في Firebase Console للتأكد من الحصة.":"✔ No obvious device-side problem.");
+ body(L.join("\n")+"\n\n"+adv.join("\n"))}
+function inject(){try{var page=document.getElementById("page-dailyup");if(!page||document.getElementById("sd-btn"))return;
+ var host=[].slice.call(page.querySelectorAll("button")).filter(function(b){return/ترحيل يدوي|Manual|manual/i.test(b.textContent)})[0];
+ var b=document.createElement("button");b.id="sd-btn";b.type="button";b.className=host?host.className:"btn-soft sm";b.style.cssText="margin-inline-start:8px;white-space:nowrap";b.textContent="\u{1F50D} "+(ar()?"فحص المزامنة":"Sync check");b.onclick=run;
+ if(host&&host.parentNode)host.parentNode.insertBefore(b,host.nextSibling);else page.insertBefore(b,page.firstChild)}catch(e){}}
+setInterval(inject,2500);setTimeout(inject,800);window.SYNCDIAG=run})();
 </script>
