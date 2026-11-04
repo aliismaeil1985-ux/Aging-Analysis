@@ -18294,7 +18294,7 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
   var DEFS = {
     fg: {
       title: "أرصدة الإنتاج التام (FG Balance)", title_en: "FG Balance", page: "rfgbal", source: "daily_reports.fgbal",
-      fields: [["item_code", "string", "كود الصنف"], ["brand", "string", "الماركة/الهوية"], ["size", "string", "الحجم"], ["category", "string", "الفئة"], ["pack", "string", "الشد/العبوة"], ["warehouse", "string", "المستودع/المصنع (عمود الفرع)"], ["qty", "number", "الكمية (وحدات التقرير)"]],
+      fields: [["item_code", "string", "كود الصنف"], ["brand", "string", "الماركة/الهوية"], ["size", "string", "الحجم"], ["category", "string", "الفئة"], ["pack", "string", "الشد/العبوة"], ["warehouse", "string", "المستودع/المصنع (عمود الفرع)"], ["qty", "number", "الكمية (وحدات التقرير)"], ["coverage_days", "number", "أيام التغطية (للصنف)"]],
       build: function () { var d = getD().fgbal; return { rows: wide2long(d, "fg"), asOf: d && d.date, meta: d }; }
     },
     old: {
