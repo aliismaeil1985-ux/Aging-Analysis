@@ -7256,6 +7256,7 @@ body.ivxui .kpi-v,body.ivxui .d-sec-h{font-variant-numeric:tabular-nums}
   function paint() {
     var body = document.getElementById("sp-act-tbody-main");
     if (!body) return;
+    if (!body.offsetParent || !body.querySelector("tr")) return; /* لا حساب ثقيل عند الإقلاع: يُرسم فقط عند ظهور جدول المساحات */
     var act;
     try { act = getSpaceActuals(); } catch (e) { return; }
     var nB = (act.branches || []).length;
@@ -23312,6 +23313,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     if (p === "tts" && c.tts_enabled === false) return { s: "off", txt: "معطّل من الإعدادات" };
     if (t && t.key === K[p === "tts" ? "gemini" : p]) {
       if (t.ok) return { s: p === "anthropic" && !c.paidEnabled ? "wait" : "on", txt: (p === "anthropic" && !c.paidEnabled ? "المفتاح يعمل — لكن المدفوع غير مفعّل" : "مفعّل ويعمل") + " · " + (t.ms != null ? t.ms + " ms · " : "") + ago(t.at) };
+      if (/high demand|overloaded|unavailable|try again later|temporar|capacity/i.test(String(t.err || ""))) return { s: "wait", txt: "مزدحم مؤقتًا: " + friendly(p, t.err, t.status) + " · " + ago(t.at) };
       return { s: "bad", txt: "لا يعمل: " + friendly(p, t.err, t.status) + " · " + ago(t.at) };
     }
     return { s: "wait", txt: "المفتاح محفوظ — لم يُختبر بعد" };
@@ -23322,6 +23324,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     if (p === "openai" && /sk-ant/i.test(err)) return "هذا مفتاح Claude وُضع في خانة OpenAI — احذفه من هنا";
     if (/no longer available|not found|does not exist|decommissioned|deprecated|model_not_found/i.test(err)) return "المفتاح صحيح لكن النموذج المحدد أُوقف — اضغط «اختيار نموذج متاح»";
     if (status === 401 || status === 403 || /invalid.{0,12}key|incorrect api key|api key not valid|unauthori[sz]ed|permission denied/i.test(err)) return "المفتاح غير صحيح أو أُلغي — أنشئ مفتاحًا جديدًا والصقه";
+    if (/high demand|overloaded|unavailable|try again later|temporar|capacity/i.test(err)) return "المفتاح سليم، لكن خوادم Google مزدحمة مؤقتًا على هذا النموذج — يجرّب الخادم نموذجًا بديلًا تلقائيًا، أعد الاختبار بعد دقائق";
     if (status === 429 || /quota|rate.?limit|resource.?exhausted/i.test(err)) return "تجاوز الحد المجاني مؤقتًا — يعود تلقائيًا لاحقًا";
     if (/no-key/.test(err)) return "لا يوجد مفتاح";
     return err.slice(0, 90);
