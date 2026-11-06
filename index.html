@@ -18703,31 +18703,55 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
     /* كم يوم يكفي/يغطي صنف معيّن: من عمود التغطية في FG، مع تذكّر آخر صنف ذُكر في المحادثة */
     var LAST = null;
     function sizeNumIn(q) { var m = q.match(/(\d+(?:\.\d+)?)\s*(?:مل|ملي|مللي|ml|لتر|ليتر|l\b|جالون|gal)/) || q.match(/(?:حجم|مقاس|عبوه|صنف|قاروره)\s*(\d{3,4})\b/); return m ? m[1] : ""; }
-    function packIn(q) { var m = q.match(/(?:مل|ملي|مللي|ml|لتر|ليتر|l)\s*(?:في|x|×|\*|شد)\s*(\d{1,2})(?!\d)/) || q.match(/(?:شد|pack)\s*(\d{1,2})(?!\d)/) || q.match(/(\d{1,2})\s*[x×*]\s*\d{3,4}/); return m ? m[1] : ""; }
+    function packIn(q) { var m = q.match(/(?:مل|ملي|مللي|ml|لتر|ليتر|l)\s*(?:في|x|×|\*|شد)\s*(\d{1,2})(?!\d)/) || q.match(/(?:شد|pack)\s*(\d{1,2})(?!\d)/) || q.match(/(?:^|\D)(\d{1,2})(?:\s+|\s*(?:في|x|×|\*)\s*)\d{3,4}(?!\d)/) || q.match(/(?:^|\D)\d{3,4}\s*(?:مل|ملي)?\s*(?:في|x|×|\*)\s*(\d{1,2})(?!\d)/); return m ? m[1] : ""; }
     function codeIn(q) { var m = q.match(/(?:^|\D)(\d{6,10})(?!\d)/); return m ? m[1] : ""; }
-    /* إجابة من جدول «بيانات المساعد» الموحّد: التغطية/كفاية المبيعات/الرصيد لصنف، بالبراند الافتراضي إن لم يُذكر براند */
+    /* إجابة صنف من جدول «بيانات المساعد»: بالاسم (الحجم × الشد) لا بالكود.
+       الترتيب: إجمالي الشركة ← الرياض (مع الخرج وهيت) ← باقي الفروع، ومع كل رقم «تكفي كم يوم». البراند الافتراضي تانيا. */
+    var GROUPS = { riyadh: ["riyadh", "kharj", "heet"] };
     function itemAns(T, f, kind) {
-      var en = f.en, num = f.sizeNum || ((f.size || [])[0] && String(f.size[0]).match(/\d+(?:\.\d+)?/) ? String(f.size[0]).match(/\d+(?:\.\d+)?/)[0] : "");
-      var m = WAITEM.match(T, { sizeNum: num, pack: (f.pack || [])[0], code: f.code, brand: f.brand }), rows = m.rows;
-      var inC = function (w) { return !(f.cities && f.cities.length) || f.cities.indexOf(cityOf(w)) >= 0; };
-      var lab = (num ? num + (/\./.test(num) || +num < 20 ? " L" : " ml") : f.code ? (en ? "item " : "الصنف ") + f.code : "") + ((f.pack || [])[0] ? " × " + f.pack[0] : "") + (f.cities && f.cities.length ? " — " + f.cities.map(function (c) { return cityLabel(c, en); }).join("، ") : "");
-      var bl = m.brand ? (en ? " — brand " : " — براند ") + m.brand : "";
-      if (!rows.length) return { t: (en ? "No items found for " : "لا توجد أصناف مطابقة لـ ") + lab + bl + "." };
-      var L = [], tot = 0, list = rows.map(function (o) { var q = 0, parts = []; Object.keys(o.by_branch).forEach(function (w) { if (!inC(w)) return; q += o.by_branch[w]; if (o.by_branch[w]) parts.push([w, o.by_branch[w]]); }); parts.sort(function (a, b) { return b[1] - a[1]; }); tot += q; return { o: o, q: r1(q), parts: parts }; });
-      var nm = function (o) { var sz = o.size && /^\d+(\.\d+)?$/.test(String(o.size).trim()) ? o.size + (+o.size < 20 ? " L" : " ml") : o.size, pk = String(o.pack || ""); return [o.item_code, (/(ml|مل|l\b|لتر)/i.test(pk) ? pk : [sz, pk ? "× " + pk : ""].filter(Boolean).join(" "))].filter(Boolean).join(" — "); };
-      if (kind === "bal") {
-        list.sort(function (a, b) { return b.q - a.q; });
-        L.push((en ? "**Stock of " : "**رصيد ") + lab + bl + "**: " + (en ? "total " : "الإجمالي ") + "**" + fmt(r1(tot)) + "**");
-        list.slice(0, 8).forEach(function (x, i) { L.push((i + 1) + ". " + nm(x.o) + " — **" + fmt(x.q) + "**" + (x.parts.length > 1 ? " (" + x.parts.slice(0, 4).map(function (p) { return p[0] + " " + fmt(r1(p[1])); }).join("، ") + ")" : "") + (x.o.coverage_days != null ? (en ? " — coverage " : " — التغطية ") + x.o.coverage_days + (en ? " days" : " يوم") : "")); });
+      var en = f.en, num = f.sizeNum || ((f.size || [])[0] && String(f.size[0]).match(/\d+(?:\.\d+)?/) ? String(f.size[0]).match(/\d+(?:\.\d+)?/)[0] : ""), pk = (f.pack || [])[0] || "";
+      var m = WAITEM.match(T, { sizeNum: num, pack: pk, code: f.code, brand: f.brand }), rows = m.rows.filter(function (o) { return o.qty > 0 || Object.keys(o.by_branch).length; });
+      var unitSz = function (v) { v = String(v || "").trim(); return /^\d+(\.\d+)?$/.test(v) ? v + (+v < 20 ? (en ? " L" : " لتر") : (en ? " ml" : " مل")) : v; };
+      var nameOf = function (o) { var p = String(o.pack || "").trim(), sz = unitSz(o.size), pm = p.match(/^(\d{1,3})\s*[x×*]/); var pn = pm ? pm[1] : (/^\d{1,3}$/.test(p) ? p : ""); return (sz || p) + (pn ? " × " + pn : ""); };
+      var lab = num ? unitSz(num) + (pk ? " × " + pk : "") : f.code ? (rows[0] ? nameOf(rows[0]) : f.code) : pk ? "× " + pk : (en ? "all items" : "كل الأصناف");
+      var bl = m.brand || "";
+      if (!rows.length) return { t: (en ? "No items found for " : "لا توجد أصناف مطابقة لـ ") + lab + (bl ? " — " + bl : "") + "." };
+      var dc = cityOf(T.rules.defaultCity || "") || "riyadh", grp = GROUPS[dc] || [dc];
+      var keyOf = function (w) { var c = cityOf(w); return c ? (grp.indexOf(c) >= 0 ? "#" + dc : c) : "@" + w; };
+      var labOf = function (k) { return k === "#" + dc ? cityLabel(dc, en) + (grp.length > 1 ? (en ? " (incl. " : " (مع ") + grp.slice(1).map(function (c) { return cityLabel(c, en); }).join(en ? " & " : " و") + ")" : "") : k.charAt(0) === "@" ? k.slice(1) : cityLabel(k, en); };
+      var want = f.cities && f.cities.length ? f.cities.map(function (c) { return grp.indexOf(c) >= 0 ? "#" + dc : c; }) : null;
+      /* تجميع الرصيد والصرف اليومي حسب الفرع/المجموعة، وحسب الصنف */
+      var B = {}, tot = 0, totDaily = 0, covs = [], items = [];
+      rows.forEach(function (o) {
+        var iq = 0; Object.keys(o.by_branch).forEach(function (w) { var q = +o.by_branch[w] || 0; if (!q) return; var k = keyOf(w), b = B[k] || (B[k] = { q: 0, d: 0, cov: [] }); b.q += q; iq += q; if (o.coverage_days != null) b.cov.push(o.coverage_days); });
+        var sb = o.sales_by_branch || {}; Object.keys(sb).forEach(function (w) { var k = keyOf(w), b = B[k] || (B[k] = { q: 0, d: 0, cov: [] }); b.d += +sb[w] || 0; });
+        tot += iq; if (o.sales_daily > 0) totDaily += o.sales_daily; if (o.coverage_days != null && iq > 0) covs.push(o.coverage_days); items.push({ o: o, q: r1(iq) });
+      });
+      var minCov = function (a) { return a.length ? Math.min.apply(null, a) : null; };
+      var days = function (q, d, cov) { return d > 0 ? { v: r1(q / d), k: "s" } : cov != null ? { v: cov, k: "c" } : null; };
+      var dTxt = function (x) { return x ? (en ? " — lasts **" : " — تكفي **") + x.v + "** " + (en ? "days" : "يوم") + (x.k === "c" ? (en ? " (FG coverage)" : " (تغطية FG)") : "") : (en ? " — days: n/a" : " — الأيام: غير متوفرة"); };
+      var title = (kind === "cov" ? (en ? "**Coverage — " : "**التغطية — ") : (en ? "**Stock — " : "**رصيد ")) + lab + (bl ? " — " + bl : "") + "**";
+      var L = [title], say = [lab + (bl ? " " + (!en && /^tania$/i.test(bl) ? "تانيا" : bl) : "")];
+      var tD = days(tot, totDaily, minCov(covs));
+      var keys = Object.keys(B).filter(function (k) { return B[k].q > 0; }).sort(function (a, b) { return B[b].q - B[a].q; });
+      if (want) {
+        want.forEach(function (k) { var b = B[k] || { q: 0, d: 0, cov: [] }, x = days(b.q, b.d, minCov(b.cov.length ? b.cov : covs)); L.push("**" + labOf(k) + "**: **" + fmt(r1(b.q)) + "**" + dTxt(x)); say.push(labOf(k) + " " + fmt(r1(b.q)) + (x ? (en ? ", lasts " : "، تكفي ") + x.v + (en ? " days" : " يوم") : "")); });
+        L.push((en ? "Company total: **" : "إجمالي الشركة: **") + fmt(r1(tot)) + "**" + dTxt(tD));
       } else {
-        list.sort(function (a, b) { var x = a.o.coverage_days == null ? 1e9 : a.o.coverage_days, y = b.o.coverage_days == null ? 1e9 : b.o.coverage_days; return x - y; });
-        L.push((en ? "**Coverage of " : "**تغطية ") + lab + bl + (en ? "** (how many days stock lasts):" : "** (كم يوم يكفي الرصيد):"));
-        list.slice(0, 8).forEach(function (x, i) { var o = x.o, sd = o.sales_daily > 0 ? r1(x.q / o.sales_daily) : null; L.push((i + 1) + ". " + nm(o) + " — " + (o.coverage_days == null ? (en ? "no coverage data" : "لا توجد تغطية في FG") : (en ? "coverage " : "التغطية ") + "**" + o.coverage_days + "** " + (en ? "days" : "يوم")) + (sd != null ? (en ? " — sales cover " : " — كفاية المبيعات ") + "**" + sd + "** " + (en ? "days" : "يوم") : "") + (en ? " — stock " : " — الرصيد ") + fmt(x.q)); });
-        L.push(en ? "\nCoverage = FG report coverage column. Sales cover = stock ÷ average daily issued (" + T.rules.salesDays + " days of movement data), when available." : "\nالتغطية = عمود التغطية في تقرير FG. كفاية المبيعات = الرصيد ÷ متوسط الصرف اليومي لآخر " + T.rules.salesDays + " يوم (عند توفر بيانات الحركة).");
+        L.push((en ? "Company total: **" : "إجمالي الشركة: **") + fmt(r1(tot)) + "**" + dTxt(tD));
+        say.push((en ? "company total " : "إجمالي الشركة ") + fmt(r1(tot)) + (tD ? (en ? ", lasts " : "، تكفي ") + tD.v + (en ? " days" : " يوم") : ""));
+        var g = B["#" + dc]; if (g && g.q > 0) { var gx = days(g.q, g.d, minCov(g.cov)); L.push("**" + labOf("#" + dc) + "**: **" + fmt(r1(g.q)) + "** (" + Math.round(g.q / Math.max(1, tot) * 100) + "%)" + dTxt(gx)); say.push(labOf("#" + dc) + " " + fmt(r1(g.q)) + (gx ? (en ? ", lasts " : "، تكفي ") + gx.v + (en ? " days" : " يوم") : "")); }
+        var rest = keys.filter(function (k) { return k !== "#" + dc; });
+        if (rest.length) { L.push(en ? "Other branches:" : "باقي الفروع:"); rest.forEach(function (k) { var b = B[k], x = days(b.q, b.d, minCov(b.cov)); L.push("- " + labOf(k) + ": **" + fmt(r1(b.q)) + "**" + dTxt(x)); }); }
       }
-      if (list.length > 8) L.push((en ? "…and " : "…و ") + (list.length - 8) + (en ? " more items in the table." : " أصناف أخرى في الجدول."));
-      var rid = env.mkRes({ title: (kind === "bal" ? (en ? "Stock — " : "الرصيد — ") : (en ? "Coverage — " : "التغطية — ")) + lab + bl, dataset: "fg", page: "rfgbal", columns: [{ key: "item_code", label: "كود الصنف", type: "string" }, { key: "brand", label: "البراند", type: "string" }, { key: "size", label: "الحجم", type: "string" }, { key: "pack", label: "الشد", type: "string" }, { key: "qty", label: "الرصيد", type: "number" }, { key: "coverage_days", label: "التغطية FG (يوم)", type: "number" }, { key: "sales_daily", label: "متوسط الصرف اليومي", type: "number" }, { key: "sales_days", label: "كفاية المبيعات (يوم)", type: "number" }, { key: "age_max", label: "أقدم عمر", type: "number" }], rows: list.map(function (x) { var o = x.o; return { item_code: o.item_code, brand: o.brand, size: o.size, pack: o.pack, qty: x.q, coverage_days: o.coverage_days, sales_daily: o.sales_daily, sales_days: o.sales_daily > 0 ? r1(x.q / o.sales_daily) : null, age_max: o.age_max }; }), sources: ["fg"] });
-      return { t: L.join("\n") + "\n" + (en ? "Source: AI data table — " : "المصدر: جدول بيانات المساعد — ") + (T.sources.join(" | ") || "—"), rids: [rid] };
+      if (items.length > 1) { L.push(en ? "\nBy item:" : "\nحسب الصنف:"); items.sort(function (a, b) { return b.q - a.q; }).slice(0, 8).forEach(function (x) { var o = x.o, xd = days(x.q, o.sales_daily, o.coverage_days); L.push("- " + nameOf(o) + (o.identity && !/tania/i.test(o.identity) ? " (" + o.identity.replace(/^\d+\s*[-.]\s*/, "") + ")" : "") + ": **" + fmt(x.q) + "**" + dTxt(xd)); }); }
+      L.push(en ? "\nDays = stock ÷ average daily issued (last " + T.rules.salesDays + " days); when no movement data, the FG coverage is shown." : "\nالأيام = الرصيد ÷ متوسط الصرف اليومي لآخر " + T.rules.salesDays + " يوم، وعند عدم توفر بيانات الصرف تُعرض تغطية FG.");
+      var rid = env.mkRes({ title: (en ? "Stock & days — " : "الرصيد والأيام — ") + lab + (bl ? " — " + bl : ""), dataset: "fg", page: "rfgbal",
+        columns: [{ key: "branch", label: "الفرع", type: "string" }, { key: "qty", label: "الرصيد", type: "number" }, { key: "share_pct", label: "النسبة %", type: "number" }, { key: "days", label: "تكفي (يوم)", type: "number" }, { key: "basis", label: "أساس الأيام", type: "string" }],
+        rows: [{ branch: en ? "Company total" : "إجمالي الشركة", qty: r1(tot), share_pct: 100, days: tD ? tD.v : null, basis: tD ? (tD.k === "s" ? "الصرف" : "تغطية FG") : "" }].concat(keys.map(function (k) { var b = B[k], x = days(b.q, b.d, minCov(b.cov)); return { branch: labOf(k), qty: r1(b.q), share_pct: tot > 0 ? r1(b.q / tot * 100) : null, days: x ? x.v : null, basis: x ? (x.k === "s" ? "الصرف" : "تغطية FG") : "" }; })), sources: ["fg"] });
+      var out = { t: L.join("\n") + "\n" + (en ? "Source: AI data table — " : "المصدر: جدول بيانات المساعد — ") + (T.sources.join(" | ") || "—"), rids: [rid] };
+      out.say = say.join(en ? ". " : ". ") + (en ? ". Details are on the screen." : ". والتفاصيل على الشاشة.");
+      return out;
     }
     function itemsT() { try { var T = env.items ? env.items() : null; return T && T.rows && T.rows.length && typeof WAITEM !== "undefined" ? T : null; } catch (e) { return null; } }
     H.itembal = function (f) { var T = itemsT(); return T ? itemAns(T, f, "bal") : { t: f.en ? "Item data is not available." : "بيانات الأصناف غير متاحة." }; };
@@ -18878,6 +18902,8 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
         if (!sn && TT) { var bm = q.match(/(?:^| )(\d{3,4})(?= |$)(?! ?(يوم|ايام|يوما|days?|شهر|%))/); if (bm && TT.rows.some(function (o) { return String(o.size).trim() === bm[1] || new RegExp("(^|[^0-9])" + bm[1] + "\\s*ml", "i").test(String(o.pack)); })) sn = bm[1]; }
         if (pk && !(e.pack && e.pack.length)) e.pack = [pk];
         if (sn || cd || (e.size && e.size.length) || (e.pack && e.pack.length)) LAST = { size: e.size || [], pack: e.pack || [], sizeNum: sn, code: cd, brand: bn, cities: cs, at: Date.now() };
+        if (!it && TT && !sn && !cd && q.split(" ").length <= 5 && /^(كم |وش |ايش |ابغى |ابي |اعطني |عطني )?(ال)?(رصيد|ارصده|المخزون|مخزون)( الحالي| الان| اليوم| كله| كامل)?( في \S+| ب\S+)?$/.test(q.trim())) it = "itembal";
+        if (!it && TT && (sn || cd) && (/^(كم|وش|ايش|اعطني|عطني|ابغى|ابي|طيب|طب)( |$)/.test(q) || q.split(" ").length <= 4)) it = "itembal";
         if (!it && TT && (sn || cd) && /(رصيد|ارصده|الرصيد|كم عندنا|كم عندي|كم متوفر|متوفر|متاح|المتاح|الكميه|كم كميه|موجود|كم باقي|stock|balance|how many|how much|on hand)/.test(q)) it = "itembal";
         if (!it && prev && (cs.length || top || days || lo != null || (e.size && e.size.length)) && q.split(" ").length <= 8) it = prev.intent;
         if (lo != null) en = lo; else if (prev && prev.en != null && !/[a-z]{2,}/.test(q) && !/[؀-ۿ]/.test(q)) en = prev.en;
@@ -18900,7 +18926,7 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
       var lines = String(out.t || "").split("\n").map(function (l) { return l.replace(/\[([^\]]*)\]\([^)]*\)/g, "").replace(/[*_#`|>]/g, "").trim(); }).filter(function (l) { return l && !/^(المصدر|source|---|ملخص جاهز|email-ready)/i.test(l); });
       var say = lines.slice(0, 3).join(en ? ". " : "، "); if (say.length > 280) say = say.slice(0, 280).replace(/\s+\S*$/, "");
       if (lines.length > 3 || (out.rids && out.rids.length)) say += en ? ". Details are on the screen." : ". والتفاصيل معروضة على الشاشة.";
-      out.say = say; return out;
+      if (!out.say) out.say = say; return out;
       },
       H: H, perCity: perCity
     };
@@ -23071,11 +23097,18 @@ if(!o.workerUrl){o.workerUrl=U;localStorage.setItem(K,JSON.stringify(o))}}catch(
     for (var i = 0; i < n; i++) { var lo = bin.charCodeAt(2 * i), hi = bin.charCodeAt(2 * i + 1), v = (hi << 8) | lo; if (v & 0x8000) v -= 0x10000; ch[i] = v / 32768; }
     return ab;
   }
+  /* Azure يرسل MP3 مضغوطًا (أصغر بكثير) ← فك الترميز بالمتصفح (يعمل في Chrome/Edge/Firefox/Safari) */
+  function mp3ToBuffer(b64) {
+    return new Promise(function (res, rej) {
+      try { var bin = atob(b64), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); var p = ctx().decodeAudioData(u.buffer, res, rej); if (p && p.then) p.then(res, rej); } catch (e) { rej(e); }
+    });
+  }
   function fetchSeg(text) {
-    if (V.cache[text]) return V.cache[text];
+    var ck = ((V.health && V.health.ttsVoice) || "") + "|" + text; /* المفتاح يشمل اسم الصوت: تغيير الصوت لا يعيد الصوت القديم */
+    if (V.cache[ck]) return V.cache[ck];
     var p = token().then(function (tk) { return fetch(url() + "/v1/tts", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + tk }, body: JSON.stringify({ text: text }) }); })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok || !j.ok) { var e = new Error(j && j.error || ("HTTP " + r.status)); e.status = r.status; throw e; } return pcmToBuffer(j.audio, j.rate); }); });
-    V.cache[text] = p; p.catch(function () { delete V.cache[text]; });
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok || !j.ok) { var e = new Error(j && j.error || ("HTTP " + r.status)); e.status = r.status; throw e; } return /mpeg|mp3/i.test(j.mime || "") ? mp3ToBuffer(j.audio) : pcmToBuffer(j.audio, j.rate); }); });
+    V.cache[ck] = p; p.catch(function () { delete V.cache[ck]; });
     var keys = Object.keys(V.cache); if (keys.length > 40) delete V.cache[keys[0]];
     return p;
   }
@@ -23111,6 +23144,14 @@ if(!o.workerUrl){o.workerUrl=U;localStorage.setItem(K,JSON.stringify(o))}}catch(
     usable: usable, speak: speak, stop: stop, sentences: sentences, refresh: refresh, ready: ready, checked: function () { return !!V.checked; },
     pause: function () { if (V.ac && V.src) { V.paused = true; V.ac.suspend(); return true; } return false; },
     resume: function () { if (V.ac && V.paused) { V.paused = false; V.ac.resume(); return true; } return false; },
+    /* معاينة صوت محدد (لوحة المدير) دون حفظه */
+    preview: function (text, voice) {
+      stop(); var my = V.tok;
+      return token().then(function (tk) { return fetch(url() + "/v1/tts", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + tk }, body: JSON.stringify({ text: text, voice: voice || undefined }) }); })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok || !j.ok) throw new Error(j && j.error || ("HTTP " + r.status)); return /mpeg|mp3/i.test(j.mime || "") ? mp3ToBuffer(j.audio) : pcmToBuffer(j.audio, j.rate); }); })
+        .then(function (buf) { if (my !== V.tok) return; var ac = ctx(), src = ac.createBufferSource(); src.buffer = buf; src.connect(V.gain); V.src = src; src.onended = function () { if (V.src === src) V.src = null; }; src.start(); return buf.duration; });
+    },
+    resetCache: function () { V.cache = {}; V.healthAt = 0; return refresh(true); },
     isPaused: function () { return !!V.paused; }, isActive: function () { return !!V.src; },
     unlock: function () { try { if (window.AudioContext || window.webkitAudioContext) ctx(); } catch (e) { } }, _V: V
   };
@@ -23123,13 +23164,13 @@ if(!o.workerUrl){o.workerUrl=U;localStorage.setItem(K,JSON.stringify(o))}}catch(
    الأرصدة لكل فرع + الإجمالي · OLD · الترانزيت · أعمار المخزون · التغطية (FG) · أيام كفاية المبيعات (محسوبة من WSO)
    + أي تقرير آخر فيه كود صنف وأعمدة رقمية يُضاف تلقائيًا. قواعد المدير: دمج أسماء البراند (Krones → Tania) وإخفاء صفوف. */
 var WAITEM = (function () {
-  var DEF_RULES = { alias: { "krones": "Tania", "kronz": "Tania", "كرونز": "Tania", "tania": "Tania", "تانيا": "Tania", "new identity": "Tania", "old identity": "Tania" }, hide: [], hideBrands: [], defaultBrand: "Tania", salesDays: 30 };
+  var DEF_RULES = { alias: { "krones": "Tania", "kronz": "Tania", "كرونز": "Tania", "tania": "Tania", "تانيا": "Tania", "new identity": "Tania", "old identity": "Tania" }, hide: [], hideBrands: [], defaultBrand: "Tania", defaultCity: "الرياض", salesDays: 30 };
   var KNOWN = { fg: 1, old: 1, transit: 1, aging: 1, wso: 1, master: 1, fg_history: 1, space: 1, bottle: 1, btl5g: 1, whp: 1, attachment: 1 };
   function n(v) { v = typeof v === "number" ? v : parseFloat(String(v == null ? "" : v).replace(/,/g, "")); return isFinite(v) ? v : null; }
   function r1(v) { return Math.round(v * 10) / 10; }
   function key(s) { return String(s == null ? "" : s).trim().toLowerCase().replace(/^\d+\s*[-.]\s*/, ""); }
   function rulesOf(r) {
-    r = r || {}; var o = { alias: {}, hide: (r.hide || []).map(String), hideBrands: (r.hideBrands || []).map(key), defaultBrand: r.defaultBrand == null ? DEF_RULES.defaultBrand : String(r.defaultBrand), salesDays: +r.salesDays > 0 ? +r.salesDays : DEF_RULES.salesDays };
+    r = r || {}; var o = { alias: {}, hide: (r.hide || []).map(String), hideBrands: (r.hideBrands || []).map(key), defaultBrand: r.defaultBrand == null ? DEF_RULES.defaultBrand : String(r.defaultBrand), salesDays: +r.salesDays > 0 ? +r.salesDays : DEF_RULES.salesDays, defaultCity: r.defaultCity == null ? DEF_RULES.defaultCity : String(r.defaultCity) };
     Object.keys(DEF_RULES.alias).forEach(function (k) { o.alias[k] = DEF_RULES.alias[k]; });
     Object.keys(r.alias || {}).forEach(function (k) { if (k) o.alias[key(k)] = String(r.alias[k] || "").trim(); });
     return o;
@@ -23148,10 +23189,10 @@ var WAITEM = (function () {
     var T = rows("transit"); if (T) { note("transit", T); T.rows.forEach(function (r) { var o = G[String(r.item_code || "").trim()]; if (o) o.transit_qty += n(r.qty) || 0; }); }
     /* أيام كفاية المبيعات = الرصيد ÷ متوسط الصرف اليومي لآخر N يوم في بيانات الحركة (إن طابق كود المنتج كود الصنف) */
     var W = rows("wso"); if (W && W.rows.length) {
-      var last = W.rows.reduce(function (a, r) { return r.date > a ? r.date : a; }, ""), from = last ? new Date(Date.parse(last) - (R.salesDays - 1) * 864e5).toISOString().slice(0, 10) : "", first = "", S = {};
-      W.rows.forEach(function (r) { if (!r.date || r.date < from) return; var q = n(r.iss); if (q == null) return; if (!first || r.date < first) first = r.date; var c = String(r.prod || "").trim(); S[c] = (S[c] || 0) + q; });
+      var last = W.rows.reduce(function (a, r) { return r.date > a ? r.date : a; }, ""), from = last ? new Date(Date.parse(last) - (R.salesDays - 1) * 864e5).toISOString().slice(0, 10) : "", first = "", S = {}, SB = {};
+      W.rows.forEach(function (r) { if (!r.date || r.date < from) return; var q = n(r.iss); if (q == null) return; if (!first || r.date < first) first = r.date; var c = String(r.prod || "").trim(); S[c] = (S[c] || 0) + q; var wh = String(r.wh || r.pl || "").trim(); if (wh) { var sb = SB[c] || (SB[c] = {}); sb[wh] = (sb[wh] || 0) + q; } });
       var span = first ? Math.round((Date.parse(last) - Date.parse(first)) / 864e5) + 1 : R.salesDays, hit = 0;
-      Object.keys(S).forEach(function (c) { var o = G[c]; if (!o) return; hit++; o.sales_daily = r1(S[c] / span); });
+      Object.keys(S).forEach(function (c) { var o = G[c]; if (!o) return; hit++; o.sales_daily = r1(S[c] / span); o.sales_by_branch = {}; Object.keys(SB[c] || {}).forEach(function (w) { o.sales_by_branch[w] = r1(SB[c][w] / span); }); });
       if (hit) { note("wso", W); srcs[srcs.length - 1] += " (متوسط " + span + " يوم)"; }
     }
     /* تقارير إضافية: أي مجموعة بيانات فيها كود صنف وأعمدة رقمية */
@@ -23232,6 +23273,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
       '<div class="ai-act" style="margin-top:8px;flex-wrap:wrap"><input data-wi-q placeholder="بحث: كود، براند، حجم، شد…" value="' + esc(U.q) + '" style="flex:1;min-width:180px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px"><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-wi-sh' + (U.showHidden ? " checked" : "") + '> إظهار المخفي</label><button data-wi="rebuild">⟳ إعادة البناء الآن</button><button data-wi="xls">⬇ Excel</button></div>' + (U.msg ? '<div class="ai-src" style="margin-top:6px">' + esc(U.msg) + "</div>" : "") + "</div>";
     if (admin()) h += '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🔐 قواعد المدير</h4><div class="ai-g">' +
       '<label class="f">البراند الافتراضي عند عدم ذكر البراند في السؤال<input id="wi-db" value="' + esc(RR.defaultBrand) + '"></label>' +
+      '<label class="f">الفرع الأولوية في الإجابة (يُذكر أولًا)<input id="wi-dc" value="' + esc(RR.defaultCity) + '"></label>' +
       '<label class="f">أيام حساب متوسط المبيعات<input id="wi-sd" type="number" min="7" max="180" value="' + RR.salesDays + '"></label>' +
       '<label class="f" style="grid-column:1/-1">دمج أسماء البراند (سطر لكل اسم: الاسم في البيانات = الاسم الصحيح). الافتراضي: Krones/Kronz/New Identity/Old Identity = Tania<textarea id="wi-al" dir="ltr" rows="4" style="width:100%">' + esc(aliasTxt) + '</textarea></label>' +
       '<label class="f" style="grid-column:1/-1">إخفاء براندات كاملة (اسم في كل سطر)<textarea id="wi-hb" dir="ltr" rows="2" style="width:100%">' + esc((R.hideBrands || []).join("\n")) + '</textarea></label></div>' +
@@ -23263,7 +23305,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     else if (a === "xls") xls();
     else if (a === "save" && admin()) {
       var al = {}; String(document.getElementById("wi-al").value || "").split(/\n+/).forEach(function (l) { var m = l.split("="); if (m.length >= 2 && m[0].trim() && m[1].trim()) al[m[0].trim()] = m.slice(1).join("=").trim(); });
-      var R = Object.assign({}, rulesRaw(), { alias: al, defaultBrand: String(document.getElementById("wi-db").value || "").trim(), salesDays: +document.getElementById("wi-sd").value || 30, hideBrands: String(document.getElementById("wi-hb").value || "").split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean) });
+      var R = Object.assign({}, rulesRaw(), { alias: al, defaultBrand: String(document.getElementById("wi-db").value || "").trim(), salesDays: +document.getElementById("wi-sd").value || 30, defaultCity: String((document.getElementById("wi-dc") || {}).value || "").trim(), hideBrands: String(document.getElementById("wi-hb").value || "").split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean) });
       saveRules(R).then(function (m) { U.msg = m; paint(); });
     }
   }, true);
@@ -23404,7 +23446,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
         "</div>" +
         (az ? '<div class="wp-key"><div class="wp-cur">مفتاح Azure الحالي<code' + (K.azure ? "" : ' style="direction:rtl;text-align:right;color:#94a3b8"') + ">" + esc(K.azure || "لا يوجد") + '</code></div><label class="f">' + (K.azure ? "استبدال المفتاح" : "إضافة مفتاح (KEY 1 من صفحة Keys and Endpoint)") + '<input id="wp-k-azure" type="password" dir="ltr" autocomplete="off" placeholder="الصق مفتاح Azure Speech هنا"></label></div>' : "") +
         '<details><summary>إعدادات متقدمة</summary><div class="wp-grid"><label class="f">نموذج Gemini للصوت<input id="wp-tm" dir="ltr" value="' + esc(c.tts_model || "gemini-2.5-flash-preview-tts") + '"></label></div></details>' +
-        '<div class="wp-btns"><button class="pri" data-wp="save">💾 حفظ الإعدادات</button>' + (az ? '<button data-wp="key" data-p="azure">💾 حفظ مفتاح Azure</button>' : "") + '<button data-wp="test" data-p="tts"' + (K[az ? "azure" : "gemini"] ? "" : " disabled") + ">🔌 اختبار الصوت</button></div></div>"; })() +
+        '<div class="wp-btns"><button class="pri" data-wp="save">💾 حفظ الإعدادات</button>' + (az ? '<button data-wp="key" data-p="azure">💾 حفظ مفتاح Azure</button>' : "") + '<button data-wp="preview"' + (K[az ? "azure" : "gemini"] ? "" : " disabled") + '>▶️ استمع للصوت المختار</button>' + '<button data-wp="test" data-p="tts"' + (K[az ? "azure" : "gemini"] ? "" : " disabled") + ">🔌 اختبار الصوت</button></div></div>"; })() +
 
       prov("gemini", "🟦 Google Gemini — مجاني", "أنشئ مفتاحًا مجانيًا من <b dir=\"ltr\">aistudio.google.com → Get API key</b> (يبدأ عادة بـ <b dir=\"ltr\">AIza</b>). يشغّل الإجابات العربية وصوت المنصة.") +
       prov("groq", "🟧 Groq — مجاني (للإنجليزية)", "أنشئ مفتاحًا مجانيًا من <b dir=\"ltr\">console.groq.com → API Keys</b> (يبدأ بـ <b dir=\"ltr\">gsk_</b>).") +
@@ -23423,7 +23465,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     if (document.getElementById("wp-tun")) { try { var un = !!v("wp-tun"), cc = Object.assign({}, AIIE.cfg(), { tts_unified: un }); localStorage.setItem("ai_cfg_v1", JSON.stringify(cc)); if (typeof fbDB !== "undefined" && fbDB) fbDB.collection(FB_COL).doc("ai_cfg").set({ tts_unified: un, updatedAt: Date.now() }, { merge: true }); } catch (e) { } }
     ["gemini", "groq", "anthropic", "openai"].forEach(function (q) { body["model_" + q] = v("wp-m-" + q); if (q !== "anthropic") body[q + "_base"] = v("wp-b-" + q); body.price[q] = { in: +v("wp-pi-" + q), out: +v("wp-po-" + q) }; });
     Object.assign(body, extra || {});
-    return run(api("/admin/config", "POST", body), function () { return "✅ حُفظت الإعدادات"; }, function () { setTR("tts", null); });
+    return run(api("/admin/config", "POST", body), function () { return "✅ حُفظت الإعدادات — قد يستغرق تطبيق الصوت الجديد على كل الأجهزة حتى دقيقة"; }, function () { setTR("tts", null); try { window.WAVOICE && WAVOICE.resetCache(); } catch (e) { } });
   }
   document.addEventListener("change", function (e) { var t = e.target; if (!t || t.id !== "wp-tp" || !root() || !root().contains(t) || !S.data) return; S.data.cfg.tts_provider = t.value; setTR("tts", null); paint(); }, true);
   document.addEventListener("click", function (e) {
@@ -23432,6 +23474,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     if (a === "reload") { S.auto = false; return load(); }
     if (a === "save") return save();
     if (a === "usegem") { var sel = document.getElementById("wp-active"); if (sel) sel.value = "gemini"; return save({ active: "gemini" }); }
+    if (a === "preview") { var vv = v("wp-av") || v("wp-tv"); if (!window.WAVOICE || !WAVOICE.preview) { S.msg = "⚠️ محرك الصوت غير محمّل"; return paint(); } S.msg = "⏳ تجهيز المعاينة…"; paint(); return WAVOICE.preview("مرحبًا، أنا صوت المنصة. رصيد ثلاثمئة وثلاثين مل في الرياض ألف كرتون، يكفي يومًا واحدًا.", vv).then(function () { S.msg = "🔊 تُشغَّل الآن معاينة الصوت: " + vv + " — إن أعجبك اضغط «حفظ الإعدادات»"; paint(); }).catch(function (e) { S.msg = "❌ تعذّرت المعاينة: " + e.message; paint(); }); }
     if (a === "testall") { var L = testList(true); if (!L.length) { S.msg = "لا توجد مفاتيح محفوظة لاختبارها."; return paint(); } S.msg = "⏳ اختبار " + L.length + " …"; return chain(L).then(function () { S.msg = "✅ انتهى الاختبار — راجع اللمبات"; paint(); }); }
     if (a === "key") { var k = String(v("wp-k-" + p) || "").trim(); if (!k) return alert("الصق المفتاح أولًا"); setTR(p, null); if (p === "gemini" || p === "azure") setTR("tts", null); if (p === "azure") { var ex = { tts_provider: "azure", azure_voice: v("wp-av") || undefined, azure_region: v("wp-ar") || undefined }; S.msg = "⏳ حفظ مفتاح Azure…"; paint(); return api("/admin/key", "POST", { provider: "azure", key: k }).then(function (j) { S.data.cfg.tts_provider = "azure"; if (ex.azure_voice) S.data.cfg.azure_voice = ex.azure_voice; if (ex.azure_region) S.data.cfg.azure_region = ex.azure_region; paint(); return save(ex); }).catch(function (e) { S.msg = "⚠️ " + e.message; paint(); }); } return run(api("/admin/key", "POST", { provider: p, key: k }), function (j) { return "✅ حُفظ مفتاح " + (PN[p] || p) + " " + (j.key || "") + " — جارٍ اختباره…"; }); }
     if (a === "delkey") { if (!confirm("حذف المفتاح؟")) return; setTR(p, null); return run(api("/admin/key", "POST", { provider: p, key: "" }), function () { return "🗑 حُذف المفتاح"; }); }
