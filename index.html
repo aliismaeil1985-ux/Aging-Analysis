@@ -18703,7 +18703,7 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
     /* كم يوم يكفي/يغطي صنف معيّن: من عمود التغطية في FG، مع تذكّر آخر صنف ذُكر في المحادثة */
     var LAST = null;
     function sizeNumIn(q) { var m = q.match(/(\d+(?:\.\d+)?)\s*(?:مل|ملي|مللي|ml|لتر|ليتر|l\b|جالون|gal)/) || q.match(/(?:حجم|مقاس|عبوه|صنف|قاروره)\s*(\d{3,4})\b/); return m ? m[1] : ""; }
-    function packIn(q) { var m = q.match(/(?:مل|ملي|مللي|ml|لتر|ليتر|l)\s*(?:في|x|×|\*|شد)\s*(\d{1,2})(?!\d)/) || q.match(/(?:شد|pack)\s*(\d{1,2})(?!\d)/) || q.match(/(?:^|\D)(\d{1,2})(?:\s+|\s*(?:في|x|×|\*)\s*)\d{3,4}(?!\d)/) || q.match(/(?:^|\D)\d{3,4}\s*(?:مل|ملي)?\s*(?:في|x|×|\*)\s*(\d{1,2})(?!\d)/); return m ? m[1] : ""; }
+    function packIn(q) { var m = q.match(/(?:مل|ملي|مللي|ml|لتر|ليتر|l)\s*(?:في|x|×|\*|شد)\s*(\d{1,2})(?!\d)/) || q.match(/(?:شد|pack)\s*(\d{1,2})(?!\d)/) || q.match(/(?:^|\D)(\d{1,2})(?:\s+|\s*(?:في|x|×|\*)\s*)\d{3,4}(?!\d)/) || q.match(/(?:^|\D)\d{3,4}\s*(?:مل|ملي)?\s*(?:في|x|×|\*)\s*(\d{1,2})(?!\d)/) || q.match(/(?:^|\D)\d{3,4}\s*(?:مل|ملي|ml)?\s+(\d{1,2})(?!\d)(?!\s*(?:يوم|ايام|يوما|%|شهر|days?))/); return m ? m[1] : ""; }
     function codeIn(q) { var m = q.match(/(?:^|\D)(\d{6,10})(?!\d)/); return m ? m[1] : ""; }
     /* إجابة صنف من جدول «بيانات المساعد»: بالاسم (الحجم × الشد) لا بالكود.
        الترتيب: إجمالي الشركة ← الرياض (مع الخرج وهيت) ← باقي الفروع، ومع كل رقم «تكفي كم يوم». البراند الافتراضي تانيا. */
@@ -18749,9 +18749,126 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
       var rid = env.mkRes({ title: (en ? "Stock & days — " : "الرصيد والأيام — ") + lab + (bl ? " — " + bl : ""), dataset: "fg", page: "rfgbal",
         columns: [{ key: "branch", label: "الفرع", type: "string" }, { key: "qty", label: "الرصيد", type: "number" }, { key: "share_pct", label: "النسبة %", type: "number" }, { key: "days", label: "تكفي (يوم)", type: "number" }, { key: "basis", label: "أساس الأيام", type: "string" }],
         rows: [{ branch: en ? "Company total" : "إجمالي الشركة", qty: r1(tot), share_pct: 100, days: tD ? tD.v : null, basis: tD ? (tD.k === "s" ? "الصرف" : "تغطية FG") : "" }].concat(keys.map(function (k) { var b = B[k], x = days(b.q, b.d, minCov(b.cov)); return { branch: labOf(k), qty: r1(b.q), share_pct: tot > 0 ? r1(b.q / tot * 100) : null, days: x ? x.v : null, basis: x ? (x.k === "s" ? "الصرف" : "تغطية FG") : "" }; })), sources: ["fg"] });
-      var out = { t: L.join("\n") + "\n" + (en ? "Source: AI data table — " : "المصدر: جدول بيانات المساعد — ") + (T.sources.join(" | ") || "—"), rids: [rid] };
+      /* بطاقة عرض واضحة (بدل الجدول) — نفس الأرقام */
+      var dd = function (x) { return x ? { v: x.v, k: x.k } : null; };
+      var ic = { title: lab, brand: bl, kind: kind, total: { q: r1(tot), d: dd(tD) }, rows: [], items: [], asOf: T.asOf || "", salesDays: T.rules.salesDays };
+      if (want) want.forEach(function (k) { var b = B[k] || { q: 0, d: 0, cov: [] }; ic.rows.push({ label: labOf(k), q: r1(b.q), pct: tot > 0 ? Math.round(b.q / tot * 100) : 0, d: dd(days(b.q, b.d, minCov(b.cov.length ? b.cov : covs))), focus: true }); });
+      else { var g0 = B["#" + dc]; if (g0 && g0.q > 0) ic.lead = { label: labOf("#" + dc), q: r1(g0.q), pct: Math.round(g0.q / Math.max(1, tot) * 100), d: dd(days(g0.q, g0.d, minCov(g0.cov))) }; keys.filter(function (k) { return k !== "#" + dc; }).forEach(function (k) { var b = B[k]; ic.rows.push({ label: labOf(k), q: r1(b.q), pct: tot > 0 ? Math.round(b.q / tot * 100) : 0, d: dd(days(b.q, b.d, minCov(b.cov))) }); }); }
+      if (items.length > 1) items.slice(0, 8).forEach(function (x) { var o = x.o; ic.items.push({ name: nameOf(o), q: x.q, d: dd(days(x.q, o.sales_daily, o.coverage_days)) }); });
+      var out = { t: L.join("\n") + "\n" + (en ? "Source: AI data table — " : "المصدر: جدول بيانات المساعد — ") + (T.sources.join(" | ") || "—"), rids: [rid], ic: ic };
       out.say = say.join(en ? ". " : ". ") + (en ? ". Details are on the screen." : ". والتفاصيل على الشاشة.");
       return out;
+    }
+    /* قاموس المساعد: استبدال العبارات المعروفة (الأطول أولًا، كلمات كاملة فقط) قبل الفهم */
+    var RWC = { sig: "", list: [] };
+    function normP(p) { return nz(typeof WADIALECT !== "undefined" ? WADIALECT.norm(p) : p).replace(/ئ/g, "ي").replace(/ؤ/g, "و"); }
+    function rewriteQ(q) {
+      var T = itemsT(), R = T && T.rules && T.rules.rewrites ? T.rules.rewrites : (typeof WAITEM !== "undefined" ? WAITEM.rulesOf(null).rewrites : []); if (!R || !R.length) return q;
+      var sig = R.map(function (r) { return r.p + "=" + r.r; }).join("|"); if (RWC.sig !== sig) { RWC.sig = sig; RWC.list = R.map(function (r) { return [normP(r.p), nz(r.r)]; }).filter(function (x) { return x[0] && x[1]; }).sort(function (a, b) { return b[0].length - a[0].length; }); }
+      var s = " " + q + " "; RWC.list.forEach(function (x) { for (var n = 0, i; n < 5 && (i = s.indexOf(" " + x[0] + " ")) >= 0; n++) s = s.slice(0, i) + " " + x[1] + " " + s.slice(i + x[0].length + 2); });
+      return s.replace(/\s+/g, " ").trim();
+    }
+    /* ===== مكتبة الأسئلة والأجوبة (قوالب): ما بين " " في السؤال جزء متغيّر، وما بين " " في الإجابة قيمة تُحسب من بيانات اليوم ===== */
+    var QAC = { sig: "", list: [] }, QA_SRC_EN = { fg: "FG Balance", old: "OLD Identity", transit: "Transit", aging: "Inventory Aging", wso: "Orders & Dispatch (WSO)", space: "Space report", items: "AI data table", engine: "Assistant engine" };
+    var SLOT_RE = /["“”«»]([^"“”«»]{1,30})["“”«»]/g;
+    function esc2(t) { return String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+    function qaCompile(items) {
+      var out = [];
+      (items || []).forEach(function (it) {
+        if (!it || it.on === false) return;
+        [].concat((Array.isArray(it.q) ? it.q : [it.q]).map(function (p) { return [p, false]; }), (Array.isArray(it.qe) ? it.qe : it.qe ? [it.qe] : []).map(function (p) { return [p, true]; })).forEach(function (pe) { var p = pe[0], isEn = pe[1];
+          p = String(p || "").trim(); if (!p) return; var slots = [], re = "", last = 0, m; SLOT_RE.lastIndex = 0;
+          while ((m = SLOT_RE.exec(p))) { var lit = normP(p.slice(last, m.index)); if (lit) re += (re ? "\\s*" : "") + esc2(lit); re += (re ? "\\s*" : "") + "(.+)"; slots.push(m[1].trim()); last = m.index + m[0].length; }
+          var tail = normP(p.slice(last)), endsSlot = !tail && slots.length > 0; if (tail) re += (re ? "\\s*" : "") + esc2(tail);
+          if (!re) return; var lits = re.replace(/\(\.\+\)|\\s\*/g, "").length;
+          try { out.push({ it: it, en: isEn, slots: slots, rx: new RegExp("^(?:\\S+\\s){0,2}?" + re + (endsSlot ? "$" : "(?:\\s\\S+){0,3}$")), score: lits }); } catch (e) { }
+        });
+      });
+      return out.sort(function (a, b) { return b.score - a.score; });
+    }
+    function slotVal(name, txt, T) {
+      var n = nz(name).replace(/^ال/, ""), v = { raw: txt };
+      if (/صنف|حجم|منتج|عبوه|item|size|product|sku/.test(n)) { v.sn = sizeNumIn(txt) || ((txt.match(/(?:^|\D)(\d{3,4})(?!\d)/) || [])[1] || ""); v.pk = packIn(txt) || ((txt.match(/(?:^|\D)(\d{1,2})(?!\d)/) || [])[1] && v.sn ? (txt.match(/(?:^|\D)(\d{1,2})(?!\d)/) || [])[1] : ""); v.cd = codeIn(txt); v.kind = "item"; return v.sn || v.cd ? v : null; }
+      if (/فرع|مدينه|مستودع|مصنع|موقع|branch|city|warehouse|plant|site/.test(n)) { v.city = cityOf(txt) || (citiesIn(txt)[0] || ""); v.kind = "city"; return v.city ? v : null; }
+      if (/براند|ماركه|علامه|brand/.test(n)) { v.brand = T ? WAITEM.brandIn(T, txt) : ""; v.kind = "brand"; return v.brand ? v : null; }
+      v.kind = "text"; return v;
+    }
+    var EN2AR = { item: "الصنف", brand: "البراند", branch: "الفرع", stock: "الرصيد", company_total: "إجمالي_الشركة", riyadh_stock: "رصيد_الرياض", riyadh_share: "نسبة_الرياض", days: "أيام_الكفاية", days_basis: "أساس_الأيام", coverage: "التغطية", daily_issue: "الصرف_اليومي", branch_daily_issue: "الصرف_اليومي_الفرع", avg_days: "أيام_المتوسط", oldest_age: "أقدم_عمر", avg_age: "متوسط_العمر", stale_qty: "المتقادم", transit: "الترانزيت", old: "OLD", total_stock: "إجمالي_المخزون", items_count: "عدد_الأصناف", lowest_coverage: "أقل_تغطية", stale_items: "الأصناف_الراكدة", top_branches: "أكبر_الفروع", data_date: "تاريخ_البيانات", branch_split: "توزيع_الفروع", min_days_left: "أقل_صلاحية_متبقية", expiring_30: "ينتهي_خلال_30", requested: "الطلب", issued: "المصروف", fill_rate: "نسبة_التلبية", top_issued: "أكثر_الأصناف_صرفا", space_metrics: "مؤشرات_المساحة", bottle_metrics: "مؤشرات_القارورة", branch_transit: "ترانزيت_الفرع", total_old: "إجمالي_OLD", total_stale: "إجمالي_المتقادم", stale_share: "نسبة_المتقادم", critical_count: "عدد_الحرجة", critical_items: "الأصناف_الحرجة" };
+    function qaVars(T, S, src, en) {
+      var NA = en ? "n/a" : "غير متوفر", DY = en ? " days" : " يوم", V = {}, fmtN = function (x) { return x == null ? NA : fmt(r1(x)); };
+      V["تاريخ_البيانات"] = T.asOf || NA; V["البراند_الافتراضي"] = T.rules.defaultBrand || "";
+      var rowsB = WAITEM.match(T, { brand: S.brand && S.brand.brand }).rows; V["البراند"] = (S.brand && S.brand.brand) || T.rules.defaultBrand || "";
+      V["إجمالي_المخزون"] = fmtN(rowsB.reduce(function (a, o) { return a + (+o.qty || 0); }, 0)); V["عدد_الأصناف"] = String(rowsB.filter(function (o) { return o.qty > 0; }).length);
+      V["أقل_تغطية"] = rowsB.filter(function (o) { return o.qty > 0 && o.coverage_days != null; }).sort(function (a, b) { return a.coverage_days - b.coverage_days; }).slice(0, 5).map(function (o) { return itemName(o, en) + " (" + o.coverage_days + DY + ")"; }).join(en ? ", " : "، ") || NA;
+      V["الأصناف_الراكدة"] = rowsB.filter(function (o) { return o.age_max != null; }).sort(function (a, b) { return b.age_max - a.age_max; }).slice(0, 5).map(function (o) { return itemName(o, en) + " (" + o.age_max + DY + ")"; }).join(en ? ", " : "، ") || NA;
+      var BB = {}; rowsB.forEach(function (o) { Object.keys(o.by_branch).forEach(function (w) { var k = cityOf(w) ? cityLabel(cityOf(w), en) : w; BB[k] = (BB[k] || 0) + (+o.by_branch[w] || 0); }); });
+      V["أكبر_الفروع"] = Object.keys(BB).sort(function (a, b) { return BB[b] - BB[a]; }).slice(0, 6).map(function (k) { return k + " " + fmt(r1(BB[k])); }).join(en ? ", " : "، ") || NA;
+      V["أيام_المتوسط"] = String(T.rules.salesDays);
+      var it = S.item || (LAST && Date.now() - LAST.at < 900000 && (LAST.sizeNum || LAST.code) ? { sn: LAST.sizeNum, pk: (LAST.pack || [])[0], cd: LAST.code } : null);
+      if (it) {
+        var m = WAITEM.match(T, { sizeNum: it.sn, pack: it.pk, code: it.cd, brand: S.brand && S.brand.brand }), rows = m.rows;
+        V["الصنف"] = rows[0] ? (rows.length === 1 ? itemName(rows[0], en) : (it.sn ? it.sn + (+it.sn < 20 ? (en ? " L" : " لتر") : (en ? " ml" : " مل")) : "") + (it.pk ? " × " + it.pk : "")) : (it.sn || it.cd || ""); if (m.brand) V["البراند"] = m.brand;
+        var city = S.city && S.city.city, grp = city === "riyadh" ? ["riyadh", "kharj", "heet"] : city ? [city] : null, isIn = function (w) { return grp ? grp.indexOf(cityOf(w)) >= 0 : true; };
+        var qty = 0, tot = 0, daily = 0, dailyIn = 0, rq = 0, cov = [], old = 0, tr = 0, ag = [], aa = 0, aq = 0, st = 0;
+        rows.forEach(function (o) {
+          Object.keys(o.by_branch).forEach(function (w) { var q = +o.by_branch[w] || 0; tot += q; if (isIn(w)) qty += q; if (["riyadh", "kharj", "heet"].indexOf(cityOf(w)) >= 0) rq += q; });
+          var sb = o.sales_by_branch || {}; Object.keys(sb).forEach(function (w) { if (isIn(w)) dailyIn += +sb[w] || 0; }); if (o.sales_daily > 0) daily += o.sales_daily;
+          if (o.coverage_days != null) cov.push(o.coverage_days); old += +o.old_qty || 0; tr += +o.transit_qty || 0; if (o.age_max != null) ag.push(o.age_max); if (o.age_avg != null) { aa += o.age_avg * (o.aging_qty || 0); aq += o.aging_qty || 0; } st += +o.stale_qty || 0;
+        });
+        var base = src === "old" ? old : src === "transit" ? tr : src === "aging" ? rows.reduce(function (a, o) { return a + (+o.aging_qty || 0); }, 0) : (grp ? qty : tot);
+        V["الرصيد"] = rows.length ? fmtN(base) : NA; V["إجمالي_الشركة"] = fmtN(tot); V["رصيد_الرياض"] = fmtN(rq); V["نسبة_الرياض"] = tot > 0 ? Math.round(rq / tot * 100) + "%" : NA;
+        V["التغطية"] = cov.length ? String(Math.min.apply(null, cov)) : NA; V["الصرف_اليومي"] = daily > 0 ? fmtN(daily) : NA; V["الصرف_اليومي_الفرع"] = (grp ? dailyIn : daily) > 0 ? fmtN(grp ? dailyIn : daily) : NA;
+        var dd = grp ? (dailyIn > 0 ? qty / dailyIn : null) : (daily > 0 ? tot / daily : null); V["أيام_الكفاية"] = dd != null ? String(r1(dd)) : (cov.length ? String(Math.min.apply(null, cov)) : NA); V["أساس_الأيام"] = dd != null ? (en ? "issues" : "الصرف") : (en ? "FG coverage" : "تغطية FG");
+        V["OLD"] = fmtN(old); V["الترانزيت"] = fmtN(tr); V["أقدم_عمر"] = ag.length ? String(Math.max.apply(null, ag)) : NA; V["متوسط_العمر"] = aq > 0 ? String(Math.round(aa / aq)) : NA; V["المتقادم"] = fmtN(st);
+        if (city) V["الفرع"] = city === "riyadh" ? (en ? "Riyadh (incl. Kharj & Heet)" : "الرياض (مع الخرج وهيت)") : cityLabel(city, en);
+        /* من جدول بيانات المساعد: التوزيع على الفروع، الصلاحية، الطلبات مقابل المصروف، الترانزيت حسب الفرع */
+        var split = {}, md = [], ex30 = 0, rqT = 0, isT = 0;
+        rows.forEach(function (o) {
+          Object.keys(o.by_branch).forEach(function (w) { var k = ["riyadh", "kharj", "heet"].indexOf(cityOf(w)) >= 0 ? (en ? "Riyadh (incl. Kharj & Heet)" : "الرياض (مع الخرج وهيت)") : cityOf(w) ? cityLabel(cityOf(w), en) : w; split[k] = (split[k] || 0) + (+o.by_branch[w] || 0); });
+          if (o.min_days_left != null) md.push(o.min_days_left); ex30 += +o.expiring_30 || 0;
+          if (grp) { Object.keys(o.req_by_branch || {}).forEach(function (w) { if (isIn(w)) rqT += +o.req_by_branch[w] || 0; }); Object.keys(o.iss_by_branch || {}).forEach(function (w) { if (isIn(w)) isT += +o.iss_by_branch[w] || 0; }); }
+          else { rqT += +o.req_qty || 0; isT += +o.iss_qty || 0; }
+        });
+        V["توزيع_الفروع"] = Object.keys(split).filter(function (k) { return split[k] > 0; }).sort(function (a, b) { return split[b] - split[a]; }).map(function (k) { return k + " " + fmt(r1(split[k])); }).join(en ? ", " : "، ") || NA;
+        V["أقل_صلاحية_متبقية"] = md.length ? String(Math.min.apply(null, md)) : NA; V["ينتهي_خلال_30"] = fmtN(ex30);
+        V["الطلب"] = rqT > 0 ? fmtN(rqT) : NA; V["المصروف"] = isT > 0 ? fmtN(isT) : NA; V["نسبة_التلبية"] = rqT > 0 ? Math.round(isT / rqT * 100) + "%" : NA;
+      } else if (S.city) V["الفرع"] = city0(S.city.city);
+      /* مؤشرات على مستوى الفرع أو الشركة (من جدول بيانات المساعد) */
+      function city0(c) { return c === "riyadh" ? (en ? "Riyadh (incl. Kharj & Heet)" : "الرياض (مع الخرج وهيت)") : cityLabel(c, en); }
+      var cgrp = S.city ? (S.city.city === "riyadh" ? ["riyadh", "kharj", "heet"] : [S.city.city]) : null, inC = function (w) { return !cgrp || cgrp.indexOf(cityOf(w)) >= 0; };
+      var sp = {}; (T.space || []).forEach(function (r) { if (!inC(r.warehouse)) return; var k = r.metric; sp[k] = (sp[k] || 0) + (+r.value || 0); });
+      V["مؤشرات_المساحة"] = Object.keys(sp).slice(0, 8).map(function (k) { return k + " " + fmt(r1(sp[k])); }).join(en ? ", " : "، ") || NA;
+      var bt = {}; (T.bottle || []).forEach(function (r) { if (!inC(r.branch)) return; bt[r.metric] = (bt[r.metric] || 0) + (+r.value || 0); });
+      V["مؤشرات_القارورة"] = Object.keys(bt).slice(0, 8).map(function (k) { return k + " " + fmt(r1(bt[k])); }).join(en ? ", " : "، ") || NA;
+      var trb = 0; rowsB.forEach(function (o) { Object.keys(o.transit_by_branch || {}).forEach(function (w) { if (inC(w)) trb += +o.transit_by_branch[w] || 0; }); }); V["ترانزيت_الفرع"] = fmtN(trb);
+      V["إجمالي_OLD"] = fmtN(rowsB.reduce(function (a, o) { return a + (+o.old_qty || 0); }, 0));
+      var agT = rowsB.reduce(function (a, o) { return a + (+o.aging_qty || 0); }, 0), stT = rowsB.reduce(function (a, o) { return a + (+o.stale_qty || 0); }, 0);
+      V["إجمالي_المتقادم"] = fmtN(stT); V["نسبة_المتقادم"] = agT > 0 ? Math.round(stT / agT * 100) + "%" : NA;
+      var crit = rowsB.filter(function (o) { return o.qty > 0 && o.coverage_days != null && o.coverage_days < 7; }).sort(function (a, b) { return a.coverage_days - b.coverage_days; });
+      V["عدد_الحرجة"] = String(crit.length); V["الأصناف_الحرجة"] = crit.slice(0, 8).map(function (o) { return itemName(o, en) + " (" + o.coverage_days + DY + ")"; }).join(en ? ", " : "، ") || (en ? "none" : "لا يوجد");
+      V["أكثر_الأصناف_صرفا"] = rowsB.filter(function (o) { return o.iss_qty > 0; }).sort(function (a, b) { return b.iss_qty - a.iss_qty; }).slice(0, 5).map(function (o) { return itemName(o, en) + " " + fmt(r1(o.iss_qty)); }).join(en ? ", " : "، ") || NA;
+      if (!S.item && S.city) V["الفرع"] = city0(S.city.city);
+      return V;
+    }
+    function itemName(o, en) { var sz = String(o.size || "").trim(), p = String(o.pack || "").trim(), pm = p.match(/^(\d{1,3})\s*[x×*]/), pn = pm ? pm[1] : (/^\d{1,3}$/.test(p) ? p : ""); return (/^\d+(\.\d+)?$/.test(sz) ? sz + (+sz < 20 ? (en ? " L" : " لتر") : (en ? " ml" : " مل")) : sz || p) + (pn ? " × " + pn : ""); }
+    function qaTry(q, en) {
+      var L = env.qa ? env.qa() : null; if (!L || !L.length) return null;
+      var sig = L.map(function (x) { return x.id + "|" + (x.on === false ? 0 : 1) + "|" + (x.at || 0) + "|" + (x.a || "") + "|" + (x.ae || "") + "|" + [].concat(x.q || []).join("~") + "|" + [].concat(x.qe || []).join("~"); }).join("#"); if (QAC.sig !== sig) { QAC.sig = sig; QAC.list = qaCompile(L); }
+      var T = itemsT();
+      for (var i = 0; i < QAC.list.length; i++) {
+        var c = QAC.list[i], m = q.match(c.rx); if (!m) continue;
+        var S = {}, ok = true; c.slots.forEach(function (sn, j) { if (!ok) return; var v = slotVal(sn, m[j + 1] || "", T); if (!v) { ok = false; return; } S[v.kind] = v; S["s:" + sn] = v.raw; });
+        if (!ok) continue;
+        if (S.item) LAST = { size: [], pack: S.item.pk ? [S.item.pk] : [], sizeNum: S.item.sn, code: S.item.cd, brand: S.brand && S.brand.brand, cities: S.city ? [S.city.city] : [], at: Date.now() };
+        var useEn = c.en || en, a = String((useEn ? c.it.ae : c.it.a) || "").trim(); if (!a) return { pass: true, id: c.it.id };
+        if (!T) return null; en = useEn;
+        var V = qaVars(T, S, c.it.src || "fg", en), miss = [];
+        var txt = a.replace(SLOT_RE, function (all, k) { k = k.trim(); var kk = EN2AR[k.toLowerCase()] || k, val = V[kk] != null ? V[kk] : (S["s:" + k] != null ? S["s:" + k] : S["s:" + kk]); if (val == null) { miss.push(k); return en ? "n/a" : "غير متوفر"; } return val; });
+        var say = txt.replace(/[*_#`]/g, "");
+        var srcTxt = (en ? "Source: " + (QA_SRC_EN[c.it.src] || c.it.src || "platform data") : "المصدر: " + (c.it.srcLabel || c.it.src || "بيانات المنصة")) + ((c.it.src || "items") === "items" && T.sources && T.sources.length ? " (" + T.sources.map(function (x) { return String(x).split(" · ")[0]; }).join(en ? ", " : "، ") + ")" : "") + (c.it.srcNote ? " — " + c.it.srcNote : "") + " · " + (T.asOf || "");
+        return { t: txt + "\n" + srcTxt, say: say, qaId: c.it.id, rids: [], en: en };
+      }
+      return null;
     }
     function itemsT() { try { var T = env.items ? env.items() : null; return T && T.rows && T.rows.length && typeof WAITEM !== "undefined" ? T : null; } catch (e) { return null; } }
     H.itembal = function (f) { var T = itemsT(); return T ? itemAns(T, f, "bal") : { t: f.en ? "Item data is not available." : "بيانات الأصناف غير متاحة." }; };
@@ -18896,7 +19013,9 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
     return {
       cityOf: cityOf,
       ask: function (text, ctx) {
-        ctx = ctx || {}; var q0 = nz(text), q = (typeof WADIALECT !== "undefined" ? nz(WADIALECT.norm(text)) : q0).replace(/ئ/g, "ي").replace(/ؤ/g, "و"), en = /[a-z]{2,}/.test(q0) && !/[؀-ۿ]/.test(q0), it = intentOf(q), lo = /(بالانجليزي|بالانجليزيه|انجليزي|in english|translate|ترجم)/.test(q) ? true : /(بالعربي|in arabic|عربي)/.test(q) ? false : null, cs = citiesIn(q), top = topIn(q), days = daysIn(q), e = env.ents ? env.ents(text) : {};
+        ctx = ctx || {}; var q0 = nz(text), q = rewriteQ((typeof WADIALECT !== "undefined" ? nz(WADIALECT.norm(text)) : q0).replace(/ئ/g, "ي").replace(/ؤ/g, "و")), en = /[a-z]{2,}/.test(q0) && !/[؀-ۿ]/.test(q0), it = intentOf(q), lo = /(بالانجليزي|بالانجليزيه|انجليزي|in english|translate|ترجم)/.test(q) ? true : /(بالعربي|in arabic|عربي)/.test(q) ? false : null, cs = citiesIn(q), top = topIn(q), days = daysIn(q), e = env.ents ? env.ents(text) : {};
+        var _qa = null; try { _qa = qaTry(q, en); } catch (e) { _qa = null; }
+        if (_qa && !_qa.pass) { _qa.ctx = { intent: "qa", cities: [], en: en }; return _qa; }
         var prev = ctx.wa && ctx.fresh ? ctx.wa : null, sn = sizeNumIn(q);
         var pk = packIn(q), cd = codeIn(q), TT = itemsT(), bn = TT ? WAITEM.brandIn(TT, q) : "";
         if (!sn && TT) { var bm = q.match(/(?:^| )(\d{3,4})(?= |$)(?! ?(يوم|ايام|يوما|days?|شهر|%))/); if (bm && TT.rows.some(function (o) { return String(o.size).trim() === bm[1] || new RegExp("(^|[^0-9])" + bm[1] + "\\s*ml", "i").test(String(o.pack)); })) sn = bm[1]; }
@@ -18967,6 +19086,7 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
     rows: function (id) { try { if (!permitted(id)) return null; return dsGet(id, false); } catch (e) { return null; } },
     nz: nz, fmt: function (x) { return fmtN(x); }, mkRes: waMkRes,
     items: function () { try { return window.WAITEM ? WAITEM.get(false) : null; } catch (e) { return null; } },
+    qa: function () { try { return window.WAQA ? WAQA.items() : null; } catch (e) { return null; } },
     ents: function (t) { var o = { size: [], pack: [] }; try { AIIE.findEntities(t, ["size"]).forEach(function (c) { if (c.field === "size" && c.score >= .85 && !c.multi && o.size.indexOf(c.value) < 0) o.size.push(c.value); }); var pm = nz(t).match(/(?:شد|×|\*)\s*(\d{1,3})/); if (pm) o.pack.push(pm[1]); } catch (e) { } return o; }
   });
   AIIE.waLocal = function (text, ctx) {
@@ -19639,6 +19759,25 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     for (var i = chat.msgs.length - 1; i >= 0; i--) { var m = chat.msgs[i]; if (m.r === "a" && m.rids && m.rids.length) return { t: w.c ? "تفضّل الجدول والرسم البياني 👇" : "تفضّل الجدول 👇", rids: m.rids, chart: w.c }; }
     return { t: "لا توجد نتيجة سابقة لأعرضها. اسألني عن البيانات أولاً.", chips: SUG.slice(0, 3) };
   }
+  /* «علّم المساعد»: نافذة صغيرة تحت الرد الخاطئ — العبارة ← المقصود؛ المدير يعتمدها فورًا، والمستخدم يرسلها اقتراحًا */
+  function openTeach(mi) {
+    var ch = curChat(), q = ""; for (var i = mi - 1; i >= 0; i--) { var mm = ch.msgs[i]; if (mm && mm.r === "u") { q = mm.t; break; } }
+    var old = document.getElementById("wa-teach"); old && old.remove();
+    var adm = false; try { adm = typeof isAdmin === "function" && isAdmin(); } catch (e) { }
+    var d = document.createElement("div"); d.id = "wa-teach"; d.setAttribute("dir", "rtl");
+    d.innerHTML = '<div class="wt-box"><h4>👎 علّم المساعد</h4><div class="wt-q">سؤالك: <b></b></div>' +
+      '<label>العبارة التي لم يفهمها (من سؤالك)<input id="wt-p"></label><label>ماذا تقصد بها؟<input id="wt-r" placeholder="مثال: 330 في 40 — أو: الرياض — أو: 200 مل"></label>' +
+      '<div class="wt-hint">' + (adm ? "ستُضاف فورًا إلى قاموس المساعد لكل المستخدمين." : "سيُرسل اقتراحك للمدير، ويُطبَّق بعد موافقته.") + '</div><div class="wt-act"><button class="pri" data-t="save">حفظ</button><button data-t="cancel">إلغاء</button></div><div class="wt-msg"></div></div>';
+    document.body.appendChild(d); d.querySelector(".wt-q b").textContent = q || "—"; var ip = d.querySelector("#wt-p"); ip.value = q; ip.focus(); ip.select();
+    d.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-t]"); if (e.target === d) return d.remove(); if (!b) return;
+      if (b.getAttribute("data-t") === "cancel") return d.remove();
+      var p = d.querySelector("#wt-p").value.trim(), r = d.querySelector("#wt-r").value.trim(), msg = d.querySelector(".wt-msg");
+      if (!p || !r) { msg.textContent = "اكتب العبارة والمقصود"; return; }
+      b.disabled = true; msg.textContent = "⏳ …";
+      WAITEM.teach(p, r, q).then(function (m) { msg.textContent = m; toast(m); setTimeout(function () { d.remove(); if (adm && q) { try { ask(q); } catch (e) { } } }, 900); });
+    });
+  }
   function chatShort(chat, text, o) {
     S.busy = true; chat.msgs.push({ r: "u", t: text, at: Date.now() }); if (chat.msgs.length === 1 || chat.title === "محادثة جديدة") chat.title = text.slice(0, 40);
     var wasVoice = sentByVoice; render(); thinking(true);
@@ -19647,12 +19786,13 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
         thinking(false); S.busy = false;
         var m = { r: "a", t: o.t, say: o.say, clar: o.chips && o.chips.length ? o.chips : undefined, mode: "chat", at: Date.now() }; if (isEnQ(text)) m.en = true;
         if (o.rids) { m.rids = o.rids; m.rid = o.rids[o.rids.length - 1]; m.expand = true; m.chart = !!o.chart; }
+        if (o.ic) { m.ic = o.ic; m.expand = false; } /* بطاقة واضحة بدل الجدول (الجدول متاح بزر «عرض الجدول») */
         chat.msgs.push(m); chat.llm.push({ role: "user", content: text }); chat.llm.push({ role: "assistant", content: m.t });
         saveChats(); render(); scrollEnd(); afterAnswer(m, wasVoice); sentByVoice = false; done();
-      }, 450);
+      }, 40);
     });
   }
-  function afterAnswer(m, wasVoice) { try { if (!(S.vm && S.vm.on) && window.WAORB && WAORB.isOpen()) { WAORB.answer(m, mdHtml(m.t)); if (VOICE.tts && A.cfg().ft_tts !== false) speakMsg(m); return; } if (S.vm && S.vm.on) return vmAnswer(m); if (VC().speak || wasVoice) speakMsg(m); } catch (e) { } }
+  function afterAnswer(m, wasVoice) { try { window.WAQA && WAQA.logTurn(curChat(), m); } catch (e) { } try { if (!(S.vm && S.vm.on) && window.WAORB && WAORB.isOpen()) { WAORB.answer(m, mdHtml(m.t)); if (VOICE.tts && A.cfg().ft_tts !== false) speakMsg(m); return; } if (S.vm && S.vm.on) return vmAnswer(m); if (VC().speak || wasVoice) speakMsg(m); } catch (e) { } }
 
   /* ===== Report Generation + Notification: Excel متعدد الأوراق من نتائج المحادثة، وإرسال عبر Outlook الموجود ===== */
   function waXlsx(rids, title) {
@@ -19708,7 +19848,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var st0 = smallTalk(text); if (st0) return chatShort(chat, text, st0);
     var dn0 = detailOnly(text, chat); if (dn0) return chatShort(chat, text, dn0);
     try { if (waFileCmd(chat, text)) return Promise.resolve(); } catch (e) { }
-    var _wl = null; try { _wl = A.waLocal(text, { wa: chat.ctx && chat.ctx.wa, fresh: !!(chat.ctx && chat.ctx.waLen === chat.msgs.length) }); } catch (e) { } if (_wl) { chat.ctx = chat.ctx || {}; chat.ctx.wa = _wl.ctx; chat.ctx.waLen = chat.msgs.length + 2; return chatShort(chat, text, { t: _wl.t, rids: _wl.rids, say: _wl.say }); }
+    var _wl = null; try { _wl = A.waLocal(text, { wa: chat.ctx && chat.ctx.wa, fresh: !!(chat.ctx && chat.ctx.waLen === chat.msgs.length) }); } catch (e) { } if (_wl) { chat.ctx = chat.ctx || {}; chat.ctx.wa = _wl.ctx; chat.ctx.waLen = chat.msgs.length + 2; return chatShort(chat, text, { t: _wl.t, rids: _wl.rids, say: _wl.say, ic: _wl.ic }); }
     var wd = wantsDetail(text);
     var lim = +c.userDailyLimit || 200; if (dayCount() >= lim) { chat.msgs.push({ r: "u", t: text }); chat.msgs.push({ r: "a", t: "بلغتَ الحد اليومي للأسئلة (" + lim + "). حاول غداً أو راجع المدير." }); render(); return Promise.resolve(); }
     S.busy = true; var t0 = Date.now(), wasVoice = sentByVoice;
@@ -19979,6 +20119,25 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     c.rows = res.rows.slice(0, 5).map(function (r) { return { n: gb.map(function (g) { return A.arName(g.key, r[g.key]); }).join(" · "), v: fm(r[m.key]), p: isSum ? Math.round(r[m.key] / tot * 1000) / 10 : null, w: max > 0 ? Math.max(3, Math.round(r[m.key] / max * 100)) : 0 }; });
     c.more = Math.max(0, res.rows.length - 5); return c;
   }
+  /* بطاقة رصيد/تغطية الصنف: أرقام كبيرة واضحة + «تكفي كم يوم» ملوّنة، بدل الجدول */
+  function icHtml(c) {
+    var nf = function (v) { return v == null ? "—" : Number(v).toLocaleString("en-US", { maximumFractionDigits: 1 }); };
+    var pill = function (d) { if (!d) return '<span class="ic-d na">الأيام غير متوفرة</span>'; var cl = d.v < 3 ? "r" : d.v < 7 ? "a" : "g"; return '<span class="ic-d ' + cl + '">تكفي <b>' + nf(d.v) + "</b> يوم" + (d.k === "c" ? '<i>تغطية FG</i>' : "") + "</span>"; };
+    var max = Math.max.apply(null, [1].concat((c.rows || []).map(function (r) { return r.q; })));
+    var h = '<div class="ic"><div class="ic-h"><b>' + esc(c.title) + "</b>" + (c.brand ? '<span class="ic-br">' + esc(c.brand) + "</span>" : "") + "</div>";
+    var focus = (c.rows || []).filter(function (r) { return r.focus; });
+    h += '<div class="ic-hero">';
+    focus.forEach(function (r) { h += '<div class="ic-k f"><span>' + esc(r.label) + '</span><strong>' + nf(r.q) + "</strong>" + pill(r.d) + "</div>"; });
+    h += '<div class="ic-k"><span>إجمالي الشركة</span><strong>' + nf(c.total.q) + "</strong>" + pill(c.total.d) + "</div>";
+    if (c.lead) h += '<div class="ic-k f"><span>' + esc(c.lead.label) + '</span><strong>' + nf(c.lead.q) + '<em>' + c.lead.pct + "%</em></strong>" + pill(c.lead.d) + "</div>";
+    h += "</div>";
+    var rest = (c.rows || []).filter(function (r) { return !r.focus; });
+    if (rest.length) { h += '<div class="ic-sec">باقي الفروع</div><div class="ic-list">'; rest.forEach(function (r) { h += '<div class="ic-r"><span class="ic-n">' + esc(r.label) + '</span><span class="ic-bar"><i style="width:' + Math.max(3, Math.round(r.q / max * 100)) + '%"></i></span><span class="ic-q">' + nf(r.q) + "</span>" + pill(r.d) + "</div>"; }); h += "</div>"; }
+    if (c.items && c.items.length) { h += '<div class="ic-sec">حسب الصنف</div><div class="ic-list">'; c.items.forEach(function (r) { h += '<div class="ic-r"><span class="ic-n">' + esc(r.name) + '</span><span class="ic-q">' + nf(r.q) + "</span>" + pill(r.d) + "</div>"; }); h += "</div>"; }
+    h += '<div class="ic-ft">الأيام = الرصيد ÷ متوسط الصرف اليومي لآخر ' + (c.salesDays || 30) + " يوم؛ وعند عدم توفر الصرف تُعرض تغطية FG" + (c.asOf ? " · بيانات " + esc(String(c.asOf).slice(0, 10)) : "") + "</div></div>";
+    return h;
+  }
+  try { AIIE.icHtml = icHtml; } catch (e) { }
   function cardHtml(c, compact) {
     var tags = c.tags && c.tags.length ? '<div class="c2-tags">' + c.tags.map(function (t) { return '<span class="c2-tag"><i>' + esc(t.k) + "</i>" + esc(t.v) + "</span>"; }).join("") + "</div>" : "";
     var ds = '<span class="c2-ds">' + esc(c.ds) + "</span>";
@@ -20027,8 +20186,8 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var tm = m.at ? new Date(m.at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "";
     var chips = clar + offer + files;
     var nt = m.note ? '<div class="ai-src">ℹ ' + esc(m.note) + "</div>" : "";
-    var bub = m.viz ? '<div class="ai-m a has-card">' + vizHtml(m.viz) + (anaLine(m.t) ? '<div class="vz-an">' + mdHtml(anaLine(m.t)) + "</div>" : "") + nt + "</div>" : m.card ? '<div class="ai-m a has-card">' + cardHtml(m.card, !!m.expand) + noteLines(m.t) + nt + "</div>" : '<div class="ai-m a"><div class="md">' + mdHtml(m.t) + "</div>" + nt + "</div>";
-    return '<div class="ai-row a">' + avatar() + '<div class="ai-bw" data-mi="' + mi + '">' + bub + (chips ? '<div class="aiw-chips">' + chips + "</div>" : "") + blocks + src + '<div class="ai-meta"><span>' + tm + "</span>" + (VOICE.tts && A.cfg().ft_tts !== false ? '<button data-a="speak" data-v="' + mi + '" title="اقرأ لي الرد صوتياً">' + ICONS.spk + "</button>" : "") + '<button data-a="copy" data-v="' + mi + '" title="نسخ الرد">' + ICONS.copy + "</button></div></div></div>";
+    var bub = m.ic ? '<div class="ai-m a has-card">' + icHtml(m.ic) + nt + "</div>" : m.viz ? '<div class="ai-m a has-card">' + vizHtml(m.viz) + (anaLine(m.t) ? '<div class="vz-an">' + mdHtml(anaLine(m.t)) + "</div>" : "") + nt + "</div>" : m.card ? '<div class="ai-m a has-card">' + cardHtml(m.card, !!m.expand) + noteLines(m.t) + nt + "</div>" : '<div class="ai-m a"><div class="md">' + mdHtml(m.t) + "</div>" + nt + "</div>";
+    return '<div class="ai-row a">' + avatar() + '<div class="ai-bw" data-mi="' + mi + '">' + bub + (chips ? '<div class="aiw-chips">' + chips + "</div>" : "") + blocks + src + '<div class="ai-meta"><span>' + tm + "</span>" + (VOICE.tts && A.cfg().ft_tts !== false ? '<button data-a="speak" data-v="' + mi + '" title="اقرأ لي الرد صوتياً">' + ICONS.spk + "</button>" : "") + '<button data-a="copy" data-v="' + mi + '" title="نسخ الرد">' + ICONS.copy + "</button>" + (window.WAITEM && WAITEM.teach ? '<button data-a="teach" data-v="' + mi + '" title="الرد غير صحيح؟ علّم المساعد">👎</button>' : "") + "</div></div></div>";
   }
   function vWin() {
     var chat = curChat(), c = A.cfg(), llm = !!(c.workerUrl && /^https:\/\//i.test(c.workerUrl));
@@ -20157,13 +20316,14 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
       '<div class="ai-card"><h4 style="margin:0 0 10px;color:#12325a">📜 سجل العمليات والأخطاء (آخر 40 على هذا الجهاز)</h4><div class="ai-tw"><table><thead><tr><th>الوقت</th><th>المستخدم</th><th>السؤال</th><th>الوضع</th><th>ms</th><th>Tokens</th><th>الحالة</th></tr></thead><tbody>' + L.slice(0, 40).map(function (e) { return "<tr><td>" + new Date(e.t).toLocaleString("en-GB") + "</td><td>" + esc(e.u) + "</td><td>" + esc(e.q) + "</td><td>" + esc(e.mode) + "</td><td class='n'>" + (e.ms || "") + "</td><td class='n'>" + ((e.tin || 0) + (e.tout || 0)) + "</td><td>" + (e.ok ? "✔" : "⚠ " + esc(e.err || "")) + "</td></tr>"; }).join("") + "</tbody></table></div></div>"];
     return adminTab(tab, cards, c, users, t);
   }
-  var TABS = [["ov", "📊 نظرة عامة"], ["ft", "🎛️ المميزات والتحكم"], ["vc", "🎙️ الصوت والرد"], ["ln", "🔌 الربط والبيانات"], ["pv", "💳 المزوّد والميزانية"], ["dt", "🗂️ بيانات المساعد"], ["st", "🧪 الاختبار الذاتي"], ["lg", "📜 السجل والصيانة"], ["pm", "🔐 الصلاحيات"]];
+  var TABS = [["ov", "📊 نظرة عامة"], ["ft", "🎛️ المميزات والتحكم"], ["vc", "🎙️ الصوت والرد"], ["ln", "🔌 الربط والبيانات"], ["pv", "💳 المزوّد والميزانية"], ["dt", "🗂️ بيانات المساعد"], ["qa", "📚 الأسئلة والأجوبة"], ["st", "🧪 الاختبار الذاتي"], ["lg", "📜 السجل والصيانة"], ["pm", "🔐 الصلاحيات"]];
   function adminTab(tab, cards, c, users, t) {
     tab = tab || S.admTab || "ov";
     if (tab === "ft") return featuresCard(c);
     if (tab === "st") return window.WATEST ? WATEST.html() : '<div class="ai-card">غير متاح</div>';
     if (tab === "pv") return window.WAPROV ? WAPROV.html() : '<div class="ai-card">غير متاح</div>';
     if (tab === "dt") return window.WAITEMUI ? WAITEMUI.html() : '<div class="ai-card">غير متاح</div>';
+    if (tab === "qa") return window.WAQAUI ? WAQAUI.html() : '<div class="ai-card">غير متاح</div>';
     if (tab === "vc") return cards[1];
     if (tab === "ln") return cards[2] + '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🔌 اختبار الاتصال بـ Claude</h4><div class="ai-src" style="margin-bottom:8px">يفحص: رابط Worker ← استجابته ← مفتاح Claude ← توثيق Firebase. إذا لم ينجح الاختبار يعمل المساعد بالفهم المحلي المحدود فقط (وقد يخطئ).</div><div class="ai-act"><button data-a="wtest">▶ ابدأ الاختبار</button></div><div id="ai-wtest" dir="auto" style="margin-top:8px;white-space:pre-line;font-weight:700;color:#12325a">' + (S.wtest || "") + "</div></div>";
     if (tab === "lg") return cards[3] + '<div class="ai-card"><h4 style="margin:0 0 10px;color:#12325a">🧹 الصيانة</h4><div class="ai-act"><button data-a="clrlog">🧹 مسح السجل والاستهلاك (هذا الجهاز)</button><button data-a="health">🔌 اختبار الاتصال</button><button data-a="cfgexp">⬇ تصدير الإعدادات (JSON)</button><button data-a="cfgreset" style="background:#fde2e2;color:#b91c1c">↺ إعادة الإعدادات للافتراضي</button></div><div class="ai-src" style="margin-top:6px">إعادة الضبط تحذف إعدادات المساعد المحفوظة (محلياً وفي السحابة) وتعيد كل شيء للقيم الافتراضية.</div></div>';
@@ -20200,6 +20360,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     else if (a === "hist") { S.hist = !S.hist; render(); } else if (a === "vopts") { S.vopts = !S.vopts; render(); } else if (a === "vlib") { S.vlib = !S.vlib; S.vlL = S.vlL || (VC().lang === "en-US" ? "en" : "ar"); render(); } else if (a === "vltab") { S.vlL = v; render(); } else if (a === "vlp") { S.vlP = v; render(); } else if (a === "wtest") { wtest(); } else if (a === "vlt") { vlTest(+v); } else if (a === "vldiag") { vlDiag(); } else if (a === "vls") { vlSelect(+v); } else if (a === "vprev") { stopSpeak(); speakSegs(["مرحباً، أنا مساعد الذكاء.", "رصيد الصنف ستمائة في ثلاثين، إجمالي الرصيد: " + numToSpeech("1323") + "."]); }
     else if (a === "tbl") { var mt = curChat().msgs[+v]; if (mt) { mt.expand = true; saveChats(); render(); scrollToMsg(v); } }
     else if (a === "chartx") { var mc = curChat().msgs[+v]; if (mc) { mc.expand = true; mc.chart = true; saveChats(); render(); scrollToMsg(v); } }
+    else if (a === "teach") { openTeach(+v); }
     else if (a === "copy") { var mq = curChat().msgs[+v]; if (mq) { try { navigator.clipboard.writeText(String(mq.t).replace(/\*\*/g, "")); toast("نُسخ الرد"); } catch (er) { } } }
     else if (a === "vmend") vmEnd(); else if (a === "vmorb") { if (S.vm.state === "speak") { stopSpeak(); vmListen(); } else if (S.vm.state === "listen") { try { REC && REC.stop(); } catch (er) { } } }
     else if (a === "del") { e.stopPropagation(); if (confirm("حذف هذه المحادثة؟")) { S.chats = S.chats.filter(function (c) { return c.id !== v; }); if (!S.chats.length) newChat(); S.cur = S.chats[0].id; saveChats(); render(); } }
@@ -20507,7 +20668,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
       var interim = ""; for (var i = ev.resultIndex; i < ev.results.length; i++) { var tx = ev.results[i][0].transcript; if (ev.results[i].isFinal) { fin += " " + tx; var cf = ev.results[i][0].confidence; if (cf > 0) minConf = minConf == null ? cf : Math.min(minConf, cf); } else interim += tx; }
       var t = $("vm-tr"); if (t) t.textContent = cleanSpeech(fin + " " + interim); heard = true;
       try { window.WAORB && WAORB.pulse(0.85); window.WAORB && WAORB.state("listen", null, cleanSpeech(fin + " " + interim)); } catch (e) { }
-      arm(fin.trim() && !interim.trim() ? 1800 : 2600);
+      arm(fin.trim() && !interim.trim() ? 900 : 1600); /* إنهاء أسرع بعد توقف الكلام */
     };
     r.onerror = function (ev) { err = ev.error || ""; vlog("sr-error", err); };
     r.onend = function () {
@@ -23169,10 +23330,16 @@ var WAITEM = (function () {
   function n(v) { v = typeof v === "number" ? v : parseFloat(String(v == null ? "" : v).replace(/,/g, "")); return isFinite(v) ? v : null; }
   function r1(v) { return Math.round(v * 10) / 10; }
   function key(s) { return String(s == null ? "" : s).trim().toLowerCase().replace(/^\d+\s*[-.]\s*/, ""); }
+  /* قاموس المساعد: عبارات يقولها الناس ← المعنى الذي يفهمه المساعد (أسماء أصناف، أرقام بالكلمات، مصطلحات) */
+  var SYS_RW = [["لتر ونص", "1.5 لتر"], ["لتر ونصف", "1.5 لتر"], ["لتر و نص", "1.5 لتر"], ["نص لتر", "500 مل"], ["نصف لتر", "500 مل"], ["ربع لتر", "250 مل"],
+    ["ثلاثمية وثلاثين", "330"], ["ثلاث مية وثلاثين", "330"], ["ثلاثمائة وثلاثين", "330"], ["ثلاثمئة وثلاثين", "330"], ["ستمية", "600"], ["ست مية", "600"], ["ستمائة", "600"], ["ستمئة", "600"], ["ميتين", "200"], ["مئتين", "200"], ["متين", "200"], ["مائتين", "200"], ["خمسمية", "500"], ["خمسمائة", "500"], ["خمس مية", "500"], ["الف وخمسمية", "1500"], ["الف وخمسمائة", "1500"],
+    ["اربعين", "40"], ["الاربعين", "40"], ["ثلاثين", "30"], ["الثلاثين", "30"], ["عشرين", "20"], ["العشرين", "20"], ["اربعه وعشرين", "24"], ["اربع وعشرين", "24"], ["الاربعه وعشرين", "24"], ["ثمانيه واربعين", "48"], ["ثمان واربعين", "48"], ["سته", "6"], ["ست حبات", "6"], ["اثنا عشر", "12"], ["اثنعش", "12"], ["اطنعش", "12"]];
   function rulesOf(r) {
     r = r || {}; var o = { alias: {}, hide: (r.hide || []).map(String), hideBrands: (r.hideBrands || []).map(key), defaultBrand: r.defaultBrand == null ? DEF_RULES.defaultBrand : String(r.defaultBrand), salesDays: +r.salesDays > 0 ? +r.salesDays : DEF_RULES.salesDays, defaultCity: r.defaultCity == null ? DEF_RULES.defaultCity : String(r.defaultCity) };
     Object.keys(DEF_RULES.alias).forEach(function (k) { o.alias[k] = DEF_RULES.alias[k]; });
     Object.keys(r.alias || {}).forEach(function (k) { if (k) o.alias[key(k)] = String(r.alias[k] || "").trim(); });
+    var user = (Array.isArray(r.rewrites) ? r.rewrites : []).filter(function (x) { return x && x.p && x.r; }).map(function (x) { return { p: String(x.p).slice(0, 60), r: String(x.r).slice(0, 80), by: x.by || "", at: x.at || 0 }; });
+    o.userRewrites = user; o.rewrites = SYS_RW.map(function (x) { return { p: x[0], r: x[1], sys: true }; }).concat(user);
     return o;
   }
   function brandOf(raw, R) { var k = key(raw); if (!k) return ""; return R.alias[k] != null ? R.alias[k] : String(raw).trim(); }
@@ -23180,19 +23347,19 @@ var WAITEM = (function () {
   /* rows(id) → {rows, asOf, title} | null — نفس صلاحيات المستخدم */
   function build(rows, rules, extraIds) {
     var R = rulesOf(rules), G = {}, br = {}, srcs = [], asOf = "";
-    function it(code) { code = String(code == null ? "" : code).trim(); if (!code) return null; return G[code] || (G[code] = { item_code: code, brand_raw: "", brand: "", identity: "", size: "", pack: "", category: "", description: "", qty: 0, by_branch: {}, old_qty: 0, transit_qty: 0, aging_qty: 0, age_max: null, age_avg: null, stale_qty: 0, oldest: "", coverage_days: null, sales_daily: null, sales_days: null, extra: {}, _aw: 0 }); }
+    function it(code) { code = String(code == null ? "" : code).trim(); if (!code) return null; return G[code] || (G[code] = { item_code: code, brand_raw: "", brand: "", identity: "", size: "", pack: "", category: "", description: "", qty: 0, by_branch: {}, old_qty: 0, transit_qty: 0, transit_by_branch: {}, min_days_left: null, expiring_30: 0, req_qty: 0, iss_qty: 0, req_by_branch: {}, iss_by_branch: {}, aging_qty: 0, age_max: null, age_avg: null, stale_qty: 0, oldest: "", coverage_days: null, sales_daily: null, sales_days: null, extra: {}, _aw: 0 }); }
     function note(id, d) { if (!d) return; srcs.push((d.title || id) + (d.asOf ? " · " + String(d.asOf).slice(0, 10) : "")); if (d.asOf && String(d.asOf) > asOf) asOf = String(d.asOf).slice(0, 10); }
     var M = rows("master"); if (M) M.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; o.brand_raw = o.brand_raw || r.brand; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.category = o.category || r.category; });
-    var A = rows("aging"); if (A) { note("aging", A); A.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; if (r.logo) o.brand_raw = r.logo; o.identity = o.identity || r.identity; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.category = o.category || r.category; o.description = o.description || r.item_name; var q = n(r.qty) || 0; o.aging_qty += q; if (r.age_days != null) { o.age_max = o.age_max == null ? r.age_days : Math.max(o.age_max, r.age_days); o._aw += q * r.age_days; if (r.age_days > 180) o.stale_qty += q; } if (r.prod_date && (!o.oldest || r.prod_date < o.oldest)) o.oldest = String(r.prod_date).slice(0, 10); }); }
+    var A = rows("aging"); if (A) { note("aging", A); A.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; if (r.logo) o.brand_raw = r.logo; o.identity = o.identity || r.identity; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.category = o.category || r.category; o.description = o.description || r.item_name; var q = n(r.qty) || 0; o.aging_qty += q; var dl = n(r.days_left); if (dl != null) { o.min_days_left = o.min_days_left == null ? dl : Math.min(o.min_days_left, dl); if (dl <= 30) o.expiring_30 += q; } if (r.age_days != null) { o.age_max = o.age_max == null ? r.age_days : Math.max(o.age_max, r.age_days); o._aw += q * r.age_days; if (r.age_days > 180) o.stale_qty += q; } if (r.prod_date && (!o.oldest || r.prod_date < o.oldest)) o.oldest = String(r.prod_date).slice(0, 10); }); }
     var F = rows("fg"); if (F) { note("fg", F); F.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; if (!o.brand_raw) o.brand_raw = r.brand; if (!o.identity) o.identity = r.brand; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.category = o.category || r.category; var q = n(r.qty) || 0; o.qty += q; o.by_branch[r.warehouse] = (o.by_branch[r.warehouse] || 0) + q; br[r.warehouse] = 1; if (n(r.coverage_days) != null) o.coverage_days = Math.max(o.coverage_days == null ? -1 : o.coverage_days, n(r.coverage_days)); }); }
     var O = rows("old"); if (O) { note("old", O); O.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; if (!o.brand_raw) o.brand_raw = r.brand; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.old_qty += n(r.qty) || 0; if (o.coverage_days == null && n(r.coverage_days) != null) o.coverage_days = n(r.coverage_days); }); }
-    var T = rows("transit"); if (T) { note("transit", T); T.rows.forEach(function (r) { var o = G[String(r.item_code || "").trim()]; if (o) o.transit_qty += n(r.qty) || 0; }); }
+    var T = rows("transit"); if (T) { note("transit", T); T.rows.forEach(function (r) { var o = G[String(r.item_code || "").trim()]; if (!o) return; var q = n(r.qty) || 0; o.transit_qty += q; if (r.warehouse) o.transit_by_branch[r.warehouse] = (o.transit_by_branch[r.warehouse] || 0) + q; }); }
     /* أيام كفاية المبيعات = الرصيد ÷ متوسط الصرف اليومي لآخر N يوم في بيانات الحركة (إن طابق كود المنتج كود الصنف) */
     var W = rows("wso"); if (W && W.rows.length) {
-      var last = W.rows.reduce(function (a, r) { return r.date > a ? r.date : a; }, ""), from = last ? new Date(Date.parse(last) - (R.salesDays - 1) * 864e5).toISOString().slice(0, 10) : "", first = "", S = {}, SB = {};
-      W.rows.forEach(function (r) { if (!r.date || r.date < from) return; var q = n(r.iss); if (q == null) return; if (!first || r.date < first) first = r.date; var c = String(r.prod || "").trim(); S[c] = (S[c] || 0) + q; var wh = String(r.wh || r.pl || "").trim(); if (wh) { var sb = SB[c] || (SB[c] = {}); sb[wh] = (sb[wh] || 0) + q; } });
+      var last = W.rows.reduce(function (a, r) { return r.date > a ? r.date : a; }, ""), from = last ? new Date(Date.parse(last) - (R.salesDays - 1) * 864e5).toISOString().slice(0, 10) : "", first = "", S = {}, SB = {}, RQ = {};
+      W.rows.forEach(function (r) { if (!r.date || r.date < from) return; var q = n(r.iss); if (q == null) return; if (!first || r.date < first) first = r.date; var c = String(r.prod || "").trim(); S[c] = (S[c] || 0) + q; var rq0 = n(r.req), wh0 = String(r.wh || r.pl || "").trim(); RQ[c] = RQ[c] || { r: 0, i: 0, rb: {}, ib: {} }; RQ[c].i += q; if (rq0 != null) RQ[c].r += rq0; if (wh0) { RQ[c].ib[wh0] = (RQ[c].ib[wh0] || 0) + q; if (rq0 != null) RQ[c].rb[wh0] = (RQ[c].rb[wh0] || 0) + rq0; } var wh = String(r.wh || r.pl || "").trim(); if (wh) { var sb = SB[c] || (SB[c] = {}); sb[wh] = (sb[wh] || 0) + q; } });
       var span = first ? Math.round((Date.parse(last) - Date.parse(first)) / 864e5) + 1 : R.salesDays, hit = 0;
-      Object.keys(S).forEach(function (c) { var o = G[c]; if (!o) return; hit++; o.sales_daily = r1(S[c] / span); o.sales_by_branch = {}; Object.keys(SB[c] || {}).forEach(function (w) { o.sales_by_branch[w] = r1(SB[c][w] / span); }); });
+      Object.keys(S).forEach(function (c) { var o = G[c]; if (!o) return; hit++; o.sales_daily = r1(S[c] / span); var rr = RQ[c]; if (rr) { o.req_qty = r1(rr.r); o.iss_qty = r1(rr.i); o.req_by_branch = rr.rb; o.iss_by_branch = rr.ib; } o.sales_by_branch = {}; Object.keys(SB[c] || {}).forEach(function (w) { o.sales_by_branch[w] = r1(SB[c][w] / span); }); });
       if (hit) { note("wso", W); srcs[srcs.length - 1] += " (متوسط " + span + " يوم)"; }
     }
     /* تقارير إضافية: أي مجموعة بيانات فيها كود صنف وأعمدة رقمية */
@@ -23206,7 +23373,9 @@ var WAITEM = (function () {
       o.hidden = R.hide.indexOf(c) >= 0 || (o.brand && R.hideBrands.indexOf(key(o.brand)) >= 0) || (o.brand_raw && R.hideBrands.indexOf(key(o.brand_raw)) >= 0);
       return o;
     }).sort(function (a, b) { return b.qty - a.qty; });
-    return { rows: list, branches: Object.keys(br).sort(), asOf: asOf, sources: srcs, rules: R, builtAt: Date.now() };
+    var SP = rows("space"), BT = rows("bottle"), WS = rows("wso");
+    if (SP && SP.rows.length) note("space", SP); if (BT && BT.rows.length) note("bottle", BT);
+    return { rows: list, branches: Object.keys(br).sort(), asOf: asOf, sources: srcs, rules: R, builtAt: Date.now(), space: SP ? SP.rows : [], bottle: BT ? BT.rows : [], salesSpan: R.salesDays, wsoNames: (function () { var nm = {}; (WS ? WS.rows : []).forEach(function (r) { if (r.prod && !nm[r.prod]) nm[r.prod] = r.cat || ""; }); return nm; })() };
   }
 
   /* مطابقة صنف من نص السؤال: الحجم (600 / 1.5 لتر) أو الشد أو كود الصنف، والبراند الافتراضي إن لم يُذكر براند */
@@ -23241,7 +23410,35 @@ var WAITEM = (function () {
     var ids = []; try { ids = AIIE.sourceIds ? AIIE.sourceIds() : []; } catch (e) { }
     var T = build(rows, cfgRules(), ids); C[raw ? "r" : "u"] = { sig: s, T: T }; return T;
   }
-  return { build: build, match: match, brandIn: brandIn, rulesOf: rulesOf, brandOf: brandOf, get: get, DEF: DEF_RULES, _C: C };
+  /* تعليم المساعد: المدير يضيف القاعدة مباشرة لكل المستخدمين؛ غيره يرسل اقتراحًا ينتظر موافقة المدير */
+  function isAdm() { try { return typeof isAdmin === "function" && !!isAdmin(); } catch (e) { return false; } }
+  function who() { try { return (CURRENT_USER && (CURRENT_USER.u || CURRENT_USER.name)) || "user"; } catch (e) { return "user"; } }
+  function cfgR() { try { return Object.assign({}, (AIIE.cfg() || {}).item_rules || {}); } catch (e) { return {}; } }
+  function putRules(r) {
+    var cur = Object.assign({}, AIIE.cfg()); cur.item_rules = r; cur.updatedAt = Date.now();
+    try { (window.LS || localStorage).setItem("ai_cfg_v1", JSON.stringify(cur)); } catch (e) { }
+    for (var k in C) delete C[k];
+    try { if (typeof fbDB !== "undefined" && fbDB) return fbDB.collection(FB_COL).doc("ai_cfg").set({ item_rules: r, updatedAt: cur.updatedAt }, { merge: true }).then(function () { return "✅ حُفظ في قاموس المساعد لكل المستخدمين"; }, function (e) { return "⚠️ حُفظ على هذا الجهاز فقط: " + (e.code || e.message); }); } catch (e) { }
+    return Promise.resolve("✅ حُفظ على هذا الجهاز");
+  }
+  function addRule(p, rr, by) {
+    p = String(p || "").trim(); rr = String(rr || "").trim(); if (!p || !rr) return Promise.resolve("⚠️ اكتب العبارة والمعنى");
+    var R = cfgR(), L = (Array.isArray(R.rewrites) ? R.rewrites : []).filter(function (x) { return key(x.p) !== key(p); }); L.push({ p: p.slice(0, 60), r: rr.slice(0, 80), by: by || who(), at: Date.now() }); R.rewrites = L.slice(-300); return putRules(R);
+  }
+  function delRule(p) { var R = cfgR(); R.rewrites = (R.rewrites || []).filter(function (x) { return key(x.p) !== key(p); }); return putRules(R); }
+  function teach(p, rr, q) {
+    if (isAdm()) return addRule(p, rr);
+    var id = "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), rec = {}; rec[id] = { p: String(p).slice(0, 60), r: String(rr).slice(0, 80), q: String(q || "").slice(0, 160), by: who(), at: Date.now() };
+    try { if (typeof fbDB !== "undefined" && fbDB) return fbDB.collection(FB_COL).doc("ai_teach").set(rec, { merge: true }).then(function () { return "✅ أُرسل اقتراحك للمدير للموافقة"; }, function (e) { return "⚠️ تعذّر إرسال الاقتراح: " + (e.code || e.message); }); } catch (e) { }
+    return Promise.resolve("⚠️ تعذّر إرسال الاقتراح");
+  }
+  function pending() { try { if (typeof fbDB !== "undefined" && fbDB) return fbDB.collection(FB_COL).doc("ai_teach").get().then(function (x) { var d = x.exists ? x.data() : {}; return Object.keys(d).map(function (k) { return Object.assign({ id: k }, d[k]); }).filter(function (r) { return r && r.p && r.r && !r.done; }).sort(function (a, b) { return b.at - a.at; }); }); } catch (e) { } return Promise.resolve([]); }
+  function resolvePending(id, ok, rec) {
+    var pr = ok && rec ? addRule(rec.p, rec.r, rec.by) : Promise.resolve("🗑 رُفض الاقتراح");
+    return pr.then(function (m) { try { if (typeof fbDB !== "undefined" && fbDB) { var u = {}; u[id] = Object.assign({}, rec || {}, { done: ok ? "ok" : "no", doneAt: Date.now() }); return fbDB.collection(FB_COL).doc("ai_teach").set(u, { merge: true }).then(function () { return m; }, function () { return m; }); } } catch (e) { } return m; });
+  }
+  return { teach: teach, addRule: addRule, delRule: delRule, pending: pending, resolvePending: resolvePending, SYS_RW: SYS_RW,
+    build: build, match: match, brandIn: brandIn, rulesOf: rulesOf, brandOf: brandOf, get: get, DEF: DEF_RULES, _C: C };
 })();
 if (typeof window !== "undefined") window.WAITEM = WAITEM;
 /* ---------- الشاشة: لوحة «🗂️ بيانات المساعد» (تبويب في إدارة AI) ---------- */
@@ -23255,9 +23452,16 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
   function rulesRaw() { try { return (AIIE.cfg() || {}).item_rules || {}; } catch (e) { return {}; } }
   function saveRules(r) {
     var cur = Object.assign({}, AIIE.cfg()); cur.item_rules = r; cur.updatedAt = Date.now();
-    try { localStorage.setItem("ai_cfg_v1", JSON.stringify(cur)); } catch (e) { }
+    try { (window.LS || localStorage).setItem("ai_cfg_v1", JSON.stringify(cur)); } catch (e) { }
     try { if (typeof fbDB !== "undefined" && fbDB) return fbDB.collection(FB_COL).doc("ai_cfg").set({ item_rules: r, updatedAt: cur.updatedAt }, { merge: true }).then(function () { return "✅ حُفظت القواعد ونُشرت لكل المستخدمين"; }, function (e) { return "⚠️ حُفظت على هذا الجهاز فقط: " + (e.code || e.message); }); } catch (e) { }
     return Promise.resolve("✅ حُفظت على هذا الجهاز");
+  }
+  function paintPending() {
+    var el = document.getElementById("wi-pend"); if (!el) return;
+    WAITEM.pending().then(function (L) {
+      U.pend = L; el = document.getElementById("wi-pend"); if (!el) return;
+      el.innerHTML = L.length ? '<div style="font-weight:800;font-size:13px;color:#92400e;margin-bottom:6px">📝 اقتراحات من المستخدمين بانتظار موافقتك (' + L.length + ')</div>' + L.slice(0, 30).map(function (x) { return '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid #fde68a;background:#fffbeb;border-radius:10px;padding:8px 10px;margin-bottom:6px;font-size:12.5px"><b>' + esc(x.p) + "</b> ← " + esc(x.r) + ' <span style="color:#94a3b8">(' + esc(x.by || "") + (x.q ? " — سأل: " + esc(x.q) : "") + ')</span><span style="margin-inline-start:auto"></span><button data-wi="okp" data-id="' + esc(x.id) + '">✅ اعتماد</button><button data-wi="nop" data-id="' + esc(x.id) + '">✖ رفض</button></div>'; }).join("") : "";
+    });
   }
   function space() { try { var d = AIIE.ds("space", true); return d && d.rows || []; } catch (e) { return []; } }
   function paint() {
@@ -23271,6 +23475,15 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     var h = '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🗂️ بيانات المساعد — جدول موحّد لكل صنف</h4>' +
       '<div class="ai-src">يُبنى تلقائيًا من الشاشات كلما تغيّرت البيانات، والمساعد يقرأ منه. آخر بناء: ' + new Date(T.builtAt).toLocaleString("en-GB") + ' · الأصناف: <b>' + T.rows.length + '</b> · المخفي: <b>' + hid + '</b> · الفروع: <b>' + BR.length + '</b><br>المصادر: ' + esc(T.sources.join(" | ") || "—") + '</div>' +
       '<div class="ai-act" style="margin-top:8px;flex-wrap:wrap"><input data-wi-q placeholder="بحث: كود، براند، حجم، شد…" value="' + esc(U.q) + '" style="flex:1;min-width:180px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px"><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-wi-sh' + (U.showHidden ? " checked" : "") + '> إظهار المخفي</label><button data-wi="rebuild">⟳ إعادة البناء الآن</button><button data-wi="xls">⬇ Excel</button></div>' + (U.msg ? '<div class="ai-src" style="margin-top:6px">' + esc(U.msg) + "</div>" : "") + "</div>";
+    if (admin()) {
+      var UR = RR.userRewrites || [];
+      h += '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">📖 قاموس المساعد — ما يقوله الناس ← ما يفهمه المساعد</h4><div class="ai-src" style="margin-bottom:8px">مثال: «الصغيرة» ← «200 مل» · «كرتون الأربعين» ← «في 40» · «مستودعنا» ← «الرياض». تُطبَّق على كل الأسئلة المكتوبة والصوتية لكل المستخدمين.</div>' +
+        '<div class="ai-g"><label class="f">العبارة كما تُقال<input id="wi-rp" placeholder="مثال: الصغيرة"></label><label class="f">المقصود<input id="wi-rr" placeholder="مثال: 200 مل في 48"></label></div><div class="ai-act" style="margin-top:8px"><button data-wi="addrw">➕ إضافة للقاموس</button></div>' +
+        (UR.length ? '<table class="ai-t" style="width:100%;font-size:12.5px;margin-top:10px"><tr><th>العبارة</th><th>المقصود</th><th>أضافها</th><th></th></tr>' + UR.slice().reverse().map(function (x) { return "<tr><td><b>" + esc(x.p) + "</b></td><td>" + esc(x.r) + "</td><td>" + esc(x.by || "") + '</td><td><button data-wi="delrw" data-p="' + esc(x.p) + '">🗑</button></td></tr>'; }).join("") + "</table>" : '<div class="ai-src" style="margin-top:8px">لا توجد عبارات مضافة بعد.</div>') +
+        '<div id="wi-pend" style="margin-top:12px"></div>' +
+        '<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;font-weight:700;color:#1e4e8c">العبارات المدمجة (' + WAITEM.SYS_RW.length + ")</summary><div class=\"ai-src\" style=\"margin-top:6px;line-height:2\">" + WAITEM.SYS_RW.map(function (x) { return esc(x[0]) + " ← " + esc(x[1]); }).join(" · ") + "</div></details></div>";
+      setTimeout(paintPending, 0);
+    }
     if (admin()) h += '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🔐 قواعد المدير</h4><div class="ai-g">' +
       '<label class="f">البراند الافتراضي عند عدم ذكر البراند في السؤال<input id="wi-db" value="' + esc(RR.defaultBrand) + '"></label>' +
       '<label class="f">الفرع الأولوية في الإجابة (يُذكر أولًا)<input id="wi-dc" value="' + esc(RR.defaultCity) + '"></label>' +
@@ -23300,6 +23513,9 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
   }, true);
   document.addEventListener("click", function (e) {
     var b = e.target && e.target.closest && e.target.closest("[data-wi]"); if (!b || !root() || !root().contains(b)) return; e.preventDefault(); var a = b.getAttribute("data-wi");
+    if (a === "addrw") { var p1 = (document.getElementById("wi-rp") || {}).value, r1 = (document.getElementById("wi-rr") || {}).value; return WAITEM.addRule(p1, r1).then(function (m) { U.msg = m; paint(); }); }
+    if (a === "delrw") { return WAITEM.delRule(b.getAttribute("data-p")).then(function (m) { U.msg = "🗑 حُذفت العبارة"; paint(); }); }
+    if (a === "okp" || a === "nop") { var id = b.getAttribute("data-id"), rec = (U.pend || []).filter(function (x) { return x.id === id; })[0]; return WAITEM.resolvePending(id, a === "okp", rec).then(function (m) { U.msg = m; paint(); }); }
     if (a === "rebuild") { for (var k in WAITEM._C) delete WAITEM._C[k]; U.msg = "✅ أُعيد البناء"; paint(); }
     else if (a === "more") { U.lim += 300; paint(); }
     else if (a === "xls") xls();
@@ -23314,6 +23530,205 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
 /* WA-ITEMS-END */
 </script>
 <style id="wa-adm-polish">#page-aiassist label.f input:not([type=checkbox]):not([type=radio]),#page-aiassist label.f select,#page-aiassist label.f textarea{width:100%;box-sizing:border-box;min-height:38px;padding:8px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;font:inherit;font-size:13.5px;color:#0f172a}#page-aiassist label.f textarea{min-height:70px}#page-aiassist label.f input:focus,#page-aiassist label.f select:focus,#page-aiassist label.f textarea:focus{outline:0;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.18);background:#fff}#page-aiassist .ai-card h4{font-size:16px}</style>
+<style id="wa-ic-css">.ic{min-width:min(520px,82vw);font-size:13.5px;color:#0f172a}.ic-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.ic-h b{font-size:16px;color:#12325a}.ic-br{font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;background:#e0ecff;color:#1e4e8c}
+.ic-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.ic-k{border:1px solid #e4e9f2;border-radius:12px;padding:10px 12px;background:#fbfcfe;display:flex;flex-direction:column;gap:4px}.ic-k.f{background:#f0f6ff;border-color:#bcd3f5}.ic-k span{font-size:12px;color:#64748b;font-weight:700}.ic-k strong{font-size:22px;color:#0f2a4d;line-height:1.2}.ic-k strong em{font-style:normal;font-size:12px;color:#1e4e8c;margin-inline-start:6px;font-weight:800}
+.ic-d{display:inline-flex;align-items:center;gap:5px;width:fit-content;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}.ic-d b{font-size:13px}.ic-d i{font-style:normal;font-weight:600;font-size:10.5px;opacity:.75}.ic-d.g{background:#dcfce7;color:#166534}.ic-d.a{background:#fef3c7;color:#92400e}.ic-d.r{background:#fee2e2;color:#991b1b}.ic-d.na{background:#f1f5f9;color:#64748b}
+.ic-sec{margin:12px 0 6px;font-size:12px;font-weight:800;color:#475569}.ic-list{display:flex;flex-direction:column;gap:6px}.ic-r{display:grid;grid-template-columns:minmax(90px,1.2fr) minmax(60px,2fr) auto auto;align-items:center;gap:8px}.ic-n{font-weight:700;color:#1e293b}.ic-q{font-weight:800;color:#0f2a4d;text-align:end}.ic-bar{height:8px;border-radius:6px;background:#eef2f7;overflow:hidden}.ic-bar i{display:block;height:100%;background:linear-gradient(90deg,#3b82f6,#29c9ff);border-radius:6px}
+.ic-ft{margin-top:10px;font-size:11px;color:#94a3b8}@media (max-width:520px){.ic-r{grid-template-columns:1fr auto auto}.ic-bar{display:none}.ic-k strong{font-size:19px}}</style>
+<style id="wa-teach-css">#wa-teach{position:fixed;inset:0;z-index:2147483600;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}#wa-teach .wt-box{background:#fff;border-radius:16px;padding:18px;width:min(460px,100%);box-shadow:0 20px 60px rgba(0,0,0,.25);font-size:13.5px;color:#0f172a;display:flex;flex-direction:column;gap:10px}#wa-teach h4{margin:0;font-size:16px;color:#12325a}#wa-teach .wt-q{color:#475569}#wa-teach label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:12.5px;color:#475569}#wa-teach input{min-height:40px;padding:8px 12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;font-size:14px}#wa-teach input:focus{outline:0;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.18)}#wa-teach .wt-hint{font-size:12px;color:#64748b}#wa-teach .wt-act{display:flex;gap:8px}#wa-teach button{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:8px 16px;font:inherit;font-weight:700;cursor:pointer;color:#1e4e8c}#wa-teach button.pri{background:#1e4e8c;border-color:#1e4e8c;color:#fff}#wa-teach .wt-msg{font-size:12.5px;color:#166534;min-height:16px}</style>
+<script id="wa-qa-js">
+/* WA-QA-BEGIN — مكتبة الأسئلة والأجوبة + سجل أسئلة المستخدمين للمراجعة (المدير يؤكد أو يعدّل ثم ينقل للمكتبة)
+   القوالب: ما بين " " في السؤال جزء متغيّر ("الصنف" "الفرع" "البراند")، وما بين " " في الإجابة قيمة تُحسب من بيانات اليوم.
+   الإجابة الفارغة = يُترك الرد لمحرك المساعد (بطاقة الرصيد/التحليل)، ويبقى السؤال موثّقًا ومصدره معروفًا. */
+var WAQA = (function () {
+  var LSK = "ai_qa_v1", DOC = "ai_qa", LOGDOC = "ai_qa_log";
+  var SRC = { fg: "أرصدة الإنتاج التام (FG Balance)", old: "الهوية القديمة (OLD)", transit: "الترانزيت", aging: "أعمار المخزون", wso: "الصرف والمبيعات (WSO)", space: "تقرير المساحات", items: "شاشة بيانات المساعد", engine: "محرك المساعد (تحليل)" };
+  var VARS = [["الصنف", "اسم الصنف (الحجم × الشد)"], ["البراند", "البراند"], ["الفرع", "الفرع المذكور"], ["الرصيد", "الرصيد حسب المصدر (في الفرع إن ذُكر)"], ["إجمالي_الشركة", "رصيد الصنف في كل الفروع"], ["رصيد_الرياض", "الرياض + الخرج + هيت"], ["نسبة_الرياض", "نسبة الرياض من الإجمالي"], ["أيام_الكفاية", "الرصيد ÷ الصرف اليومي"], ["أساس_الأيام", "الصرف أو تغطية FG"], ["التغطية", "تغطية FG بالأيام"], ["الصرف_اليومي", "متوسط الصرف اليومي (كل الفروع)"], ["الصرف_اليومي_الفرع", "متوسط الصرف اليومي في الفرع"], ["أيام_المتوسط", "عدد أيام حساب المتوسط"], ["أقدم_عمر", "أقدم عمر بالأيام"], ["متوسط_العمر", "متوسط العمر"], ["المتقادم", "الكمية الأقدم من 180 يوم"], ["الترانزيت", "الكمية في الطريق"], ["OLD", "رصيد الهوية القديمة"], ["إجمالي_المخزون", "إجمالي مخزون البراند"], ["عدد_الأصناف", "عدد الأصناف التي لها رصيد"], ["أقل_تغطية", "أقل 5 أصناف تغطية"], ["الأصناف_الراكدة", "أقدم 5 أصناف"], ["أكبر_الفروع", "الفروع حسب الرصيد"], ["تاريخ_البيانات", "تاريخ آخر بيانات"], ["توزيع_الفروع", "رصيد الصنف لكل فرع"], ["أقل_صلاحية_متبقية", "أقل أيام صلاحية متبقية"], ["ينتهي_خلال_30", "كمية تنتهي خلال 30 يوم"], ["الطلب", "الكمية المطلوبة"], ["المصروف", "الكمية المصروفة"], ["نسبة_التلبية", "المصروف ÷ المطلوب"], ["أكثر_الأصناف_صرفا", "أعلى 5 أصناف صرفًا"], ["مؤشرات_المساحة", "مؤشرات المساحة للفرع"], ["مؤشرات_القارورة", "مؤشرات القارورة"], ["ترانزيت_الفرع", "الكمية في الطريق للفرع"], ["إجمالي_OLD", "إجمالي الهوية القديمة"], ["إجمالي_المتقادم", "إجمالي الأقدم من 180 يوم"], ["نسبة_المتقادم", "نسبة المتقادم"], ["عدد_الحرجة", "عدد الأصناف تحت 7 أيام"], ["الأصناف_الحرجة", "الأصناف تحت 7 أيام"]];
+  var SEED_EN = {"1": {"qe": ["stock of \"item\" in \"branch\"", "how much \"item\" in \"branch\"", "how many \"item\" in \"branch\"", "\"item\" stock in \"branch\"", "balance of \"item\" in \"branch\"", "what is the stock of \"item\" in \"branch\""], "ae": "Stock of \"item\" in \"branch\": \"stock\" — lasts \"days\" days, FG coverage \"coverage\" days. Company total \"company_total\"."}, "2": {"qe": ["stock of \"item\"", "how much \"item\" do we have", "how many \"item\" do we have", "\"item\" stock", "balance of \"item\"", "what is the stock of \"item\""], "ae": ""}, "3": {"qe": ["stock of \"brand\" \"item\"", "\"brand\" \"item\" stock"], "ae": ""}, "4": {"qe": ["stock in \"branch\"", "\"branch\" stock", "inventory in \"branch\"", "what is the stock in \"branch\""], "ae": ""}, "5": {"qe": ["total inventory", "total stock", "overall stock", "how much stock do we have"], "ae": "Total \"brand\" stock across all branches: \"total_stock\" in \"items_count\" items. Branches: \"top_branches\"."}, "6": {"qe": ["old identity stock of \"item\"", "old stock of \"item\""], "ae": "Old identity (OLD) stock of \"item\": \"old\"."}, "7": {"qe": ["transit of \"item\"", "\"item\" in transit", "how much \"item\" is in transit"], "ae": "Quantity in transit for \"item\": \"transit\"."}, "8": {"qe": ["how many days will \"item\" last", "coverage of \"item\"", "\"item\" coverage", "days of cover for \"item\""], "ae": ""}, "9": {"qe": ["how many days will \"item\" last in \"branch\"", "coverage of \"item\" in \"branch\""], "ae": "\"item\" in \"branch\": stock \"stock\" lasts \"days\" days (daily issue \"branch_daily_issue\")."}, "10": {"qe": ["which items will run out soon", "items running out", "low coverage items", "lowest coverage items"], "ae": "Lowest coverage items now: \"lowest_coverage\"."}, "11": {"qe": ["age of \"item\"", "how old is \"item\"", "\"item\" aging"], "ae": "\"item\": oldest age \"oldest_age\" days, average age \"avg_age\" days, quantity older than 180 days \"stale_qty\"."}, "12": {"qe": ["stagnant items", "oldest items", "slow moving items"], "ae": "Oldest items in stock: \"stale_items\"."}, "13": {"qe": ["which branch has the most stock", "branches by stock", "rank branches"], "ae": "Branches by stock: \"top_branches\"."}, "14": {"qe": ["daily issue of \"item\"", "how much \"item\" do we issue per day", "consumption of \"item\""], "ae": "Average daily issue of \"item\": \"daily_issue\" (last \"avg_days\" days)."}, "15": {"qe": ["how many items", "number of items", "item count"], "ae": "Number of \"brand\" items with stock: \"items_count\"."}, "16": {"qe": ["when was the data updated", "data date", "last update"], "ae": "Data last updated: \"data_date\"."}, "17": {"qe": ["analyze inventory", "analyze the inventory status", "inventory overview"], "ae": ""}, "18": {"qe": ["what are the main problems today", "top issues today", "problems today"], "ae": ""}, "19": {"qe": ["prepare a management report", "executive report", "management summary"], "ae": ""}, "20": {"qe": ["compare this month with last month", "month over month"], "ae": ""}, "21": {"qe": ["which branches have excess stock", "excess stock"], "ae": ""}, "22": {"qe": ["compare \"branch\" and \"branch\"", "compare \"branch\" with \"branch\""], "ae": ""}, "23": {"qe": ["distribution of \"item\" by branch", "where is \"item\" available", "\"item\" by branch"], "ae": "Distribution of \"item\" by branch: \"branch_split\". Total \"company_total\"."}, "24": {"qe": ["all info about \"item\"", "details of \"item\"", "\"item\" profile", "status of \"item\""], "ae": "\"item\" profile: stock \"company_total\" (Riyadh \"riyadh_stock\" = \"riyadh_share\"), lasts \"days\" days, FG coverage \"coverage\" days, daily issue \"daily_issue\", oldest age \"oldest_age\" days, transit \"transit\", OLD \"old\". By branch: \"branch_split\"."}, "25": {"qe": ["critical items", "items with less than 7 days coverage"], "ae": "Critical items (coverage under 7 days): \"critical_count\" — \"critical_items\"."}, "26": {"qe": ["shelf life of \"item\"", "expiry of \"item\"", "when does \"item\" expire"], "ae": "\"item\": shortest remaining shelf life \"min_days_left\" days; quantity expiring within 30 days \"expiring_30\"."}, "27": {"qe": ["fill rate of \"item\"", "orders vs issued for \"item\"", "orders of \"item\""], "ae": "Orders for \"item\" (last \"avg_days\" days): requested \"requested\", issued \"issued\", fill rate \"fill_rate\"."}, "28": {"qe": ["fill rate of \"item\" in \"branch\"", "orders of \"item\" in \"branch\""], "ae": "Orders for \"item\" in \"branch\": requested \"requested\", issued \"issued\", fill rate \"fill_rate\"."}, "29": {"qe": ["top issued items", "best selling items", "top moving items"], "ae": "Top issued items (last \"avg_days\" days): \"top_issued\"."}, "30": {"qe": ["space in \"branch\"", "storage in \"branch\"", "pallets in \"branch\""], "ae": "Space indicators in \"branch\": \"space_metrics\"."}, "31": {"qe": ["bottles in \"branch\"", "bottle stock in \"branch\""], "ae": "Bottle indicators in \"branch\": \"bottle_metrics\"."}, "32": {"qe": ["bottle stock", "bottles status"], "ae": "Bottles — all branches: \"bottle_metrics\"."}, "33": {"qe": ["transit to \"branch\"", "in transit to \"branch\""], "ae": "In transit to \"branch\": \"branch_transit\"."}, "34": {"qe": ["old identity stock", "total OLD"], "ae": "Total OLD identity stock: \"total_old\"."}, "35": {"qe": ["stale stock", "stock older than 180 days"], "ae": "Stock older than 180 days: \"total_stale\" (\"stale_share\" of aging stock)."}};
+  function S(cat, q, a, src, ex) { return { cat: cat, q: q, a: a, src: src, ex: ex }; }
+  var SEED = [
+    S("الأرصدة", ['كم رصيد "الصنف" في "الفرع"', 'رصيد "الصنف" في "الفرع"', 'كم عندنا "الصنف" في "الفرع"', 'كم باقي "الصنف" في "الفرع"', 'وش رصيد "الصنف" في "الفرع"', 'ايش رصيد "الصنف" في "الفرع"', 'كم المتوفر من "الصنف" في "الفرع"', 'كم موجود "الصنف" في "الفرع"'], 'رصيد "الصنف" في "الفرع": "الرصيد" — تكفي "أيام_الكفاية" يوم، والتغطية "التغطية" يوم. إجمالي الشركة "إجمالي_الشركة".', "fg", "كم رصيد 330 في 40 في جدة"),
+    S("الأرصدة", ['كم رصيد "الصنف"', 'رصيد "الصنف"', 'كم عندنا "الصنف"', 'كم باقي "الصنف"', 'وش رصيد "الصنف"', 'ايش رصيد "الصنف"', 'كم المتوفر من "الصنف"', 'كم موجود من "الصنف"', 'كم "الصنف"', '"الصنف" كم رصيده', '"الصنف" كم عندنا'], "", "items", "كم رصيد 330 في 40"),
+    S("الأرصدة", ['كم رصيد "البراند" "الصنف"', 'رصيد "البراند" "الصنف"', 'كم عندنا "البراند" "الصنف"'], "", "items", "كم رصيد ماي 600"),
+    S("الأرصدة", ['كم رصيد "الفرع"', 'رصيد "الفرع"', 'كم المخزون في "الفرع"', 'وش رصيد "الفرع"', 'كم عندنا في "الفرع"'], "", "items", "كم رصيد جدة"),
+    S("الأرصدة", ["كم اجمالي المخزون", "اجمالي الرصيد", "كم المخزون الكلي", "كم المخزون كله", "اجمالي المخزون"], 'إجمالي مخزون "البراند" في كل الفروع: "إجمالي_المخزون" في "عدد_الأصناف" صنف. الفروع: "أكبر_الفروع".', "fg", "كم اجمالي المخزون"),
+    S("الأرصدة", ['كم رصيد "الصنف" في الهويه القديمه', 'رصيد OLD "الصنف"', 'كم القديم من "الصنف"'], 'رصيد "الصنف" في الهوية القديمة (OLD): "OLD".', "old", "كم رصيد 600 في الهوية القديمة"),
+    S("الترانزيت", ['كم في الطريق من "الصنف"', 'ترانزيت "الصنف"', 'كم الترانزيت "الصنف"', 'كم جاي في الطريق من "الصنف"'], 'الكمية في الطريق (ترانزيت) من "الصنف": "الترانزيت".', "transit", "كم في الطريق من 600"),
+    S("التغطية", ['كم يوم يكفي "الصنف"', '"الصنف" يكفي كم يوم', 'كم تغطيه "الصنف"', 'تغطيه "الصنف"', '"الصنف" يغطي كم يوم', 'كم يوم يغطي "الصنف"'], "", "items", "كم يوم يكفي 330 في 40"),
+    S("التغطية", ['كم يوم يكفي "الصنف" في "الفرع"', '"الصنف" يكفي كم يوم في "الفرع"', 'تغطيه "الصنف" في "الفرع"'], '"الصنف" في "الفرع": الرصيد "الرصيد" يكفي "أيام_الكفاية" يوم (الصرف اليومي "الصرف_اليومي_الفرع").', "wso", "كم يوم يكفي 330 في 40 في الرياض"),
+    S("التغطية", ["ايش الاصناف اللي بتخلص", "الاصناف المتوقع نفادها", "وش اللي بيخلص قريب", "الاصناف اللي تغطيتها قليله", "اقل الاصناف تغطيه"], 'أقل الأصناف تغطية الآن: "أقل_تغطية".', "fg", "وش اللي بيخلص قريب"),
+    S("الأعمار", ['كم عمر "الصنف"', 'اقدم انتاج "الصنف"', 'عمر مخزون "الصنف"', 'كم عمر مخزون "الصنف"'], '"الصنف": أقدم عمر "أقدم_عمر" يوم، ومتوسط العمر "متوسط_العمر" يوم، والكمية الأقدم من 180 يوم "المتقادم".', "aging", "كم عمر 600"),
+    S("الأعمار", ["ايش الاصناف الراكده", "الاصناف القديمه", "اقدم الاصناف", "وش الراكد"], 'أقدم الأصناف في المخزون: "الأصناف_الراكدة".', "aging", "اقدم الاصناف"),
+    S("الفروع", ["اي فرع فيه اكثر رصيد", "اكبر الفروع رصيد", "ترتيب الفروع", "الفروع حسب الرصيد"], 'الفروع حسب الرصيد: "أكبر_الفروع".', "fg", "ترتيب الفروع"),
+    S("الصرف", ['كم الصرف اليومي ل "الصنف"', 'كم نصرف من "الصنف" يوميا', 'معدل صرف "الصنف"', 'كم مبيعات "الصنف" يوميا'], 'متوسط الصرف اليومي لـ "الصنف": "الصرف_اليومي" (آخر "أيام_المتوسط" يوم).', "wso", "معدل صرف 600"),
+    S("ملخص", ["كم عدد الاصناف", "كم صنف عندنا", "عدد الاصناف"], 'عدد أصناف "البراند" التي لها رصيد: "عدد_الأصناف".', "fg", "كم صنف عندنا"),
+    S("ملخص", ["متى اخر تحديث للبيانات", "تاريخ البيانات", "متى تحدثت البيانات"], 'آخر تحديث للبيانات: "تاريخ_البيانات".', "fg", "متى اخر تحديث للبيانات"),
+    S("تحليل", ["حلل حاله المخزون", "حلل المخزون", "وش وضع المخزون"], "", "engine", "حلل حالة المخزون"),
+    S("تحليل", ["وش اهم المشاكل اليوم", "ايش المشاكل", "اهم المشكلات"], "", "engine", "وش اهم المشاكل اليوم"),
+    S("تحليل", ["جهز تقرير للاداره", "تقرير تنفيذي", "ملخص للاداره"], "", "engine", "جهز تقرير للادارة"),
+    S("تحليل", ["قارن هذا الشهر بالشهر السابق", "مقارنه بالشهر الماضي"], "", "engine", "قارن هذا الشهر بالشهر السابق"),
+    S("تحليل", ["ايش الفروع اللي عندها مخزون زايد", "المخزون الزائد"], "", "engine", "ايش الفروع اللي عندها مخزون زايد"),
+    S("تحليل", ['قارن "الفرع" و "الفرع"', 'مقارنه "الفرع" مع "الفرع"'], "", "engine", "قارن الرياض وجدة"),
+    S("الأرصدة", ["رصيد \"الصنف\" في كل الفروع", "توزيع \"الصنف\" على الفروع", "\"الصنف\" في اي فرع", "وين يتوفر \"الصنف\"", "وين موجود \"الصنف\""], "توزيع \"الصنف\" على الفروع: \"توزيع_الفروع\". الإجمالي \"إجمالي_الشركة\".", "items", "وين يتوفر 330 في 40"),
+    S("الأرصدة", ["كل معلومات \"الصنف\"", "تفاصيل \"الصنف\"", "ملف \"الصنف\"", "وضع \"الصنف\""], "ملف \"الصنف\": الرصيد \"إجمالي_الشركة\" (الرياض \"رصيد_الرياض\" = \"نسبة_الرياض\")، تكفي \"أيام_الكفاية\" يوم، التغطية \"التغطية\" يوم، الصرف اليومي \"الصرف_اليومي\"، أقدم عمر \"أقدم_عمر\" يوم، الترانزيت \"الترانزيت\"، OLD \"OLD\". التوزيع: \"توزيع_الفروع\".", "items", "تفاصيل 330 في 40"),
+    S("التغطية", ["الاصناف الحرجه", "كم صنف تغطيته اقل من 7 ايام", "الاصناف اللي تغطيتها اقل من اسبوع"], "الأصناف الحرجة (تغطية أقل من 7 أيام): \"عدد_الحرجة\" صنف — \"الأصناف_الحرجة\".", "items", "الاصناف الحرجة"),
+    S("الصلاحية", ["كم باقي على انتهاء \"الصنف\"", "صلاحيه \"الصنف\"", "\"الصنف\" متى ينتهي", "تاريخ انتهاء \"الصنف\""], "\"الصنف\": أقل صلاحية متبقية \"أقل_صلاحية_متبقية\" يوم، والكمية التي تنتهي خلال 30 يوم \"ينتهي_خلال_30\".", "items", "صلاحية 600"),
+    S("الطلبات", ["نسبه تلبيه طلبات \"الصنف\"", "كم طلبنا وكم صرفنا من \"الصنف\"", "نسبه التلبيه \"الصنف\"", "طلبات \"الصنف\""], "طلبات \"الصنف\" (آخر \"أيام_المتوسط\" يوم): المطلوب \"الطلب\"، المصروف \"المصروف\"، نسبة التلبية \"نسبة_التلبية\".", "items", "نسبة تلبية 600"),
+    S("الطلبات", ["نسبه تلبيه \"الصنف\" في \"الفرع\"", "طلبات \"الصنف\" في \"الفرع\""], "طلبات \"الصنف\" في \"الفرع\": المطلوب \"الطلب\"، المصروف \"المصروف\"، نسبة التلبية \"نسبة_التلبية\".", "items", "نسبة تلبية 600 في جدة"),
+    S("الصرف", ["اكثر الاصناف صرفا", "اعلى الاصناف مبيعا", "وش اكثر صنف يطلع", "اكثر الاصناف حركه"], "أكثر الأصناف صرفًا (آخر \"أيام_المتوسط\" يوم): \"أكثر_الأصناف_صرفا\".", "items", "اكثر الاصناف صرفا"),
+    S("المساحات", ["كم المساحه في \"الفرع\"", "مساحه \"الفرع\"", "وضع التخزين في \"الفرع\"", "كم البلتات في \"الفرع\""], "مؤشرات المساحة في \"الفرع\": \"مؤشرات_المساحة\".", "items", "مساحة الرياض"),
+    S("القارورة", ["رصيد القاروره في \"الفرع\"", "قوارير \"الفرع\"", "كم قاروره في \"الفرع\""], "مؤشرات القارورة في \"الفرع\": \"مؤشرات_القارورة\".", "items", "قوارير جدة"),
+    S("القارورة", ["رصيد القاروره", "كم القوارير", "وضع القاروره"], "القارورة — كل الفروع: \"مؤشرات_القارورة\".", "items", "وضع القارورة"),
+    S("الترانزيت", ["كم في الطريق الى \"الفرع\"", "ترانزيت \"الفرع\"", "وش جاي \"الفرع\""], "الكميات في الطريق إلى \"الفرع\": \"ترانزيت_الفرع\".", "items", "ترانزيت جدة"),
+    S("الأرصدة", ["كم رصيد الهويه القديمه", "اجمالي OLD", "كم الهويه القديمه"], "إجمالي الهوية القديمة (OLD): \"إجمالي_OLD\".", "items", "كم رصيد الهوية القديمة"),
+    S("الأعمار", ["كم المتقادم", "الكميه الاقدم من 180 يوم", "كم المخزون القديم"], "الكمية الأقدم من 180 يوم: \"إجمالي_المتقادم\" (\"نسبة_المتقادم\" من مخزون الأعمار).", "items", "كم المتقادم")
+  ];
+  var st = { items: null, loading: false };
+  function LS() { try { return window.LS || localStorage; } catch (e) { return localStorage; } }
+  function db() { try { return typeof fbDB !== "undefined" && fbDB ? fbDB : null; } catch (e) { return null; } }
+  function col() { try { return FB_COL; } catch (e) { return "inventory_dashboard"; } }
+  function isAdm() { try { return typeof isAdmin === "function" && !!isAdmin(); } catch (e) { return false; } }
+  function who() { try { return (CURRENT_USER && (CURRENT_USER.u || CURRENT_USER.name)) || "user"; } catch (e) { return "user"; } }
+  function nid() { return "q" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function seedItems() { return SEED.map(function (x, i) { var e = SEED_EN[String(i + 1)] || {}; return { id: "s" + (i + 1), cat: x.cat, q: x.q.slice(), a: x.a, qe: (e.qe || []).slice(), ae: e.ae || "", src: x.src === "engine" ? "engine" : "items", srcLabel: x.src === "engine" ? SRC.engine : SRC.items, ex: x.ex, on: true, by: "seed", at: 0 }; }); }
+  /* مكتبة محفوظة قبل دعم الإنجليزية: نكمل صيغها الإنجليزية من القائمة الأساسية دون المساس بتعديلات المدير */
+  function fillEn(list) {
+    var have = {}, mx = 0; list.forEach(function (x) { have[x.id] = 1; var m = /^s(\d+)$/.exec(x.id || ""); if (m) mx = Math.max(mx, +m[1]); }); /* أضف الأسئلة الجديدة فقط (أرقام أعلى) — لا تُرجع ما حذفه المدير */ seedItems().forEach(function (sd) { if (!have[sd.id] && +sd.id.slice(1) > mx) list.push(sd); });
+    list.forEach(function (x) { if (x.by === "seed" && x.src !== "engine" && x.src !== "items") { x.src = "items"; x.srcLabel = SRC.items; } });
+    list.forEach(function (x) { var m = /^s(\d+)$/.exec(x.id || ""), e = m && SEED_EN[m[1]]; if (!e) return; if (!x.qe || !x.qe.length) x.qe = e.qe.slice(); if (x.ae == null) x.ae = e.ae; }); return list; }
+  function items() {
+    if (!st.items) { try { var o = JSON.parse(LS().getItem(LSK) || "null"); st.items = o && Array.isArray(o.items) ? fillEn(o.items) : null; } catch (e) { } if (!st.items) st.items = seedItems(); }
+    if (!st.pulled) pull();
+    return st.items;
+  }
+  function pull() {
+    if (st.loading || !db()) return; st.loading = true; st.pulled = true;
+    try { db().collection(col()).doc(DOC).get().then(function (x) { st.loading = false; var d = x && x.exists ? x.data() : null; if (d && Array.isArray(d.items) && d.items.length) { st.items = fillEn(d.items); try { LS().setItem(LSK, JSON.stringify({ items: d.items, at: Date.now() })); } catch (e) { } } }, function () { st.loading = false; }); } catch (e) { st.loading = false; }
+  }
+  function save(list) {
+    list.forEach(function (x) { x.srcLabel = SRC[x.src] || x.src || ""; }); st.items = list;
+    try { LS().setItem(LSK, JSON.stringify({ items: list, at: Date.now() })); } catch (e) { }
+    if (!db()) return Promise.resolve("✅ حُفظ على هذا الجهاز");
+    return db().collection(col()).doc(DOC).set({ items: list, updatedAt: Date.now(), updatedBy: who() }).then(function () { return "✅ حُفظت المكتبة لكل المستخدمين"; }, function (e) { return "⚠️ حُفظت على هذا الجهاز فقط: " + (e.code || e.message); });
+  }
+  /* سجل كل أسئلة المستخدمين وإجاباتها (للمراجعة) — يُدمج المكرر حسب نص السؤال */
+  function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return "h" + (h >>> 0).toString(36); }
+  function logTurn(chat, m) {
+    try {
+      if (!m || m.r !== "a" || !chat || !db()) return; var q = ""; for (var i = chat.msgs.length - 1; i >= 0; i--) { if (chat.msgs[i] === m) { for (var j = i - 1; j >= 0; j--) if (chat.msgs[j].r === "u") { q = chat.msgs[j].t; break; } break; } }
+      q = String(q || "").trim(); if (!q || q.length < 3 || (window.AIIE && AIIE.greet && AIIE.greet(q))) return;
+      var key = hash(q.replace(/\s+/g, " ").toLowerCase()), rec = {}; rec[key] = { q: q.slice(0, 200), a: String(m.t || "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").slice(0, 600), mode: m.mode || "", by: who(), at: Date.now(), st: "new" };
+      db().collection(col()).doc(LOGDOC).set(rec, { merge: true }).catch(function () { });
+    } catch (e) { }
+  }
+  function loadLog() { if (!db()) return Promise.resolve([]); return db().collection(col()).doc(LOGDOC).get().then(function (x) { var d = x && x.exists ? x.data() : {}; return Object.keys(d).map(function (k) { return Object.assign({ id: k }, d[k]); }).filter(function (r) { return r && r.q; }).sort(function (a, b) { return b.at - a.at; }); }, function () { return []; }); }
+  function setLog(id, patch) { if (!db()) return Promise.resolve(); var u = {}; u[id] = patch; return db().collection(col()).doc(LOGDOC).set(u, { merge: true }); }
+  return { items: function () { return items(); }, all: items, save: save, seed: seedItems, SRC: SRC, VARS: VARS, logTurn: logTurn, loadLog: loadLog, setLog: setLog, nid: nid, isAdm: isAdm, pull: pull, fillEn: fillEn };
+})();
+if (typeof window !== "undefined") window.WAQA = WAQA;
+
+/* ---------- الشاشة: «📚 الأسئلة والأجوبة» في لوحة AI ---------- */
+(function () {
+  if (typeof window === "undefined" || typeof document === "undefined" || window.WAQAUI) return;
+  var U = { tab: "lib", q: "", cat: "", msg: "", edit: null, log: null, logBusy: false };
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function root() { return document.getElementById("qa-root"); }
+  function srcOpts(sel) { return Object.keys(WAQA.SRC).map(function (k) { return '<option value="' + k + '"' + (sel === k ? " selected" : "") + ">" + esc(WAQA.SRC[k]) + "</option>"; }).join(""); }
+  function tryQ(q) { try { var r = window.AIIE && AIIE.waLocal ? AIIE.waLocal(q, {}) : null; return r ? String(r.t || "") : "— لم يُطابق محليًا (سيذهب للذكاء الاصطناعي)"; } catch (e) { return "خطأ: " + e.message; } }
+  function css() { return '<style>#qa-root .qa-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}#qa-root .qa-tabs button{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;font-size:13px;color:#1e4e8c;cursor:pointer}#qa-root .qa-tabs button.on{background:#1e4e8c;color:#fff;border-color:#1e4e8c}#qa-root .qa-tabs b{background:#f59e0b;color:#fff;border-radius:999px;padding:0 7px;margin-inline-start:6px;font-size:11px}' +
+    '#qa-root .qa-row{border:1px solid #e4e9f2;border-radius:12px;padding:12px;margin-bottom:8px;background:#fff}#qa-root .qa-row.off{opacity:.5}#qa-root .qa-q{font-weight:700;color:#12325a;line-height:1.9}#qa-root .qa-q span{display:inline-block;background:#f1f5f9;border-radius:8px;padding:1px 8px;margin:2px 0 2px 4px;font-size:12.5px}#qa-root .qa-a{margin-top:6px;color:#334155;font-size:13px;white-space:pre-wrap}#qa-root .qa-a.eng{color:#64748b;font-style:italic}#qa-root .qa-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:11.5px;color:#64748b}#qa-root .qa-tag{background:#e0ecff;color:#1e4e8c;border-radius:999px;padding:2px 8px;font-weight:700}#qa-root .qa-act{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}#qa-root .qa-act button,#qa-root .qa-btn{border:1px solid #cbd5e1;background:#fff;border-radius:9px;padding:5px 10px;font:inherit;font-size:12px;font-weight:700;color:#1e4e8c;cursor:pointer}#qa-root .qa-btn.pri,#qa-root .qa-act button.pri{background:#1e4e8c;color:#fff;border-color:#1e4e8c}#qa-root .qa-try{margin-top:8px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:pre-wrap}' +
+    '#qa-root .qa-ed{display:grid;gap:8px;margin-top:8px}#qa-root .qa-ed label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#475569}#qa-root .qa-ed textarea,#qa-root .qa-ed input,#qa-root .qa-ed select,#qa-root .qa-top input,#qa-root .qa-top select{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;font-size:13px;background:#f8fafc}#qa-root .qa-ed textarea{min-height:70px}#qa-root .qa-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}#qa-root .qa-top input{flex:1;min-width:160px}#qa-root .qa-top select{width:auto}#qa-root .qa-vars{font-size:12px;color:#475569;line-height:2}#qa-root .qa-vars code{background:#eef4ff;border-radius:6px;padding:1px 6px;margin-inline-end:4px;cursor:pointer}#qa-root .qa-tw{overflow:auto;border:1px solid #e4e9f2;border-radius:12px;background:#fff}#qa-root .qa-tb{width:100%;border-collapse:collapse;font-size:12.5px;min-width:980px}#qa-root .qa-tb th{position:sticky;top:0;background:#1e4e8c;color:#fff;font-weight:700;padding:9px 8px;text-align:start;white-space:nowrap;z-index:1}#qa-root .qa-tb td{border-top:1px solid #edf1f7;padding:8px;vertical-align:top}#qa-root .qa-tb tbody tr:nth-child(4n+1){background:#fbfcfe}#qa-root .qa-tb tr.off td{opacity:.5}#qa-root .qa-qc{min-width:220px;max-width:300px;line-height:1.9}#qa-root .qa-btns{width:1%}#qa-root .qa-btns button{display:block;margin:2px auto!important}#qa-root .qa-qc span{display:block;width:fit-content;background:#f1f5f9;border-radius:7px;padding:0 7px;margin:1px 0 1px 3px}#qa-root .qa-ac{min-width:200px;max-width:280px;line-height:1.7;color:#334155}#qa-root .qa-v{color:#0e7490}#qa-root .qa-eng{color:#94a3b8}#qa-root .qa-src{font-size:11.5px;color:#64748b;min-width:110px}#qa-root .qa-st{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}#qa-root .qa-st.on{background:#dcfce7;color:#166534}#qa-root .qa-st.off{background:#f1f5f9;color:#64748b}#qa-root .qa-btns{white-space:nowrap}#qa-root .qa-btns button{border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:3px 7px;margin:1px;cursor:pointer;font-size:13px}#qa-root .qa-btns button:hover{background:#eef4fd}#qa-root .qa-msg{position:sticky;bottom:8px;background:#0f2a4d;color:#fff;border-radius:10px;padding:8px 12px;font-size:13px;margin-top:8px}</style>'; }
+  function qHtml(qs) { return (Array.isArray(qs) ? qs : [qs]).map(function (p) { return "<span>" + esc(p).replace(/(&quot;[^&]{1,30}?&quot;|“[^”]{1,30}”)/g, '<b style="color:#b45309">$1</b>') + "</span>"; }).join(""); }
+  function editor(x, isNew) {
+    return '<div class="qa-ed"><label>صيغ السؤال (سطر لكل صيغة، والجزء المتغير بين " " مثل "الصنف" "الفرع" "البراند")<textarea id="qa-eq">' + esc((x.q || []).join("\n")) + '</textarea></label>' +
+      '<label>الإجابة (ما بين " " يُملأ من بيانات اليوم؛ اتركها فارغة ليجيب محرك المساعد ببطاقته)<textarea id="qa-ea">' + esc(x.a || "") + '</textarea></label>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px" dir="ltr"><label>Question variants (English, one per line; variables: "item" "branch" "brand")<textarea id="qa-eqe" dir="ltr">' + esc((x.qe || []).join("\n")) + '</textarea></label><label>Answer (English; e.g. "stock", "days", "coverage", "company_total")<textarea id="qa-eae" dir="ltr">' + esc(x.ae || "") + '</textarea></label></div>' +
+      '<div class="qa-vars">المتغيرات (اضغط للإدراج): ' + WAQA.VARS.map(function (v) { return '<code data-qa="ins" data-v="' + esc(v[0]) + '" title="' + esc(v[1]) + '">"' + esc(v[0]) + '"</code>'; }).join("") + "</div>" +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px"><label>مصدر المعلومة<select id="qa-es">' + srcOpts(x.src || "items") + '</select></label><label>القسم<input id="qa-ec" value="' + esc(x.cat || "") + '"></label><label>ملاحظة على المصدر (تظهر مع الإجابة)<input id="qa-en" value="' + esc(x.srcNote || "") + '" placeholder="مثال: حسب تقرير الصباح"></label><label>مثال للتجربة<input id="qa-ex" value="' + esc(x.ex || "") + '"></label></div>' +
+      '<div class="qa-act" style="margin:0"><button class="pri" data-qa="saveed" data-id="' + esc(x.id || "") + '"' + (isNew ? ' data-new="1"' : "") + '>💾 حفظ</button><button data-qa="tryed">🧪 جرّب المثال</button><button data-qa="canced">إلغاء</button></div><div class="qa-try" id="qa-tryout" style="display:none"></div></div>';
+  }
+  function paint() {
+    var r = root(); if (!r) return; var L = WAQA.all(), adm = WAQA.isAdm();
+    var logN = (U.log || []).filter(function (x) { return x.st === "new"; }).length, okN = (U.log || []).filter(function (x) { return x.st === "ok" && !x.moved; }).length;
+    var h = css() + '<div class="ai-card"><h4 style="margin:0 0 6px;color:#12325a">📚 الأسئلة والأجوبة — مكتبة المساعد</h4><div class="ai-src" style="margin-bottom:10px">أسئلة متوقعة بقوالب: ما بين " " في السؤال متغيّر، وما بين " " في الإجابة يُحسب من بيانات اليوم، فتبقى الأرقام صحيحة مع تحديث البيانات. وكل أسئلة المستخدمين تُسجَّل هنا لتراجعها.</div>' +
+      '<div class="qa-tabs"><button data-qa="tab" data-v="lib" class="' + (U.tab === "lib" ? "on" : "") + '">📚 المكتبة (' + L.length + ')</button><button data-qa="tab" data-v="log" class="' + (U.tab === "log" ? "on" : "") + '">📝 أسئلة المستخدمين' + (logN ? "<b>" + logN + "</b>" : "") + '</button><button data-qa="tab" data-v="ok" class="' + (U.tab === "ok" ? "on" : "") + '">✅ المؤكدة (للنقل)' + (okN ? "<b>" + okN + "</b>" : "") + "</button></div>";
+    if (!adm) { r.innerHTML = h + '<div class="ai-src">هذه الشاشة للمدير.</div></div>'; return; }
+    if (U.tab === "lib") {
+      var cats = {}; L.forEach(function (x) { cats[x.cat || "عام"] = 1; });
+      var q = U.q.trim().toLowerCase(), F = L.filter(function (x) { return (!U.cat || (x.cat || "عام") === U.cat) && (!q || (x.q.join(" ") + " " + x.a + " " + (x.cat || "")).toLowerCase().indexOf(q) >= 0); });
+      h += '<div class="qa-top"><input data-qa-q placeholder="بحث في الأسئلة والأجوبة…" value="' + esc(U.q) + '"><select data-qa-cat><option value="">كل الأقسام</option>' + Object.keys(cats).map(function (c) { return '<option' + (U.cat === c ? " selected" : "") + ">" + esc(c) + "</option>"; }).join("") + '</select><button class="qa-btn pri" data-qa="new">➕ سؤال جديد</button><button class="qa-btn" data-qa="exp">⬇ تصدير Excel</button><label class="qa-btn" style="display:inline-flex;align-items:center">⬆ استيراد<input type="file" accept=".csv" data-qa-imp style="display:none"></label></div>';
+      if (U.edit === "__new") h += '<div class="qa-row">' + editor({ q: [], a: "", qe: [], ae: "", src: "items", cat: U.cat || "" }, true) + "</div>";
+      var en0 = function (a) { return a ? esc(a).replace(/(&quot;[^&]{1,30}?&quot;)/g, '<b class="qa-v">$1</b>') : '<i class="qa-eng">↩ بطاقة المساعد</i>'; };
+      h += '<div class="qa-tw"><table class="qa-tb"><thead><tr><th>#</th><th>إجراءات</th><th>القسم</th><th>السؤال</th><th dir="ltr">Question (EN)</th><th>الإجابة</th><th dir="ltr">Answer (EN)</th><th>المصدر</th><th>الحالة</th></tr></thead><tbody>';
+      F.forEach(function (x, n) {
+        if (U.edit === x.id) { h += '<tr><td colspan="9">' + editor(x) + "</td></tr>"; return; }
+        var btns = '<td class="qa-btns"><button data-qa="try" data-id="' + esc(x.id) + '" title="جرّب">🧪</button><button data-qa="ed" data-id="' + esc(x.id) + '" title="تعديل">✏️</button><button data-qa="tog" data-id="' + esc(x.id) + '" title="إيقاف/تفعيل">' + (x.on === false ? "▶" : "⏸") + '</button><button data-qa="del" data-id="' + esc(x.id) + '" title="حذف">🗑</button></td>';
+        h += '<tr class="' + (x.on === false ? "off" : "") + '"><td>' + (n + 1) + "</td>" + btns + '<td><span class="qa-tag">' + esc(x.cat || "عام") + '</span></td><td class="qa-qc">' + qHtml(x.q) + '</td><td class="qa-qc" dir="ltr">' + qHtml(x.qe || []) + '</td><td class="qa-ac">' + en0(x.a) + '</td><td class="qa-ac" dir="ltr">' + en0(x.ae) + '</td><td class="qa-src">' + esc(WAQA.SRC[x.src] || x.src || "—") + '</td><td>' + (x.on === false ? '<span class="qa-st off">موقوف</span>' : '<span class="qa-st on">مفعّل</span>') + "</td></tr>" +
+          '<tr class="qa-tryrow" id="qa-tr-' + esc(x.id) + '" style="display:none"><td colspan="9"><div class="qa-try" id="qa-try-' + esc(x.id) + '"></div></td></tr>';
+      });
+      h += "</tbody></table></div>";
+      if (!F.length) h += '<div class="ai-src">لا توجد نتائج.</div>';
+    } else {
+      var LG = (U.log || []).filter(function (x) { return U.tab === "log" ? x.st === "new" : x.st === "ok" && !x.moved; });
+      h += '<div class="qa-top"><button class="qa-btn" data-qa="reloadlog">⟳ تحديث</button>' + (U.tab === "ok" && LG.length ? '<button class="qa-btn pri" data-qa="moveall">📚 نقل الكل للمكتبة</button>' : "") + "</div>";
+      if (U.logBusy) h += '<div class="ai-src">⏳ تحميل…</div>';
+      LG.slice(0, 200).forEach(function (x) {
+        h += '<div class="qa-row">' + (U.edit === "L:" + x.id ? (function () { var qq = x.q2 || x.q, isE = /[a-z]{2,}/i.test(qq) && !/[\u0600-\u06FF]/.test(qq); return editor({ id: x.id, q: isE ? (x.q2a ? [x.q2a] : []) : [qq], qe: isE ? [qq] : (x.qe2 ? [x.qe2] : []), a: isE ? "" : (x.a2 != null ? x.a2 : ""), ae: isE ? (x.ae2 != null ? x.ae2 : "") : (x.ae2 || ""), src: x.src || "items", cat: x.cat || "من المستخدمين", ex: x.q }); })() :
+          '<div class="qa-q"><span>' + esc(x.q2 || x.q) + '</span></div><div class="qa-a">' + esc(String(x.a2 != null ? (x.a2 || "↩ ببطاقة المحرك") : x.a || "").slice(0, 400)) + '</div><div class="qa-meta"><span>' + esc(x.by || "") + " · " + new Date(x.at || 0).toLocaleString("en-GB") + "</span>" + (x.mode ? '<span class="qa-tag">' + esc(x.mode) + "</span>" : "") +
+          '<span class="qa-act">' + (U.tab === "log" ? '<button class="pri" data-qa="lok" data-id="' + esc(x.id) + '">✅ تأكيد</button><button data-qa="led" data-id="' + esc(x.id) + '">✏️ تعديل</button><button data-qa="lno" data-id="' + esc(x.id) + '">🗑 تجاهل</button>' : '<button class="pri" data-qa="lmove" data-id="' + esc(x.id) + '">📚 نقل للمكتبة</button><button data-qa="led" data-id="' + esc(x.id) + '">✏️ تعديل</button><button data-qa="lback" data-id="' + esc(x.id) + '">↩ إرجاع</button>') + "</span></div>") + "</div>";
+      });
+      if (!U.logBusy && !LG.length) h += '<div class="ai-src">' + (U.tab === "log" ? "لا توجد أسئلة جديدة بانتظار المراجعة." : "لا توجد أسئلة مؤكدة بانتظار النقل.") + "</div>";
+    }
+    h += (U.msg ? '<div class="qa-msg">' + esc(U.msg) + "</div>" : "") + "</div>";
+    r.innerHTML = h;
+  }
+  function loadLog() { U.logBusy = true; paint(); WAQA.loadLog().then(function (L) { U.log = L; U.logBusy = false; paint(); }); }
+  function edVals() { var g = function (id) { var e = document.getElementById(id); return e ? e.value : ""; }; return { q: g("qa-eq").split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean), a: g("qa-ea").trim(), qe: g("qa-eqe").split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean), ae: g("qa-eae").trim(), src: g("qa-es"), cat: g("qa-ec").trim(), ex: g("qa-ex").trim(), srcNote: g("qa-en").trim() }; }
+  function toLib(x, ed) {
+    var qq = x.q2 || x.q, isE = /[a-z]{2,}/i.test(qq) && !/[\u0600-\u06FF]/.test(qq);
+    var L = WAQA.all().slice(), v = ed || { q: isE ? (x.q2a ? [x.q2a] : []) : [qq], qe: isE ? [qq] : (x.qe2 ? [x.qe2] : []), a: isE ? "" : (x.a2 != null ? x.a2 : ""), ae: isE ? (x.ae2 || x.a2 || "") : (x.ae2 || ""), src: x.src || "items", cat: "من المستخدمين", ex: x.q };
+    L.push({ id: WAQA.nid(), cat: v.cat || "من المستخدمين", q: v.q, a: v.a, qe: v.qe || [], ae: v.ae || "", src: v.src, ex: v.ex || x.q, on: true, by: x.by || "", at: Date.now(), from: x.id });
+    return WAQA.save(L).then(function (m) { return WAQA.setLog(x.id, { moved: Date.now() }).then(function () { x.moved = Date.now(); return m; }); });
+  }
+  function csv(rows) { return "﻿" + rows.map(function (r) { return r.map(function (v) { v = v == null ? "" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","); }).join("\r\n"); }
+  function parseCsv(t) { var rows = [], row = [], cur = "", q = false; t = t.replace(/^﻿/, ""); for (var i = 0; i < t.length; i++) { var c = t[i]; if (q) { if (c === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; } else if (c === '"') q = true; else if (c === ",") { row.push(cur); cur = ""; } else if (c === "\n" || c === "\r") { if (c === "\r" && t[i + 1] === "\n") i++; row.push(cur); rows.push(row); row = []; cur = ""; } else cur += c; } if (cur || row.length) { row.push(cur); rows.push(row); } return rows; }
+  document.addEventListener("input", function (e) { var t = e.target; if (!root() || !root().contains(t)) return; if (t.hasAttribute("data-qa-q")) { U.q = t.value; clearTimeout(U.t); U.t = setTimeout(function () { var pos = t.selectionStart; paint(); var n = root().querySelector("[data-qa-q]"); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } } }, 250); } }, true);
+  document.addEventListener("change", function (e) {
+    var t = e.target; if (!root() || !root().contains(t)) return;
+    if (t.hasAttribute("data-qa-cat")) { U.cat = t.value; paint(); }
+    if (t.hasAttribute("data-qa-imp") && t.files && t.files[0]) { var fr = new FileReader(); fr.onload = function () { try { var R = parseCsv(String(fr.result)), H = R.shift() || [], ix = function (n) { return H.indexOf(n); }; var L = R.filter(function (r) { return r.length > 2 && r[ix("الأسئلة")]; }).map(function (r) { var src = r[ix("المصدر")] || "fg", srcK = Object.keys(WAQA.SRC).filter(function (k) { return k === src || WAQA.SRC[k] === src; })[0] || "fg"; return { id: r[ix("المعرّف")] || WAQA.nid(), cat: r[ix("القسم")] || "عام", q: String(r[ix("الأسئلة")]).split(/\s*\|\s*/).filter(Boolean), a: r[ix("الإجابة")] || "", qe: ix("Questions (EN)") >= 0 ? String(r[ix("Questions (EN)")] || "").split(/\s*\|\s*/).filter(Boolean) : [], ae: ix("Answer (EN)") >= 0 ? r[ix("Answer (EN)")] || "" : "", src: srcK, ex: r[ix("مثال")] || "", on: r[ix("مفعّل")] !== "لا", by: "import", at: Date.now() }; }); if (!L.length) { U.msg = "⚠️ الملف لا يحتوي صفوفًا صالحة"; return paint(); } WAQA.save(L).then(function (m) { U.msg = m + " — " + L.length + " سؤال"; paint(); }); } catch (x) { U.msg = "⚠️ " + x.message; paint(); } }; fr.readAsText(t.files[0], "utf-8"); }
+  }, true);
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-qa]"); if (!b || !root() || !root().contains(b)) return; e.preventDefault();
+    var a = b.getAttribute("data-qa"), id = b.getAttribute("data-id"), L = WAQA.all(), x = L.filter(function (y) { return y.id === id; })[0], lg = (U.log || []).filter(function (y) { return y.id === id; })[0];
+    if (a === "tab") { U.tab = b.getAttribute("data-v"); U.edit = null; if (U.tab !== "lib" && !U.log) loadLog(); else paint(); return; }
+    if (a === "reloadlog") return loadLog();
+    if (a === "new") { U.edit = "__new"; return paint(); }
+    if (a === "ed") { U.edit = id; return paint(); }
+    if (a === "led") { U.edit = "L:" + id; return paint(); }
+    if (a === "canced") { U.edit = null; return paint(); }
+    if (a === "ins") { var ta = document.getElementById("qa-ea"); if (ta) { var p0 = ta.selectionStart || ta.value.length; ta.value = ta.value.slice(0, p0) + '"' + b.getAttribute("data-v") + '"' + ta.value.slice(p0); ta.focus(); } return; }
+    if (a === "try" && x) { var o = document.getElementById("qa-try-" + id), tr0 = document.getElementById("qa-tr-" + id); if (o) { if (tr0) tr0.style.display = ""; o.style.display = "block"; var exA = x.ex || String(x.q[0]).replace(/["“”]/g, ""), exE = (x.qe || [])[0] ? String(x.qe[0]).replace(/"item"/g, "330 ml 40").replace(/"branch"/g, "Jeddah").replace(/"brand"/g, "Tania").replace(/["“”]/g, "") : ""; o.innerHTML = '<div dir="rtl"><b>🧪 ' + esc(exA) + "</b>\n" + esc(tryQ(exA)) + "</div>" + (exE ? '<div dir="ltr" style="text-align:left;margin-top:8px;border-top:1px dashed #cbd5e1;padding-top:8px"><b>🧪 ' + esc(exE) + "</b>\n" + esc(tryQ(exE)) + "</div>" : ""); } return; }
+    if (a === "tryed") { var v0 = edVals(), o2 = document.getElementById("qa-tryout"); if (o2) { var arr = WAQA.all(), draft = { id: "__draft" + Date.now(), cat: v0.cat, q: v0.q, a: v0.a, src: v0.src, on: true }; arr.unshift(draft); try { o2.style.display = "block"; o2.textContent = "🧪 " + (v0.ex || v0.q[0] || "") + "\n\n" + tryQ(v0.ex || String(v0.q[0] || "").replace(/["“”]/g, "")); } finally { arr.splice(arr.indexOf(draft), 1); } } return; }
+    if (a === "saveed") {
+      var v = edVals(); if (!v.q.length && !v.qe.length) { U.msg = "⚠️ اكتب صيغة سؤال واحدة على الأقل (عربي أو إنجليزي)"; return paint(); }
+      if (U.edit && String(U.edit).indexOf("L:") === 0) { var lid = U.edit.slice(2), l2 = (U.log || []).filter(function (y) { return y.id === lid; })[0]; if (!l2) return; var patch = { q2: v.q[0] || v.qe[0], a2: v.a, qe2: v.qe[0] || "", ae2: v.ae, q2a: v.q[0] || "", src: v.src, cat: v.cat, st: "ok", okAt: Date.now() }; Object.assign(l2, patch); U.edit = null; return WAQA.setLog(lid, patch).then(function () { U.msg = "✅ حُفظ التعديل ونُقل إلى «المؤكدة»"; paint(); }); }
+      var L2 = L.slice(); if (b.getAttribute("data-new")) L2.unshift({ id: WAQA.nid(), cat: v.cat || "عام", q: v.q, a: v.a, qe: v.qe, ae: v.ae, src: v.src, srcNote: v.srcNote, ex: v.ex, on: true, by: "admin", at: Date.now() }); else L2 = L2.map(function (y) { return y.id === id ? Object.assign({}, y, v, { at: Date.now() }) : y; });
+      U.edit = null; return WAQA.save(L2).then(function (m) { U.msg = m; paint(); });
+    }
+    if (a === "tog" && x) { return WAQA.save(L.map(function (y) { return y.id === id ? Object.assign({}, y, { on: y.on === false, at: Date.now() }) : y; })).then(function (m) { U.msg = m; paint(); }); }
+    if (a === "del" && x) { if (!confirm("حذف هذا السؤال من المكتبة؟")) return; return WAQA.save(L.filter(function (y) { return y.id !== id; })).then(function (m) { U.msg = "🗑 حُذف — " + m; paint(); }); }
+    if (a === "exp") { var rows = [["المعرّف", "القسم", "الأسئلة", "الإجابة", "Questions (EN)", "Answer (EN)", "المصدر", "مثال", "مفعّل"]].concat(L.map(function (y) { return [y.id, y.cat || "", y.q.join(" | "), y.a || "", (y.qe || []).join(" | "), y.ae || "", WAQA.SRC[y.src] || y.src, y.ex || "", y.on === false ? "لا" : "نعم"]; })); var bl = new Blob([csv(rows)], { type: "text/csv;charset=utf-8" }), an = document.createElement("a"); an.href = URL.createObjectURL(bl); an.download = "ai_qa_library_" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(an); an.click(); setTimeout(function () { URL.revokeObjectURL(an.href); an.remove(); }, 500); return; }
+    if (a === "lok" && lg) { lg.st = "ok"; return WAQA.setLog(id, { st: "ok", okAt: Date.now() }).then(function () { U.msg = "✅ أُكّد — تجده في «المؤكدة»"; paint(); }); }
+    if (a === "lno" && lg) { lg.st = "no"; return WAQA.setLog(id, { st: "no" }).then(function () { U.msg = "🗑 تم التجاهل"; paint(); }); }
+    if (a === "lback" && lg) { lg.st = "new"; return WAQA.setLog(id, { st: "new" }).then(function () { paint(); }); }
+    if (a === "lmove" && lg) { return toLib(lg).then(function (m) { U.msg = "📚 نُقل للمكتبة — " + m; paint(); }); }
+    if (a === "moveall") { var M = (U.log || []).filter(function (y) { return y.st === "ok" && !y.moved; }); var p = Promise.resolve(); M.forEach(function (y) { p = p.then(function () { return toLib(y); }); }); return p.then(function () { U.msg = "📚 نُقل " + M.length + " سؤال للمكتبة"; paint(); }); }
+  }, true);
+  window.WAQAUI = { html: function () { setTimeout(function () { paint(); if (U.tab !== "lib" && !U.log) loadLog(); else if (!U.log) WAQA.loadLog().then(function (L) { U.log = L; paint(); }); }, 0); return '<div id="qa-root"></div>'; }, paint: paint };
+})();
+/* WA-QA-END */
+</script>
 <script id="wa-prov-js">
 /* WA-PROV-BEGIN — لوحة المدير: مزوّدو الذكاء الاصطناعي والمفاتيح والميزانية (المفاتيح تُحفظ في الـ Worker فقط) — v3: تصميم أوضح + لمبة حالة لكل مفتاح */
 (function () {
@@ -23337,7 +23752,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
   function TR() { try { return JSON.parse(localStorage.getItem(TK) || "{}") || {}; } catch (e) { return {}; } }
   function setTR(p, o) { var t = TR(); if (o) t[p] = o; else delete t[p]; try { localStorage.setItem(TK, JSON.stringify(t)); } catch (e) { } }
   function root() { return document.getElementById("wp-root"); }
-  function load() { S.busy = true; paint(); api("/admin/config").then(function (j) { S.data = j; if (/^⏳/.test(S.msg)) S.msg = ""; }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; paint(); autoTest(); }); }
+  function load() { S.busy = true; paint(); api("/admin/config").then(function (j) { S.data = j; if (S.savedCfg && Date.now() - S.savedCfg.at < 90000) S.data.cfg = S.savedCfg.cfg; if (/^⏳/.test(S.msg)) S.msg = ""; }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; paint(); autoTest(); }); }
   function v(id) { var e = document.getElementById(id); return e ? (e.type === "checkbox" ? e.checked : e.value) : null; }
   function opts(sel, list) { return list.map(function (p) { return '<option value="' + p + '"' + (sel === p ? " selected" : "") + ">" + esc(PN[p] || (p === "none" ? "بدون (نفس المزوّد الأساسي)" : p)) + "</option>"; }).join(""); }
   function ago(t) { var m = Math.round((Date.now() - t) / 60000); return m < 1 ? "الآن" : m < 60 ? "قبل " + m + " د" : m < 1440 ? "قبل " + Math.round(m / 60) + " س" : "قبل " + Math.round(m / 1440) + " يوم"; }
@@ -23462,10 +23877,14 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     var body = { active: v("wp-active"), englishProvider: v("wp-en"), paidEnabled: paid, budgetUsd: +v("wp-budget"), freeModel: v("wp-fm"), price: {} };
     if (document.getElementById("wp-tts")) { body.tts_enabled = !!v("wp-tts"); if (v("wp-tv")) body.tts_voice = v("wp-tv"); body.tts_model = v("wp-tm"); }
     if (document.getElementById("wp-tp")) { body.tts_provider = v("wp-tp"); if (v("wp-av")) body.azure_voice = v("wp-av"); if (v("wp-ar")) body.azure_region = v("wp-ar"); }
-    if (document.getElementById("wp-tun")) { try { var un = !!v("wp-tun"), cc = Object.assign({}, AIIE.cfg(), { tts_unified: un }); localStorage.setItem("ai_cfg_v1", JSON.stringify(cc)); if (typeof fbDB !== "undefined" && fbDB) fbDB.collection(FB_COL).doc("ai_cfg").set({ tts_unified: un, updatedAt: Date.now() }, { merge: true }); } catch (e) { } }
+    if (document.getElementById("wp-tun")) { try { var un = !!v("wp-tun"), cc = Object.assign({}, AIIE.cfg(), { tts_unified: un }); (window.LS || localStorage).setItem("ai_cfg_v1", JSON.stringify(cc)); if (typeof fbDB !== "undefined" && fbDB) fbDB.collection(FB_COL).doc("ai_cfg").set({ tts_unified: un, updatedAt: Date.now() }, { merge: true }); } catch (e) { } }
     ["gemini", "groq", "anthropic", "openai"].forEach(function (q) { body["model_" + q] = v("wp-m-" + q); if (q !== "anthropic") body[q + "_base"] = v("wp-b-" + q); body.price[q] = { in: +v("wp-pi-" + q), out: +v("wp-po-" + q) }; });
     Object.assign(body, extra || {});
-    return run(api("/admin/config", "POST", body), function () { return "✅ حُفظت الإعدادات — قد يستغرق تطبيق الصوت الجديد على كل الأجهزة حتى دقيقة"; }, function () { setTR("tts", null); try { window.WAVOICE && WAVOICE.resetCache(); } catch (e) { } });
+    /* نعتمد الإعداد الذي أعاده الخادم بعد الحفظ مباشرة (قراءة KV قد تكون قديمة حتى دقيقة فتُرجع الاختيار القديم في الشاشة) */
+    S.busy = true; S.msg = "⏳ …"; paint();
+    return api("/admin/config", "POST", body).then(function (j) { if (j && j.cfg) { S.savedCfg = { at: Date.now(), cfg: j.cfg }; if (S.data) S.data.cfg = j.cfg; } S.msg = "✅ حُفظت الإعدادات" + (j && j.cfg && j.cfg.tts_provider === "azure" ? " — الصوت الآن: " + (j.cfg.azure_voice || "") + " (يصل لكل الأجهزة خلال دقيقة)" : ""); })
+      .catch(function (e) { S.msg = "⚠️ " + e.message; })
+      .then(function () { S.busy = false; setTR("tts", null); try { window.WAVOICE && WAVOICE.resetCache(); } catch (e) { } S.auto = false; load(); });
   }
   document.addEventListener("change", function (e) { var t = e.target; if (!t || t.id !== "wp-tp" || !root() || !root().contains(t) || !S.data) return; S.data.cfg.tts_provider = t.value; setTR("tts", null); paint(); }, true);
   document.addEventListener("click", function (e) {
