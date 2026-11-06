@@ -18699,6 +18699,54 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
       var rid = env.mkRes({ title: (en ? "Run-out risk" : "مخاطر النفاد") + " ≤" + d + scopeNote(f, en), dataset: "fg", page: "rfgbal", columns: [{ key: "item_code", label: "كود الصنف", type: "string" }, { key: "brand", label: "الماركة", type: "string" }, { key: "size", label: "الحجم", type: "string" }, { key: "pack", label: "الشد", type: "string" }, { key: "coverage_days", label: "التغطية (يوم)", type: "number" }, { key: "qty", label: "الرصيد", type: "number" }], rows: r.lowest, sources: ["fg"] });
       return { t: L.join("\n") + "\n" + (en ? "Source: " : "المصدر: ") + src(["fg"]), rids: [rid] };
     };
+    /* كم يوم يكفي/يغطي صنف معيّن: من عمود التغطية في FG، مع تذكّر آخر صنف ذُكر في المحادثة */
+    var LAST = null;
+    function sizeNumIn(q) { var m = q.match(/(\d+(?:\.\d+)?)\s*(?:مل|ملي|مللي|ml|لتر|ليتر|l\b|جالون|gal)/) || q.match(/(?:حجم|مقاس|عبوه|صنف|قاروره)\s*(\d{3,4})\b/); return m ? m[1] : ""; }
+    function packIn(q) { var m = q.match(/(?:مل|ملي|مللي|ml|لتر|ليتر|l)\s*(?:في|x|×|\*|شد)\s*(\d{1,2})(?!\d)/) || q.match(/(?:شد|pack)\s*(\d{1,2})(?!\d)/) || q.match(/(\d{1,2})\s*[x×*]\s*\d{3,4}/); return m ? m[1] : ""; }
+    function codeIn(q) { var m = q.match(/(?:^|\D)(\d{6,10})(?!\d)/); return m ? m[1] : ""; }
+    /* إجابة من جدول «بيانات المساعد» الموحّد: التغطية/كفاية المبيعات/الرصيد لصنف، بالبراند الافتراضي إن لم يُذكر براند */
+    function itemAns(T, f, kind) {
+      var en = f.en, num = f.sizeNum || ((f.size || [])[0] && String(f.size[0]).match(/\d+(?:\.\d+)?/) ? String(f.size[0]).match(/\d+(?:\.\d+)?/)[0] : "");
+      var m = WAITEM.match(T, { sizeNum: num, pack: (f.pack || [])[0], code: f.code, brand: f.brand }), rows = m.rows;
+      var inC = function (w) { return !(f.cities && f.cities.length) || f.cities.indexOf(cityOf(w)) >= 0; };
+      var lab = (num ? num + (/\./.test(num) || +num < 20 ? " L" : " ml") : f.code ? (en ? "item " : "الصنف ") + f.code : "") + ((f.pack || [])[0] ? " × " + f.pack[0] : "") + (f.cities && f.cities.length ? " — " + f.cities.map(function (c) { return cityLabel(c, en); }).join("، ") : "");
+      var bl = m.brand ? (en ? " — brand " : " — براند ") + m.brand : "";
+      if (!rows.length) return { t: (en ? "No items found for " : "لا توجد أصناف مطابقة لـ ") + lab + bl + "." };
+      var L = [], tot = 0, list = rows.map(function (o) { var q = 0, parts = []; Object.keys(o.by_branch).forEach(function (w) { if (!inC(w)) return; q += o.by_branch[w]; if (o.by_branch[w]) parts.push([w, o.by_branch[w]]); }); parts.sort(function (a, b) { return b[1] - a[1]; }); tot += q; return { o: o, q: r1(q), parts: parts }; });
+      var nm = function (o) { var sz = o.size && /^\d+(\.\d+)?$/.test(String(o.size).trim()) ? o.size + (+o.size < 20 ? " L" : " ml") : o.size, pk = String(o.pack || ""); return [o.item_code, (/(ml|مل|l\b|لتر)/i.test(pk) ? pk : [sz, pk ? "× " + pk : ""].filter(Boolean).join(" "))].filter(Boolean).join(" — "); };
+      if (kind === "bal") {
+        list.sort(function (a, b) { return b.q - a.q; });
+        L.push((en ? "**Stock of " : "**رصيد ") + lab + bl + "**: " + (en ? "total " : "الإجمالي ") + "**" + fmt(r1(tot)) + "**");
+        list.slice(0, 8).forEach(function (x, i) { L.push((i + 1) + ". " + nm(x.o) + " — **" + fmt(x.q) + "**" + (x.parts.length > 1 ? " (" + x.parts.slice(0, 4).map(function (p) { return p[0] + " " + fmt(r1(p[1])); }).join("، ") + ")" : "") + (x.o.coverage_days != null ? (en ? " — coverage " : " — التغطية ") + x.o.coverage_days + (en ? " days" : " يوم") : "")); });
+      } else {
+        list.sort(function (a, b) { var x = a.o.coverage_days == null ? 1e9 : a.o.coverage_days, y = b.o.coverage_days == null ? 1e9 : b.o.coverage_days; return x - y; });
+        L.push((en ? "**Coverage of " : "**تغطية ") + lab + bl + (en ? "** (how many days stock lasts):" : "** (كم يوم يكفي الرصيد):"));
+        list.slice(0, 8).forEach(function (x, i) { var o = x.o, sd = o.sales_daily > 0 ? r1(x.q / o.sales_daily) : null; L.push((i + 1) + ". " + nm(o) + " — " + (o.coverage_days == null ? (en ? "no coverage data" : "لا توجد تغطية في FG") : (en ? "coverage " : "التغطية ") + "**" + o.coverage_days + "** " + (en ? "days" : "يوم")) + (sd != null ? (en ? " — sales cover " : " — كفاية المبيعات ") + "**" + sd + "** " + (en ? "days" : "يوم") : "") + (en ? " — stock " : " — الرصيد ") + fmt(x.q)); });
+        L.push(en ? "\nCoverage = FG report coverage column. Sales cover = stock ÷ average daily issued (" + T.rules.salesDays + " days of movement data), when available." : "\nالتغطية = عمود التغطية في تقرير FG. كفاية المبيعات = الرصيد ÷ متوسط الصرف اليومي لآخر " + T.rules.salesDays + " يوم (عند توفر بيانات الحركة).");
+      }
+      if (list.length > 8) L.push((en ? "…and " : "…و ") + (list.length - 8) + (en ? " more items in the table." : " أصناف أخرى في الجدول."));
+      var rid = env.mkRes({ title: (kind === "bal" ? (en ? "Stock — " : "الرصيد — ") : (en ? "Coverage — " : "التغطية — ")) + lab + bl, dataset: "fg", page: "rfgbal", columns: [{ key: "item_code", label: "كود الصنف", type: "string" }, { key: "brand", label: "البراند", type: "string" }, { key: "size", label: "الحجم", type: "string" }, { key: "pack", label: "الشد", type: "string" }, { key: "qty", label: "الرصيد", type: "number" }, { key: "coverage_days", label: "التغطية FG (يوم)", type: "number" }, { key: "sales_daily", label: "متوسط الصرف اليومي", type: "number" }, { key: "sales_days", label: "كفاية المبيعات (يوم)", type: "number" }, { key: "age_max", label: "أقدم عمر", type: "number" }], rows: list.map(function (x) { var o = x.o; return { item_code: o.item_code, brand: o.brand, size: o.size, pack: o.pack, qty: x.q, coverage_days: o.coverage_days, sales_daily: o.sales_daily, sales_days: o.sales_daily > 0 ? r1(x.q / o.sales_daily) : null, age_max: o.age_max }; }), sources: ["fg"] });
+      return { t: L.join("\n") + "\n" + (en ? "Source: AI data table — " : "المصدر: جدول بيانات المساعد — ") + (T.sources.join(" | ") || "—"), rids: [rid] };
+    }
+    function itemsT() { try { var T = env.items ? env.items() : null; return T && T.rows && T.rows.length && typeof WAITEM !== "undefined" ? T : null; } catch (e) { return null; } }
+    H.itembal = function (f) { var T = itemsT(); return T ? itemAns(T, f, "bal") : { t: f.en ? "Item data is not available." : "بيانات الأصناف غير متاحة." }; };
+    H.itemcov = function (f) {
+      var T = itemsT(); if (T && (f.sizeNum || (f.size && f.size.length) || f.code || (f.pack && f.pack.length))) return itemAns(T, f, "cov");
+      var en = f.en, x = need("fg", en); if (x.err) return { t: x.err };
+      if (!(f.size && f.size.length) && !f.sizeNum && !(f.pack && f.pack.length)) return H.runout(f);
+      var num = f.sizeNum ? new RegExp("(^|[^0-9.])" + f.sizeNum.replace(".", "\\.") + "(?![0-9])") : null;
+      var rows = filt(x.d.rows, { cities: f.cities, pack: f.pack, size: num ? [] : f.size }, "warehouse").filter(function (r) { return !num || num.test(String(r.size || "") + " " + String(r.item_name || r.description || r.desc || "")); });
+      var g = {}; rows.forEach(function (r) { var k = r.item_code || [r.brand, r.size, r.pack].join(" "); var o = g[k] || (g[k] = { item_code: r.item_code || "", brand: r.brand || "", size: r.size || "", pack: r.pack == null ? "" : String(r.pack), coverage_days: null, qty: 0 }); o.qty += n(r.qty); if (r.coverage_days != null && r.coverage_days !== "" && isFinite(+r.coverage_days)) o.coverage_days = Math.max(o.coverage_days == null ? -1 : o.coverage_days, +r.coverage_days); });
+      var list = Object.keys(g).map(function (k) { return g[k]; }).sort(function (a, b) { return (a.coverage_days == null ? 1e9 : a.coverage_days) - (b.coverage_days == null ? 1e9 : b.coverage_days); });
+      var lab = (f.sizeNum ? f.sizeNum + (/\./.test(f.sizeNum) || +f.sizeNum < 20 ? " L" : " ml") : (f.size || []).join("/")) + (f.pack && f.pack.length ? " × " + f.pack.join("/") : "") + (f.cities && f.cities.length ? " — " + f.cities.map(function (c) { return cityLabel(c, en); }).join("، ") : "");
+      if (!list.length) return { t: (en ? "No FG items found for " : "لا توجد أصناف في تقرير FG لـ ") + lab + "." };
+      var L = [(en ? "**Coverage of " : "**تغطية ") + lab + (en ? "** (how many days current stock lasts):" : "** (كم يوم يكفي الرصيد الحالي):")];
+      list.slice(0, 10).forEach(function (it, i) { L.push((i + 1) + ". " + [it.item_code, [it.brand, it.size, it.pack ? "× " + it.pack : ""].filter(Boolean).join(" ")].filter(Boolean).join(" — ") + " — " + (it.coverage_days == null ? (en ? "no coverage data" : "لا توجد بيانات تغطية") : (en ? "lasts " : "يكفي ") + "**" + it.coverage_days + "** " + (en ? "days" : "يوم")) + " — " + (en ? "stock " : "الرصيد ") + fmt(it.qty)); });
+      if (list.length > 10) L.push((en ? "…and " : "…و ") + (list.length - 10) + (en ? " more items in the table." : " أصناف أخرى في الجدول."));
+      L.push(en ? "\nCoverage is taken from the FG report coverage column (one value per item)." : "\nالتغطية مأخوذة من عمود التغطية في تقرير FG (قيمة واحدة لكل صنف).");
+      var rid = env.mkRes({ title: (en ? "Coverage — " : "التغطية — ") + lab, dataset: "fg", page: "rfgbal", columns: [{ key: "item_code", label: "كود الصنف", type: "string" }, { key: "brand", label: "الماركة", type: "string" }, { key: "size", label: "الحجم", type: "string" }, { key: "pack", label: "الشد", type: "string" }, { key: "coverage_days", label: "التغطية (يوم)", type: "number" }, { key: "qty", label: "الرصيد", type: "number" }], rows: list, sources: ["fg"] });
+      return { t: L.join("\n") + "\n" + (en ? "Source: " : "المصدر: ") + src(["fg"]), rids: [rid] };
+    };
     H.compare = function (f) {
       var en = f.en; if (!f.cities || f.cities.length < 2) return { t: en ? "Which branches should I compare? e.g. “compare Riyadh and Jeddah”." : "أي فروع تريد مقارنتها؟ مثل: «قارن الرياض وجدة»." };
       var rows = perCity(f); var miss = f.cities.filter(function (c) { return !rows.some(function (r) { return r.city === c; }); });
@@ -18805,10 +18853,12 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
     /* ---------- فهم السؤال ---------- */
     function intentOf(q) {
       if (/(تقرير|report|ملخص تنفيذي|executive)/.test(q)) return "report";
+      if (/(يكفي|يكفى|تكفي|بيكفي|يكفينا|يغطي|يغطى|بيغطي|كفايه|كفايه المبيعات|days of cover|how many days|how long will)/.test(q) && /(\d+(?:\.\d+)?\s*(مل|ملي|ml|لتر|l\b)|\d{6,10})/.test(q)) return "itemcov";
       if (/(الشهر (السابق|الماضي|اللي فات)|الشهر اللي قبل|last month|previous month|month over month)/.test(q)) return "period";
       if (/(استهلاك|معدل الصرف|المنصرف|الصرف|المبيعات|مبيعات|consumption|issued|sales rate|dispatch rate)/.test(q)) return "consumption";
       if (/(اسباب|سبب|ليش|لماذا|ليه|\bwhy\b|reasons?)/.test(q) && /(تغطي|coverage|نفاد|نقص)/.test(q)) return "causes";
       if (/(نفاد|نفاذ|تنفد|ينفد|تخلص|يخلص|بيخلص|هيخلص|راح يخلص|حيخلص|خلصان|قربت تخلص|run ?out|stock ?out|low coverage|منخفض\S* التغطي|قليل\S* التغطي|التغطيه (المنخفضه|القليله))/.test(q)) return "runout";
+      if (/(يكفي|يكفى|تكفي|بيكفي|يكفينا|تكفينا|يغطي|يغطى|بيغطي|تغطي|يقضي|كفايه|كم يوم|كم ايام|عدد ايام|عدد الايام|coverage|days of cover|how many days|how long will)/.test(q) && !/(زائد|زايد|فائض|فايض|excess)/.test(q)) return "itemcov";
       if (/(زائد|زايد|زياده|فائض|فايض|excess|overstock|over stock|اكثر من الحاجه|متكدس عندنا)/.test(q)) return "excess";
       if (/(تجاوز|اكثر من|اكبر من|فوق|over|older than|above|more than)\s*\S*\s*(\d{2,3})\s*(يوم|ايام|يوما|days?)/.test(q) && /(عمر|age|aged|old|اصناف|items)/.test(q)) return "ageover";
       if (/(راكد|ركود|متقادم|stagnant|\bstale\b|slow ?moving|فتره طويله|مده طويله|وقت طويل|من زمان|قديمه|القديمه|مكدس|متكدس|مركون|ما (ي|ت)تحرك|بطي\S* الحركه|aging|اعمار المخزون|اعمار)/.test(q)) return "stale";
@@ -18822,7 +18872,12 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
       cityOf: cityOf,
       ask: function (text, ctx) {
         ctx = ctx || {}; var q0 = nz(text), q = (typeof WADIALECT !== "undefined" ? nz(WADIALECT.norm(text)) : q0).replace(/ئ/g, "ي").replace(/ؤ/g, "و"), en = /[a-z]{2,}/.test(q0) && !/[؀-ۿ]/.test(q0), it = intentOf(q), lo = /(بالانجليزي|بالانجليزيه|انجليزي|in english|translate|ترجم)/.test(q) ? true : /(بالعربي|in arabic|عربي)/.test(q) ? false : null, cs = citiesIn(q), top = topIn(q), days = daysIn(q), e = env.ents ? env.ents(text) : {};
-        var prev = ctx.wa && ctx.fresh ? ctx.wa : null;
+        var prev = ctx.wa && ctx.fresh ? ctx.wa : null, sn = sizeNumIn(q);
+        var pk = packIn(q), cd = codeIn(q), TT = itemsT(), bn = TT ? WAITEM.brandIn(TT, q) : "";
+        if (!sn && TT) { var bm = q.match(/(?:^| )(\d{3,4})(?= |$)(?! ?(يوم|ايام|يوما|days?|شهر|%))/); if (bm && TT.rows.some(function (o) { return String(o.size).trim() === bm[1] || new RegExp("(^|[^0-9])" + bm[1] + "\\s*ml", "i").test(String(o.pack)); })) sn = bm[1]; }
+        if (pk && !(e.pack && e.pack.length)) e.pack = [pk];
+        if (sn || cd || (e.size && e.size.length) || (e.pack && e.pack.length)) LAST = { size: e.size || [], pack: e.pack || [], sizeNum: sn, code: cd, brand: bn, cities: cs, at: Date.now() };
+        if (!it && TT && (sn || cd) && /(رصيد|ارصده|الرصيد|كم عندنا|كم عندي|كم متوفر|متوفر|متاح|المتاح|الكميه|كم كميه|موجود|كم باقي|stock|balance|how many|how much|on hand)/.test(q)) it = "itembal";
         if (!it && prev && (cs.length || top || days || lo != null || (e.size && e.size.length)) && q.split(" ").length <= 8) it = prev.intent;
         if (lo != null) en = lo; else if (prev && prev.en != null && !/[a-z]{2,}/.test(q) && !/[؀-ۿ]/.test(q)) en = prev.en;
         if (!it) return null;
@@ -18835,6 +18890,7 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
           if (!f.size.length && prev.size && prev.intent === it) f.size = prev.size;
           if (!days && prev.days && prev.intent === it) f.days = prev.days;
         }
+        if (it === "itemcov" || it === "itembal") { f.sizeNum = sn; f.code = cd; f.brand = bn; if (!sn && !cd && !f.size.length && !f.pack.length && LAST && Date.now() - LAST.at < 900000) { f.size = LAST.size; f.pack = LAST.pack; f.sizeNum = LAST.sizeNum; f.code = LAST.code; f.brand = f.brand || LAST.brand; if (!cs.length) f.cities = LAST.cities || []; } }
         if (it === "ageover") { var m = q.match(/(\d{2,3})\s*(يوم|ايام|يوما|days?)/); f.ageOver = m ? +m[1] : 180; }
         if (it === "compare" && /(الفروع|كل الفروع|all branches|branches)/.test(q) && f.cities.length < 2) f.cities = CITY.map(function (c) { return c[0]; });
         if (it === "compare" && f.top && /(aging|اعمار|متقادم|راكد|اقدم)/.test(q)) it = "stale";
@@ -18883,6 +18939,7 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
   var WAC = WACHAT({
     rows: function (id) { try { if (!permitted(id)) return null; return dsGet(id, false); } catch (e) { return null; } },
     nz: nz, fmt: function (x) { return fmtN(x); }, mkRes: waMkRes,
+    items: function () { try { return window.WAITEM ? WAITEM.get(false) : null; } catch (e) { return null; } },
     ents: function (t) { var o = { size: [], pack: [] }; try { AIIE.findEntities(t, ["size"]).forEach(function (c) { if (c.field === "size" && c.score >= .85 && !c.multi && o.size.indexOf(c.value) < 0) o.size.push(c.value); }); var pm = nz(t).match(/(?:شد|×|\*)\s*(\d{1,3})/); if (pm) o.pack.push(pm[1]); } catch (e) { } return o; }
   });
   AIIE.waLocal = function (text, ctx) {
@@ -18898,6 +18955,7 @@ wrap();"loading"===document.readyState&&document.addEventListener("DOMContentLoa
     return { wh: Object.keys(wh).sort(), br: Object.keys(br).sort() };
   };
   AIIE.permitted = permitted;
+  AIIE.ds = function (id, raw) { return dsGet(id, raw); }; AIIE.dataSig = function () { return sig(); };
   AIIE.titleOf = function (id) { return DEFS[id] ? DEFS[id].title : id; };
   AIIE.pageOf = function (id) { return DEFS[id] ? DEFS[id].page : null; };
   AIIE.allIds = function () { return Object.keys(DEFS); };
@@ -19520,9 +19578,26 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
   }
   function normT(s) { return String(s || "").toLowerCase().replace(/[ً-ْـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/[^a-z0-9؀-ۿ ]+/g, " ").replace(/\s+/g, " ").trim(); }
   function wantsDetail(text) { var s = String(text || ""); return { t: /جدول|تفاصيل|التفصيل|بالتفصيل|كل الصفوف|اكسل|إكسل|excel|pdf|بي دي اف|صورة|تقرير|رسم|مخطط|بياني|chart|table|graph|تصدير/i.test(s), c: /رسم|مخطط|بياني|chart|graph|plot/i.test(s) }; }
+  /* ردود تحية حسب ما قاله المستخدم (السلام ← وعليكم السلام، صباح الخير ← صباح النور، هاي/هلا/مرحبا…) */
+  function greetReply(t, words) {
+    if (!t || words > 6 || /[0-9]|رصيد|مخزون|تغطي|يكفي|صنف|فرع|مستودع|مصنع|تقرير|اعمار|ترانزيت/.test(t)) return null;
+    var nm = dispName(), n = nm ? " " + nm : "", how = /(كيف الحال|كيف حالك|كيفك|كيفكم|شلونك|شلونكم|شخبارك|وش اخبارك|ايش اخبارك|ايش لونك|عامل ايه|عاملين ايه|ازيك|ازيكم|اخبارك)/.test(t), g = null;
+    if (/^(ال)?سلام عليكم|^(ال)?سلام( |$)|^السلام عليكم ورحمه/.test(t)) g = "وعليكم السلام ورحمة الله وبركاته" + (nm ? "، أهلًا " + nm : "");
+    else if (/^(صباح الخير|صباح النور|صباحو|صباح الورد|صباح الفل)/.test(t)) g = "صباح النور والسرور" + n;
+    else if (/^(مساء الخير|مسا الخير|مساء النور|مساء الورد|مسا النور)/.test(t)) g = "مساء النور" + n;
+    else if (/^(يا )?هلا( |$)|^هلا والله|^هلا وغلا|^هلا بك|^هلابك/.test(t)) g = "هلا وغلا" + n + "، حيّاك الله";
+    else if (/^(مرحبا|مرحبتين|مرحبه|مرحب)( |$)/.test(t)) g = "مرحبتين" + n + "، أهلًا وسهلًا";
+    else if (/^(اهلا|اهلين|اهلا وسهلا|هلا وسهلا)( |$)/.test(t)) g = "أهلًا وسهلًا" + n;
+    else if (/^(هاي|هايي|هلو|هالو|هاللو|هيلو|hi|hello|hey)( |$)/.test(t)) g = "أهلًا" + n + "، يا هلا";
+    else if (how && words <= 5) g = "";
+    if (g === null) return null;
+    var say = (g ? g + ". " : "") + (how ? "الحمد لله بخير، عساك بخير. " : "") + "كيف أقدر أساعدك اليوم؟";
+    return { t: say + "\nاسألني مثلًا: كم رصيد 600 مل؟ أو كم يوم يكفي المخزون؟", say: say };
+  }
+  AIIE.greet = function (t) { var x = normT(t); return greetReply(x, x.split(" ").length); };
   function smallTalk(text) {
     var t = normT(text); if (!t || t.length > 45) return null; var chips = SUG.slice(0, 3), words = t.split(" ").length;
-    if (words <= 4 && /^(مرحبا|اهلا|هلا|السلام عليكم|سلام|صباح الخير|مساء الخير|hi|hello|hey)( |$)/.test(t)) return { t: helloTitle().replace(/[!！]*\s*$/, "") + ". " + helloBody(), chips: chips, say: "هلا والله! تفضّل، اسألني عن المخزون أو أي فرع." };
+    var _g = greetReply(t, words); if (_g) return { t: _g.t, chips: chips, say: _g.say };
     if (/(شكرا|مشكور|يعطيك العافيه|تسلم|thanks|thank you)/.test(t)) return { t: "العفو! أنا جاهز لأي سؤال آخر عن البيانات. 🙂", chips: [] };
     if (/(اسمك|اسمي ايه|عرف نفسك|عرفني بنفسك|تعرف بنفسك|سم نفسك)/.test(t)) return { t: "اسمي **" + botName() + "** 👋 مساعدك الذكي في المستودعات. اسألني عن أرصدة الإنتاج التام أو أعمار المخزون أو الترانزيت أو المساحات.", chips: chips };
     if (/(من انت|مين انت|ما اسمك|وش اسمك|who are you)/.test(t)) return { t: "أنا " + botName() + "، مساعدك الذكي في المستودعات، مساعد تحليلي للقراءة فقط. أجيب عن أسئلتك من بيانات المنصة الفعلية، ولا أستطيع تعديل أو حذف أي بيانات.", chips: chips };
@@ -20055,12 +20130,13 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
       '<div class="ai-card"><h4 style="margin:0 0 10px;color:#12325a">📜 سجل العمليات والأخطاء (آخر 40 على هذا الجهاز)</h4><div class="ai-tw"><table><thead><tr><th>الوقت</th><th>المستخدم</th><th>السؤال</th><th>الوضع</th><th>ms</th><th>Tokens</th><th>الحالة</th></tr></thead><tbody>' + L.slice(0, 40).map(function (e) { return "<tr><td>" + new Date(e.t).toLocaleString("en-GB") + "</td><td>" + esc(e.u) + "</td><td>" + esc(e.q) + "</td><td>" + esc(e.mode) + "</td><td class='n'>" + (e.ms || "") + "</td><td class='n'>" + ((e.tin || 0) + (e.tout || 0)) + "</td><td>" + (e.ok ? "✔" : "⚠ " + esc(e.err || "")) + "</td></tr>"; }).join("") + "</tbody></table></div></div>"];
     return adminTab(tab, cards, c, users, t);
   }
-  var TABS = [["ov", "📊 نظرة عامة"], ["ft", "🎛️ المميزات والتحكم"], ["vc", "🎙️ الصوت والرد"], ["ln", "🔌 الربط والبيانات"], ["pv", "💳 المزوّد والميزانية"], ["st", "🧪 الاختبار الذاتي"], ["lg", "📜 السجل والصيانة"], ["pm", "🔐 الصلاحيات"]];
+  var TABS = [["ov", "📊 نظرة عامة"], ["ft", "🎛️ المميزات والتحكم"], ["vc", "🎙️ الصوت والرد"], ["ln", "🔌 الربط والبيانات"], ["pv", "💳 المزوّد والميزانية"], ["dt", "🗂️ بيانات المساعد"], ["st", "🧪 الاختبار الذاتي"], ["lg", "📜 السجل والصيانة"], ["pm", "🔐 الصلاحيات"]];
   function adminTab(tab, cards, c, users, t) {
     tab = tab || S.admTab || "ov";
     if (tab === "ft") return featuresCard(c);
     if (tab === "st") return window.WATEST ? WATEST.html() : '<div class="ai-card">غير متاح</div>';
     if (tab === "pv") return window.WAPROV ? WAPROV.html() : '<div class="ai-card">غير متاح</div>';
+    if (tab === "dt") return window.WAITEMUI ? WAITEMUI.html() : '<div class="ai-card">غير متاح</div>';
     if (tab === "vc") return cards[1];
     if (tab === "ln") return cards[2] + '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🔌 اختبار الاتصال بـ Claude</h4><div class="ai-src" style="margin-bottom:8px">يفحص: رابط Worker ← استجابته ← مفتاح Claude ← توثيق Firebase. إذا لم ينجح الاختبار يعمل المساعد بالفهم المحلي المحدود فقط (وقد يخطئ).</div><div class="ai-act"><button data-a="wtest">▶ ابدأ الاختبار</button></div><div id="ai-wtest" dir="auto" style="margin-top:8px;white-space:pre-line;font-weight:700;color:#12325a">' + (S.wtest || "") + "</div></div>";
     if (tab === "lg") return cards[3] + '<div class="ai-card"><h4 style="margin:0 0 10px;color:#12325a">🧹 الصيانة</h4><div class="ai-act"><button data-a="clrlog">🧹 مسح السجل والاستهلاك (هذا الجهاز)</button><button data-a="health">🔌 اختبار الاتصال</button><button data-a="cfgexp">⬇ تصدير الإعدادات (JSON)</button><button data-a="cfgreset" style="background:#fde2e2;color:#b91c1c">↺ إعادة الإعدادات للافتراضي</button></div><div class="ai-src" style="margin-top:6px">إعادة الضبط تحذف إعدادات المساعد المحفوظة (محلياً وفي السحابة) وتعيد كل شيء للقيم الافتراضية.</div></div>';
@@ -20306,7 +20382,8 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var want = VC().voice; if (want && /^ar/i.test(lang)) { var uv = vs.filter(function (x) { return x.name === want; })[0]; if (uv) return uv; }
     var base = lang.slice(0, 2), c = vs.filter(function (x) { return x.lang && x.lang.toLowerCase().replace("_", "-").indexOf(base) === 0; });
     if (!c.length) return null;
-    var score = function (x) { var n = (x.name || "").toLowerCase(), sc = 0; if (/natural|neural|online/.test(n)) sc += 6; if (/google/.test(n)) sc += 4; if (/hoda|naayf|zariyah|hamed|laila|maged|tarik|salma/.test(n)) sc += 3; if (x.lang && x.lang.toLowerCase().replace("_", "-") === lang.toLowerCase()) sc += 2; if (x.localService === false) sc += 1; return sc; };
+    var femPref = false; try { femPref = !!(window.WAVOICE && WAVOICE._V.health && /^(kore|aoede|leda|zephyr|callirrhoe|autonoe|despina|erinome|laomedeia|achernar|gacrux|pulcherrima|vindemiatrix|sulafat)$/i.test(WAVOICE._V.health.ttsVoice || "")); } catch (e) { }
+    var score = function (x) { var n = (x.name || "").toLowerCase(), sc = 0; if (femPref && FEM_N.test(x.name || "")) sc += 5; if (femPref && MALE_N.test(x.name || "")) sc -= 2; if (/natural|neural|online/.test(n)) sc += 6; if (/google/.test(n)) sc += 4; if (/hoda|naayf|zariyah|hamed|laila|maged|tarik|salma/.test(n)) sc += 3; if (x.lang && x.lang.toLowerCase().replace("_", "-") === lang.toLowerCase()) sc += 2; if (x.localService === false) sc += 1; return sc; };
     c.sort(function (a, b) { return score(b) - score(a); }); return c[0];
   }
   function speakSegs(segs, onDone, browserOnly) {
@@ -20314,16 +20391,25 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     var fin = function () { if (tok !== S.spkTok) return; S.speaking = false; try { clearInterval(S.spkKA); } catch (e) { } try { window.WAORB && WAORB.tts({ t: "e" }); } catch (e) { } onDone && onDone(); };
     if (A.cfg().ft_tts === false || !segs || !segs.length) { S.speaking = false; onDone && setTimeout(fin, 0); return; }
     /* الصوت الطبيعي (Gemini TTS عبر الـ Worker): طابور + تحميل مسبق + مستوى صوت حقيقي للكرة؛ عند الفشل يكمل صوت المتصفح من حيث توقف */
+    /* الصوت الموحّد للمنصة: نفس الصوت لكل المستخدمين والأجهزة والمتصفحات (يُختار من لوحة المدير). صوت المتصفح فقط عند تعطّل الخادم */
+    var unified = A.cfg().tts_unified !== false;
+    if (!browserOnly && window.WAVOICE && !WAVOICE.checked()) { S.speaking = true; WAVOICE.ready(function () { if (tok === S.spkTok) speakSegs(segs, onDone, false); }); return; }
     if (!browserOnly && window.WAVOICE && WAVOICE.usable()) {
-      S.speaking = true; vlog("gtts", segs.length);
+      S.speaking = true; vlog("gtts", segs.length + (unified ? " unified" : ""));
       try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) { }
       WAVOICE.speak(segs, {
-        tx: gemText,
-        start: function (i, t) { if (tok !== S.spkTok) return; vlog("gtts-start", i); S.ttsStarted = true; try { window.WAORB && WAORB.tts({ t: "s", s: t }); } catch (e) { } },
+        tx: gemText, unified: unified, firstMs: unified ? 20000 : (+A.cfg().tts_first_ms || 4000), nextMs: unified ? 20000 : 3500,
+        start: function (i, t) { if (tok !== S.spkTok) return; vlog("gtts-start", i + " " + (WAVOICE._V.lastMs || 0) + "ms"); S.ttsStarted = true; try { window.WAORB && WAORB.tts({ t: "s", s: t }); } catch (e) { } },
         progress: function (i, t, r, l) { if (tok !== S.spkTok) return; try { window.WAORB && WAORB.tts({ t: "p", s: t, r: r, l: l }); } catch (e) { } },
         end: function (i) { vlog("gtts-end", i); },
         done: fin,
-        fallback: function (rest, err) { vlog("gtts-fallback", String(err && (err.status || err.message) || "x")); if (tok !== S.spkTok) return; speakSegs(rest, onDone, true); }
+        fallback: function (rest, err) {
+          vlog("gtts-fallback", String(err && (err.status || err.message) || "x")); if (tok !== S.spkTok) return;
+          /* في الوضع الموحّد: محاولة ثانية بعد ثانية ونصف قبل اللجوء لصوت المتصفح */
+          if (unified && !segs.__retried) { var r2 = rest.slice(); r2.__retried = true; setTimeout(function () { if (tok === S.spkTok) speakSegs(r2, onDone, false); }, 1500); return; }
+          if (unified && !S.ttsWarned) { S.ttsWarned = true; try { toast("تعذّر صوت المنصة الموحّد الآن (" + String(err && (err.status || err.message) || "") + ") — استُخدم صوت الجهاز مؤقتًا", false); } catch (e) { } }
+          speakSegs(rest, onDone, true);
+        }
       });
       return;
     }
@@ -20437,7 +20523,7 @@ var AIW_ROBOT="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAw
     try {
       if (!t) return false; if (smallTalk(t)) return true;
       var q = window.WADIALECT ? WADIALECT.norm(t) : String(t);
-      var dom = /(رصيد|مخزون|المخزون|مستودع|مصنع|فرع|فروع|صنف|اصناف|كرتون|قارور|تغطي|ركود|راكد|متقادم|زائد|نقص|ينفد|ترانزيت|عمر|اعمار|مساح|قارن|مقارن|تقرير|مشاكل|مشكل|المشكلات|تحليل|حلل|الرياض|جده|جدة|الدمام|القصيم|الاحساء|الخرج|هيت|مل|لتر|جالون|شد|كود|هويه|انتاج|حاله|وضع|اليوم|الشهر|[0-9]|stock|inventory|warehouse|branch|aging|coverage|balance|report|riyadh|jeddah|dammam)/i.test(q);
+      var dom = /(رصيد|مخزون|المخزون|مستودع|مصنع|فرع|فروع|صنف|اصناف|كرتون|قارور|تغطي|يغطي|يغطى|يكفي|يكفى|تكفي|كفايه|كفاية|يوم|ايام|أيام|ملي|ركود|راكد|متقادم|زائد|نقص|ينفد|ترانزيت|عمر|اعمار|مساح|قارن|مقارن|تقرير|مشاكل|مشكل|المشكلات|تحليل|حلل|الرياض|جده|جدة|الدمام|القصيم|الاحساء|الخرج|هيت|مل|لتر|جالون|شد|كود|هويه|انتاج|حاله|وضع|اليوم|الشهر|[0-9]|stock|inventory|warehouse|branch|aging|coverage|balance|report|riyadh|jeddah|dammam)/i.test(q);
       if (!dom) return false;
       return !(conf != null && conf < 0.45);
     } catch (e) { return true; }
@@ -22950,11 +23036,14 @@ if(!o.workerUrl){o.workerUrl=U;localStorage.setItem(K,JSON.stringify(o))}}catch(
   if (window.WAVOICE) return;
   var V = { health: null, healthAt: 0, ac: null, gain: null, an: null, buf: null, tok: 0, src: null, paused: false, cache: {} };
   function url() { try { return String(AIIE.cfg().workerUrl || "").replace(/\/+$/, ""); } catch (e) { return ""; } }
-  function refresh() {
-    var u = url(); if (!u || Date.now() - V.healthAt < 300000) return; V.healthAt = Date.now();
-    fetch(u + "/health", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { V.health = j; }).catch(function () { V.health = null; });
+  function refresh(force) {
+    var u = url(); if (!u) { V.checked = true; return Promise.resolve(); } if (!force && Date.now() - V.healthAt < 300000) return V.hp || Promise.resolve(); V.healthAt = Date.now();
+    V.hp = fetch(u + "/health", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { V.health = j; }).catch(function () { V.health = null; }).then(function () { V.checked = true; });
+    return V.hp;
   }
-  function usable() { refresh(); try { if (AIIE.cfg().ft_cloudtts === false) return false; } catch (e) { } return !!(V.health && V.health.tts) && !!(window.AudioContext || window.webkitAudioContext); }
+  /* ready(cb): ينتظر معرفة حالة الصوت الموحّد من الخادم (حتى 3 ثوانٍ) قبل أول نطق */
+  function ready(cb) { if (V.checked) return cb(); var done = false, fin = function () { if (!done) { done = true; cb(); } }; setTimeout(fin, 3000); try { (refresh(true) || Promise.resolve()).then(fin, fin); } catch (e) { fin(); } }
+  function usable() { refresh(); try { if (AIIE.cfg().ft_cloudtts === false) return false; } catch (e) { } if (V.slowUntil && Date.now() < V.slowUntil) return false; return !!(V.health && V.health.tts) && !!(window.AudioContext || window.webkitAudioContext); }
   function token() { return new Promise(function (res, rej) { try { var a = _fbAuthObj(), u = a && a.currentUser; if (!u) return rej(new Error("no-auth")); u.getIdToken().then(res, rej); } catch (e) { rej(e); } }); }
   function vol() { try { var o = JSON.parse(localStorage.getItem("ai_voice_v1") || "{}"); return o.vol != null ? Math.max(0.05, Math.min(1, +o.vol)) : 1; } catch (e) { return 1; } }
   function ctx() {
@@ -22962,15 +23051,15 @@ if(!o.workerUrl){o.workerUrl=U;localStorage.setItem(K,JSON.stringify(o))}}catch(
     try { if (V.ac.state === "suspended" && !V.paused) V.ac.resume(); } catch (e) { }
     V.gain.gain.value = vol(); return V.ac;
   }
-  /* تقسيم إلى جمل كاملة: لا تُقطع كلمة ولا جملة؛ المقطع الأول ≤ 140 حرفًا ثم ≤ 280 */
+  /* تقسيم إلى جمل كاملة: لا تُقطع كلمة؛ المقطع الأول قصير جدًا (≤ 70 حرفًا) ليبدأ الصوت بسرعة ثم ≤ 150 */
   function sentences(segs) {
     var t = (Array.isArray(segs) ? segs.join(" ") : String(segs || "")).replace(/\s+/g, " ").trim(); if (!t) return [];
     var parts = t.match(/(?:[^.!?؟\n]|\.(?=\d))+[.!?؟]*/g) || [t], out = [], cur = ""; /* النقطة بين رقمين (1.5) ليست نهاية جملة */
     parts.forEach(function (p) {
-      p = p.trim(); if (!p) return; var lim = out.length ? 280 : 140;
+      p = p.trim(); if (!p) return; var lim = out.length ? 150 : 55;
       if ((cur + " " + p).trim().length <= lim) { cur = (cur + " " + p).trim(); return; }
       if (cur) out.push(cur); cur = "";
-      while (p.length > lim) { var k = p.lastIndexOf("، ", lim); if (k < 40) k = p.lastIndexOf(" ", lim); if (k < 40) k = lim; out.push(p.slice(0, k + 1).trim()); p = p.slice(k + 1).trim(); lim = 280; }
+      while (p.length > lim) { var k = p.lastIndexOf("، ", lim); if (k < 20) k = p.lastIndexOf(" ", lim); if (k < 20) k = lim; out.push(p.slice(0, k + 1).trim()); p = p.slice(k + 1).trim(); lim = 150; }
       cur = p;
     });
     if (cur) out.push(cur); return out;
@@ -22998,38 +23087,206 @@ if(!o.workerUrl){o.workerUrl=U;localStorage.setItem(K,JSON.stringify(o))}}catch(
     function alive() { return my === V.tok; }
     function next() {
       if (!alive()) return; if (i >= list.length) { h.done && h.done(); return; }
-      var idx = i, text = list[idx];
+      var idx = i, text = list[idx], ready = false, t0q = Date.now();
+      /* حد انتظار: إن تأخر الصوت الطبيعي يكمل صوت المتصفح فورًا (السرعة أولًا)، ويُعلَّق الصوت الطبيعي 10 دقائق إن تأخر أول مقطع */
+      var wait = idx === 0 ? (+h.firstMs || 2500) : (+h.nextMs || 3500);
+      var tmo = setTimeout(function () { if (ready || !alive()) return; V.tok++; if (idx === 0 && !h.unified) V.slowUntil = Date.now() + 180000; var e = new Error("slow"); e.status = "slow"; h.fallback ? h.fallback(list.slice(idx), e) : (h.done && h.done()); }, wait);
+      if (idx === 0) { fetchSeg(h.tx ? h.tx(text) : text).catch(function () { }); for (var k0 = 1; k0 <= 2 && k0 < list.length; k0++) fetchSeg(h.tx ? h.tx(list[k0]) : list[k0]).catch(function () { }); } /* المقطع الأول أولًا ثم تجهيز متوازٍ للمقطعين التاليين */
       fetchSeg(h.tx ? h.tx(text) : text).then(function (buf) {
-        if (!alive()) return;
-        if (idx + 1 < list.length) fetchSeg(h.tx ? h.tx(list[idx + 1]) : list[idx + 1]).catch(function () { }); /* تحميل المقطع التالي مسبقًا */
+        ready = true; clearTimeout(tmo); if (!alive()) return; V.lastMs = Date.now() - t0q;
+        for (var k = 1; k <= 2 && idx + k < list.length; k++) fetchSeg(h.tx ? h.tx(list[idx + k]) : list[idx + k]).catch(function () { }); /* تحميل المقطعين التاليين مسبقًا */
         var ac = ctx(), src = ac.createBufferSource(); src.buffer = buf; src.connect(V.gain); V.src = src;
         var t0 = ac.currentTime + 0.03, dur = buf.duration, raf = 0;
         h.start && h.start(idx, text);
         (function tick() { if (!alive() || V.src !== src) return; var r = Math.max(0, Math.min(1, (ac.currentTime - t0) / dur)); h.progress && h.progress(idx, text, r, level()); raf = requestAnimationFrame(tick); })();
         src.onended = function () { cancelAnimationFrame(raf); if (!alive() || V.src !== src) return; h.end && h.end(idx); i++; next(); };
         src.start(t0);
-      }).catch(function (e) { if (!alive()) return; h.fallback ? h.fallback(list.slice(idx), e) : (h.done && h.done()); });
+      }).catch(function (e) { ready = true; clearTimeout(tmo); if (!alive()) return; h.fallback ? h.fallback(list.slice(idx), e) : (h.done && h.done()); });
     }
     next();
   }
   window.WAVOICE = {
-    usable: usable, speak: speak, stop: stop, sentences: sentences, refresh: refresh,
+    usable: usable, speak: speak, stop: stop, sentences: sentences, refresh: refresh, ready: ready, checked: function () { return !!V.checked; },
     pause: function () { if (V.ac && V.src) { V.paused = true; V.ac.suspend(); return true; } return false; },
     resume: function () { if (V.ac && V.paused) { V.paused = false; V.ac.resume(); return true; } return false; },
     isPaused: function () { return !!V.paused; }, isActive: function () { return !!V.src; },
     unlock: function () { try { if (window.AudioContext || window.webkitAudioContext) ctx(); } catch (e) { } }, _V: V
   };
   setTimeout(refresh, 2500);
+  /* تجهيز صوت التحيات مسبقًا مرة يوميًا (تُخزَّن في ذاكرة الجلسة وفي ذاكرة الـ Worker) ليبدأ الرد على «السلام عليكم/هلا/مرحبا» فورًا */
+  setTimeout(function warm() {
+    try {
+      if (!usable() || !window.AIIE || !AIIE.greet) return; var d = new Date().toISOString().slice(0, 10), k = "wa_tts_warm"; if (localStorage.getItem(k) === d) return;
+      ["السلام عليكم", "هلا", "مرحبا", "هاي"].forEach(function (g, i) { setTimeout(function () { var r = AIIE.greet(g); if (r && r.say) sentences(r.say).slice(0, 1).forEach(function (x) { fetchSeg(x).catch(function () { }); }); }, i * 2500); });
+      localStorage.setItem(k, d);
+    } catch (e) { }
+  }, 9000);
 })();
 /* WA-VOICE-END */
 </script>
+<script id="wa-items-js">
+/* WA-ITEMS-BEGIN — «بيانات المساعد»: جدول موحّد لكل صنف يُبنى تلقائيًا من شاشات المنصة عند تغيّر البيانات (قراءة فقط)
+   الأرصدة لكل فرع + الإجمالي · OLD · الترانزيت · أعمار المخزون · التغطية (FG) · أيام كفاية المبيعات (محسوبة من WSO)
+   + أي تقرير آخر فيه كود صنف وأعمدة رقمية يُضاف تلقائيًا. قواعد المدير: دمج أسماء البراند (Krones → Tania) وإخفاء صفوف. */
+var WAITEM = (function () {
+  var DEF_RULES = { alias: { "krones": "Tania", "kronz": "Tania", "كرونز": "Tania", "tania": "Tania", "تانيا": "Tania", "new identity": "Tania", "old identity": "Tania" }, hide: [], hideBrands: [], defaultBrand: "Tania", salesDays: 30 };
+  var KNOWN = { fg: 1, old: 1, transit: 1, aging: 1, wso: 1, master: 1, fg_history: 1, space: 1, bottle: 1, btl5g: 1, whp: 1, attachment: 1 };
+  function n(v) { v = typeof v === "number" ? v : parseFloat(String(v == null ? "" : v).replace(/,/g, "")); return isFinite(v) ? v : null; }
+  function r1(v) { return Math.round(v * 10) / 10; }
+  function key(s) { return String(s == null ? "" : s).trim().toLowerCase().replace(/^\d+\s*[-.]\s*/, ""); }
+  function rulesOf(r) {
+    r = r || {}; var o = { alias: {}, hide: (r.hide || []).map(String), hideBrands: (r.hideBrands || []).map(key), defaultBrand: r.defaultBrand == null ? DEF_RULES.defaultBrand : String(r.defaultBrand), salesDays: +r.salesDays > 0 ? +r.salesDays : DEF_RULES.salesDays };
+    Object.keys(DEF_RULES.alias).forEach(function (k) { o.alias[k] = DEF_RULES.alias[k]; });
+    Object.keys(r.alias || {}).forEach(function (k) { if (k) o.alias[key(k)] = String(r.alias[k] || "").trim(); });
+    return o;
+  }
+  function brandOf(raw, R) { var k = key(raw); if (!k) return ""; return R.alias[k] != null ? R.alias[k] : String(raw).trim(); }
+
+  /* rows(id) → {rows, asOf, title} | null — نفس صلاحيات المستخدم */
+  function build(rows, rules, extraIds) {
+    var R = rulesOf(rules), G = {}, br = {}, srcs = [], asOf = "";
+    function it(code) { code = String(code == null ? "" : code).trim(); if (!code) return null; return G[code] || (G[code] = { item_code: code, brand_raw: "", brand: "", identity: "", size: "", pack: "", category: "", description: "", qty: 0, by_branch: {}, old_qty: 0, transit_qty: 0, aging_qty: 0, age_max: null, age_avg: null, stale_qty: 0, oldest: "", coverage_days: null, sales_daily: null, sales_days: null, extra: {}, _aw: 0 }); }
+    function note(id, d) { if (!d) return; srcs.push((d.title || id) + (d.asOf ? " · " + String(d.asOf).slice(0, 10) : "")); if (d.asOf && String(d.asOf) > asOf) asOf = String(d.asOf).slice(0, 10); }
+    var M = rows("master"); if (M) M.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; o.brand_raw = o.brand_raw || r.brand; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.category = o.category || r.category; });
+    var A = rows("aging"); if (A) { note("aging", A); A.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; if (r.logo) o.brand_raw = r.logo; o.identity = o.identity || r.identity; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.category = o.category || r.category; o.description = o.description || r.item_name; var q = n(r.qty) || 0; o.aging_qty += q; if (r.age_days != null) { o.age_max = o.age_max == null ? r.age_days : Math.max(o.age_max, r.age_days); o._aw += q * r.age_days; if (r.age_days > 180) o.stale_qty += q; } if (r.prod_date && (!o.oldest || r.prod_date < o.oldest)) o.oldest = String(r.prod_date).slice(0, 10); }); }
+    var F = rows("fg"); if (F) { note("fg", F); F.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; if (!o.brand_raw) o.brand_raw = r.brand; if (!o.identity) o.identity = r.brand; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.category = o.category || r.category; var q = n(r.qty) || 0; o.qty += q; o.by_branch[r.warehouse] = (o.by_branch[r.warehouse] || 0) + q; br[r.warehouse] = 1; if (n(r.coverage_days) != null) o.coverage_days = Math.max(o.coverage_days == null ? -1 : o.coverage_days, n(r.coverage_days)); }); }
+    var O = rows("old"); if (O) { note("old", O); O.rows.forEach(function (r) { var o = it(r.item_code); if (!o) return; if (!o.brand_raw) o.brand_raw = r.brand; o.size = o.size || r.size; o.pack = o.pack || r.pack; o.old_qty += n(r.qty) || 0; if (o.coverage_days == null && n(r.coverage_days) != null) o.coverage_days = n(r.coverage_days); }); }
+    var T = rows("transit"); if (T) { note("transit", T); T.rows.forEach(function (r) { var o = G[String(r.item_code || "").trim()]; if (o) o.transit_qty += n(r.qty) || 0; }); }
+    /* أيام كفاية المبيعات = الرصيد ÷ متوسط الصرف اليومي لآخر N يوم في بيانات الحركة (إن طابق كود المنتج كود الصنف) */
+    var W = rows("wso"); if (W && W.rows.length) {
+      var last = W.rows.reduce(function (a, r) { return r.date > a ? r.date : a; }, ""), from = last ? new Date(Date.parse(last) - (R.salesDays - 1) * 864e5).toISOString().slice(0, 10) : "", first = "", S = {};
+      W.rows.forEach(function (r) { if (!r.date || r.date < from) return; var q = n(r.iss); if (q == null) return; if (!first || r.date < first) first = r.date; var c = String(r.prod || "").trim(); S[c] = (S[c] || 0) + q; });
+      var span = first ? Math.round((Date.parse(last) - Date.parse(first)) / 864e5) + 1 : R.salesDays, hit = 0;
+      Object.keys(S).forEach(function (c) { var o = G[c]; if (!o) return; hit++; o.sales_daily = r1(S[c] / span); });
+      if (hit) { note("wso", W); srcs[srcs.length - 1] += " (متوسط " + span + " يوم)"; }
+    }
+    /* تقارير إضافية: أي مجموعة بيانات فيها كود صنف وأعمدة رقمية */
+    (extraIds || []).forEach(function (id) {
+      if (KNOWN[id]) return; var D = rows(id); if (!D || !D.rows.length || !("item_code" in D.rows[0])) return; note(id, D);
+      D.rows.forEach(function (r) { var o = G[String(r.item_code || "").trim()]; if (!o) return; Object.keys(r).forEach(function (k) { var v = r[k]; if (k === "item_code" || typeof v !== "number" || !isFinite(v)) return; var kk = id + "." + k; o.extra[kk] = (o.extra[kk] || 0) + v; }); });
+    });
+    var list = Object.keys(G).map(function (c) {
+      var o = G[c]; o.brand = brandOf(o.brand_raw, R); o.age_avg = o.aging_qty > 0 ? Math.round(o._aw / o.aging_qty) : null; delete o._aw;
+      o.qty = r1(o.qty); if (o.sales_daily > 0) o.sales_days = r1(o.qty / o.sales_daily);
+      o.hidden = R.hide.indexOf(c) >= 0 || (o.brand && R.hideBrands.indexOf(key(o.brand)) >= 0) || (o.brand_raw && R.hideBrands.indexOf(key(o.brand_raw)) >= 0);
+      return o;
+    }).sort(function (a, b) { return b.qty - a.qty; });
+    return { rows: list, branches: Object.keys(br).sort(), asOf: asOf, sources: srcs, rules: R, builtAt: Date.now() };
+  }
+
+  /* مطابقة صنف من نص السؤال: الحجم (600 / 1.5 لتر) أو الشد أو كود الصنف، والبراند الافتراضي إن لم يُذكر براند */
+  function sizeText(o) { return [o.size, o.pack, o.description].join(" "); }
+  function match(T, q) {
+    q = q || {}; var R = T.rules, rows = T.rows.filter(function (o) { return !o.hidden; });
+    if (q.code) rows = rows.filter(function (o) { return o.item_code === q.code; });
+    if (q.sizeNum) { var re = new RegExp("(^|[^0-9.])" + String(q.sizeNum).replace(".", "\\.") + "(?![0-9])"); rows = rows.filter(function (o) { return re.test(String(o.size)) || re.test(sizeText(o)); }); }
+    if (q.pack) { var rp = new RegExp("(^|[^0-9])" + q.pack + "\\s*[x×*]|[x×*]\\s*" + q.pack + "(?![0-9])|^" + q.pack + "$"); rows = rows.filter(function (o) { return rp.test(String(o.pack)) || String(o.pack).trim() === String(q.pack); }); }
+    var brandUsed = "";
+    if (q.brand) { var kb = key(q.brand); rows = rows.filter(function (o) { return key(o.brand) === kb || key(o.brand_raw) === kb || key(o.identity).indexOf(kb) >= 0; }); brandUsed = q.brand; }
+    else if (R.defaultBrand) { var kd = key(R.defaultBrand), only = rows.filter(function (o) { return key(o.brand) === kd; }); if (only.length) { rows = only; brandUsed = R.defaultBrand; } }
+    return { rows: rows, brand: brandUsed };
+  }
+  var AR_BRAND = { "mai": "ماي", "mokabat": "موكابات|مكابات|مكبات", "tg sparkling": "سباركلنج|سبركلنج|فوار", "sar": "سار", "tania": "تانيا|تانية|تانيه", "new identity": "الهويه الجديده|هويه جديده", "old identity": "الهويه القديمه|هويه قديمه" };
+  function brandIn(T, text) {
+    var t = " " + key(text).replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/\s+/g, " ") + " ", best = "";
+    var names = {}; T.rows.forEach(function (o) { if (o.brand) names[o.brand] = 1; if (o.brand_raw) names[o.brand_raw] = 1; }); Object.keys(T.rules.alias).forEach(function (k) { names[k] = 1; });
+    Object.keys(names).forEach(function (b) { var forms = [key(b)].concat((AR_BRAND[key(b)] || "").split("|")).filter(function (x) { return x && x.length >= 3; }); forms.forEach(function (fm) { if (t.indexOf(" " + fm + " ") >= 0 && fm.length > best.length) best = b; }); });
+    if (best) return /^(new|old) identity$/.test(key(best)) ? best : brandOf(best, T.rules);
+    return "";
+  }
+
+  /* ---------- البيئة داخل المنصة: تخزين مؤقت يُعاد بناؤه تلقائيًا عند تغيّر البيانات أو القواعد ---------- */
+  var C = {};
+  function cfgRules() { try { return (AIIE.cfg() || {}).item_rules || null; } catch (e) { return null; } }
+  function sigNow(raw) { var s = ""; try { s = AIIE.dataSig ? AIIE.dataSig() : ""; } catch (e) { } var w = ""; try { var o = JSON.parse(localStorage.getItem("wso_rows_v1") || "null"); w = o && o.rows ? o.rows.length + ":" + (o.meta && o.meta.ts || "") : ""; } catch (e) { } return [raw ? 1 : 0, s, w, JSON.stringify(cfgRules() || {})].join("|"); }
+  function get(raw) {
+    if (typeof AIIE === "undefined" || !AIIE.ds) return null; var s = sigNow(raw), c = C[raw ? "r" : "u"];
+    if (c && c.sig === s) return c.T;
+    var rows = function (id) { try { if (!raw && AIIE.permitted && !AIIE.permitted(id)) return null; var d = AIIE.ds(id, !!raw); return d && d.rows ? d : null; } catch (e) { return null; } };
+    var ids = []; try { ids = AIIE.sourceIds ? AIIE.sourceIds() : []; } catch (e) { }
+    var T = build(rows, cfgRules(), ids); C[raw ? "r" : "u"] = { sig: s, T: T }; return T;
+  }
+  return { build: build, match: match, brandIn: brandIn, rulesOf: rulesOf, brandOf: brandOf, get: get, DEF: DEF_RULES, _C: C };
+})();
+if (typeof window !== "undefined") window.WAITEM = WAITEM;
+/* ---------- الشاشة: لوحة «🗂️ بيانات المساعد» (تبويب في إدارة AI) ---------- */
+(function () {
+  if (typeof window === "undefined" || typeof document === "undefined" || window.WAITEMUI) return;
+  var U = { q: "", lim: 200, msg: "", showHidden: false };
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function f(v) { return v == null || v === "" ? "—" : (typeof v === "number" ? v.toLocaleString("en-US", { maximumFractionDigits: 1 }) : esc(v)); }
+  function admin() { try { return typeof isAdmin === "function" ? !!isAdmin() : false; } catch (e) { return false; } }
+  function root() { return document.getElementById("wi-root"); }
+  function rulesRaw() { try { return (AIIE.cfg() || {}).item_rules || {}; } catch (e) { return {}; } }
+  function saveRules(r) {
+    var cur = Object.assign({}, AIIE.cfg()); cur.item_rules = r; cur.updatedAt = Date.now();
+    try { localStorage.setItem("ai_cfg_v1", JSON.stringify(cur)); } catch (e) { }
+    try { if (typeof fbDB !== "undefined" && fbDB) return fbDB.collection(FB_COL).doc("ai_cfg").set({ item_rules: r, updatedAt: cur.updatedAt }, { merge: true }).then(function () { return "✅ حُفظت القواعد ونُشرت لكل المستخدمين"; }, function (e) { return "⚠️ حُفظت على هذا الجهاز فقط: " + (e.code || e.message); }); } catch (e) { }
+    return Promise.resolve("✅ حُفظت على هذا الجهاز");
+  }
+  function space() { try { var d = AIIE.ds("space", true); return d && d.rows || []; } catch (e) { return []; } }
+  function paint() {
+    var r = root(); if (!r) return;
+    var T = WAITEM.get(true); if (!T) { r.innerHTML = '<div class="ai-card">لا توجد بيانات محمّلة بعد.</div>'; return; }
+    var R = rulesRaw(), RR = T.rules, q = U.q.trim().toLowerCase();
+    var rows = T.rows.filter(function (o) { return (U.showHidden || !o.hidden) && (!q || [o.item_code, o.brand, o.brand_raw, o.identity, o.size, o.pack, o.category, o.description].join(" ").toLowerCase().indexOf(q) >= 0); });
+    var BR = T.branches, extraK = {}; T.rows.forEach(function (o) { Object.keys(o.extra).forEach(function (k) { extraK[k] = 1; }); }); extraK = Object.keys(extraK);
+    var hid = T.rows.filter(function (o) { return o.hidden; }).length, brands = {}; T.rows.forEach(function (o) { var k = (o.brand_raw || "—") + " → " + (o.brand || "—"); brands[k] = (brands[k] || 0) + 1; });
+    var aliasTxt = Object.keys(R.alias || {}).map(function (k) { return k + " = " + R.alias[k]; }).join("\n");
+    var h = '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🗂️ بيانات المساعد — جدول موحّد لكل صنف</h4>' +
+      '<div class="ai-src">يُبنى تلقائيًا من الشاشات كلما تغيّرت البيانات، والمساعد يقرأ منه. آخر بناء: ' + new Date(T.builtAt).toLocaleString("en-GB") + ' · الأصناف: <b>' + T.rows.length + '</b> · المخفي: <b>' + hid + '</b> · الفروع: <b>' + BR.length + '</b><br>المصادر: ' + esc(T.sources.join(" | ") || "—") + '</div>' +
+      '<div class="ai-act" style="margin-top:8px;flex-wrap:wrap"><input data-wi-q placeholder="بحث: كود، براند، حجم، شد…" value="' + esc(U.q) + '" style="flex:1;min-width:180px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px"><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-wi-sh' + (U.showHidden ? " checked" : "") + '> إظهار المخفي</label><button data-wi="rebuild">⟳ إعادة البناء الآن</button><button data-wi="xls">⬇ Excel</button></div>' + (U.msg ? '<div class="ai-src" style="margin-top:6px">' + esc(U.msg) + "</div>" : "") + "</div>";
+    if (admin()) h += '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🔐 قواعد المدير</h4><div class="ai-g">' +
+      '<label class="f">البراند الافتراضي عند عدم ذكر البراند في السؤال<input id="wi-db" value="' + esc(RR.defaultBrand) + '"></label>' +
+      '<label class="f">أيام حساب متوسط المبيعات<input id="wi-sd" type="number" min="7" max="180" value="' + RR.salesDays + '"></label>' +
+      '<label class="f" style="grid-column:1/-1">دمج أسماء البراند (سطر لكل اسم: الاسم في البيانات = الاسم الصحيح). الافتراضي: Krones/Kronz/New Identity/Old Identity = Tania<textarea id="wi-al" dir="ltr" rows="4" style="width:100%">' + esc(aliasTxt) + '</textarea></label>' +
+      '<label class="f" style="grid-column:1/-1">إخفاء براندات كاملة (اسم في كل سطر)<textarea id="wi-hb" dir="ltr" rows="2" style="width:100%">' + esc((R.hideBrands || []).join("\n")) + '</textarea></label></div>' +
+      '<div class="ai-src" style="margin-top:6px">البراندات الحالية (في البيانات ← بعد الدمج): ' + Object.keys(brands).map(function (k) { return esc(k) + " (" + brands[k] + ")"; }).join(" · ") + '</div>' +
+      '<div class="ai-act" style="margin-top:8px"><button data-wi="save">💾 حفظ القواعد ونشرها</button></div></div>';
+    h += '<div class="ai-card" style="overflow:auto"><table class="ai-t" style="width:100%;font-size:12px;white-space:nowrap"><tr>' + (admin() ? "<th>إخفاء</th>" : "") + '<th>الكود</th><th>البراند</th><th>الهوية</th><th>الحجم</th><th>الشد</th><th>الرصيد FG</th>' + BR.map(function (b) { return "<th>" + esc(b) + "</th>"; }).join("") + '<th>OLD</th><th>ترانزيت</th><th>كمية الأعمار</th><th>أقدم عمر</th><th>متوسط العمر</th><th>&gt;180 يوم</th><th>أقدم إنتاج</th><th>التغطية FG (يوم)</th><th>متوسط الصرف اليومي</th><th>أيام كفاية المبيعات</th>' + extraK.map(function (k) { return "<th>" + esc(k) + "</th>"; }).join("") + "</tr>" +
+      rows.slice(0, U.lim).map(function (o) { return '<tr style="' + (o.hidden ? "opacity:.45" : "") + '">' + (admin() ? '<td><input type="checkbox" data-wi-h="' + esc(o.item_code) + '"' + (RR.hide.indexOf(o.item_code) >= 0 ? " checked" : "") + "></td>" : "") + "<td>" + esc(o.item_code) + "</td><td>" + esc(o.brand) + (o.brand_raw && o.brand_raw !== o.brand ? ' <small style="color:#94a3b8">(' + esc(o.brand_raw) + ")</small>" : "") + "</td><td>" + esc(o.identity) + "</td><td>" + esc(o.size) + "</td><td>" + esc(o.pack) + "</td><td><b>" + f(o.qty) + "</b></td>" + BR.map(function (b) { return "<td>" + f(o.by_branch[b]) + "</td>"; }).join("") + "<td>" + f(o.old_qty || null) + "</td><td>" + f(o.transit_qty || null) + "</td><td>" + f(o.aging_qty || null) + "</td><td>" + f(o.age_max) + "</td><td>" + f(o.age_avg) + "</td><td>" + f(o.stale_qty || null) + "</td><td>" + f(o.oldest) + "</td><td><b>" + f(o.coverage_days) + "</b></td><td>" + f(o.sales_daily) + "</td><td><b>" + f(o.sales_days) + "</b></td>" + extraK.map(function (k) { return "<td>" + f(o.extra[k]) + "</td>"; }).join("") + "</tr>"; }).join("") + "</table>" +
+      (rows.length > U.lim ? '<div class="ai-act" style="margin-top:6px"><button data-wi="more">عرض المزيد (' + (rows.length - U.lim) + ")</button></div>" : "") + "</div>";
+    var sp = space(); if (sp.length) { var W = {}, Mx = {}; sp.forEach(function (x) { W[x.warehouse] = 1; var k = (x.group ? x.group + " — " : "") + x.metric; (Mx[k] = Mx[k] || {})[x.warehouse] = x.value; }); var WW = Object.keys(W);
+      h += '<div class="ai-card" style="overflow:auto"><h4 style="margin:0 0 8px;color:#12325a">🏬 مساحة التخزين لكل فرع (من تقرير المساحات)</h4><div class="ai-src" style="margin-bottom:6px">تقرير المساحات على مستوى الفرع وليس الصنف، لذلك يُعرض هنا لكل فرع.</div><table class="ai-t" style="width:100%;font-size:12px;white-space:nowrap"><tr><th>المؤشر</th>' + WW.map(function (w) { return "<th>" + esc(w) + "</th>"; }).join("") + "</tr>" + Object.keys(Mx).slice(0, 60).map(function (k) { return "<tr><td>" + esc(k) + "</td>" + WW.map(function (w) { return "<td>" + f(Mx[k][w]) + "</td>"; }).join("") + "</tr>"; }).join("") + "</table></div>"; }
+    r.innerHTML = h;
+  }
+  function xls() {
+    var T = WAITEM.get(true); if (!T) return; var BR = T.branches, head = ["الكود", "البراند", "البراند في البيانات", "الهوية", "الحجم", "الشد", "الرصيد FG"].concat(BR, ["OLD", "ترانزيت", "كمية الأعمار", "أقدم عمر", "متوسط العمر", ">180 يوم", "أقدم إنتاج", "التغطية FG", "متوسط الصرف اليومي", "أيام كفاية المبيعات", "مخفي"]);
+    var lines = [head].concat(T.rows.map(function (o) { return [o.item_code, o.brand, o.brand_raw, o.identity, o.size, o.pack, o.qty].concat(BR.map(function (b) { return o.by_branch[b] == null ? "" : o.by_branch[b]; }), [o.old_qty, o.transit_qty, o.aging_qty, o.age_max, o.age_avg, o.stale_qty, o.oldest, o.coverage_days, o.sales_daily, o.sales_days, o.hidden ? "نعم" : ""]); }));
+    var csv = "﻿" + lines.map(function (l) { return l.map(function (v) { v = v == null ? "" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","); }).join("\r\n");
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = "ai_items_" + new Date().toISOString().slice(0, 10) + ".csv"; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  document.addEventListener("input", function (e) { var t = e.target; if (!t || !root() || !root().contains(t)) return; if (t.hasAttribute("data-wi-q")) { U.q = t.value; clearTimeout(U.qt); U.qt = setTimeout(function () { var pos = t.selectionStart; paint(); var n = root().querySelector("[data-wi-q]"); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } } }, 250); } }, true);
+  document.addEventListener("change", function (e) {
+    var t = e.target; if (!t || !root() || !root().contains(t)) return;
+    if (t.hasAttribute("data-wi-sh")) { U.showHidden = t.checked; paint(); return; }
+    if (t.hasAttribute("data-wi-h") && admin()) { var R = rulesRaw(), H = (R.hide || []).slice(), c = t.getAttribute("data-wi-h"), i = H.indexOf(c); if (t.checked && i < 0) H.push(c); if (!t.checked && i >= 0) H.splice(i, 1); R = Object.assign({}, R, { hide: H }); saveRules(R).then(function (m) { U.msg = m + " (" + c + (t.checked ? " مخفي" : " ظاهر") + ")"; paint(); }); }
+  }, true);
+  document.addEventListener("click", function (e) {
+    var b = e.target && e.target.closest && e.target.closest("[data-wi]"); if (!b || !root() || !root().contains(b)) return; e.preventDefault(); var a = b.getAttribute("data-wi");
+    if (a === "rebuild") { for (var k in WAITEM._C) delete WAITEM._C[k]; U.msg = "✅ أُعيد البناء"; paint(); }
+    else if (a === "more") { U.lim += 300; paint(); }
+    else if (a === "xls") xls();
+    else if (a === "save" && admin()) {
+      var al = {}; String(document.getElementById("wi-al").value || "").split(/\n+/).forEach(function (l) { var m = l.split("="); if (m.length >= 2 && m[0].trim() && m[1].trim()) al[m[0].trim()] = m.slice(1).join("=").trim(); });
+      var R = Object.assign({}, rulesRaw(), { alias: al, defaultBrand: String(document.getElementById("wi-db").value || "").trim(), salesDays: +document.getElementById("wi-sd").value || 30, hideBrands: String(document.getElementById("wi-hb").value || "").split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean) });
+      saveRules(R).then(function (m) { U.msg = m; paint(); });
+    }
+  }, true);
+  window.WAITEMUI = { html: function () { setTimeout(paint, 0); return '<div id="wi-root"></div>'; }, paint: paint };
+})();
+/* WA-ITEMS-END */
+</script>
+<style id="wa-adm-polish">#page-aiassist label.f input:not([type=checkbox]):not([type=radio]),#page-aiassist label.f select,#page-aiassist label.f textarea{width:100%;box-sizing:border-box;min-height:38px;padding:8px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;font:inherit;font-size:13.5px;color:#0f172a}#page-aiassist label.f textarea{min-height:70px}#page-aiassist label.f input:focus,#page-aiassist label.f select:focus,#page-aiassist label.f textarea:focus{outline:0;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.18);background:#fff}#page-aiassist .ai-card h4{font-size:16px}</style>
 <script id="wa-prov-js">
-/* WA-PROV-BEGIN — لوحة المدير: مزوّدو الذكاء الاصطناعي والمفاتيح والميزانية (المفاتيح تُحفظ في الـ Worker فقط) */
+/* WA-PROV-BEGIN — لوحة المدير: مزوّدو الذكاء الاصطناعي والمفاتيح والميزانية (المفاتيح تُحفظ في الـ Worker فقط) — v3: تصميم أوضح + لمبة حالة لكل مفتاح */
 (function () {
   if (window.WAPROV) return;
-  var S = { data: null, busy: false, msg: "" };
+  var S = { data: null, busy: false, msg: "", auto: false, testing: {} };
   var PN = { free: "مجاني — Cloudflare Workers AI", gemini: "Google Gemini (مفتاح مجاني)", groq: "Groq (مفتاح مجاني)", anthropic: "Claude (Anthropic — مدفوع)", openai: "مزوّد آخر متوافق مع OpenAI", tts: "الصوت الطبيعي (Gemini TTS)" };
+  var SN = { free: "Workers AI", gemini: "Google Gemini", groq: "Groq", anthropic: "Claude", openai: "OpenAI متوافق", tts: "صوت المنصة" };
   var TTSV = [["Kore", "Kore — أنثى، واضح"], ["Aoede", "Aoede — أنثى، دافئ"], ["Leda", "Leda — أنثى، شاب"], ["Zephyr", "Zephyr — أنثى، مشرق"], ["Charon", "Charon — ذكر، رسمي"], ["Puck", "Puck — ذكر، حيوي"], ["Fenrir", "Fenrir — ذكر، حماسي"], ["Orus", "Orus — ذكر، رزين"]];
+  var TK = "wp_test_v1", FRESH = 6 * 3600e3;
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function url() { try { return String(AIIE.cfg().workerUrl || "").replace(/\/+$/, ""); } catch (e) { return ""; } }
   function tok() { return new Promise(function (res, rej) { try { var a = _fbAuthObj(), u = a && a.currentUser; if (!u || u.isAnonymous) return rej(new Error("سجّل الدخول بحساب المدير أولًا")); u.getIdToken().then(res, rej); } catch (e) { rej(e); } }); }
@@ -23038,61 +23295,130 @@ if(!o.workerUrl){o.workerUrl=U;localStorage.setItem(K,JSON.stringify(o))}}catch(
     return tok().then(function (t) { return fetch(u + path, { method: method || "GET", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: body ? JSON.stringify(body) : undefined }); })
       .then(function (r) { return r.json().then(function (j) { if (r.status === 403) throw new Error("هذا الحساب ليس مديرًا في الـ Worker"); if (!r.ok && !j.ok) throw new Error(j.error || ("HTTP " + r.status)); return j; }); });
   }
+  function TR() { try { return JSON.parse(localStorage.getItem(TK) || "{}") || {}; } catch (e) { return {}; } }
+  function setTR(p, o) { var t = TR(); if (o) t[p] = o; else delete t[p]; try { localStorage.setItem(TK, JSON.stringify(t)); } catch (e) { } }
   function root() { return document.getElementById("wp-root"); }
-  function load() { S.busy = true; paint(); api("/admin/config").then(function (j) { S.data = j; S.msg = ""; }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; paint(); }); }
+  function load() { S.busy = true; paint(); api("/admin/config").then(function (j) { S.data = j; S.msg = ""; }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; paint(); autoTest(); }); }
   function v(id) { var e = document.getElementById(id); return e ? (e.type === "checkbox" ? e.checked : e.value) : null; }
   function opts(sel, list) { return list.map(function (p) { return '<option value="' + p + '"' + (sel === p ? " selected" : "") + ">" + esc(PN[p] || (p === "none" ? "بدون (نفس المزوّد الأساسي)" : p)) + "</option>"; }).join(""); }
+  function ago(t) { var m = Math.round((Date.now() - t) / 60000); return m < 1 ? "الآن" : m < 60 ? "قبل " + m + " د" : m < 1440 ? "قبل " + Math.round(m / 60) + " س" : "قبل " + Math.round(m / 1440) + " يوم"; }
+  /* حالة كل مزوّد: on (يعمل) · bad (لا يعمل) · wait (محفوظ لم يُختبر) · off (لا يوجد مفتاح) */
+  function stat(p) {
+    var d = S.data || {}, K = d.keys || {}, c = d.cfg || {}, t = TR()[p];
+    if (S.testing[p]) return { s: "test", txt: "جارٍ الاختبار…" };
+    if (p === "free") return { s: "on", txt: "مدمج ومتاح دائمًا (احتياطي)" };
+    var has = p === "tts" ? !!K.gemini : !!K[p];
+    if (!has) return { s: "off", txt: p === "tts" ? "يحتاج مفتاح Gemini" : "غير مفعّل — لا يوجد مفتاح" };
+    if (p === "tts" && c.tts_enabled === false) return { s: "off", txt: "معطّل من الإعدادات" };
+    if (t && t.key === K[p === "tts" ? "gemini" : p]) {
+      if (t.ok) return { s: p === "anthropic" && !c.paidEnabled ? "wait" : "on", txt: (p === "anthropic" && !c.paidEnabled ? "المفتاح يعمل — لكن المدفوع غير مفعّل" : "مفعّل ويعمل") + " · " + (t.ms != null ? t.ms + " ms · " : "") + ago(t.at) };
+      return { s: "bad", txt: "لا يعمل: " + (t.err || "خطأ") + (t.status ? " (" + t.status + ")" : "") + " · " + ago(t.at) };
+    }
+    return { s: "wait", txt: "المفتاح محفوظ — لم يُختبر بعد" };
+  }
+  function lamp(p, big) { var x = stat(p); return '<span class="wp-lamp wp-' + x.s + (big ? " big" : "") + '" title="' + esc(x.txt) + '"></span>'; }
+  function role(p) { var d = S.data || {}, c = d.cfg || {}, rt = d.route || {}, r = []; if (p === c.active) r.push("أساسي"); if (p === c.englishProvider) r.push("الإنجليزية"); if (rt.ar === p && p !== c.active) r.push("يعمل الآن للعربية"); if (p === "free") r.push("احتياطي"); return r; }
+  function testOne(p) {
+    S.testing[p] = 1; paint(); var K = (S.data && S.data.keys) || {};
+    return api("/admin/test", "POST", { provider: p }).then(function (j) { setTR(p, { ok: !!j.ok, ms: j.ms, model: j.model, err: j.ok ? "" : String(j.error || "").slice(0, 80), status: j.status, at: Date.now(), key: K[p === "tts" ? "gemini" : p] }); return j; })
+      .catch(function (e) { setTR(p, { ok: false, err: String(e.message || e).slice(0, 80), at: Date.now(), key: K[p === "tts" ? "gemini" : p] }); return { ok: false, error: e.message }; })
+      .then(function (j) { delete S.testing[p]; paint(); return j; });
+  }
+  function testList(force) { var d = S.data || {}, K = d.keys || {}, t = TR(); return ["gemini", "groq", "anthropic", "openai", "tts"].filter(function (p) { var k = K[p === "tts" ? "gemini" : p]; if (!k) return false; if (p === "tts" && d.cfg && d.cfg.tts_enabled === false) return false; return force || !t[p] || t[p].key !== k || Date.now() - t[p].at > FRESH; }); }
+  function chain(list) { return list.reduce(function (pr, p) { return pr.then(function () { return testOne(p); }); }, Promise.resolve()); }
+  function autoTest() { if (S.auto || !S.data) return; S.auto = true; chain(testList(false)); }
+
+  function css() {
+    return '<style>#wp-root{--wp-b:#e4e9f2;--wp-t:#12325a}#wp-root .wp-h{display:flex;align-items:center;gap:10px;margin:0 0 4px;color:var(--wp-t);font-size:16px;font-weight:800}#wp-root .wp-sub{color:#64748b;font-size:12.5px;margin:0 0 12px;line-height:1.7}' +
+      '#wp-root .wp-lamp{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;background:#cbd5e1;box-shadow:0 0 0 3px rgba(203,213,225,.35)}#wp-root .wp-lamp.big{width:16px;height:16px}' +
+      '#wp-root .wp-on{background:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.18),0 0 10px rgba(22,163,74,.75)}#wp-root .wp-bad{background:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.18),0 0 10px rgba(220,38,38,.6)}#wp-root .wp-wait{background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.2),0 0 8px rgba(245,158,11,.6)}#wp-root .wp-test{background:#3b82f6;animation:wpPulse 1s infinite}@keyframes wpPulse{50%{opacity:.35}}' +
+      '#wp-root .wp-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}#wp-root .wp-tile{border:1px solid var(--wp-b);border-radius:14px;padding:12px 14px;background:#fbfcfe;display:flex;flex-direction:column;gap:6px}#wp-root .wp-tile b{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;font-size:14px;color:var(--wp-t)}#wp-root .wp-tile small{color:#64748b;font-size:11.5px;line-height:1.5}' +
+      '#wp-root .wp-tag{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:#e0ecff;color:#1e4e8c;margin-inline-start:4px}#wp-root .wp-tag.g{background:#dcfce7;color:#166534}' +
+      '#wp-root .wp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 14px}#wp-root label.f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:700;color:#475569}' +
+      '#wp-root label.f input:not([type=checkbox]),#wp-root label.f select{width:100%;box-sizing:border-box;min-height:40px;padding:8px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;font:inherit;font-size:13.5px;color:#0f172a}#wp-root label.f input:focus,#wp-root label.f select:focus{outline:0;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.18);background:#fff}' +
+      '#wp-root .wp-ck{flex-direction:row!important;align-items:center;gap:10px!important;padding:10px 12px;border:1px dashed #cbd5e1;border-radius:10px;background:#fff}#wp-root .wp-ck input{width:18px;height:18px}' +
+      '#wp-root .wp-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}#wp-root .wp-btns button{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:8px 14px;font:inherit;font-size:13px;font-weight:700;color:#1e4e8c;cursor:pointer}#wp-root .wp-btns button:hover{background:#eef4fd}#wp-root .wp-btns button.pri{background:#1e4e8c;border-color:#1e4e8c;color:#fff}#wp-root .wp-btns button.pri:hover{background:#163d6f}#wp-root .wp-btns button.dng{color:#b91c1c;border-color:#fecaca}#wp-root .wp-btns button.dng:hover{background:#fef2f2}#wp-root .wp-btns button:disabled{opacity:.5;cursor:default}' +
+      '#wp-root .wp-prov{border:1px solid var(--wp-b);border-radius:16px;padding:16px;margin-bottom:14px;background:#fff}#wp-root .wp-prov.st-on{border-inline-start:5px solid #16a34a}#wp-root .wp-prov.st-bad{border-inline-start:5px solid #dc2626}#wp-root .wp-prov.st-wait{border-inline-start:5px solid #f59e0b}#wp-root .wp-prov.st-off{border-inline-start:5px solid #cbd5e1}' +
+      '#wp-root .wp-ph{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#wp-root .wp-ph h4{margin:0;font-size:15.5px;color:var(--wp-t)}#wp-root .wp-pill{margin-inline-start:auto;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#f1f5f9;color:#475569}#wp-root .st-on .wp-pill{background:#dcfce7;color:#166534}#wp-root .st-bad .wp-pill{background:#fee2e2;color:#991b1b}#wp-root .st-wait .wp-pill{background:#fef3c7;color:#92400e}' +
+      '#wp-root .wp-key{display:grid;grid-template-columns:minmax(150px,auto) 1fr;gap:10px;align-items:end;margin-top:12px}#wp-root .wp-cur{font-size:12px;color:#475569;font-weight:700}#wp-root .wp-cur code{display:block;margin-top:6px;padding:9px 12px;border-radius:10px;background:#f1f5f9;direction:ltr;text-align:left;font-size:13px;color:#0f172a}' +
+      '#wp-root details{margin-top:12px;border-top:1px dashed #e2e8f0;padding-top:10px}#wp-root summary{cursor:pointer;font-size:12.5px;font-weight:700;color:#1e4e8c}#wp-root details .wp-grid{margin-top:10px}' +
+      '#wp-root .wp-warn{border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}#wp-root .wp-warn button{margin-inline-start:auto;border:0;border-radius:10px;padding:8px 14px;font:inherit;font-size:13px;font-weight:800;background:#1e4e8c;color:#fff;cursor:pointer}#wp-root .wp-warn button:hover{background:#163d6f}' +
+      '#wp-root .wp-msg{position:sticky;bottom:10px;z-index:3;border-radius:12px;padding:10px 14px;background:#0f2a4d;color:#fff;font-size:13px;box-shadow:0 8px 24px rgba(15,42,77,.25)}' +
+      '#wp-root .wp-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:#64748b;margin-top:10px}#wp-root .wp-legend span{display:inline-flex;align-items:center;gap:6px}' +
+      '@media (max-width:640px){#wp-root .wp-key{grid-template-columns:1fr}}</style>';
+  }
   function paint() {
     var r = root(); if (!r) return; var d = S.data;
-    if (!d) { r.innerHTML = '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">💳 المزوّد والمفاتيح والميزانية</h4><div class="ai-src">' + (S.busy ? "جارٍ التحميل…" : esc(S.msg || "")) + '</div><div class="ai-act" style="margin-top:8px"><button data-wp="reload">⟳ تحميل</button></div></div>'; return; }
+    if (!d) { r.innerHTML = css() + '<div class="ai-card"><div class="wp-h">💳 المزوّد والمفاتيح والميزانية</div><div class="wp-sub">' + (S.busy ? "جارٍ التحميل…" : esc(S.msg || "")) + '</div><div class="wp-btns"><button data-wp="reload">⟳ تحميل</button></div></div>'; return; }
     var c = d.cfg, u = d.usage || {}, tot = +u.total || 0, pct = c.budgetUsd ? Math.min(100, tot / c.budgetUsd * 100) : 0, K = d.keys || {}, rt = d.route || {};
-    function row(p) { var x = u[p] || { in: 0, out: 0, cost: 0, calls: 0 }; return "<tr><td>" + esc(PN[p]) + "</td><td>" + x.calls + "</td><td>" + (x.in || 0).toLocaleString("en-US") + "</td><td>" + (x.out || 0).toLocaleString("en-US") + "</td><td>$" + (+x.cost || 0).toFixed(4) + "</td></tr>"; }
+    var tiles = ["gemini", "groq", "tts", "anthropic", "openai", "free"].map(function (p) { var x = stat(p), rl = role(p); return '<div class="wp-tile"><b>' + lamp(p, true) + esc(SN[p]) + rl.map(function (t) { return '<span class="wp-tag' + (t === "أساسي" ? " g" : "") + '">' + t + "</span>"; }).join("") + "</b><small>" + esc(x.txt) + "</small></div>"; }).join("");
+    var warns = [], gs = stat("gemini");
+    if (gs.s === "on" && c.active === "free") warns.push('<div class="wp-warn">⚠️ مفتاح Gemini يعمل لكن المزوّد الأساسي حاليًا <b>Workers AI</b>، فالإجابات أقل دقة. <button class="pri" data-wp="usegem">اجعل Gemini المزوّد الأساسي</button></div>');
+    if (gs.s === "bad" && K.gemini && !/^AIza/.test(K.gemini)) warns.push('<div class="wp-warn">⚠️ مفتاح Gemini المحفوظ لا يبدأ بـ <b dir="ltr">AIza</b> كالمعتاد. أنشئ مفتاحًا من <b dir="ltr">aistudio.google.com → Get API key</b> والصقه من جديد.</div>');
+    if (stat("tts").s === "bad") warns.push('<div class="wp-warn">⚠️ صوت المنصة لا يعمل حاليًا، فسيُستخدم صوت جهاز كل مستخدم مؤقتًا. اضغط «اختبار الصوت» بعد تصحيح مفتاح Gemini.</div>');
     function prov(p, title, hint) {
-      return '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">' + title + '</h4>' + (hint ? '<div class="ai-src" style="margin-bottom:8px">' + hint + "</div>" : "") + '<div class="ai-g">' +
-        '<label class="f">المفتاح — الحالي: <b dir="ltr">' + esc(K[p] || "غير موجود") + '</b><input id="wp-k-' + p + '" type="password" dir="ltr" autocomplete="off" placeholder="الصق المفتاح هنا"></label>' +
+      var x = stat(p);
+      return '<div class="wp-prov st-' + (x.s === "test" ? "wait" : x.s) + '"><div class="wp-ph">' + lamp(p, true) + "<h4>" + title + "</h4>" + role(p).map(function (t) { return '<span class="wp-tag' + (t === "أساسي" ? " g" : "") + '">' + t + "</span>"; }).join("") + '<span class="wp-pill">' + esc(x.txt) + "</span></div>" + (hint ? '<div class="wp-sub" style="margin:8px 0 0">' + hint + "</div>" : "") +
+        '<div class="wp-key"><div class="wp-cur">المفتاح الحالي<code' + (K[p] ? "" : ' style="direction:rtl;text-align:right;color:#94a3b8"') + '>' + esc(K[p] || "لا يوجد") + '</code></div><label class="f">' + (K[p] ? "استبدال المفتاح" : "إضافة مفتاح") + '<input id="wp-k-' + p + '" type="password" dir="ltr" autocomplete="off" placeholder="الصق المفتاح هنا"></label></div>' +
+        '<div class="wp-btns"><button class="pri" data-wp="key" data-p="' + p + '">💾 حفظ المفتاح</button><button data-wp="test" data-p="' + p + '"' + (K[p] ? "" : " disabled") + '>🔌 اختبار الاتصال</button>' + (K[p] ? '<button class="dng" data-wp="delkey" data-p="' + p + '">🗑 حذف المفتاح</button>' : "") + "</div>" +
+        '<details><summary>إعدادات متقدمة (النموذج، الرابط، السعر)</summary><div class="wp-grid">' +
         '<label class="f">النموذج<input id="wp-m-' + p + '" dir="ltr" value="' + esc(c["model_" + p]) + '"></label>' +
         (p !== "anthropic" ? '<label class="f">الرابط (https)<input id="wp-b-' + p + '" dir="ltr" value="' + esc(p === "openai" ? c.openai_base : c[p + "_base"]) + '"></label>' : "") +
-        '<label class="f">السعر لكل مليون Token (دخل / خرج $) — صفر = مجاني<span style="display:flex;gap:6px"><input id="wp-pi-' + p + '" type="number" step="0.01" value="' + esc((c.price[p] || {}).in) + '"><input id="wp-po-' + p + '" type="number" step="0.01" value="' + esc((c.price[p] || {}).out) + '"></span></label>' +
-        '</div><div class="ai-act" style="margin-top:8px"><button data-wp="key" data-p="' + p + '">💾 حفظ المفتاح</button><button data-wp="test" data-p="' + p + '">🔌 اختبار الاتصال</button><button data-wp="delkey" data-p="' + p + '">🗑 حذف المفتاح</button></div></div>';
+        '<label class="f">سعر الدخل لكل مليون Token ($) — صفر = مجاني<input id="wp-pi-' + p + '" type="number" step="0.01" value="' + esc((c.price[p] || {}).in) + '"></label>' +
+        '<label class="f">سعر الخرج لكل مليون Token ($)<input id="wp-po-' + p + '" type="number" step="0.01" value="' + esc((c.price[p] || {}).out) + '"></label>' +
+        '</div><div class="wp-sub" style="margin-top:8px">تُحفظ هذه القيم بزر «💾 حفظ الإعدادات» في بطاقة التوجيه.</div></details></div>';
     }
-    r.innerHTML = '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🧭 التوجيه الحالي</h4><div class="ai-g"><div class="ai-k"><b>' + esc(PN[rt.ar] || rt.ar || "—") + '</b><span>الأسئلة العربية</span></div><div class="ai-k"><b>' + esc(PN[rt.en] || rt.en || "—") + '</b><span>الأسئلة الإنجليزية</span></div><div class="ai-k"><b>$' + tot.toFixed(4) + '</b><span>تكلفة هذا الشهر (' + esc(d.month) + ')</span></div></div>' +
-      '<div class="ai-g" style="margin-top:10px"><label class="f">المزوّد الأساسي<select id="wp-active">' + opts(c.active, ["gemini", "groq", "anthropic", "openai", "free"]) + '</select></label>' +
-      '<label class="f">مزوّد الأسئلة الإنجليزية<select id="wp-en">' + opts(c.englishProvider, ["groq", "gemini", "anthropic", "openai", "free", "none"]) + '</select></label>' +
+    var unified = true; try { unified = AIIE.cfg().tts_unified !== false; } catch (e) { }
+    r.innerHTML = css() +
+      '<div class="ai-card"><div class="wp-h">🔌 حالة الاتصال</div><div class="wp-sub">لمبة لكل مزوّد: تُختبر المفاتيح تلقائيًا عند فتح الصفحة (كل 6 ساعات)، ويمكنك إعادة الاختبار في أي وقت.</div>' + warns.join("") + '<div class="wp-tiles">' + tiles + "</div>" +
+      '<div class="wp-legend"><span><i class="wp-lamp wp-on"></i>مفعّل ويعمل</span><span><i class="wp-lamp wp-wait"></i>محفوظ لم يُختبر / يحتاج موافقة</span><span><i class="wp-lamp wp-bad"></i>لا يعمل</span><span><i class="wp-lamp"></i>غير مفعّل</span></div>' +
+      '<div class="wp-btns"><button class="pri" data-wp="testall">🔌 اختبار كل المفاتيح</button><button data-wp="reload">⟳ تحديث</button></div></div>' +
+
+      '<div class="ai-card"><div class="wp-h">🧭 التوجيه والميزانية</div><div class="wp-sub">يعمل الآن للعربية: <b>' + esc(PN[rt.ar] || rt.ar || "—") + '</b> · للإنجليزية: <b>' + esc(PN[rt.en] || rt.en || "—") + '</b> · تكلفة هذا الشهر (' + esc(d.month) + '): <b dir="ltr">$' + tot.toFixed(4) + '</b></div><div class="wp-grid">' +
+      '<label class="f">المزوّد الأساسي (العربية)<select id="wp-active">' + opts(c.active, ["gemini", "groq", "anthropic", "openai", "free"]) + "</select></label>" +
+      '<label class="f">مزوّد الأسئلة الإنجليزية<select id="wp-en">' + opts(c.englishProvider, ["groq", "gemini", "anthropic", "openai", "free", "none"]) + "</select></label>" +
       '<label class="f">الميزانية الشهرية للمدفوع (USD)<input id="wp-budget" type="number" min="0" step="0.5" value="' + esc(c.budgetUsd) + '"></label>' +
-      '<label class="f">النموذج المجاني الاحتياطي (Workers AI)<input id="wp-fm" dir="ltr" value="' + esc(c.freeModel) + '"></label>' +
-      '<label class="f" style="grid-column:1/-1;display:flex;gap:8px;align-items:center"><input type="checkbox" id="wp-paid"' + (c.paidEnabled ? " checked" : "") + '> أوافق على تشغيل المزوّدات المدفوعة (Claude وغيره) — تتوقف تلقائيًا عند بلوغ الميزانية</label></div>' +
-      '<div class="ai-act" style="margin-top:10px"><button data-wp="save">💾 حفظ الإعدادات</button><button data-wp="reload">⟳ تحديث</button></div>' +
-      '<small style="color:#64748b;display:block;margin-top:6px">ترتيب المحاولة: (الإنجليزية ← مزوّد الإنجليزية) ثم الأساسي ثم أي مزوّد مجاني له مفتاح ثم Workers AI. إذا امتلأ الحد المجاني لأحدها ينتقل تلقائيًا للتالي.</small></div>' +
-      '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">🔊 الصوت الطبيعي — Gemini TTS (مجاني بمفتاح Gemini نفسه)</h4><div class="ai-src" style="margin-bottom:8px">نطق بشري للإجابات مع مزامنة الكتابة وحركة الكرة. عند تعذّره يعمل صوت المتصفح تلقائيًا. الحالة: ' + (d.tts || (K.gemini ? "جاهز عند التفعيل" : "يحتاج مفتاح Gemini")) + '</div><div class="ai-g">' +
-        '<label class="f" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wp-tts"' + (c.tts_enabled !== false ? " checked" : "") + '> تفعيل الصوت الطبيعي</label>' +
-        '<label class="f">الصوت<select id="wp-tv">' + TTSV.map(function (x) { return '<option value="' + x[0] + '"' + (c.tts_voice === x[0] ? " selected" : "") + ">" + esc(x[1]) + "</option>"; }).join("") + '</select></label>' +
-        '<label class="f">النموذج<input id="wp-tm" dir="ltr" value="' + esc(c.tts_model || "gemini-2.5-flash-preview-tts") + '"></label></div>' +
-        '<div class="ai-act" style="margin-top:8px"><button data-wp="test" data-p="tts">🔌 اختبار الصوت</button></div></div>' +
-      prov("gemini", "🟦 Google Gemini — مجاني", "أنشئ مفتاحًا مجانيًا من aistudio.google.com ← Get API key. ملاحظة: في الخطة المجانية قد تستخدم Google الطلبات لتحسين خدماتها.") +
-      prov("groq", "🟧 Groq — مجاني (للإنجليزية)", "أنشئ مفتاحًا مجانيًا من console.groq.com ← API Keys.") +
+      '<label class="f wp-ck" style="grid-column:1/-1"><input type="checkbox" id="wp-paid"' + (c.paidEnabled ? " checked" : "") + "> أوافق على تشغيل المزوّدات المدفوعة (Claude وغيره) — تتوقف تلقائيًا عند بلوغ الميزانية</label></div>" +
+      '<details><summary>إعدادات متقدمة</summary><div class="wp-grid"><label class="f">النموذج المجاني الاحتياطي (Workers AI)<input id="wp-fm" dir="ltr" value="' + esc(c.freeModel) + '"></label></div><div class="wp-sub" style="margin-top:8px">ترتيب المحاولة: (الإنجليزية ← مزوّد الإنجليزية) ثم الأساسي ثم أي مزوّد مجاني له مفتاح ثم Workers AI. إذا امتلأ الحد المجاني لأحدها ينتقل تلقائيًا للتالي.</div></details>' +
+      '<div class="wp-btns"><button class="pri" data-wp="save">💾 حفظ الإعدادات</button></div></div>' +
+
+      '<div class="wp-prov st-' + (function () { var x = stat("tts").s; return x === "test" ? "wait" : x; })() + '"><div class="wp-ph">' + lamp("tts", true) + '<h4>🔊 صوت المنصة — Gemini TTS</h4><span class="wp-pill">' + esc(stat("tts").txt) + '</span></div><div class="wp-sub" style="margin:8px 0 12px">صوت واحد لكل المستخدمين والأجهزة، مجاني بنفس مفتاح Gemini، مع مزامنة الكتابة وحركة الكرة.</div><div class="wp-grid">' +
+      '<label class="f wp-ck"><input type="checkbox" id="wp-tts"' + (c.tts_enabled !== false ? " checked" : "") + "> تفعيل صوت المنصة</label>" +
+      '<label class="f wp-ck"><input type="checkbox" id="wp-tun"' + (unified ? " checked" : "") + "> صوت موحّد (صوت الجهاز فقط عند تعطّل الخادم)</label>" +
+      '<label class="f">الصوت<select id="wp-tv">' + TTSV.map(function (x) { return '<option value="' + x[0] + '"' + (c.tts_voice === x[0] ? " selected" : "") + ">" + esc(x[1]) + "</option>"; }).join("") + "</select></label>" +
+      '</div><details><summary>إعدادات متقدمة</summary><div class="wp-grid"><label class="f">نموذج الصوت<input id="wp-tm" dir="ltr" value="' + esc(c.tts_model || "gemini-2.5-flash-preview-tts") + '"></label></div></details>' +
+      '<div class="wp-btns"><button class="pri" data-wp="save">💾 حفظ الإعدادات</button><button data-wp="test" data-p="tts"' + (K.gemini ? "" : " disabled") + ">🔌 اختبار الصوت</button></div></div>" +
+
+      prov("gemini", "🟦 Google Gemini — مجاني", "أنشئ مفتاحًا مجانيًا من <b dir=\"ltr\">aistudio.google.com → Get API key</b> (يبدأ عادة بـ <b dir=\"ltr\">AIza</b>). يشغّل الإجابات العربية وصوت المنصة.") +
+      prov("groq", "🟧 Groq — مجاني (للإنجليزية)", "أنشئ مفتاحًا مجانيًا من <b dir=\"ltr\">console.groq.com → API Keys</b> (يبدأ بـ <b dir=\"ltr\">gsk_</b>).") +
       prov("anthropic", "🟪 Claude (Anthropic) — مدفوع", "يعمل فقط بعد تفعيل الموافقة على المدفوع، ويتوقف عند الميزانية.") +
       prov("openai", "⬜ مزوّد آخر متوافق مع OpenAI", "") +
-      '<div class="ai-card"><h4 style="margin:0 0 8px;color:#12325a">📈 استهلاك هذا الشهر</h4><div style="height:8px;border-radius:6px;background:#e2e8f0;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:' + pct.toFixed(1) + '%;background:' + (pct >= 100 ? "#dc2626" : pct >= 80 ? "#f59e0b" : "#16a34a") + '"></div></div>' +
-      '<div class="ai-src">المدفوع: $' + tot.toFixed(4) + ' من $' + (+c.budgetUsd).toFixed(2) + '</div><table class="ai-t" style="width:100%;font-size:12.5px;margin-top:6px"><tr><th>المزوّد</th><th>طلبات</th><th>Tokens دخل</th><th>Tokens خرج</th><th>التكلفة</th></tr>' + ["gemini", "groq", "anthropic", "openai"].map(row).join("") + '</table></div>' +
-      (S.msg ? '<div class="ai-src" style="margin-top:6px">' + esc(S.msg) + "</div>" : "");
+      '<div class="ai-card"><div class="wp-h">📈 استهلاك هذا الشهر</div><div style="height:10px;border-radius:6px;background:#e2e8f0;overflow:hidden;margin:6px 0"><div style="height:100%;width:' + pct.toFixed(1) + "%;background:" + (pct >= 100 ? "#dc2626" : pct >= 80 ? "#f59e0b" : "#16a34a") + '"></div></div>' +
+      '<div class="wp-sub">المدفوع: <b dir="ltr">$' + tot.toFixed(4) + '</b> من <b dir="ltr">$' + (+c.budgetUsd).toFixed(2) + '</b></div><div style="overflow:auto"><table class="ai-t" style="width:100%;font-size:12.5px"><tr><th>المزوّد</th><th>طلبات</th><th>Tokens دخل</th><th>Tokens خرج</th><th>التكلفة</th></tr>' + ["gemini", "groq", "anthropic", "openai"].map(function (p) { var x = u[p] || { in: 0, out: 0, cost: 0, calls: 0 }; return "<tr><td>" + lamp(p) + " " + esc(SN[p]) + "</td><td>" + (x.calls || 0) + "</td><td>" + (x.in || 0).toLocaleString("en-US") + "</td><td>" + (x.out || 0).toLocaleString("en-US") + '</td><td dir="ltr">$' + (+x.cost || 0).toFixed(4) + "</td></tr>"; }).join("") + "</table></div></div>" +
+      (S.msg ? '<div class="wp-msg">' + esc(S.msg) + "</div>" : "");
   }
-  function run(p, ok) { S.busy = true; S.msg = "⏳ …"; paint(); return p.then(function (j) { S.msg = ok(j); }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; load(); }); }
+  function run(p, ok, after) { S.busy = true; S.msg = "⏳ …"; paint(); return p.then(function (j) { S.msg = ok(j); }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; S.auto = false; if (after) after(); load(); }); }
+  function save(extra) {
+    var paid = !!v("wp-paid"); if (paid && S.data && !S.data.cfg.paidEnabled && !confirm("تفعيل المزوّدات المدفوعة يعني أن المزوّد سيحاسبك على الاستخدام حتى حد الميزانية الشهرية. موافق؟")) return;
+    var body = { active: v("wp-active"), englishProvider: v("wp-en"), paidEnabled: paid, budgetUsd: +v("wp-budget"), freeModel: v("wp-fm"), price: {} };
+    if (document.getElementById("wp-tts")) { body.tts_enabled = !!v("wp-tts"); body.tts_voice = v("wp-tv"); body.tts_model = v("wp-tm"); }
+    if (document.getElementById("wp-tun")) { try { var un = !!v("wp-tun"), cc = Object.assign({}, AIIE.cfg(), { tts_unified: un }); localStorage.setItem("ai_cfg_v1", JSON.stringify(cc)); if (typeof fbDB !== "undefined" && fbDB) fbDB.collection(FB_COL).doc("ai_cfg").set({ tts_unified: un, updatedAt: Date.now() }, { merge: true }); } catch (e) { } }
+    ["gemini", "groq", "anthropic", "openai"].forEach(function (q) { body["model_" + q] = v("wp-m-" + q); if (q !== "anthropic") body[q + "_base"] = v("wp-b-" + q); body.price[q] = { in: +v("wp-pi-" + q), out: +v("wp-po-" + q) }; });
+    Object.assign(body, extra || {});
+    return run(api("/admin/config", "POST", body), function () { return "✅ حُفظت الإعدادات"; }, function () { setTR("tts", null); });
+  }
   document.addEventListener("click", function (e) {
-    var b = e.target && e.target.closest && e.target.closest("[data-wp]"); if (!b || !root() || !root().contains(b)) return; e.preventDefault();
+    var b = e.target && e.target.closest && e.target.closest("[data-wp]"); if (!b || !root() || !root().contains(b)) return; e.preventDefault(); if (b.disabled) return;
     var a = b.getAttribute("data-wp"), p = b.getAttribute("data-p");
-    if (a === "reload") return load();
-    if (a === "save") {
-      var paid = !!v("wp-paid"); if (paid && S.data && !S.data.cfg.paidEnabled && !confirm("تفعيل المزوّدات المدفوعة يعني أن المزوّد سيحاسبك على الاستخدام حتى حد الميزانية الشهرية. موافق؟")) return;
-      var body = { active: v("wp-active"), englishProvider: v("wp-en"), paidEnabled: paid, budgetUsd: +v("wp-budget"), freeModel: v("wp-fm"), price: {} };
-      if (document.getElementById("wp-tts")) { body.tts_enabled = !!v("wp-tts"); body.tts_voice = v("wp-tv"); body.tts_model = v("wp-tm"); }
-      ["gemini", "groq", "anthropic", "openai"].forEach(function (q) { body["model_" + q] = v("wp-m-" + q); if (q !== "anthropic") body[q + "_base"] = v("wp-b-" + q); body.price[q] = { in: +v("wp-pi-" + q), out: +v("wp-po-" + q) }; });
-      return run(api("/admin/config", "POST", body), function () { return "✅ حُفظت الإعدادات"; });
-    }
-    if (a === "key") { var k = String(v("wp-k-" + p) || "").trim(); if (!k) return alert("الصق المفتاح أولًا"); return run(api("/admin/key", "POST", { provider: p, key: k }), function (j) { return "✅ حُفظ مفتاح " + (PN[p] || p) + " " + (j.key || ""); }); }
-    if (a === "delkey") { if (!confirm("حذف المفتاح؟")) return; return run(api("/admin/key", "POST", { provider: p, key: "" }), function () { return "🗑 حُذف المفتاح"; }); }
-    if (a === "test") return run(api("/admin/test", "POST", { provider: p }), function (j) { return j.ok ? "✅ " + (PN[p] || p) + " يعمل — " + (j.model || "") + " (" + j.ms + " ms)" : "❌ فشل اختبار " + (PN[p] || p) + ": " + (j.error || "") + (j.status ? " (" + j.status + ")" : ""); });
+    if (a === "reload") { S.auto = false; return load(); }
+    if (a === "save") return save();
+    if (a === "usegem") { var sel = document.getElementById("wp-active"); if (sel) sel.value = "gemini"; return save({ active: "gemini" }); }
+    if (a === "testall") { var L = testList(true); if (!L.length) { S.msg = "لا توجد مفاتيح محفوظة لاختبارها."; return paint(); } S.msg = "⏳ اختبار " + L.length + " …"; return chain(L).then(function () { S.msg = "✅ انتهى الاختبار — راجع اللمبات"; paint(); }); }
+    if (a === "key") { var k = String(v("wp-k-" + p) || "").trim(); if (!k) return alert("الصق المفتاح أولًا"); setTR(p, null); if (p === "gemini") setTR("tts", null); return run(api("/admin/key", "POST", { provider: p, key: k }), function (j) { return "✅ حُفظ مفتاح " + (PN[p] || p) + " " + (j.key || "") + " — جارٍ اختباره…"; }); }
+    if (a === "delkey") { if (!confirm("حذف المفتاح؟")) return; setTR(p, null); return run(api("/admin/key", "POST", { provider: p, key: "" }), function () { return "🗑 حُذف المفتاح"; }); }
+    if (a === "test") return testOne(p).then(function (j) { S.msg = j.ok ? "✅ " + (PN[p] || p) + " يعمل — " + (j.model || "") + (j.ms != null ? " (" + j.ms + " ms)" : "") : "❌ فشل اختبار " + (PN[p] || p) + ": " + (j.error || "") + (j.status ? " (" + j.status + ")" : ""); paint(); });
   }, true);
-  window.WAPROV = { html: function () { setTimeout(function () { S.data ? paint() : load(); }, 0); return '<div id="wp-root"></div>'; }, reload: load };
+  window.WAPROV = { html: function () { setTimeout(function () { S.data ? paint() : load(); }, 0); return '<div id="wp-root"></div>'; }, reload: load, _S: S };
 })();
 /* WA-PROV-END */
 
