@@ -23298,7 +23298,7 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
   function TR() { try { return JSON.parse(localStorage.getItem(TK) || "{}") || {}; } catch (e) { return {}; } }
   function setTR(p, o) { var t = TR(); if (o) t[p] = o; else delete t[p]; try { localStorage.setItem(TK, JSON.stringify(t)); } catch (e) { } }
   function root() { return document.getElementById("wp-root"); }
-  function load() { S.busy = true; paint(); api("/admin/config").then(function (j) { S.data = j; S.msg = ""; }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; paint(); autoTest(); }); }
+  function load() { S.busy = true; paint(); api("/admin/config").then(function (j) { S.data = j; if (/^⏳/.test(S.msg)) S.msg = ""; }).catch(function (e) { S.msg = "⚠️ " + e.message; }).then(function () { S.busy = false; paint(); autoTest(); }); }
   function v(id) { var e = document.getElementById(id); return e ? (e.type === "checkbox" ? e.checked : e.value) : null; }
   function opts(sel, list) { return list.map(function (p) { return '<option value="' + p + '"' + (sel === p ? " selected" : "") + ">" + esc(PN[p] || (p === "none" ? "بدون (نفس المزوّد الأساسي)" : p)) + "</option>"; }).join(""); }
   function ago(t) { var m = Math.round((Date.now() - t) / 60000); return m < 1 ? "الآن" : m < 60 ? "قبل " + m + " د" : m < 1440 ? "قبل " + Math.round(m / 60) + " س" : "قبل " + Math.round(m / 1440) + " يوم"; }
@@ -23312,15 +23312,25 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     if (p === "tts" && c.tts_enabled === false) return { s: "off", txt: "معطّل من الإعدادات" };
     if (t && t.key === K[p === "tts" ? "gemini" : p]) {
       if (t.ok) return { s: p === "anthropic" && !c.paidEnabled ? "wait" : "on", txt: (p === "anthropic" && !c.paidEnabled ? "المفتاح يعمل — لكن المدفوع غير مفعّل" : "مفعّل ويعمل") + " · " + (t.ms != null ? t.ms + " ms · " : "") + ago(t.at) };
-      return { s: "bad", txt: "لا يعمل: " + (t.err || "خطأ") + (t.status ? " (" + t.status + ")" : "") + " · " + ago(t.at) };
+      return { s: "bad", txt: "لا يعمل: " + friendly(p, t.err, t.status) + " · " + ago(t.at) };
     }
     return { s: "wait", txt: "المفتاح محفوظ — لم يُختبر بعد" };
+  }
+  /* ترجمة أخطاء المزوّدين إلى سبب واضح وما المطلوب */
+  function friendly(p, err, status) {
+    err = String(err || "");
+    if (p === "openai" && /sk-ant/i.test(err)) return "هذا مفتاح Claude وُضع في خانة OpenAI — احذفه من هنا";
+    if (/no longer available|not found|does not exist|decommissioned|deprecated|model_not_found/i.test(err)) return "المفتاح صحيح لكن النموذج المحدد أُوقف — اضغط «اختيار نموذج متاح»";
+    if (status === 401 || status === 403 || /invalid.{0,12}key|incorrect api key|api key not valid|unauthori[sz]ed|permission denied/i.test(err)) return "المفتاح غير صحيح أو أُلغي — أنشئ مفتاحًا جديدًا والصقه";
+    if (status === 429 || /quota|rate.?limit|resource.?exhausted/i.test(err)) return "تجاوز الحد المجاني مؤقتًا — يعود تلقائيًا لاحقًا";
+    if (/no-key/.test(err)) return "لا يوجد مفتاح";
+    return err.slice(0, 90);
   }
   function lamp(p, big) { var x = stat(p); return '<span class="wp-lamp wp-' + x.s + (big ? " big" : "") + '" title="' + esc(x.txt) + '"></span>'; }
   function role(p) { var d = S.data || {}, c = d.cfg || {}, rt = d.route || {}, r = []; if (p === c.active) r.push("أساسي"); if (p === c.englishProvider) r.push("الإنجليزية"); if (rt.ar === p && p !== c.active) r.push("يعمل الآن للعربية"); if (p === "free") r.push("احتياطي"); return r; }
   function testOne(p) {
     S.testing[p] = 1; paint(); var K = (S.data && S.data.keys) || {};
-    return api("/admin/test", "POST", { provider: p }).then(function (j) { setTR(p, { ok: !!j.ok, ms: j.ms, model: j.model, err: j.ok ? "" : String(j.error || "").slice(0, 80), status: j.status, at: Date.now(), key: K[p === "tts" ? "gemini" : p] }); return j; })
+    return api("/admin/test", "POST", { provider: p }).then(function (j) { setTR(p, { ok: !!j.ok, ms: j.ms, model: j.model, err: j.ok ? "" : String(j.error || "").slice(0, 200), status: j.status, at: Date.now(), key: K[p === "tts" ? "gemini" : p] }); return j; })
       .catch(function (e) { setTR(p, { ok: false, err: String(e.message || e).slice(0, 80), at: Date.now(), key: K[p === "tts" ? "gemini" : p] }); return { ok: false, error: e.message }; })
       .then(function (j) { delete S.testing[p]; paint(); return j; });
   }
@@ -23354,13 +23364,14 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     var tiles = ["gemini", "groq", "tts", "anthropic", "openai", "free"].map(function (p) { var x = stat(p), rl = role(p); return '<div class="wp-tile"><b>' + lamp(p, true) + esc(SN[p]) + rl.map(function (t) { return '<span class="wp-tag' + (t === "أساسي" ? " g" : "") + '">' + t + "</span>"; }).join("") + "</b><small>" + esc(x.txt) + "</small></div>"; }).join("");
     var warns = [], gs = stat("gemini");
     if (gs.s === "on" && c.active === "free") warns.push('<div class="wp-warn">⚠️ مفتاح Gemini يعمل لكن المزوّد الأساسي حاليًا <b>Workers AI</b>، فالإجابات أقل دقة. <button class="pri" data-wp="usegem">اجعل Gemini المزوّد الأساسي</button></div>');
-    if (gs.s === "bad" && K.gemini && !/^AIza/.test(K.gemini)) warns.push('<div class="wp-warn">⚠️ مفتاح Gemini المحفوظ لا يبدأ بـ <b dir="ltr">AIza</b> كالمعتاد. أنشئ مفتاحًا من <b dir="ltr">aistudio.google.com → Get API key</b> والصقه من جديد.</div>');
+    if (gs.s === "bad" && K.gemini && !/^AIza/.test(K.gemini) && /المفتاح غير صحيح/.test(friendly("gemini", (TR().gemini || {}).err, (TR().gemini || {}).status))) warns.push('<div class="wp-warn">⚠️ مفتاح Gemini المحفوظ لا يبدأ بـ <b dir="ltr">AIza</b> كالمعتاد. أنشئ مفتاحًا من <b dir="ltr">aistudio.google.com → Get API key</b> والصقه من جديد.</div>');
+    if (gs.s === "bad" && /النموذج المحدد أُوقف/.test(gs.txt)) warns.push('<div class="wp-warn">⚠️ مفتاح Gemini صحيح (صوت المنصة يعمل به)، لكن نموذج المحادثة المحدد أوقفته Google. <button data-wp="models" data-p="gemini">🔍 اختيار نموذج متاح تلقائيًا</button></div>');
     if (stat("tts").s === "bad") warns.push('<div class="wp-warn">⚠️ صوت المنصة لا يعمل حاليًا، فسيُستخدم صوت جهاز كل مستخدم مؤقتًا. اضغط «اختبار الصوت» بعد تصحيح مفتاح Gemini.</div>');
     function prov(p, title, hint) {
       var x = stat(p);
       return '<div class="wp-prov st-' + (x.s === "test" ? "wait" : x.s) + '"><div class="wp-ph">' + lamp(p, true) + "<h4>" + title + "</h4>" + role(p).map(function (t) { return '<span class="wp-tag' + (t === "أساسي" ? " g" : "") + '">' + t + "</span>"; }).join("") + '<span class="wp-pill">' + esc(x.txt) + "</span></div>" + (hint ? '<div class="wp-sub" style="margin:8px 0 0">' + hint + "</div>" : "") +
         '<div class="wp-key"><div class="wp-cur">المفتاح الحالي<code' + (K[p] ? "" : ' style="direction:rtl;text-align:right;color:#94a3b8"') + '>' + esc(K[p] || "لا يوجد") + '</code></div><label class="f">' + (K[p] ? "استبدال المفتاح" : "إضافة مفتاح") + '<input id="wp-k-' + p + '" type="password" dir="ltr" autocomplete="off" placeholder="الصق المفتاح هنا"></label></div>' +
-        '<div class="wp-btns"><button class="pri" data-wp="key" data-p="' + p + '">💾 حفظ المفتاح</button><button data-wp="test" data-p="' + p + '"' + (K[p] ? "" : " disabled") + '>🔌 اختبار الاتصال</button>' + (K[p] ? '<button class="dng" data-wp="delkey" data-p="' + p + '">🗑 حذف المفتاح</button>' : "") + "</div>" +
+        '<div class="wp-btns"><button class="pri" data-wp="key" data-p="' + p + '">💾 حفظ المفتاح</button><button data-wp="test" data-p="' + p + '"' + (K[p] ? "" : " disabled") + '>🔌 اختبار الاتصال</button>' + (K[p] && p !== "anthropic" ? '<button data-wp="models" data-p="' + p + '">🔍 اختيار نموذج متاح</button>' : "") + (K[p] ? '<button class="dng" data-wp="delkey" data-p="' + p + '">🗑 حذف المفتاح</button>' : "") + "</div>" +
         '<details><summary>إعدادات متقدمة (النموذج، الرابط، السعر)</summary><div class="wp-grid">' +
         '<label class="f">النموذج<input id="wp-m-' + p + '" dir="ltr" value="' + esc(c["model_" + p]) + '"></label>' +
         (p !== "anthropic" ? '<label class="f">الرابط (https)<input id="wp-b-' + p + '" dir="ltr" value="' + esc(p === "openai" ? c.openai_base : c[p + "_base"]) + '"></label>' : "") +
@@ -23416,6 +23427,12 @@ if (typeof window !== "undefined") window.WAITEM = WAITEM;
     if (a === "testall") { var L = testList(true); if (!L.length) { S.msg = "لا توجد مفاتيح محفوظة لاختبارها."; return paint(); } S.msg = "⏳ اختبار " + L.length + " …"; return chain(L).then(function () { S.msg = "✅ انتهى الاختبار — راجع اللمبات"; paint(); }); }
     if (a === "key") { var k = String(v("wp-k-" + p) || "").trim(); if (!k) return alert("الصق المفتاح أولًا"); setTR(p, null); if (p === "gemini") setTR("tts", null); return run(api("/admin/key", "POST", { provider: p, key: k }), function (j) { return "✅ حُفظ مفتاح " + (PN[p] || p) + " " + (j.key || "") + " — جارٍ اختباره…"; }); }
     if (a === "delkey") { if (!confirm("حذف المفتاح؟")) return; setTR(p, null); return run(api("/admin/key", "POST", { provider: p, key: "" }), function () { return "🗑 حُذف المفتاح"; }); }
+    if (a === "models") { S.msg = "⏳ جلب النماذج المتاحة لهذا المفتاح…"; paint(); return api("/admin/models", "POST", { provider: p }).then(function (j) {
+        if (!j.ok) { S.msg = "❌ تعذّر جلب النماذج: " + friendly(p, j.error, j.status); return paint(); }
+        if (!j.suggested) { S.msg = "لم أجد نموذج محادثة مناسبًا. المتاح: " + (j.models || []).slice(0, 12).join("، "); return paint(); }
+        var ex = {}; ex["model_" + p] = j.suggested; var inp = document.getElementById("wp-m-" + p); if (inp) inp.value = j.suggested;
+        return Promise.resolve(save(ex)).then(function () { setTR(p, null); return testOne(p); }).then(function () { S.msg = "✅ اختير النموذج المتاح: " + j.suggested + " (كان: " + (j.current || "—") + ")"; paint(); });
+      }).catch(function (e) { S.msg = "⚠️ " + e.message + " — تأكد أن الـ Worker منشور بآخر تحديث"; paint(); }); }
     if (a === "test") return testOne(p).then(function (j) { S.msg = j.ok ? "✅ " + (PN[p] || p) + " يعمل — " + (j.model || "") + (j.ms != null ? " (" + j.ms + " ms)" : "") : "❌ فشل اختبار " + (PN[p] || p) + ": " + (j.error || "") + (j.status ? " (" + j.status + ")" : ""); paint(); });
   }, true);
   window.WAPROV = { html: function () { setTimeout(function () { S.data ? paint() : load(); }, 0); return '<div id="wp-root"></div>'; }, reload: load, _S: S };
