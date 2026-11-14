@@ -1,0 +1,4 @@
+/* 009-anon-src.js */
+try{
+!function(){function hide(){var s=document.getElementById("app-splash");s&&!s.classList.contains("hide")&&(s.classList.add("hide"),setTimeout(function(){s&&s.parentNode&&s.parentNode.removeChild(s)},420))}function setLogo(){try{var sp=document.getElementById("app-splash"),im=document.getElementById("as-logo-img");if(!sp||!im)return true;var src=document.querySelector(".lb-logo img.tania-logo"),v=src&&src.getAttribute("src");if(v&&v.length>200)return im.src=v,sp.classList.add("has-logo"),true}catch(e){}return false}if(window.__hideSplash=hide,"complete"===document.readyState?hide():(document.addEventListener("DOMContentLoaded",function(){setTimeout(hide,60)}),window.addEventListener("load",hide)),setTimeout(hide,12e3),!setLogo()){var _lgIv=setInterval(function(){setLogo()&&clearInterval(_lgIv)},40);setTimeout(function(){clearInterval(_lgIv)},6e3)}}()
+}catch(e){setTimeout(function(){throw e})}

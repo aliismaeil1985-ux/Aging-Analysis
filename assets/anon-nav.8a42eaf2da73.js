@@ -1,0 +1,4 @@
+/* 012-anon-nav.js */
+try{
+!function(){function apply(collapsed){var nav=document.getElementById("nav");if(nav){nav.classList.toggle("icons-only",collapsed);var top=document.getElementById("nav-collapse-btn-top");top&&(top.innerHTML=collapsed?"&raquo;":"&laquo;");var arrow=document.getElementById("nav-collapse-arrow");arrow&&(arrow.textContent=collapsed?"›":"‹");var lbl=document.getElementById("nav-collapse-lbl");lbl&&(lbl.style.display=collapsed?"none":"")}}function boot(){var saved="0";try{saved=localStorage.getItem("tania_nav_collapsed")||"0"}catch(e){}apply("1"===saved)}window.toggleNavCollapsed=function(){var nav=document.getElementById("nav");if(nav){var collapsed=!nav.classList.contains("icons-only");apply(collapsed);try{localStorage.setItem("tania_nav_collapsed",collapsed?"1":"0")}catch(e){}}},"loading"!==document.readyState?boot():document.addEventListener("DOMContentLoaded",boot)}()
+}catch(e){setTimeout(function(){throw e})}
